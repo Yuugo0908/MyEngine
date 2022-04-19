@@ -18,8 +18,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 	this->dxCommon = dxCommon;
 	this->input = input;
 	this->playAudio = audio;
-	this->shot = audio;
-	this->hit = audio;
 	// デバッグテキスト用テクスチャ読み込み
 	if (!Sprite::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png")) {
 		assert(0);
@@ -59,21 +57,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 	title = Sprite::Create(0, { 0.0f,0.0f });
 	title->SetSize({ 1280.0f,720.0f });
 
-	HPText = Sprite::Create(1, { 0.0f,0.0f });
-	HPText->SetSize({ 1280.0f,720.0f });
-
-	PlayerHPBar = Sprite::Create(2, { 0.0f,45.0f });
-	PlayerHPBar->SetSize({ 360.0f,60.0f });
-
-	PlayerHPGauge = Sprite::Create(3, { 0.0f,45.0f });
-	PlayerHPGauge->SetSize({ 30.0f,60.0f });
-
-	TimerBar = Sprite::Create(2, { 0.0f,160.0f });
-	TimerBar->SetSize({ 360.0f,60.0f });
-
-	TimerGauge = Sprite::Create(4, { 0.0f,160.0f });
-	TimerGauge->SetSize({ 30.0f,60.0f });
-
 	GameClear = Sprite::Create(5, { 0.0f,0.0f });
 	GameClear->SetSize({ 1280.0f,720.0f });
 
@@ -95,13 +78,12 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 	playerObj->SetModel(playerModel);
 	skydomeObj->SetModel(skydomeModel);
 
-
 	playerObj->SetPosition({ 0.0f, 30.0f, 0.0f });
 	playerObj->SetScale({ 1.0f,1.0f,1.0f });
 
 	skydomeObj->SetScale({ 1.0f, 1.0f, 1.0f });
 
-	playerPos = playerObj->GetPosition();
+	p_pos = playerObj->GetPosition();
 }
 
 void GameScene::Update() {
@@ -109,7 +91,24 @@ void GameScene::Update() {
 	XMFLOAT3 cameraEye = Object3d::GetEye();
 	XMFLOAT3 cameraTarget = Object3d::GetTarget();
 
+	if (input->TriggerKey(DIK_SPACE))
+	{
+		p_flag = true;
+	}
 
+	if (p_flag == true) {
+		p_pos.y -= p_val;
+		p_val += p_gra;
+	}
+
+	if (p_pos.y <= -60.0f)
+	{
+		p_flag = false;
+		p_pos.y = 30.0f;
+		p_val = 0.1f;
+	}
+
+	playerObj->SetPosition(p_pos);
 	Object3d::SetEye(cameraEye);
 	Object3d::SetTarget(cameraTarget);
 	playerObj->Update();
@@ -137,7 +136,7 @@ void GameScene::Draw() {
 	// 3Dオブジェクト描画前処理
 	Object3d::PreDraw(dxCommon->GetCommandList());
 	// 3Dオブクジェクトの描画
-	
+
 	playerObj->Draw();
 	skydomeObj->Draw();
 
@@ -149,7 +148,7 @@ void GameScene::Draw() {
 	Sprite::PreDraw(dxCommon->GetCommandList());
 
 	// 前景スプライトの描画
-	
+
 	// デバッグテキストの描画
 	debugText.DrawAll(dxCommon->GetCommandList());
 	// スプライト描画後処理
