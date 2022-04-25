@@ -3,7 +3,6 @@
 #include "fbxsdk.h"
 #include <string>
 #include "FbxModel.h"
-
 #include <d3d12.h>
 #include <d3dx12.h>
 
@@ -14,8 +13,10 @@ private: // エイリアス
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	using string = std::string;
 public:
-	//モデル格納ルートパス
+	// モデル格納ルートパス
 	static const string baseDirectory;
+	// テクスチャがない場合の標準テクスチャファイル名
+	static const string defaultTextureFileName;
 public:
 	/// <summary>
 	/// シングルトンインスタンスの取得
@@ -59,19 +60,21 @@ public:
 	/// </summary>
 	void Finalize();
 
-	//頂点座標読み取り
+	// 頂点座標読み取り
 	void ParseMeshVertices(FbxModel* fbxModel, FbxMesh* fbxMesh);
-	//面情報読み取り
+	// 面情報読み取り
 	void ParseMeshFaces(FbxModel* fbxModel, FbxMesh* fbxMesh);
-	//マテリアル読み取り
+	// マテリアル読み取り
 	void ParseMaterial(FbxModel* fbxModel, FbxNode* fbxNode);
-	//テクスチャ読み取り
+	// テクスチャ読み取り
 	void LoadTexture(FbxModel* fbxModel, const std::string& fullpath);
+	// ディレクトリを含んだファイルパスからファイル名を抽出する
+	std::string ExtractFileName(const std::string& path);
 private:
-	//D3D12デバイス
+	// D3D12デバイス
 	ID3D12Device* device = nullptr;
-	//FBXマネージャ
+	// FBXマネージャ
 	FbxManager* fbxManager = nullptr;
-	//FBXインポータ
+	// FBXインポータ
 	FbxImporter* fbxImporter = nullptr;
 };

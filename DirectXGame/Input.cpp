@@ -8,7 +8,7 @@ bool Input::Initialize(HINSTANCE hInstance, HWND hwnd)
 {
 	HRESULT result = S_FALSE;
 
-	//初期化（一度だけ行う処理）
+	// 初期化（一度だけ行う処理）
 	result = DirectInput8Create
 	(
 		hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dinput, nullptr
@@ -19,7 +19,7 @@ bool Input::Initialize(HINSTANCE hInstance, HWND hwnd)
 		return result;
 	}
 
-	//キーボードデバイスの生成
+	// キーボードデバイスの生成
 	result = dinput->CreateDevice(GUID_SysKeyboard, &devkeyboard, NULL);
 	if (FAILED(result))
 	{
@@ -27,7 +27,7 @@ bool Input::Initialize(HINSTANCE hInstance, HWND hwnd)
 		return result;
 	}
 
-	//入力データ形式のセット
+	// 入力データ形式のセット
 	result = devkeyboard->SetDataFormat(&c_dfDIKeyboard);
 	if (FAILED(result))
 	{
@@ -35,7 +35,7 @@ bool Input::Initialize(HINSTANCE hInstance, HWND hwnd)
 		return result;
 	}
 
-	//排他制御レベルのセット
+	// 排他制御レベルのセット
 	result = devkeyboard->SetCooperativeLevel
 	(
 		hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
@@ -53,11 +53,11 @@ void Input::Update()
 {
 	HRESULT result;
 
-	//キーボード情報の取得開始
+	// キーボード情報の取得開始
 	result = devkeyboard->Acquire();
 	// 前回のキー入力を保存
 	memcpy(keyPre, key, sizeof(key));
-	//全キーの入力状態を取得する
+	// 全キーの入力状態を取得する
 	result = devkeyboard->GetDeviceState(sizeof(key), key);
 }
 

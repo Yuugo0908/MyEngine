@@ -54,10 +54,10 @@ bool Model::LoadTexture(const std::string& directoryPath, const std::string& fil
 	TexMetadata metadata{};
 	ScratchImage scratchImg{};
 
-	//ファイルパスを結合
+	// ファイルパスを結合
 	string filepath = directoryPath + filename;
 
-	//ユニコード文字列に変換する
+	// ユニコード文字列に変換する
 	wchar_t wfilepath[128];
 	int iBufferSize = MultiByteToWideChar
 	(
@@ -144,7 +144,7 @@ bool Model::LoadTexture(const std::string& directoryPath, const std::string& fil
 
 void Model::CreateModel(const std::string& text)
 {
-	//ファイルストリーム
+	// ファイルストリーム
 	std::ifstream file;
 	//.odjファイルを開く
 	//file.open("Resources/triangle/triangle_tex.obj");
@@ -153,101 +153,101 @@ void Model::CreateModel(const std::string& text)
 	const string filename = modelname + ".obj";
 	const string directoryPath = "Resources/" + modelname + "/";
 	file.open(directoryPath + filename);
-	//ファイルオープン失敗をチェック
+	// ファイルオープン失敗をチェック
 	if (file.fail())
 	{
 		assert(0);
 	}
 
-	vector<XMFLOAT3> positions;  //頂点座標
-	vector<XMFLOAT3> normals;    //法線ベクトル
-	vector<XMFLOAT2> texcoords;  //テクスチャUV
-	//1行ずつ読み込む
+	vector<XMFLOAT3> positions;  // 頂点座標
+	vector<XMFLOAT3> normals;    // 法線ベクトル
+	vector<XMFLOAT2> texcoords;  // テクスチャUV
+	// 1行ずつ読み込む
 	string line;
 	while (getline(file, line))
 	{
-		//1行分の文字列をストリームに変換して解析しやすくなる
+		// 1行分の文字列をストリームに変換して解析しやすくなる
 		std::istringstream line_stream(line);
 
-		//半角スペース区切りで行の先頭文字列を取得
+		// 半角スペース区切りで行の先頭文字列を取得
 		string key;
 		getline(line_stream, key, ' ');
 
-		//先頭文字列がmtllibなら頂点座標
+		// 先頭文字列がmtllibなら頂点座標
 		if (key == "mtllib")
 		{
-			//マテリアルのファイル名読み込み
+			// マテリアルのファイル名読み込み
 			string filename;
 			line_stream >> filename;
-			//マテリアル読み込み
+			// マテリアル読み込み
 			LoadMaterial(directoryPath, filename);
 		}
 
-		//先頭文字列がvなら頂点座標
+		// 先頭文字列がvなら頂点座標
 		if (key == "v")
 		{
-			//X.Y.Z座標読み込み
+			// X.Y.Z座標読み込み
 			XMFLOAT3 position{};
 			line_stream >> position.x;
 			line_stream >> position.y;
 			line_stream >> position.z;
-			//座標データに追加
+			// 座標データに追加
 			positions.emplace_back(position);
 		}
 
-		//先頭文字列がvtならテクスチャ
+		// 先頭文字列がvtならテクスチャ
 		if (key == "vt")
 		{
-			//U,V座標読み込み
+			// UV座標読み込み
 			XMFLOAT2 texcoord{};
 			line_stream >> texcoord.x;
 			line_stream >> texcoord.y;
-			//V方向反転
+			// V方向反転
 			texcoord.y = 1.0f - texcoord.y;
-			//テクスチャ座標データに追加
+			// テクスチャ座標データに追加
 			texcoords.emplace_back(texcoord);
 		}
 
-		//先頭文字列がvnなら法線ベクトル
+		// 先頭文字列がvnなら法線ベクトル
 		if (key == "vn")
 		{
-			//X.Y.Z座標読み込み
+			// X.Y.Z座標読み込み
 			XMFLOAT3 normal{};
 			line_stream >> normal.x;
 			line_stream >> normal.y;
 			line_stream >> normal.z;
-			//法線ベクトルデータに追加
+			// 法線ベクトルデータに追加
 			normals.emplace_back(normal);
 		}
 
-		//先頭文字列がfならポリゴン(三角形)
+		// 先頭文字列がfならポリゴン(三角形)
 		if (key == "f")
 		{
-			//半角スペース区切りで行の続きを読み込む
+			// 半角スペース区切りで行の続きを読み込む
 			string index_string;
 			while (getline(line_stream, index_string, ' '))
 			{
-				//頂点インデックス1個分の文字列をストリームに変換して解析しやすくする
+				// 頂点インデックス1個分の文字列をストリームに変換して解析しやすくする
 				std::istringstream index_stream(index_string);
 				unsigned short indexPosition, indexTexcoord, indexNormal;
 				index_stream >> indexPosition;
-				index_stream.seekg(1, ios_base::cur);//スラッシュを飛ばす
+				index_stream.seekg(1, ios_base::cur);// スラッシュを飛ばす
 				index_stream >> indexTexcoord;
-				index_stream.seekg(1, ios_base::cur);//スラッシュを飛ばす
+				index_stream.seekg(1, ios_base::cur);// スラッシュを飛ばす
 				index_stream >> indexNormal;
 
-				//頂点データの追加
+				// 頂点データの追加
 				VertexPosNormalUv vertex{};
 				vertex.pos = positions[indexPosition - 1];
 				vertex.normal = normals[indexNormal - 1];
 				vertex.uv = texcoords[indexTexcoord - 1];
 				vertices.emplace_back(vertex);
-				//インデックスデータの追加
+				// インデックスデータの追加
 				indices.emplace_back((unsigned short)indices.size());
 			}
 		}
 	}
-	//ファイルを閉じる
+	// ファイルを閉じる
 	file.close();
 
 	HRESULT result = S_FALSE;
@@ -322,40 +322,40 @@ void Model::CreateModel(const std::string& text)
 
 void Model::LoadMaterial(const std::string& directoryPath, const std::string& filename)
 {
-	//ファイルストリーム
+	// ファイルストリーム
 	std::ifstream file;
-	//マテリアルファイルを開く
+	// マテリアルファイルを開く
 	file.open(directoryPath + filename);
-	//ファイルオープン失敗をチェック
+	// ファイルオープン失敗をチェック
 	if (file.fail())
 	{
 		assert(0);
 	}
 
-	//1行ずつ読み込む
+	// 1行ずつ読み込む
 	string line;
 	while (getline(file, line))
 	{
-		//1行分の文字列をストリームに変換
+		// 1行分の文字列をストリームに変換
 		std::istringstream line_stream(line);
 
-		//半角スペース区切りで行の先頭文字列を取得
+		// 半角スペース区切りで行の先頭文字列を取得
 		string key;
 		getline(line_stream, key, ' ');
 
-		//先頭のタブ文字は無視する
+		// 先頭のタブ文字は無視する
 		if (key[0] == '\t')
 		{
-			key.erase(key.begin()); //先頭の文字を削除
+			key.erase(key.begin()); // 先頭の文字を削除
 		}
 
-		//先頭の文字列がnewmtlならマテリアル名
+		// 先頭の文字列がnewmtlならマテリアル名
 		if (key == "newmtl")
-		{//マテリアル名読み込み
+		{// マテリアル名読み込み
 			line_stream >> material.ambient.x;
 		}
 
-		//先頭の文字列がKaならアンビエント色
+		// 先頭の文字列がKaならアンビエント色
 		if (key == "Ka")
 		{
 			line_stream >> material.ambient.x;
@@ -363,7 +363,7 @@ void Model::LoadMaterial(const std::string& directoryPath, const std::string& fi
 			line_stream >> material.ambient.z;
 		}
 
-		//先頭の文字列がKdならディフューズ色
+		// 先頭の文字列がKdならディフューズ色
 		if (key == "Kd")
 		{
 			line_stream >> material.diffuse.x;
@@ -371,7 +371,7 @@ void Model::LoadMaterial(const std::string& directoryPath, const std::string& fi
 			line_stream >> material.diffuse.z;
 		}
 
-		//先頭の文字列がKsならスペキュラー色
+		// 先頭の文字列がKsならスペキュラー色
 		if (key == "Ks")
 		{
 			line_stream >> material.specular.x;
@@ -379,18 +379,18 @@ void Model::LoadMaterial(const std::string& directoryPath, const std::string& fi
 			line_stream >> material.specular.z;
 		}
 
-		//先頭の文字列がmap_Kdならテクスチャファイル名
+		// 先頭の文字列がmap_Kdならテクスチャファイル名
 		if (key == "map_Kd")
 		{
-			//テクスチャのファイル名読み込み
+			// テクスチャのファイル名読み込み
 			line_stream >> material.textureFilename;
 			// デスクリプタヒープの初期化
 			InitializeDescriptorHeap();
-			//テクスチャ読み込み
+			// テクスチャ読み込み
 			LoadTexture(directoryPath, material.textureFilename);
 		}
 	}
-	//ファイルを閉じる
+	// ファイルを閉じる
 	file.close();
 }
 
