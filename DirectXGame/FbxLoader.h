@@ -49,9 +49,24 @@ public:
 	/// <param name="fbxNode"></param>
 	void ParseNodeRecursive(FbxModel* fbxModel, FbxNode* fbxNode, Node* parent = nullptr);
 	/// <summary>
+	/// メッシュ読み取り
+	/// </summary>
+	/// <param name="fbxModel"></param>
+	/// <param name="fbxNode"></param>
+	void ParseMesh(FbxModel* fbxModel, FbxNode* fbxNode);
+	/// <summary>
 	/// 後始末
 	/// </summary>
 	void Finalize();
+
+	//頂点座標読み取り
+	void ParseMeshVertices(FbxModel* fbxModel, FbxMesh* fbxMesh);
+	//面情報読み取り
+	void ParseMeshFaces(FbxModel* fbxModel, FbxMesh* fbxMesh);
+	//マテリアル読み取り
+	void ParseMaterial(FbxModel* fbxModel, FbxNode* fbxNode);
+	//テクスチャ読み取り
+	void LoadTexture(FbxModel* fbxModel, const std::string& fullpath);
 private:
 	//D3D12デバイス
 	ID3D12Device* device = nullptr;
