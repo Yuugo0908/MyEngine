@@ -1,8 +1,14 @@
 #pragma once
+
+#include <Windows.h>
+#include <wrl.h>
+#include <d3d12.h>
+#include <d3dx12.h>
 #include <string>
 #include <DirectXMath.h>
 #include <vector>
 #include <DirectXTex.h>
+
 
 // DirectX::を省略
 using XMFLOAT2 = DirectX::XMFLOAT2;
@@ -33,6 +39,12 @@ struct Node
 
 class FbxModel
 {
+private: // エイリアス
+// Microsoft::WRL::を省略
+	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+// std::を省略
+	template <class T> using vector = std::vector<T>;
+	using string = std::string;
 public:
 	// フレンドクラス
 	friend class FbxLoader;
@@ -63,4 +75,22 @@ private:
 	TexMetadata metadata = {};
 	// スクラッチイメージ
 	ScratchImage scratchImg = {};
+	// 頂点バッファ
+	ComPtr<ID3D12Resource> vertBuff;
+	// インデックスバッファ
+	ComPtr<ID3D12Resource> indexBuff;
+	// テクスチャバッファ
+	ComPtr<ID3D12Resource> texbuff;
+	// 頂点バッファビュー
+	D3D12_VERTEX_BUFFER_VIEW vbView = {};
+	// インデックスバッファビュー
+	D3D12_INDEX_BUFFER_VIEW ibView = {};
+	// SRV用デスクリプタヒープ
+	ComPtr<ID3D12DescriptorHeap> descHeapSRV;
+public:
+	void CreateBuffers(ID3D12Device* device);
+	// 描画
+	void Draw(ID3D12GraphicsCommandList* cmdList);
+	// モデルの変形行列取得
+	const XMMATRIX& GetModelTransform() { return meshNode->globalTransform; }
 };
