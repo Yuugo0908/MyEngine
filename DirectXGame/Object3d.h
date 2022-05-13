@@ -6,6 +6,7 @@
 #include <DirectXMath.h>
 #include <d3dx12.h>
 #include "Model.h"
+#include "Camera.h"
 
 class Object3d
 {
@@ -38,17 +39,6 @@ public: // 静的メンバ関数
 	static void PostDraw();
 	// 3Dオブジェクト生成
 	static Object3d* Create();
-	// 視点座標の取得
-	static const XMFLOAT3& GetEye() { return eye; }
-	// 視点座標の設定
-	static void SetEye(XMFLOAT3 eye);
-	// 注視点座標の取得
-	static const XMFLOAT3& GetTarget() { return target; }
-	// 注視点座標の設定
-	static void SetTarget(XMFLOAT3 target);
-	// ベクトルによる移動
-	static void CameraMoveVector(XMFLOAT3 move);
-	static void CameraMoveEyeVector(XMFLOAT3 move);
 
 private: // 静的メンバ変数
 	// デバイス
@@ -59,24 +49,10 @@ private: // 静的メンバ変数
 	static ComPtr<ID3D12RootSignature> rootsignature;
 	// パイプラインステートオブジェクト
 	static ComPtr<ID3D12PipelineState> pipelinestate;
-	// ビュー行列
-	static XMMATRIX matView;
-	// 射影行列
-	static XMMATRIX matProjection;
-	// 視点座標
-	static XMFLOAT3 eye;
-	// 注視点座標
-	static XMFLOAT3 target;
-	// 上方向ベクトル
-	static XMFLOAT3 up;
 
 private:// 静的メンバ関数
-	// カメラ初期化
-	static void InitializeCamera(int window_width, int window_height);
 	// グラフィックパイプライン生成
 	static bool InitializeGraphicsPipeline();
-	// ビュー行列を更新
-	static void UpdateViewMatrix();
 
 public: // メンバ関数
 	bool Initialize();

@@ -12,6 +12,7 @@
 #include "stdlib.h"
 #include "time.h"
 #include "FbxLoader.h"
+#include "Camera.h"
 
 #define SHOT 100
 

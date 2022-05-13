@@ -88,8 +88,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 
 void GameScene::Update() {
 	// 現在の座標を取得
-	XMFLOAT3 cameraEye = Object3d::GetEye();
-	XMFLOAT3 cameraTarget = Object3d::GetTarget();
+	XMFLOAT3 cameraEye = Camera::GetEye();
+	XMFLOAT3 cameraTarget = Camera::GetTarget();
 
 	if (input->TriggerKey(DIK_SPACE))
 	{
@@ -105,12 +105,12 @@ void GameScene::Update() {
 	{
 		p_flag = false;
 		p_pos.y = 30.0f;
-		p_val = 0.1f;
+		p_val = 0.0f;
 	}
 
 	playerObj->SetPosition(p_pos);
-	Object3d::SetEye(cameraEye);
-	Object3d::SetTarget(cameraTarget);
+	Camera::SetEye(cameraEye);
+	Camera::SetTarget(cameraTarget);
 	playerObj->Update();
 	skydomeObj->Update();
 }
