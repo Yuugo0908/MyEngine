@@ -26,10 +26,8 @@ bool Object3d::StaticInitialize(ID3D12Device* device, int window_width, int wind
 
 	Object3d::device = device;
 
-	Model::StaticInitialize(device);
-
 	// カメラ初期化
-	Camera::InitializeCamera(window_width, window_height);
+	Camera::Initialize(window_width, window_height);
 
 	// パイプライン初期化
 	InitializeGraphicsPipeline();

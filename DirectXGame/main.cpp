@@ -13,6 +13,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Input* input = nullptr;
 	Audio* audio = nullptr;
 	GameScene* gameScene = nullptr;
+	Camera* camera = nullptr;
 
 	// ゲームウィンドウの作成
 	win = new WinApp();
@@ -27,6 +28,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//入力の初期化
 	input = new Input();
 	input->Initialize(win->GetInstance(), win->GetHwnd());
+
+	camera = new Camera();
 
 	//FBXの初期化
 	FbxLoader::GetInstance()->Initialize(dxCommon->GetDevice());

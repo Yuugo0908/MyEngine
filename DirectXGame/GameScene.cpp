@@ -18,6 +18,13 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 	this->dxCommon = dxCommon;
 	this->input = input;
 	this->playAudio = audio;
+
+	camera = new Camera();
+	// デバイスのセット
+	FbxObject3d::SetDevice(dxCommon->GetDevice());
+	// カメラのセット
+	FbxObject3d::SetCamera(camera);
+
 	// デバッグテキスト用テクスチャ読み込み
 	if (!Sprite::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png")) {
 		assert(0);
@@ -88,8 +95,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 
 void GameScene::Update() {
 	// 現在の座標を取得
-	XMFLOAT3 cameraEye = Camera::GetEye();
-	XMFLOAT3 cameraTarget = Camera::GetTarget();
+	XMFLOAT3 cameraEye = camera->GetEye();
+	XMFLOAT3 cameraTarget = camera->GetTarget();
 
 	if (input->TriggerKey(DIK_SPACE))
 	{
@@ -109,8 +116,8 @@ void GameScene::Update() {
 	}
 
 	playerObj->SetPosition(p_pos);
-	Camera::SetEye(cameraEye);
-	Camera::SetTarget(cameraTarget);
+	camera->SetEye(cameraEye);
+	camera->SetTarget(cameraTarget);
 	playerObj->Update();
 	skydomeObj->Update();
 }

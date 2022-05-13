@@ -8,8 +8,8 @@
 
 class Input
 {
-private:
-	//namespace省略
+protected: // エイリアス
+// Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 public: //メンバ関数

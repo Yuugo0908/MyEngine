@@ -12,6 +12,7 @@
 #include "stdlib.h"
 #include "time.h"
 #include "FbxLoader.h"
+#include "FbxObject3d.h"
 #include "Camera.h"
 
 #define SHOT 100
@@ -19,7 +20,7 @@
 using namespace DirectX;
 
 class GameScene {
-private: // エイリアス
+protected: // エイリアス
 // Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	// DirectX::を省略
@@ -51,6 +52,7 @@ private: // メンバ変数
 	Input* input = nullptr;
 	Audio* playAudio = nullptr;
 	DebugText debugText;
+	Camera* camera = nullptr;
 
 	// ゲームシーン用
 	Sprite* title = nullptr;

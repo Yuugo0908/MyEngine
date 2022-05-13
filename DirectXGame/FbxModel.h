@@ -9,7 +9,6 @@
 #include <vector>
 #include <DirectXTex.h>
 
-
 // DirectX::を省略
 using XMFLOAT2 = DirectX::XMFLOAT2;
 using XMFLOAT3 = DirectX::XMFLOAT3;
@@ -39,10 +38,10 @@ struct Node
 
 class FbxModel
 {
-private: // エイリアス
-// Microsoft::WRL::を省略
+protected: // エイリアス
+	// Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-// std::を省略
+	// std::を省略
 	template <class T> using vector = std::vector<T>;
 	using string = std::string;
 public:

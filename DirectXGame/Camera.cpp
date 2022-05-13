@@ -8,7 +8,7 @@ XMFLOAT3 Camera::eye = { 0.0f, 0.0f, -90.0f };
 XMFLOAT3 Camera::target = { 0, 0, 0 };
 XMFLOAT3 Camera::up = { 0, 1, 0 };
 
-void Camera::InitializeCamera(int window_width, int window_height)
+void Camera::Initialize(int window_width, int window_height)
 {
 	// ÉrÉÖÅ[çsóÒÇÃê∂ê¨
 	matView = XMMatrixLookAtLH
