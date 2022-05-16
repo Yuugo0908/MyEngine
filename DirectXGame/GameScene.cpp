@@ -24,6 +24,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 	FbxObject3d::SetDevice(dxCommon->GetDevice());
 	// カメラのセット
 	FbxObject3d::SetCamera(camera);
+	// グラフィックスパイプライン生成
+	FbxObject3d::CreateGraphicsPipeline();
 
 	// デバッグテキスト用テクスチャ読み込み
 	if (!Sprite::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png")) {
@@ -70,16 +72,24 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 	GameOver = Sprite::Create(6, { 0.0f,0.0f });
 	GameOver->SetSize({ 1280.0f,720.0f });
 
-	//.objの名前を指定してモデルを読み込む
+	// カメラの設定
+	camera->SetTarget({ 0, 20, 0 });
+	camera->SetEye({ 0, 0, -90 });
+
+	// .objの名前を指定してモデルを読み込む
 	playerModel = playerModel->CreateFromObject("RedBox");
 	skydomeModel = skydomeModel->CreateFromObject("skydome");
 
-	//モデル名を指定して読み込み
-	FbxLoader::GetInstance()->LoadModelFromFile("cube");
+	// モデル名を指定して読み込み
+	fbxModel = FbxLoader::GetInstance()->LoadModelFromFile("cube");
 
 	// 3Dオブジェクト生成
 	playerObj = Object3d::Create();
 	skydomeObj = Object3d::Create();
+
+	fbxObject = new FbxObject3d;
+	fbxObject->Initialize();
+	fbxObject->SetModel(fbxModel);
 
 	// 3Dオブジェクトにモデルを割り当てる
 	playerObj->SetModel(playerModel);
@@ -91,6 +101,12 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 	skydomeObj->SetScale({ 1.0f, 1.0f, 1.0f });
 
 	p_pos = playerObj->GetPosition();
+}
+
+void GameScene::Finalize()
+{
+	safe_delete(fbxModel);
+	safe_delete(fbxObject);
 }
 
 void GameScene::Update() {
@@ -118,6 +134,7 @@ void GameScene::Update() {
 	playerObj->SetPosition(p_pos);
 	camera->SetEye(cameraEye);
 	camera->SetTarget(cameraTarget);
+	fbxObject->Update();
 	playerObj->Update();
 	skydomeObj->Update();
 }
@@ -145,7 +162,7 @@ void GameScene::Draw() {
 	// 3Dオブクジェクトの描画
 
 	playerObj->Draw();
-	skydomeObj->Draw();
+	fbxObject->Draw(cmdList);
 
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
