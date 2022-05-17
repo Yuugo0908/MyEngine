@@ -40,8 +40,6 @@ public: // メンバ関数
 	~GameScene();
 	// 初期化
 	void Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio);
-	// 解放
-	void Finalize();
 	// 毎フレーム処理
 	void Update();
 	//pos初期化
@@ -55,8 +53,6 @@ private: // メンバ変数
 	Audio* playAudio = nullptr;
 	DebugText debugText;
 	Camera* camera = nullptr;
-	FbxModel* fbxModel = nullptr;
-	FbxObject3d* fbxObject = nullptr;
 
 	// ゲームシーン用
 	Sprite* title = nullptr;
