@@ -15,8 +15,6 @@
 #include "FbxObject3d.h"
 #include "Camera.h"
 
-#define SHOT 100
-
 using namespace DirectX;
 
 class GameScene {
@@ -55,8 +53,6 @@ private: // メンバ変数
 	Audio* playAudio = nullptr;
 	DebugText debugText;
 	Camera* camera = nullptr;
-	FbxModel* fbxModel = nullptr;
-	FbxObject3d* fbxObject = nullptr;
 
 	// ゲームシーン用
 	Sprite* title = nullptr;
@@ -66,6 +62,8 @@ private: // メンバ変数
 	Object3d* playerObj = nullptr;
 	Model* skydomeModel = nullptr;
 	Object3d* skydomeObj = nullptr;
+	FbxModel* fbxModel = nullptr;
+	FbxObject3d* fbxObject = nullptr;
 
 	XMFLOAT3 p_pos = {};
 	bool p_flag = false;//自由落下のフラグ

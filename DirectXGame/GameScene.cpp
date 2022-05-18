@@ -73,7 +73,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 	GameOver->SetSize({ 1280.0f,720.0f });
 
 	// カメラの設定
-	camera->SetTarget({ 0, 20, 0 });
+	camera->SetTarget({ 0, 0, 0 });
 	camera->SetEye({ 0, 0, -90 });
 
 	// .objの名前を指定してモデルを読み込む
@@ -82,6 +82,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 
 	// モデル名を指定して読み込み
 	fbxModel = FbxLoader::GetInstance()->LoadModelFromFile("cube");
+	//FbxLoader::GetInstance()->LoadTexture(fbxModel, "Resources/cube/Create.jpg");
 
 	// 3Dオブジェクト生成
 	playerObj = Object3d::Create();
@@ -97,8 +98,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 
 	playerObj->SetPosition({ 0.0f, 30.0f, 0.0f });
 	playerObj->SetScale({ 1.0f,1.0f,1.0f });
-
 	skydomeObj->SetScale({ 1.0f, 1.0f, 1.0f });
+	fbxObject->SetPosition({ 0.0f, -20.0f, 0.0f });
 
 	p_pos = playerObj->GetPosition();
 }
@@ -162,7 +163,8 @@ void GameScene::Draw() {
 	// 3Dオブクジェクトの描画
 
 	playerObj->Draw();
-	fbxObject->Draw(cmdList);
+	skydomeObj->Draw();
+	fbxObject->Draw(dxCommon->GetCommandList());
 
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();

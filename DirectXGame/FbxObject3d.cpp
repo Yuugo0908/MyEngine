@@ -14,23 +14,6 @@ ID3D12GraphicsCommandList* FbxObject3d::cmdList = nullptr;
 ComPtr<ID3D12RootSignature> FbxObject3d::rootsignature;
 ComPtr<ID3D12PipelineState> FbxObject3d::pipelinestate;
 
-void FbxObject3d::PreDraw(ID3D12GraphicsCommandList* cmdList)
-{
-	// PreDrawとPostDrawがペアで呼ばれていなければエラー
-	assert(FbxObject3d::cmdList == nullptr);
-
-	// コマンドリストをセット
-	FbxObject3d::cmdList = cmdList;
-
-
-}
-
-void FbxObject3d::PostDraw()
-{
-	// コマンドリストを解除
-	FbxObject3d::cmdList = nullptr;
-}
-
 void FbxObject3d::Initialize()
 {
 	HRESULT result;
@@ -244,7 +227,8 @@ void FbxObject3d::Draw(ID3D12GraphicsCommandList* cmdList)
 	// プリミティブ形状を設定
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	// 定数バッファビューをセット
-	cmdList->SetGraphicsRootConstantBufferView(0, constBufferTransform->GetGPUVirtualAddress());
+	cmdList->SetGraphicsRootConstantBufferView(0, 
+		constBufferTransform->GetGPUVirtualAddress());
 
 	fbxModel->Draw(cmdList);
 }

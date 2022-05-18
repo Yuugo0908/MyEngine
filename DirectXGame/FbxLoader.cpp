@@ -48,7 +48,6 @@ FbxModel* FbxLoader::LoadModelFromFile(const string& modelName)
 
 	// シーン生成
 	FbxScene* fbxScene = FbxScene::Create(fbxManager, "fbxScene");
-
 	// ファイルからロードしたFBXの情報をシーンにインポート
 	fbxImporter->Import(fbxScene);
 
@@ -63,6 +62,8 @@ FbxModel* FbxLoader::LoadModelFromFile(const string& modelName)
 	ParseNodeRecursive(fbxModel, fbxScene->GetRootNode());
 	// FBXシーン解放
 	fbxScene->Destroy();
+	// バッファ生成
+	fbxModel->CreateBuffers(device);
 
 	return fbxModel;
 }
@@ -173,11 +174,11 @@ void FbxLoader::LoadTexture(FbxModel* fbxModel, const std::string& fullpath)
 	HRESULT result = S_FALSE;
 	// WICテクスチャのロード
 	TexMetadata& metadata = fbxModel->metadata;
-	ScratchImage& scrachImg = fbxModel->scratchImg;
+	ScratchImage& scratchImg = fbxModel->scratchImg;
 	// ユニコード文字列に変換
 	wchar_t wfilepath[128];
 	MultiByteToWideChar(CP_ACP, 0, fullpath.c_str(), -1, wfilepath, _countof(wfilepath));
-	result = LoadFromWICFile(wfilepath, WIC_FLAGS_NONE,&metadata, scrachImg);
+	result = LoadFromWICFile(wfilepath, WIC_FLAGS_NONE,&metadata, scratchImg);
 
 	if (FAILED(result))
 	{
@@ -292,6 +293,7 @@ void FbxLoader::ParseMaterial(FbxModel* fbxModel, FbxNode* fbxNode)
 		bool textureLoaded = false;
 		if (material)
 		{
+			//FbxSurfaceLambertクラスかどうかを調べる
 			if (material->GetClassId().Is(FbxSurfaceLambert::ClassId))
 			{
 				FbxSurfaceLambert* lambert = static_cast<FbxSurfaceLambert*>(material);
@@ -310,7 +312,7 @@ void FbxLoader::ParseMaterial(FbxModel* fbxModel, FbxNode* fbxNode)
 
 				// ディフューズテクスチャを取り出す
 				const FbxProperty diffuseProperty =
-					material->FindDstProperty(FbxSurfaceMaterial::sDiffuse);
+					material->FindProperty(FbxSurfaceMaterial::sDiffuse);
 
 				if (diffuseProperty.IsValid())
 				{

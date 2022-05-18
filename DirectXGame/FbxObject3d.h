@@ -36,9 +36,6 @@ public: // 静的メンバ関数
 	// setter
 	static void SetDevice(ID3D12Device* device){FbxObject3d::device = device;}
 	static void SetCamera(Camera* camera) { FbxObject3d::camera = camera; }
-
-	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
-	static void PostDraw();
 private:
 	// デバイス
 	static ID3D12Device* device;
@@ -69,11 +66,14 @@ public: // メンバ関数
 	/// モデルのセット
 	/// </summary>
 	/// <param name="model">モデル</param>
-	void SetModel(FbxModel* model) { this->fbxModel = model; }
+	void SetModel(FbxModel* fbxModel) { this->fbxModel = fbxModel; }
 	/// <summary>
 	/// 描画
 	/// </summary>
 	void Draw(ID3D12GraphicsCommandList* cmdList);
+
+	// 座標の設定
+	void SetPosition(XMFLOAT3 position) { this->position = position; }
 private: // メンバ変数
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBufferTransform;
