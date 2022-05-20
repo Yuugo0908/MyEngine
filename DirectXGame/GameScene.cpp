@@ -73,14 +73,14 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 	GameOver->SetSize({ 1280.0f,720.0f });
 
 	// カメラの設定
-	camera->SetTarget({ 0, 0, 0 });
+	camera->SetTarget({ 0, 1, 0 });
 	camera->SetEye({ 0, 0, -90 });
 
 	// .objの名前を指定してモデルを読み込む
-	playerModel = playerModel->CreateFromObject("RedBox");
+	playerModel = playerModel->CreateFromObject("sphere");
 	skydomeModel = skydomeModel->CreateFromObject("skydome");
 
-	// モデル名を指定して読み込み
+	 //モデル名を指定して読み込み
 	fbxModel = FbxLoader::GetInstance()->LoadModelFromFile("cube");
 	//FbxLoader::GetInstance()->LoadTexture(fbxModel, "Resources/cube/Create.jpg");
 
@@ -96,8 +96,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 	playerObj->SetModel(playerModel);
 	skydomeObj->SetModel(skydomeModel);
 
-	playerObj->SetPosition({ 0.0f, 30.0f, 0.0f });
-	playerObj->SetScale({ 1.0f,1.0f,1.0f });
+	playerObj->SetPosition({ 0.0f, 0.0f, 0.0f });
+	playerObj->SetScale({ 5.0f,5.0f,5.0f });
 	skydomeObj->SetScale({ 1.0f, 1.0f, 1.0f });
 	fbxObject->SetPosition({ 0.0f, -20.0f, 0.0f });
 
