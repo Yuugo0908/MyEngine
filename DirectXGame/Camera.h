@@ -11,7 +11,7 @@ protected: // エイリアス
 	using XMMATRIX = DirectX::XMMATRIX;
 public: // 静的メンバ関数
 	// カメラ初期化
-	static void Initialize(int window_width, int window_height);
+	static void Initialize(const int window_width, const int window_height);
 	// 視点座標の取得
 	static const XMFLOAT3& GetEye() { return eye; }
 	// 視点座標の設定
@@ -43,4 +43,3 @@ private: // 静的メンバ変数
 public: // メンバ関数
 	static const XMMATRIX& GetMatViewProjection();
 };
-

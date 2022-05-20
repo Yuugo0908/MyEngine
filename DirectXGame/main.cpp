@@ -97,6 +97,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	safe_delete(audio);
 	safe_delete(input);
 	safe_delete(dxCommon);
+	safe_delete(camera);
 	FbxLoader::GetInstance()->Finalize();
 
 	// ゲームウィンドウの破棄

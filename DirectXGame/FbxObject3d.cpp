@@ -1,16 +1,18 @@
 #include "FbxObject3d.h"
+#include <d3dcompiler.h>
+#pragma comment(lib, "d3dcompiler.lib")
+
+using namespace DirectX;
+using namespace Microsoft::WRL;
 
 /// <summary>
 /// 静的メンバ変数の実体
 /// </summary>
 ID3D12Device* FbxObject3d::device = nullptr;
 Camera* FbxObject3d::camera = nullptr;
-<<<<<<< HEAD
-=======
 ID3D12GraphicsCommandList* FbxObject3d::cmdList = nullptr;
 ComPtr<ID3D12RootSignature> FbxObject3d::rootsignature;
 ComPtr<ID3D12PipelineState> FbxObject3d::pipelinestate;
->>>>>>> Error
 
 void FbxObject3d::Initialize()
 {
@@ -24,8 +26,6 @@ void FbxObject3d::Initialize()
 		nullptr,
 		IID_PPV_ARGS(&constBufferTransform));
 }
-<<<<<<< HEAD
-=======
 
 void FbxObject3d::CreateGraphicsPipeline()
 {
@@ -45,6 +45,7 @@ void FbxObject3d::CreateGraphicsPipeline()
 		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
 		0,
 		&vsBlob, &errorBlob);
+
 	if (FAILED(result)) {
 		// errorBlobからエラー内容をstring型にコピー
 		std::string errstr;
@@ -227,9 +228,8 @@ void FbxObject3d::Draw(ID3D12GraphicsCommandList* cmdList)
 	// プリミティブ形状を設定
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	// 定数バッファビューをセット
-	cmdList->SetGraphicsRootConstantBufferView(0, 
+	cmdList->SetGraphicsRootConstantBufferView(0,
 		constBufferTransform->GetGPUVirtualAddress());
 
 	fbxModel->Draw(cmdList);
 }
->>>>>>> Error

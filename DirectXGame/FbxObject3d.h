@@ -21,9 +21,20 @@ protected: // エイリアス
 	using XMFLOAT4 = DirectX::XMFLOAT4;
 	using XMVECTOR = DirectX::XMVECTOR;
 	using XMMATRIX = DirectX::XMMATRIX;
+
+	// ローカルスケール
+	XMFLOAT3 scale = { 1, 1, 1 };
+	// X, Y, Z軸回りのローカル回転角
+	XMFLOAT3 rotation = { 0, 0, 0 };
+	// ローカル座標
+	XMFLOAT3 position = { 0, 0, 0 };
+	// ローカルワールド変換行列
+	XMMATRIX matWorld;
+	// モデル
+	FbxModel* fbxModel = nullptr;
 public: // 静的メンバ関数
 	// setter
-	static void SetDevice(ID3D12Device* device){FbxObject3d::device = device;}
+	static void SetDevice(ID3D12Device* device) { FbxObject3d::device = device; }
 	static void SetCamera(Camera* camera) { FbxObject3d::camera = camera; }
 private:
 	// デバイス
@@ -43,9 +54,6 @@ public: // メンバ関数
 	/// 初期化
 	/// </summary>
 	void Initialize();
-<<<<<<< HEAD
-protected: // メンバ変数
-=======
 	/// <summary>
 	/// グラフィックスパイプラインの生成
 	/// </summary>
@@ -67,8 +75,12 @@ protected: // メンバ変数
 	// 座標の設定
 	void SetPosition(XMFLOAT3 position) { this->position = position; }
 private: // メンバ変数
->>>>>>> Error
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBufferTransform;
+	// ルートシグネチャ
+	static ComPtr<ID3D12RootSignature> rootsignature;
+	// パイプラインステートオブジェクト
+	static ComPtr<ID3D12PipelineState> pipelinestate;
+	// コマンドリスト
+	static ID3D12GraphicsCommandList* cmdList;
 };
-

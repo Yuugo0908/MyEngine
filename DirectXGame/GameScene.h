@@ -38,6 +38,8 @@ public: // メンバ関数
 	~GameScene();
 	// 初期化
 	void Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio);
+	// 解放
+	void Finalize();
 	// 毎フレーム処理
 	void Update();
 	//pos初期化
