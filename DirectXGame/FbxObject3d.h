@@ -43,7 +43,31 @@ public: // メンバ関数
 	/// 初期化
 	/// </summary>
 	void Initialize();
+<<<<<<< HEAD
 protected: // メンバ変数
+=======
+	/// <summary>
+	/// グラフィックスパイプラインの生成
+	/// </summary>
+	static void CreateGraphicsPipeline();
+	/// <summary>
+	/// 毎フレーム処理
+	/// </summary>
+	void Update();
+	/// <summary>
+	/// モデルのセット
+	/// </summary>
+	/// <param name="model">モデル</param>
+	void SetModel(FbxModel* fbxModel) { this->fbxModel = fbxModel; }
+	/// <summary>
+	/// 描画
+	/// </summary>
+	void Draw(ID3D12GraphicsCommandList* cmdList);
+
+	// 座標の設定
+	void SetPosition(XMFLOAT3 position) { this->position = position; }
+private: // メンバ変数
+>>>>>>> Error
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBufferTransform;
 };
