@@ -39,6 +39,7 @@ struct Node
 
 class FbxModel
 {
+public:
 	struct Bone
 	{
 		// –¼‘O

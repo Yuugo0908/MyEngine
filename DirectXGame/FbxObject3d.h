@@ -32,6 +32,14 @@ protected: // エイリアス
 	XMMATRIX matWorld;
 	// モデル
 	FbxModel* fbxModel = nullptr;
+public: // 定数
+	// ボーンの最大数
+	static const int MAX_BONES = 32;
+public: // 定数バッファ用データ構造体(スキニング)
+	struct ConstBufferDataSkin
+	{
+		XMMATRIX bones[MAX_BONES];
+	};
 public: // 静的メンバ関数
 	// setter
 	static void SetDevice(ID3D12Device* device) { FbxObject3d::device = device; }
@@ -77,6 +85,8 @@ public: // メンバ関数
 private: // メンバ変数
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBufferTransform;
+	// 定数バッファ(スキン)
+	ComPtr<ID3D12Resource> constBufferSkin;
 	// ルートシグネチャ
 	static ComPtr<ID3D12RootSignature> rootsignature;
 	// パイプラインステートオブジェクト

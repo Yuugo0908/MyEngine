@@ -23,12 +23,6 @@ public:
 	/// </summary>
 	/// <returns>インスタンス</returns>
 	static FbxLoader* GetInstance();
-	/// <summary>
-	/// FBXの行列をXMMatrixに変換
-	/// </summary>
-	/// <param name="dst">書き込み先</param>
-	/// <param name="src">もととなるFBX行列</param>
-	static void ConvertMatrixFromFbx(DirectX::XMMATRIX* dst, const FbxAMatrix& src);
 private:
 	// privateなコンストラクタ（シングルトンパターン）
 	FbxLoader() = default;
@@ -72,12 +66,18 @@ public:
 	void ParseMeshFaces(FbxModel* fbxModel, FbxMesh* fbxMesh);
 	// マテリアル読み取り
 	void ParseMaterial(FbxModel* fbxModel, FbxNode* fbxNode);
-	// スキニング情報の読み取り
-	void ParseSkin(FbxModel* fbxModel, FbxMesh* fbxMesh);
 	// テクスチャ読み取り
 	void LoadTexture(FbxModel* fbxModel, const std::string& fullpath);
 	// ディレクトリを含んだファイルパスからファイル名を抽出する
 	std::string ExtractFileName(const std::string& path);
+	/// <summary>
+	/// FBXの行列をXMMatrixに変換
+	/// </summary>
+	/// <param name="dst">書き込み先</param>
+	/// <param name="src">もととなるFBX行列</param>
+	static void ConvertMatrixFromFbx(DirectX::XMMATRIX* dst, const FbxAMatrix& src);
+	// スキニング情報の読み取り
+	void ParseSkin(FbxModel* fbxModel, FbxMesh* fbxMesh);
 private:
 	// D3D12デバイス
 	ID3D12Device* device = nullptr;

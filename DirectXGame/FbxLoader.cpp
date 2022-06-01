@@ -337,3 +337,15 @@ void FbxLoader::ParseMaterial(FbxModel* fbxModel, FbxNode* fbxNode)
 		}
 	}
 }
+
+void FbxLoader::ConvertMatrixFromFbx(DirectX::XMMATRIX* dst, const FbxAMatrix& src)
+{
+	// 行
+	for (int i = 0; i < 4; i++) {
+		// 列
+		for (int j = 0; j < 4; j++) {
+			// 1要素コピー
+			dst->r[i].m128_f32[j] = (float)src.Get(i, j);
+		}
+	}
+}
