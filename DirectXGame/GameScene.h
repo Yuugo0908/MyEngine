@@ -58,6 +58,7 @@ private: // メンバ変数
 	Sprite* title = nullptr;
 	Sprite* GameClear = nullptr;
 	Sprite* GameOver = nullptr;
+	Sprite* backGround = nullptr;
 	Model* playerModel = nullptr;
 	Object3d* playerObj = nullptr;
 	Model* skydomeModel = nullptr;

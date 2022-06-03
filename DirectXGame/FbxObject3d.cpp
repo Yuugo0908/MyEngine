@@ -1,5 +1,6 @@
 #include "FbxObject3d.h"
 #include <d3dcompiler.h>
+#include "FbxLoader.h"
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace DirectX;
@@ -115,7 +116,7 @@ void FbxObject3d::CreateGraphicsPipeline()
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},
 		{ // ボーンのスキンウェイト
-			"BONEWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,
+			"BONEWEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},
@@ -169,11 +170,13 @@ void FbxObject3d::CreateGraphicsPipeline()
 	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
 
 	// ルートパラメータ
-	CD3DX12_ROOT_PARAMETER rootparams[2];
+	CD3DX12_ROOT_PARAMETER rootparams[3];
 	// CBV（座標変換行列用）
 	rootparams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
 	// SRV（テクスチャ）
 	rootparams[1].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
+	// CBV(スキニング)
+	rootparams[2].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
 
 	// スタティックサンプラー
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0);
@@ -266,8 +269,9 @@ void FbxObject3d::Draw(ID3D12GraphicsCommandList* cmdList)
 	// プリミティブ形状を設定
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	// 定数バッファビューをセット
-	cmdList->SetGraphicsRootConstantBufferView(0,
-		constBufferTransform->GetGPUVirtualAddress());
-
+	cmdList->SetGraphicsRootConstantBufferView(0,constBufferTransform->GetGPUVirtualAddress());
+	// 定数バッファビューをセット
+	cmdList->SetGraphicsRootConstantBufferView(2, constBufferSkin->GetGPUVirtualAddress());
+											// マジックナンバーにつき、定数化推奨
 	fbxModel->Draw(cmdList);
 }

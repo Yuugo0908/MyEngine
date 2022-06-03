@@ -1,3 +1,6 @@
+// ボーンの最大数
+static const int MAX_BONES = 32;
+
 // 行列用定数バッファ
 cbuffer cbuff0 : register(b0)
 {
@@ -6,12 +9,20 @@ cbuffer cbuff0 : register(b0)
 	float3 cameraPos;	// カメラ座標
 };
 
+cbuffer skinning:register(b3)
+{
+	// ボーンのスキニング行列
+	matrix matSkinning[MAX_BONES];
+};
+
 // vertexバッファーの入力
 struct VSInput
 {
 	float4 pos : POSITION;	// 位置
 	float3 normal : NORMAL;	// 頂点法線
 	float2 uv : TEXCOORD;	//テクスチャ座標
+	uint4 boneIndices : BONEINDICES; // ボーンの番号
+	float4 boneWeights : BONEWEIGHTS; // ボーンのスキンウェイト
 };
 
 // 頂点シェーダーからピクセルシェーダーへのやり取りに使用する構造体

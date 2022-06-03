@@ -39,7 +39,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 		assert(0);
 	}
 
-	if (!Sprite::LoadTexture(1, L"Resources/HPText.png")) {
+	if (!Sprite::LoadTexture(1, L"Resources/background.png")) {
 		assert(0);
 	}
 
@@ -66,6 +66,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 	title = Sprite::Create(0, { 0.0f,0.0f });
 	title->SetSize({ 1280.0f,720.0f });
 
+	backGround = Sprite::Create(1, { 0, 0 });
+	backGround->SetSize({ 1280.0f, 720.0f });
+
 	GameClear = Sprite::Create(5, { 0.0f,0.0f });
 	GameClear->SetSize({ 1280.0f,720.0f });
 
@@ -74,14 +77,14 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 
 	// カメラの設定
 	camera->SetTarget({ 0, 1, 0 });
-	camera->SetEye({ 0, 0, -90 });
+	camera->SetEye({ 0, 0, -50 });
 
 	// .objの名前を指定してモデルを読み込む
 	playerModel = playerModel->CreateFromObject("sphere");
 	skydomeModel = skydomeModel->CreateFromObject("skydome");
 
 	//モデル名を指定して読み込み
-	fbxModel = FbxLoader::GetInstance()->LoadModelFromFile("cube");
+	fbxModel = FbxLoader::GetInstance()->LoadModelFromFile("boneTest");
 	//FbxLoader::GetInstance()->LoadTexture(fbxModel, "Resources/cube/Create.jpg");
 
 	// 3Dオブジェクト生成
@@ -99,7 +102,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) 
 	playerObj->SetPosition({ 0.0f, 0.0f, 0.0f });
 	playerObj->SetScale({ 5.0f,5.0f,5.0f });
 	skydomeObj->SetScale({ 1.0f, 1.0f, 1.0f });
-	fbxObject->SetPosition({ 0.0f, -20.0f, 0.0f });
+	fbxObject->SetPosition({ 0.0f, 0.0f, 0.0f });
+	fbxObject->SetScale({ 0.1f, 0.1f, 0.1f });
 
 	p_pos = playerObj->GetPosition();
 }
@@ -151,7 +155,7 @@ void GameScene::Draw() {
 	// 背景スプライト描画前処理
 	Sprite::PreDraw(dxCommon->GetCommandList());
 	// 背景スプライト描画
-	//backGround->Draw();
+	backGround->Draw();
 	// スプライト描画後処理
 	Sprite::PostDraw();
 	// 深度バッファクリア
@@ -162,8 +166,8 @@ void GameScene::Draw() {
 	Object3d::PreDraw(dxCommon->GetCommandList());
 	// 3Dオブクジェクトの描画
 
-	playerObj->Draw();
-	skydomeObj->Draw();
+	//playerObj->Draw();
+	//skydomeObj->Draw();
 	fbxObject->Draw(dxCommon->GetCommandList());
 
 	// 3Dオブジェクト描画後処理
