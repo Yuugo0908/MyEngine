@@ -33,6 +33,8 @@ struct Node
 	XMMATRIX transform;
 	// グローバル変形行列
 	XMMATRIX globalTransform;
+	// グローバル変形逆行列
+	XMMATRIX inverseGlobalTransform;
 	// 親ノード
 	Node* parent = nullptr;
 };
@@ -120,4 +122,10 @@ public:
 	FbxScene* GetFbxScene() { return fbxScene; }
 	// モデルの変形行列取得
 	const XMMATRIX& GetModelTransform() { return meshNode->globalTransform; }
+	//モデルの変形逆行列取得
+	const XMMATRIX& GetInverseGlobalTransform()
+	{
+		meshNode->inverseGlobalTransform = DirectX::XMMatrixInverse(nullptr, meshNode->globalTransform);
+		return meshNode->inverseGlobalTransform;
+	}
 };
