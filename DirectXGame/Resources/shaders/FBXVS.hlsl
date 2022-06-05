@@ -10,40 +10,40 @@ struct SkinOutput
 // スキニング計算
 SkinOutput ComputeSkin(VSInput input)
 {
-	// ゼロクリア
+	//ゼロクリア
 	SkinOutput output = (SkinOutput)0;
 
-	uint iBone;
-	float boneWeight;
-	matrix skinMatrix;
+	uint iBone;			//計算するボーン番号
+	float weight;		//ボーンウェイト(重み)
+	matrix m;			//スキニング行列
 
-	// ボーン0
+	//ボーン0
 	iBone = input.boneIndices.x;
-	boneWeight = input.boneWeights.x;
-	skinMatrix = matSkinning[iBone];
-	output.pos += boneWeight * mul(skinMatrix, input.pos);
-	output.normal += boneWeight * mul((float3x3)skinMatrix, input.normal);
+	weight = input.boneWeights.x;
+	m = matSkinning[iBone];
+	output.pos += weight * mul(m, input.pos);
+	output.normal += weight * mul((float3x3)m, input.normal);
 
-	// ボーン1
+	//ボーン1
 	iBone = input.boneIndices.y;
-	boneWeight = input.boneWeights.y;
-	skinMatrix = matSkinning[iBone];
-	output.pos += boneWeight * mul(skinMatrix, input.pos);
-	output.normal += boneWeight * mul((float3x3)skinMatrix, input.normal);
+	weight = input.boneWeights.y;
+	m = matSkinning[iBone];
+	output.pos += weight * mul(m, input.pos);
+	output.normal += weight * mul((float3x3)m, input.normal);
 
-	// ボーン2
+	//ボーン2
 	iBone = input.boneIndices.z;
-	boneWeight = input.boneWeights.z;
-	skinMatrix = matSkinning[iBone];
-	output.pos += boneWeight * mul(skinMatrix, input.pos);
-	output.normal += boneWeight * mul((float3x3)skinMatrix, input.normal);
+	weight = input.boneWeights.z;
+	m = matSkinning[iBone];
+	output.pos += weight * mul(m, input.pos);
+	output.normal += weight * mul((float3x3)m, input.normal);
 
-	// ボーン3
+	//ボーン3
 	iBone = input.boneIndices.w;
-	boneWeight = input.boneWeights.w;
-	skinMatrix = matSkinning[iBone];
-	output.pos += boneWeight * mul(skinMatrix, input.pos);
-	output.normal += boneWeight * mul((float3x3)skinMatrix, input.normal);
+	weight = input.boneWeights.w;
+	m = matSkinning[iBone];
+	output.pos += weight * mul(m, input.pos);
+	output.normal += weight * mul((float3x3)m, input.normal);
 
 	return output;
 }

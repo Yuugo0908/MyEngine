@@ -39,22 +39,6 @@ struct Node
 
 class FbxModel
 {
-public:
-	struct Bone
-	{
-		// 名前
-		std::string name;
-		// 初期姿勢の逆行列
-		XMMATRIX invInitialPose;
-		// クラスター(FBX側のボーン情報)
-		FbxCluster* fbxCluster;
-		// コンストラクタ
-		Bone(const std::string& name)
-		{
-			this->name = name;
-		}
-	};
-
 protected: // エイリアス
 	// Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
@@ -75,6 +59,20 @@ public:// サブクラス
 		XMFLOAT2 uv;	// uv座標
 		UINT boneIndex[MAX_BONE_INDICES]; // ボーン 番号
 		float boneWeight[MAX_BONE_INDICES]; // ボーン 重み
+	};
+	struct Bone
+	{
+		// 名前
+		std::string name;
+		// 初期姿勢の逆行列
+		XMMATRIX invInitialPose;
+		// クラスター(FBX側のボーン情報)
+		FbxCluster* fbxCluster;
+		// コンストラクタ
+		Bone(const std::string& name)
+		{
+			this->name = name;
+		}
 	};
 private:
 	// FBXシーン

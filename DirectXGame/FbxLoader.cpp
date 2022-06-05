@@ -61,7 +61,7 @@ FbxModel* FbxLoader::LoadModelFromFile(const string& modelName)
 	// ルートノードから順に解析してモデルに流し込む
 	ParseNodeRecursive(fbxModel, fbxScene->GetRootNode());
 	// FBXシーン解放
-	fbxScene->Destroy();
+	fbxModel->fbxScene = fbxScene;
 	// バッファ生成
 	fbxModel->CreateBuffers(device);
 
@@ -160,6 +160,8 @@ void FbxLoader::ParseMesh(FbxModel* fbxModel, FbxNode* fbxNode)
 	ParseMeshFaces(fbxModel, fbxMesh);
 	// マテリアルの読み取り
 	ParseMaterial(fbxModel, fbxNode);
+	// スキニング情報の読み取り
+	ParseSkin(fbxModel, fbxMesh);
 }
 
 void FbxLoader::Finalize()
@@ -334,6 +336,124 @@ void FbxLoader::ParseMaterial(FbxModel* fbxModel, FbxNode* fbxNode)
 		if (!textureLoaded)
 		{
 			LoadTexture(fbxModel, baseDirectory + defaultTextureFileName);
+		}
+	}
+}
+
+void FbxLoader::ParseSkin(FbxModel* fbxModel, FbxMesh* fbxMesh)
+{
+	// スキニング情報
+	FbxSkin* fbxSkin =
+		static_cast<FbxSkin*>(fbxMesh->GetDeformer(0, FbxDeformer::eSkin));
+
+	// スキニング情報(情報がなければ終了)
+	if (fbxSkin == nullptr)
+	{
+		return;
+	}
+
+	// ボーン配列の参照
+	std::vector<FbxModel::Bone>& bones = fbxModel->bones;
+
+	// ボーンの数
+	int clusterCount = fbxSkin->GetClusterCount();
+	bones.reserve(clusterCount);
+
+	// 全てのボーンについて
+	for (int i = 0; i < clusterCount; i++)
+	{
+		// FBXボーン情報
+		FbxCluster* fbxCluster = fbxSkin->GetCluster(i);
+		// ボーン自体のノードの名前を取得
+		const char* boneName = fbxCluster->GetLink()->GetName();
+
+		// 新しくボーンを追加し、追加したボーンの情報を得る
+		bones.emplace_back(FbxModel::Bone(boneName));
+		FbxModel::Bone& bone = bones.back();
+		// 自作ボーンとFBXボーンを紐づける
+		bone.fbxCluster = fbxCluster;
+
+		// FBXから初期姿勢行列を取得する
+		FbxAMatrix fbxmat;
+		fbxCluster->GetTransformLinkMatrix(fbxmat);
+
+		// XMMatrix型に変換する
+		XMMATRIX initialPose;
+		ConvertMatrixFromFbx(&initialPose, fbxmat);
+
+		// 初期姿勢行列の逆行列を得る
+		bone.invInitialPose = XMMatrixInverse(nullptr, initialPose);
+	}
+
+	// ボーン番号とスキンウェイトのペア
+	struct WeightSet
+	{
+		UINT index;
+		float weight;
+	};
+
+	// 二次元配列(ジャグ配列)
+	// list:頂点が影響を受けるボーンの全リスト
+	// vector:それを全頂点分
+	std::vector<std::list<WeightSet>>
+		weightLists(fbxModel->vertices.size());
+
+	// 全てのボーンについて
+	for (int i = 0; i < clusterCount; i++)
+	{
+		// FBXボーン情報
+		FbxCluster* fbxCluster = fbxSkin->GetCluster(i);
+		// このボーンに影響を受ける頂点の数
+		int controlPointIndicesCount = fbxCluster->GetControlPointIndicesCount();
+		// このボーンに影響を受ける頂点の配列
+		int* controlPointIndices = fbxCluster->GetControlPointIndices();
+		double* controlPointWeights = fbxCluster->GetControlPointWeights();
+
+		// 影響を受ける全頂点について
+		for (int j = 0; j < controlPointIndicesCount; j++)
+		{
+			// 頂点番号
+			int vertIndex = controlPointIndices[j];
+			// スキンウェイト
+			float weight = (float)controlPointWeights[j];
+			// その頂点の影響を受けるボーンリストに、ボーンとウェイトのペアを追加
+			weightLists[vertIndex].emplace_back(WeightSet{ (UINT)i, weight });
+		}
+	}
+	// 頂点配列書き換え用の参照
+	auto& vertices = fbxModel->vertices;
+	// 各頂点について処理
+	for (int i = 0; i < vertices.size(); i++)
+	{
+		// 頂点のウェイトから最も大きい4つを選択
+		auto& weightList = weightLists[i];
+		// 大小比較用のラムダ式を指定して降順にソート
+		weightList.sort(
+			[](auto const& lhs, auto const& rhs) {
+				// 左の要素数の方が大きければtrue それでなければfalseを返す
+				return lhs.weight > rhs.weight;
+			});
+
+		int weightArrayIndex = 0;
+		// 降順ソート済みのウェイトリストから
+		for (auto& weightSet : weightList)
+		{
+			// 頂点データに書き込み
+			vertices[i].boneIndex[weightArrayIndex] = weightSet.index;
+			vertices[i].boneWeight[weightArrayIndex] = weightSet.weight;
+			// 4つに達したら終了
+			if (++weightArrayIndex >= FbxModel::MAX_BONE_INDICES) {
+				float weight = 0.0f;
+				// 2番目以降のウェイトを計算
+				for (int j = 1; j < FbxModel::MAX_BONE_INDICES; j++)
+				{
+					weight += vertices[i].boneWeight[j];
+				}
+
+				// 合計で1.0f(100%)になるように調整
+				vertices[i].boneWeight[0] = 1.0f - weight;
+				break;
+			}
 		}
 	}
 }
