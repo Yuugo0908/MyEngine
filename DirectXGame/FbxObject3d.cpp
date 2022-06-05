@@ -17,6 +17,7 @@ ComPtr<ID3D12PipelineState> FbxObject3d::pipelinestate;
 
 void FbxObject3d::Initialize()
 {
+	frameTime.SetTime(0, 0, 0, 1, 0, FbxTime::EMode::eFrames60);
 	HRESULT result;
 	// 定数バッファの生成
 	result = device->CreateCommittedResource(
@@ -235,6 +236,23 @@ void FbxObject3d::Update()
 		constBufferTransform->Unmap(0, nullptr);
 	}
 
+	if (isPlay == false)
+	{
+		PlayAnimation();
+	}
+
+	// アニメーション
+	if (isPlay == true)
+	{
+		// 1フレーム進める
+		currentTime += frameTime;
+		// 最後まで再生したら先頭に戻す
+		if (currentTime > endTime)
+		{
+			currentTime = startTime;
+		}
+	}
+
 	// ボーン配列
 	std::vector<FbxModel::Bone>& bones = fbxModel->GetBones();
 
@@ -246,7 +264,8 @@ void FbxObject3d::Update()
 		// 今の姿勢行列
 		XMMATRIX matCurrentPose;
 		// 今の姿勢行列を取得
-		FbxAMatrix fbxCurrentPose =bones[i].fbxCluster->GetLink()->EvaluateGlobalTransform(0);
+		FbxAMatrix fbxCurrentPose =
+			bones[i].fbxCluster->GetLink()->EvaluateGlobalTransform(currentTime);
 		// XMMATRIXに変換
 		FbxLoader::ConvertMatrixFromFbx(&matCurrentPose, fbxCurrentPose);
 		// 合成してスキニング行列に
@@ -274,4 +293,24 @@ void FbxObject3d::Draw(ID3D12GraphicsCommandList* cmdList)
 	cmdList->SetGraphicsRootConstantBufferView(2, constBufferSkin->GetGPUVirtualAddress());
 											// マジックナンバーにつき、定数化推奨
 	fbxModel->Draw(cmdList);
+}
+
+void FbxObject3d::PlayAnimation()
+{
+	FbxScene* fbxScene = fbxModel->GetFbxScene();
+	// 0番のアニメーション取得
+	FbxAnimStack* animStack = fbxScene->GetSrcObject<FbxAnimStack>(0);
+	// アニメーションの名前取得
+	const char* animStackName = animStack->GetName();
+	// アニメーションの時間情報
+	FbxTakeInfo* takeInfo = fbxScene->GetTakeInfo(animStackName);
+
+	// 開始時間取得
+	startTime = takeInfo->mLocalTimeSpan.GetStart();
+	// 終了時間取得
+	endTime = takeInfo->mLocalTimeSpan.GetStop();
+	// 開始時間に合わせる
+	currentTime = startTime;
+	// 再生中状態にする
+	isPlay = true;
 }

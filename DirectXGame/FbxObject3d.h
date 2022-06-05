@@ -32,6 +32,16 @@ protected: // エイリアス
 	XMMATRIX matWorld;
 	// モデル
 	FbxModel* fbxModel = nullptr;
+	// 1フレームの時間
+	FbxTime frameTime;
+	// アニメーション開始時間
+	FbxTime startTime;
+	// アニメーション終了時間
+	FbxTime endTime;
+	// 現在時間（アニメーション）
+	FbxTime currentTime;
+	// アニメーション再生中
+	bool isPlay = false;
 public: // 定数
 	// ボーンの最大数
 	static const int MAX_BONES = 32;
@@ -79,6 +89,11 @@ public: // メンバ関数
 	/// 描画
 	/// </summary>
 	void Draw(ID3D12GraphicsCommandList* cmdList);
+
+	/// <summary>
+	/// アニメーション開始
+	/// </summary>
+	void PlayAnimation();
 
 	// 座標の設定
 	void SetPosition(XMFLOAT3 position) { this->position = position; }
