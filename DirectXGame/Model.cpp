@@ -76,6 +76,7 @@ bool Model::LoadTexture(const std::string& directoryPath, const std::string& fil
 	);
 	if (FAILED(result))
 	{
+		assert(0);
 		return result;
 	}
 
@@ -103,6 +104,7 @@ bool Model::LoadTexture(const std::string& directoryPath, const std::string& fil
 	);
 	if (FAILED(result))
 	{
+		assert(0);
 		return result;
 	}
 
@@ -117,6 +119,7 @@ bool Model::LoadTexture(const std::string& directoryPath, const std::string& fil
 	);
 	if (FAILED(result))
 	{
+		assert(0);
 		return result;
 	}
 

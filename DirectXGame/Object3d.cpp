@@ -206,11 +206,11 @@ bool Object3d::InitializeGraphicsPipeline()
 	gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
 	// デスクリプタレンジ
-	CD3DX12_DESCRIPTOR_RANGE descRangeSRV;
+	CD3DX12_DESCRIPTOR_RANGE descRangeSRV{};
 	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
 
 	// ルートパラメータ
-	CD3DX12_ROOT_PARAMETER rootparams[3];
+	CD3DX12_ROOT_PARAMETER rootparams[3]{};
 	rootparams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
 	rootparams[1].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
 	rootparams[2].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
@@ -219,7 +219,7 @@ bool Object3d::InitializeGraphicsPipeline()
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0);
 
 	// ルートシグネチャの設定
-	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
+	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc{};
 	rootSignatureDesc.Init_1_0(_countof(rootparams), rootparams, 1, &samplerDesc, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	ComPtr<ID3DBlob> rootSigBlob;
@@ -229,6 +229,7 @@ bool Object3d::InitializeGraphicsPipeline()
 	result = device->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
 	if (FAILED(result))
 	{
+		assert(0);
 		return result;
 	}
 
@@ -239,6 +240,7 @@ bool Object3d::InitializeGraphicsPipeline()
 
 	if (FAILED(result))
 	{
+		assert(0);
 		return result;
 	}
 

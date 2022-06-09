@@ -41,7 +41,7 @@ void Audio::PlayWave(const char* filename, int loopCount, float volume)
 	}
 
 	// RIFFヘッダーの読み込み
-	RiffHeader riff;
+	RiffHeader riff{};
 	file.read((char*)&riff, sizeof(riff));
 	// ファイルがRIFFかチェック
 	if (strncmp(riff.chunk.id, "RIFF", 4) != 0)
@@ -50,11 +50,11 @@ void Audio::PlayWave(const char* filename, int loopCount, float volume)
 	}
 
 	// Formatチャンクの読み込み
-	FormatChunk format;
+	FormatChunk format{};
 	file.read((char*)&format, sizeof(format));
 
 	// Dataチャンクの読み込み
-	Chunk data;
+	Chunk data{};
 	file.read((char*)&data, sizeof(data));
 
 	// Dataチャンクのデータ部（波形データ）の読み込み
