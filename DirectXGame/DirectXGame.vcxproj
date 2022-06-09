@@ -158,7 +158,7 @@
     <ClCompile Include="FbxModel.cpp" />
     <ClCompile Include="FbxObject3d.cpp" />
     <ClCompile Include="GameScene.cpp" />
-    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Object3d.cpp" />
@@ -174,7 +174,7 @@
     <ClInclude Include="FbxModel.h" />
     <ClInclude Include="FbxObject3d.h" />
     <ClInclude Include="GameScene.h" />
-    <ClInclude Include="Input.h" />
+    <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Object3d.h" />
     <ClInclude Include="SafeDelete.h" />

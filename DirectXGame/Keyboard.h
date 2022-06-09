@@ -6,7 +6,7 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
-class Input
+class Keyboard
 {
 protected: // エイリアス
 // Microsoft::WRL::を省略

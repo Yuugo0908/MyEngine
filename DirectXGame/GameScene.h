@@ -3,7 +3,7 @@
 #include "SafeDelete.h"
 #include "DirectXCommon.h"
 #include <DirectXMath.h>
-#include "Input.h"
+#include "Keyboard.h"
 #include "Sprite.h"
 #include "Object3d.h"
 #include "DebugText.h"
@@ -37,7 +37,7 @@ public: // メンバ関数
 	// デストラクタ
 	~GameScene();
 	// 初期化
-	void Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio);
+	void Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* audio);
 	// 解放
 	void Finalize();
 	// 毎フレーム処理
@@ -49,7 +49,7 @@ public: // メンバ関数
 
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
-	Input* input = nullptr;
+	Keyboard* keyboard = nullptr;
 	Audio* playAudio = nullptr;
 	DebugText debugText;
 	Camera* camera = nullptr;

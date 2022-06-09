@@ -1,10 +1,10 @@
-#include "Input.h"
+#include "Keyboard.h"
 #include <cassert>
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
-bool Input::Initialize(HINSTANCE hInstance, HWND hwnd)
+bool Keyboard::Initialize(HINSTANCE hInstance, HWND hwnd)
 {
 	HRESULT result = S_FALSE;
 
@@ -49,7 +49,7 @@ bool Input::Initialize(HINSTANCE hInstance, HWND hwnd)
 	return true;
 }
 
-void Input::Update()
+void Keyboard::Update()
 {
 	HRESULT result;
 
@@ -61,7 +61,7 @@ void Input::Update()
 	result = devkeyboard->GetDeviceState(sizeof(key), key);
 }
 
-bool Input::PushKey(BYTE keyNumber)
+bool Keyboard::PushKey(BYTE keyNumber)
 {
 	// ˆÙí‚Èˆø”‚ğŒŸo
 	assert(0 <= keyNumber && keyNumber <= 256);
@@ -76,7 +76,7 @@ bool Input::PushKey(BYTE keyNumber)
 	return false;
 }
 
-bool Input::TriggerKey(BYTE keyNumber)
+bool Keyboard::TriggerKey(BYTE keyNumber)
 {
 	// ˆÙí‚Èˆø”‚ğŒŸo
 	assert(0 <= keyNumber && keyNumber <= 256);

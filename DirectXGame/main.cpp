@@ -10,7 +10,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//ポインタ置き場
 	WinApp* win = nullptr;
 	DirectXCommon* dxCommon = nullptr;
-	Input* input = nullptr;
+	Keyboard* keyboard = nullptr;
 	Audio* audio = nullptr;
 	GameScene* gameScene = nullptr;
 	Camera* camera = nullptr;
@@ -26,8 +26,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma region 汎用機能初期化
 
 	//入力の初期化
-	input = new Input();
-	input->Initialize(win->GetInstance(), win->GetHwnd());
+	keyboard = new Keyboard();
+	keyboard->Initialize(win->GetInstance(), win->GetHwnd());
 
 	camera = new Camera();
 
@@ -59,7 +59,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	// ゲームシーンの初期化
 	gameScene = new GameScene();
-	gameScene->Initialize(dxCommon, input, audio);
+	gameScene->Initialize(dxCommon, keyboard, audio);
 
 	while (true)  // ゲームループ
 	{
@@ -72,7 +72,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma region DirectX毎フレーム処理
 
 		// 入力関連の毎フレーム処理
-		input->Update();
+		keyboard->Update();
 		// ゲームシーンの毎フレーム処理
 		gameScene->Update();
 
@@ -95,7 +95,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// 各種解放
 	safe_delete(gameScene);
 	safe_delete(audio);
-	safe_delete(input);
+	safe_delete(keyboard);
 	safe_delete(dxCommon);
 	safe_delete(camera);
 	FbxLoader::GetInstance()->Finalize();

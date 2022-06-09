@@ -9,14 +9,14 @@ GameScene::~GameScene() {
 
 }
 
-void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio) {
+void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* audio) {
 	// nullptrチェック
 	assert(dxCommon);
-	assert(input);
+	assert(keyboard);
 	assert(audio);
 
 	this->dxCommon = dxCommon;
-	this->input = input;
+	this->keyboard = keyboard;
 	this->playAudio = audio;
 
 	camera = new Camera();
@@ -119,7 +119,7 @@ void GameScene::Update() {
 	XMFLOAT3 cameraEye = camera->GetEye();
 	XMFLOAT3 cameraTarget = camera->GetTarget();
 
-	if (input->TriggerKey(DIK_SPACE))
+	if (keyboard->TriggerKey(DIK_SPACE))
 	{
 		p_flag = true;
 	}
