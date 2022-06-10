@@ -99,6 +99,8 @@ public: // メンバ関数
 	void SetPosition(XMFLOAT3 position) { this->position = position; }
 	// モデルスケールの設定
 	void SetScale(XMFLOAT3 scale) { this->scale = scale; }
+	// 回転角の設定
+	void SetRotation(XMFLOAT3 rotation) { this->rotation = rotation; }
 private: // メンバ変数
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBufferTransform;

@@ -76,8 +76,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	GameOver->SetSize({ 1280.0f,720.0f });
 
 	// カメラの設定
-	camera->SetTarget({ 0, 1, 0 });
-	camera->SetEye({ 0, 0, -30 });
+	camera->SetTarget({ 0, 2.5f, 0 });
+	camera->SetEye({ 0, 0, -8.0f });
 
 	// .objの名前を指定してモデルを読み込む
 	playerModel = playerModel->CreateFromObject("sphere");
@@ -104,6 +104,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	skydomeObj->SetScale({ 1.0f, 1.0f, 1.0f });
 	fbxObject->SetPosition({ 0.0f, 0.0f, 0.0f });
 	fbxObject->SetScale({ 1.0f, 1.0f, 1.0f });
+	fbxObject->SetRotation({0, 90, 0});
 
 	p_pos = playerObj->GetPosition();
 }

@@ -3,6 +3,7 @@
 #include "Audio.h"
 #include "GameScene.h"
 #include "FbxLoader.h"
+#include "PostEffect.h"
 
 //# Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -14,6 +15,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Audio* audio = nullptr;
 	GameScene* gameScene = nullptr;
 	Camera* camera = nullptr;
+	PostEffect* postEffect = nullptr;
 
 	// ゲームウィンドウの作成
 	win = new WinApp();
@@ -29,9 +31,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	keyboard = new Keyboard();
 	keyboard->Initialize(win->GetInstance(), win->GetHwnd());
 
+	// カメラ初期化
 	camera = new Camera();
+	camera->Initialize(WinApp::window_width, WinApp::window_height);
 
-	//FBXの初期化
+	// FBXの初期化
 	FbxLoader::GetInstance()->Initialize(dxCommon->GetDevice());
 
 	// オーディオの初期化
@@ -54,6 +58,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		assert(0);
 		return 1;
 	}
+
+	// ポストエフェクト用のテクスチャ読み込み
+	Sprite::LoadTexture(100, L"Resources/white1x1.png");
+	// ポストエフェクトの初期化
+	postEffect = new PostEffect();
+	postEffect->Initialize();
 
 #pragma endregion 汎用機能初期化
 
@@ -82,8 +92,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		// 描画開始
 		dxCommon->PreDraw();
 
+		// ポストエフェクトの描画
+		postEffect->Draw(dxCommon->GetCommandList());
 		// ゲームシーンの描画
-		gameScene->Draw();
+		//gameScene->Draw();
 
 		// 描画終了
 		dxCommon->PostDraw();
@@ -98,6 +110,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	safe_delete(keyboard);
 	safe_delete(dxCommon);
 	safe_delete(camera);
+	safe_delete(postEffect);
 	FbxLoader::GetInstance()->Finalize();
 
 	// ゲームウィンドウの破棄
