@@ -3,6 +3,7 @@
 #include <d3dx12.h>
 
 using namespace DirectX;
+HRESULT result;
 
 PostEffect::PostEffect() : Sprite(
 	100,				// テクスチャ番号
@@ -17,11 +18,21 @@ PostEffect::PostEffect() : Sprite(
 
 void PostEffect::Initialize()
 {
-	HRESULT result;
-
 	// 基底クラスとしての初期化
 	Sprite::Initialize();
 
+	// テクスチャ生成
+	CreateTex();
+
+	// SRV生成
+	CreateSRV();
+
+	// RTV生成
+	CreateRTV();
+}
+
+void PostEffect::CreateTex()
+{
 	// テクスチャリソース設定
 	CD3DX12_RESOURCE_DESC texresDesc = CD3DX12_RESOURCE_DESC::Tex2D(
 		DXGI_FORMAT_R8G8B8A8_UNORM,
@@ -61,7 +72,10 @@ void PostEffect::Initialize()
 		assert(SUCCEEDED(result));
 		delete[] img;
 	}
+}
 
+void PostEffect::CreateSRV()
+{
 	// SRV用デスクリプタヒープを生成
 	D3D12_DESCRIPTOR_HEAP_DESC srvDescHeapDesc = {};
 	srvDescHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -73,7 +87,7 @@ void PostEffect::Initialize()
 
 	// SRV設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{}; // 設定構造体
-	srvDesc.Format = texresDesc.Format;
+	srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
 	srvDesc.Texture2D.MipLevels = 1;
@@ -84,6 +98,25 @@ void PostEffect::Initialize()
 		texBuff.Get(), //ビューと関連付けるバッファ
 		&srvDesc, //テクスチャ設定情報
 		descHeapSRV->GetCPUDescriptorHandleForHeapStart()
+	);
+}
+
+void PostEffect::CreateRTV()
+{
+	// RTV用デスクリプタヒープを生成
+	D3D12_DESCRIPTOR_HEAP_DESC rtvDescHeapDesc = {};
+	rtvDescHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	rtvDescHeapDesc.NumDescriptors = 1;
+
+	result = device->CreateDescriptorHeap(&rtvDescHeapDesc, IID_PPV_ARGS(&descHeapRTV));//生成
+	assert(SUCCEEDED(result));
+
+	// デスクリプタヒープにSRV作成
+	device->CreateShaderResourceView
+	(
+		texBuff.Get(), //ビューと関連付けるバッファ
+		nullptr,
+		descHeapRTV->GetCPUDescriptorHandleForHeapStart()
 	);
 }
 

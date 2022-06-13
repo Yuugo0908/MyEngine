@@ -86,6 +86,8 @@ public: // メンバ関数
 	void SetTextureRect(XMFLOAT2 texBase, XMFLOAT2 texSize);
 	// 描画
 	void Draw();
+	// 頂点データ転送
+	void TransferVertices();
 
 protected: // メンバ変数
 	// 頂点バッファ
@@ -116,8 +118,4 @@ protected: // メンバ変数
 	XMFLOAT2 texBase = { 0, 0 };
 	// テクスチャ幅、高さ
 	XMFLOAT2 texSize = { 100.0f, 100.0f };
-
-private: // メンバ関数
-	// 頂点データ転送
-	void TransferVertices();
 };

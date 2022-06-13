@@ -24,6 +24,21 @@ public:
 	void Initialize();
 
 	/// <summary>
+	/// テクスチャ生成
+	/// </summary>
+	void CreateTex();
+
+	/// <summary>
+	/// SRV作成
+	/// </summary>
+	void CreateSRV();
+
+	/// <summary>
+	/// RTV生成
+	/// </summary>
+	void CreateRTV();
+
+	/// <summary>
 	/// 描画コマンドの発行
 	/// </summary>
 	/// <param name="cmdList">コマンドリスト</param>
@@ -32,7 +47,13 @@ public:
 private: // メンバ変数
 	// テクスチャバッファ
 	ComPtr<ID3D12Resource> texBuff;
+	// 深度バッファ
+	ComPtr<ID3D12Resource> depthBuff;
 	// SRV用デスクリプタヒープ
 	ComPtr<ID3D12DescriptorHeap> descHeapSRV;
+	// RTV用デスクリプタヒープ
+	ComPtr<ID3D12DescriptorHeap> descHeapRTV;
+	// DSV用デスクリプタヒープ
+	ComPtr<ID3D12DescriptorHeap> descHeapDSV;
 };
 
