@@ -77,7 +77,7 @@ bool Model::LoadTexture(const std::string& directoryPath, const std::string& fil
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	const Image* img = scratchImg.GetImage(0, 0, 0); // 生データ抽出
@@ -105,7 +105,7 @@ bool Model::LoadTexture(const std::string& directoryPath, const std::string& fil
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	// テクスチャバッファにデータ転送
@@ -120,7 +120,7 @@ bool Model::LoadTexture(const std::string& directoryPath, const std::string& fil
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	// シェーダリソースビュー作成
@@ -273,7 +273,6 @@ void Model::CreateModel(const std::string& text)
 	if (FAILED(result))
 	{
 		assert(0);
-		return;
 	}
 
 	// インデックスバッファ生成
@@ -289,7 +288,6 @@ void Model::CreateModel(const std::string& text)
 	if (FAILED(result))
 	{
 		assert(0);
-		return;
 	}
 
 	// 頂点バッファへのデータ転送

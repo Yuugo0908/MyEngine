@@ -89,13 +89,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma endregion DirectX毎フレーム処理
 
 #pragma region グラフィックスコマンド
+
+		//レンダーテクスチャへの描画開始
+		postEffect->PreDraw(dxCommon->GetCommandList());
+
+		// ゲームシーンの描画
+		gameScene->Draw();
+
+		//レンダーテクスチャへの描画終了
+		postEffect->PostDraw(dxCommon->GetCommandList());
+
 		// 描画開始
 		dxCommon->PreDraw();
 
 		// ポストエフェクトの描画
 		postEffect->Draw(dxCommon->GetCommandList());
-		// ゲームシーンの描画
-		//gameScene->Draw();
 
 		// 描画終了
 		dxCommon->PostDraw();

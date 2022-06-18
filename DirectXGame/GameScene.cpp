@@ -85,7 +85,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 
 	//モデル名を指定して読み込み
 	fbxModel = FbxLoader::GetInstance()->LoadModelFromFile("boneTest");
-	//FbxLoader::GetInstance()->LoadTexture(fbxModel, "Resources/cube/Create.jpg");
 
 	// 3Dオブジェクト生成
 	playerObj = Object3d::Create();

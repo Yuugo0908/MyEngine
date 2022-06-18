@@ -12,6 +12,9 @@ protected: // エイリアス
 	using XMVECTOR = DirectX::XMVECTOR;
 	using XMMATRIX = DirectX::XMMATRIX;
 
+private: // 静的メンバ変数
+	// 画面クリアカラー
+	static const float clearColor[4];
 public:
 	/// <summary>
 	/// コンストラクタ
@@ -29,20 +32,42 @@ public:
 	void CreateTex();
 
 	/// <summary>
-	/// SRV作成
+	/// シェーダーリソースビュー作成
 	/// </summary>
 	void CreateSRV();
 
 	/// <summary>
-	/// RTV生成
+	/// レンダーターゲットビュー生成
 	/// </summary>
 	void CreateRTV();
+
+	/// <summary>
+	/// 深度バッファ生成
+	/// </summary>
+	void CreateDepth();
+
+	/// <summary>
+	/// デプスステンシルビュー生成
+	/// </summary>
+	void CreateDSV();
 
 	/// <summary>
 	/// 描画コマンドの発行
 	/// </summary>
 	/// <param name="cmdList">コマンドリスト</param>
 	void Draw(ID3D12GraphicsCommandList* cmdList);
+
+	/// <summary>
+	/// 描画前処理
+	/// </summary>
+	/// <param name="cmdList"></param>
+	void PreDraw(ID3D12GraphicsCommandList* cmdList);
+
+	/// <summary>
+	/// 描画後処理
+	/// </summary>
+	/// <param name="cmdList"></param>
+	void PostDraw(ID3D12GraphicsCommandList* cmdList);
 
 private: // メンバ変数
 	// テクスチャバッファ

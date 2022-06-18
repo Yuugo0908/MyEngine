@@ -16,7 +16,7 @@ bool Keyboard::Initialize(HINSTANCE hInstance, HWND hwnd)
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	// キーボードデバイスの生成
@@ -24,7 +24,7 @@ bool Keyboard::Initialize(HINSTANCE hInstance, HWND hwnd)
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	// 入力データ形式のセット
@@ -32,7 +32,7 @@ bool Keyboard::Initialize(HINSTANCE hInstance, HWND hwnd)
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	// 排他制御レベルのセット
@@ -43,7 +43,7 @@ bool Keyboard::Initialize(HINSTANCE hInstance, HWND hwnd)
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	return true;

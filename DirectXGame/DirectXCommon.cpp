@@ -244,7 +244,7 @@ bool DirectXCommon::CreateSwapChain()
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 	swapchain1.As(&swapchain);
 
@@ -260,7 +260,7 @@ bool DirectXCommon::InitializeCommand()
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	// コマンドリストを生成
@@ -268,7 +268,7 @@ bool DirectXCommon::InitializeCommand()
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	// 標準設定でコマンドキューを生成
@@ -277,7 +277,7 @@ bool DirectXCommon::InitializeCommand()
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	return true;
@@ -292,7 +292,7 @@ bool DirectXCommon::CreateFinalRenderTargets()
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	// 各種設定をしてディスクリプタヒープを生成
@@ -303,7 +303,7 @@ bool DirectXCommon::CreateFinalRenderTargets()
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	// 裏表の２つ分について
@@ -315,7 +315,7 @@ bool DirectXCommon::CreateFinalRenderTargets()
 		if (FAILED(result))
 		{
 			assert(0);
-			return result;
+			return false;
 		}
 
 		// ディスクリプタヒープのハンドルを取得
@@ -359,7 +359,7 @@ bool DirectXCommon::CreateDepthBuffer()
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	// 深度ビュー用デスクリプタヒープ作成
@@ -370,7 +370,7 @@ bool DirectXCommon::CreateDepthBuffer()
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	// 深度ビュー作成
