@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sprite.h"
+#include "Image2d.h"
 #include <Windows.h>
 #include <string>
 
@@ -23,8 +23,8 @@ public:
 	void DrawAll(ID3D12GraphicsCommandList* cmdList);
 
 private:
-	// スプライトデータの配列
-	Sprite* spriteDatas[maxCharCount] = {};
-	// スプライトデータ配列の添え字番号
-	int spriteIndex = 0;
+	// 画像データの配列
+	Image2d* image2dDatas[maxCharCount] = {};
+	// 画像データ配列の添え字番号
+	int image2dIndex = 0;
 };

@@ -6,19 +6,19 @@ DebugText::DebugText()
 
 DebugText::~DebugText()
 {
-	for (int i = 0; i < _countof(spriteDatas); i++)
+	for (int i = 0; i < _countof(image2dDatas); i++)
 	{
-		delete spriteDatas[i];
+		delete image2dDatas[i];
 	}
 }
 
 void DebugText::Initialize(UINT texnumber)
 {
-	// 全てのスプライトデータについて
-	for (int i = 0; i < _countof(spriteDatas); i++)
+	// 全ての画像データについて
+	for (int i = 0; i < _countof(image2dDatas); i++)
 	{
-		// スプライトを生成する
-		spriteDatas[i] = Sprite::Create(texnumber, { 0,0 });
+		// 画像を生成する
+		image2dDatas[i] = Image2d::Create(texnumber, { 0,0 });
 	}
 }
 
@@ -29,7 +29,7 @@ void DebugText::Print(const std::string& text, float x, float y, float scale = 1
 	for (int i = 0; i < text.size(); i++)
 	{
 		// 最大文字数超過
-		if (spriteIndex >= maxCharCount)
+		if (image2dIndex >= maxCharCount)
 		{
 			break;
 		}
@@ -47,24 +47,24 @@ void DebugText::Print(const std::string& text, float x, float y, float scale = 1
 		int fontIndexX = fontIndex % fontLineCount;
 
 		// 座標計算
-		spriteDatas[spriteIndex]->SetPosition({ x + fontWidth * scale * i, y });
-		spriteDatas[spriteIndex]->SetTextureRect({ (float)fontIndexX * fontWidth, (float)fontIndexY * fontHeight }, { (float)fontWidth, (float)fontHeight });
-		spriteDatas[spriteIndex]->SetSize({ fontWidth * scale, fontHeight * scale });
+		image2dDatas[image2dIndex]->SetPosition({ x + fontWidth * scale * i, y });
+		image2dDatas[image2dIndex]->SetTextureRect({ (float)fontIndexX * fontWidth, (float)fontIndexY * fontHeight }, { (float)fontWidth, (float)fontHeight });
+		image2dDatas[image2dIndex]->SetSize({ fontWidth * scale, fontHeight * scale });
 
 		// 文字を１つ進める
-		spriteIndex++;
+		image2dIndex++;
 	}
 }
 
 // まとめて描画
 void DebugText::DrawAll(ID3D12GraphicsCommandList* cmdList)
 {
-	// 全ての文字のスプライトについて
-	for (int i = 0; i < spriteIndex; i++)
+	// 全ての文字の画像について
+	for (int i = 0; i < image2dIndex; i++)
 	{
-		// スプライト描画
-		spriteDatas[i]->Draw();
+		// 画像描画
+		image2dDatas[i]->Draw();
 	}
 
-	spriteIndex = 0;
+	image2dIndex = 0;
 }

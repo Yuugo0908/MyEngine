@@ -45,8 +45,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		assert(0);
 		return 1;
 	}
-	// スプライト静的初期化
-	if (!Sprite::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height))
+	// 画像静的初期化
+	if (!Image2d::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height))
 	{
 		assert(0);
 		return 1;
@@ -60,7 +60,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	}
 
 	// ポストエフェクト用のテクスチャ読み込み
-	Sprite::LoadTexture(100, L"Resources/white1x1.png");
+	Image2d::LoadTexture(100, L"Resources/white1x1.png");
 	// ポストエフェクトの初期化
 	postEffect = new PostEffect();
 	postEffect->Initialize();

@@ -1,6 +1,6 @@
 #pragma once
-#include "Sprite.h"
-class PostEffect : public Sprite
+#include "Image2d.h"
+class PostEffect : public Image2d
 {
 protected: // エイリアス
 // Microsoft::WRL::を省略

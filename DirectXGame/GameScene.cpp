@@ -28,51 +28,51 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	FbxObject3d::CreateGraphicsPipeline();
 
 	// デバッグテキスト用テクスチャ読み込み
-	if (!Sprite::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png")) {
+	if (!Image2d::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png")) {
 		assert(0);
 	}
 	// デバッグテキスト初期化
 	debugText.Initialize(debugTextTexNumber);
 
 	// テクスチャ読み込み
-	if (!Sprite::LoadTexture(0, L"Resources/title.png")) {
+	if (!Image2d::LoadTexture(0, L"Resources/title.png")) {
 		assert(0);
 	}
 
-	if (!Sprite::LoadTexture(1, L"Resources/background.png")) {
+	if (!Image2d::LoadTexture(1, L"Resources/background.png")) {
 		assert(0);
 	}
 
-	if (!Sprite::LoadTexture(2, L"Resources/HPBar.png")) {
+	if (!Image2d::LoadTexture(2, L"Resources/HPBar.png")) {
 		assert(0);
 	}
 
-	if (!Sprite::LoadTexture(3, L"Resources/PlayerHPGauge.png")) {
+	if (!Image2d::LoadTexture(3, L"Resources/PlayerHPGauge.png")) {
 		assert(0);
 	}
 
-	if (!Sprite::LoadTexture(4, L"Resources/TimerGauge.png")) {
+	if (!Image2d::LoadTexture(4, L"Resources/TimerGauge.png")) {
 		assert(0);
 	}
 
-	if (!Sprite::LoadTexture(5, L"Resources/GameClear.png")) {
+	if (!Image2d::LoadTexture(5, L"Resources/GameClear.png")) {
 		assert(0);
 	}
 
-	if (!Sprite::LoadTexture(6, L"Resources/GameOver.png")) {
+	if (!Image2d::LoadTexture(6, L"Resources/GameOver.png")) {
 		assert(0);
 	}
-	//スプライト
-	title = Sprite::Create(0, { 0.0f,0.0f });
+	//画像
+	title = Image2d::Create(0, { 0.0f,0.0f });
 	title->SetSize({ 1280.0f,720.0f });
 
-	backGround = Sprite::Create(1, { 0, 0 });
+	backGround = Image2d::Create(1, { 0, 0 });
 	backGround->SetSize({ 1280.0f, 720.0f });
 
-	GameClear = Sprite::Create(5, { 0.0f,0.0f });
+	GameClear = Image2d::Create(5, { 0.0f,0.0f });
 	GameClear->SetSize({ 1280.0f,720.0f });
 
-	GameOver = Sprite::Create(6, { 0.0f,0.0f });
+	GameOver = Image2d::Create(6, { 0.0f,0.0f });
 	GameOver->SetSize({ 1280.0f,720.0f });
 
 	// カメラの設定
@@ -151,16 +151,16 @@ void GameScene::reset() {
 void GameScene::Draw() {
 	// コマンドリストの取得
 	ID3D12GraphicsCommandList* cmdList = dxCommon->GetCommandList();
-#pragma region 背景スプライト描画
-	// 背景スプライト描画前処理
-	Sprite::PreDraw(dxCommon->GetCommandList());
-	// 背景スプライト描画
+#pragma region 背景画像描画
+	// 背景画像描画前処理
+	Image2d::PreDraw(dxCommon->GetCommandList());
+	// 背景画像描画
 	backGround->Draw();
-	// スプライト描画後処理
-	Sprite::PostDraw();
+	// 画像描画後処理
+	Image2d::PostDraw();
 	// 深度バッファクリア
 	dxCommon->ClearDepthBuffer();
-#pragma endregion 背景スプライト描画
+#pragma endregion 背景画像描画
 #pragma region 3Dオブジェクト描画
 	// 3Dオブジェクト描画前処理
 	Object3d::PreDraw(dxCommon->GetCommandList());
@@ -173,15 +173,15 @@ void GameScene::Draw() {
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
 #pragma endregion 3Dオブジェクト描画
-#pragma region 前景スプライト描画
-	// 前景スプライト描画前処理
-	Sprite::PreDraw(dxCommon->GetCommandList());
+#pragma region 前景画像描画
+	// 前景画像描画前処理
+	Image2d::PreDraw(dxCommon->GetCommandList());
 
-	// 前景スプライトの描画
+	// 前景画像の描画
 
 	// デバッグテキストの描画
 	debugText.DrawAll(dxCommon->GetCommandList());
-	// スプライト描画後処理
-	Sprite::PostDraw();
-#pragma endregion 前景スプライト描画
+	// 画像描画後処理
+	Image2d::PostDraw();
+#pragma endregion 前景画像描画
 }

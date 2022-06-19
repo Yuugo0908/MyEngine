@@ -4,7 +4,7 @@
 #include "DirectXCommon.h"
 #include <DirectXMath.h>
 #include "Keyboard.h"
-#include "Sprite.h"
+#include "Image2d.h"
 #include "Object3d.h"
 #include "DebugText.h"
 #include "Audio.h"
@@ -55,10 +55,10 @@ private: // メンバ変数
 	Camera* camera = nullptr;
 
 	// ゲームシーン用
-	Sprite* title = nullptr;
-	Sprite* GameClear = nullptr;
-	Sprite* GameOver = nullptr;
-	Sprite* backGround = nullptr;
+	Image2d* title = nullptr;
+	Image2d* GameClear = nullptr;
+	Image2d* GameOver = nullptr;
+	Image2d* backGround = nullptr;
 	Model* playerModel = nullptr;
 	Object3d* playerObj = nullptr;
 	Model* skydomeModel = nullptr;

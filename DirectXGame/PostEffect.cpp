@@ -8,7 +8,7 @@ HRESULT result;
 // 静的メンバ変数
 const float PostEffect::clearColor[4] = { 0.25f, 0.5f, 0.1f, 0.0f };
 
-PostEffect::PostEffect() : Sprite(
+PostEffect::PostEffect() : Image2d(
 	100,				// テクスチャ番号
 	{0, 0},				// 座標
 	{500.0f, 500.0f},	// サイズ
@@ -22,7 +22,7 @@ PostEffect::PostEffect() : Sprite(
 void PostEffect::Initialize()
 {
 	// 基底クラスとしての初期化
-	Sprite::Initialize();
+	Image2d::Initialize();
 
 	// テクスチャ生成
 	CreateTex();

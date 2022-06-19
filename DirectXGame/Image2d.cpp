@@ -1,4 +1,4 @@
-#include "Sprite.h"
+#include "Image2d.h"
 #include <cassert>
 #include <d3dx12.h>
 #include <d3dcompiler.h>
@@ -10,21 +10,21 @@ using namespace DirectX;
 using namespace Microsoft::WRL;
 
 // 静的メンバ変数の実体
-ID3D12Device* Sprite::device = nullptr;
-UINT Sprite::descriptorHandleIncrementSize;
-ID3D12GraphicsCommandList* Sprite::cmdList = nullptr;
-ComPtr<ID3D12RootSignature> Sprite::rootSignature;
-ComPtr<ID3D12PipelineState> Sprite::pipelineState;
-XMMATRIX Sprite::matProjection;
-ComPtr<ID3D12DescriptorHeap> Sprite::descHeap;
-ComPtr<ID3D12Resource> Sprite::texBuff[srvCount];
+ID3D12Device* Image2d::device = nullptr;
+UINT Image2d::descriptorHandleIncrementSize;
+ID3D12GraphicsCommandList* Image2d::cmdList = nullptr;
+ComPtr<ID3D12RootSignature> Image2d::rootSignature;
+ComPtr<ID3D12PipelineState> Image2d::pipelineState;
+XMMATRIX Image2d::matProjection;
+ComPtr<ID3D12DescriptorHeap> Image2d::descHeap;
+ComPtr<ID3D12Resource> Image2d::texBuff[srvCount];
 
-bool Sprite::StaticInitialize(ID3D12Device* device, int window_width, int window_height)
+bool Image2d::StaticInitialize(ID3D12Device* device, int window_width, int window_height)
 {
 	// nullptrチェック
 	assert(device);
 
-	Sprite::device = device;
+	Image2d::device = device;
 
 	// デスクリプタサイズを取得
 	descriptorHandleIncrementSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -37,7 +37,7 @@ bool Sprite::StaticInitialize(ID3D12Device* device, int window_width, int window
 	// 頂点シェーダの読み込みとコンパイル
 	result = D3DCompileFromFile
 	(
-		L"Resources/shaders/SpriteVS.hlsl", // シェーダファイル名
+		L"Resources/shaders/Image2dVS.hlsl", // シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "vs_5_0", // エントリーポイント名、シェーダーモデル指定
@@ -64,7 +64,7 @@ bool Sprite::StaticInitialize(ID3D12Device* device, int window_width, int window
 	// ピクセルシェーダの読み込みとコンパイル
 	result = D3DCompileFromFile
 	(
-		L"Resources/shaders/SpritePS.hlsl", // シェーダファイル名
+		L"Resources/shaders/Image2dPS.hlsl", // シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "ps_5_0", // エントリーポイント名、シェーダーモデル指定
@@ -212,7 +212,7 @@ bool Sprite::StaticInitialize(ID3D12Device* device, int window_width, int window
 	return true;
 }
 
-bool Sprite::LoadTexture(UINT texnumber, const wchar_t* filename)
+bool Image2d::LoadTexture(UINT texnumber, const wchar_t* filename)
 {
 	// nullptrチェック
 	assert(device);
@@ -295,13 +295,13 @@ bool Sprite::LoadTexture(UINT texnumber, const wchar_t* filename)
 	return true;
 }
 
-void Sprite::PreDraw(ID3D12GraphicsCommandList* cmdList)
+void Image2d::PreDraw(ID3D12GraphicsCommandList* cmdList)
 {
 	// PreDrawとPostDrawがペアで呼ばれていなければエラー
-	assert(Sprite::cmdList == nullptr);
+	assert(Image2d::cmdList == nullptr);
 
 	// コマンドリストをセット
-	Sprite::cmdList = cmdList;
+	Image2d::cmdList = cmdList;
 
 	// パイプラインステートの設定
 	cmdList->SetPipelineState(pipelineState.Get());
@@ -311,13 +311,13 @@ void Sprite::PreDraw(ID3D12GraphicsCommandList* cmdList)
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 }
 
-void Sprite::PostDraw()
+void Image2d::PostDraw()
 {
 	// コマンドリストを解除
-	Sprite::cmdList = nullptr;
+	Image2d::cmdList = nullptr;
 }
 
-Sprite* Sprite::Create(UINT texNumber, XMFLOAT2 position, XMFLOAT4 color, XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)
+Image2d* Image2d::Create(UINT texNumber, XMFLOAT2 position, XMFLOAT4 color, XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)
 {
 	// 仮サイズ
 	XMFLOAT2 size = { 100.0f, 100.0f };
@@ -330,25 +330,25 @@ Sprite* Sprite::Create(UINT texNumber, XMFLOAT2 position, XMFLOAT4 color, XMFLOA
 		size = { (float)resDesc.Width, (float)resDesc.Height };
 	}
 
-	// Spriteのインスタンスを生成
-	Sprite* sprite = new Sprite(texNumber, position, size, color, anchorpoint, isFlipX, isFlipY);
-	if (sprite == nullptr)
+	// Image2dのインスタンスを生成
+	Image2d* image2d = new Image2d(texNumber, position, size, color, anchorpoint, isFlipX, isFlipY);
+	if (image2d == nullptr)
 	{
 		return nullptr;
 	}
 
 	// 初期化
-	if (!sprite->Initialize())
+	if (!image2d->Initialize())
 	{
-		delete sprite;
+		delete image2d;
 		assert(0);
 		return nullptr;
 	}
 
-	return sprite;
+	return image2d;
 }
 
-Sprite::Sprite(UINT texNumber, XMFLOAT2 position, XMFLOAT2 size, XMFLOAT4 color, XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)
+Image2d::Image2d(UINT texNumber, XMFLOAT2 position, XMFLOAT2 size, XMFLOAT4 color, XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)
 {
 	this->position = position;
 	this->size = size;
@@ -361,7 +361,7 @@ Sprite::Sprite(UINT texNumber, XMFLOAT2 position, XMFLOAT2 size, XMFLOAT4 color,
 	this->texSize = size;
 }
 
-bool Sprite::Initialize()
+bool Image2d::Initialize()
 {
 	// nullptrチェック
 	assert(device);
@@ -421,7 +421,7 @@ bool Sprite::Initialize()
 	return true;
 }
 
-void Sprite::SetRotation(float rotation)
+void Image2d::SetRotation(float rotation)
 {
 	this->rotation = rotation;
 
@@ -429,7 +429,7 @@ void Sprite::SetRotation(float rotation)
 	TransferVertices();
 }
 
-void Sprite::SetPosition(XMFLOAT2 position)
+void Image2d::SetPosition(XMFLOAT2 position)
 {
 	this->position = position;
 
@@ -437,7 +437,7 @@ void Sprite::SetPosition(XMFLOAT2 position)
 	TransferVertices();
 }
 
-void Sprite::SetSize(XMFLOAT2 size)
+void Image2d::SetSize(XMFLOAT2 size)
 {
 	this->size = size;
 
@@ -445,7 +445,7 @@ void Sprite::SetSize(XMFLOAT2 size)
 	TransferVertices();
 }
 
-void Sprite::SetAnchorPoint(XMFLOAT2 anchorpoint)
+void Image2d::SetAnchorPoint(XMFLOAT2 anchorpoint)
 {
 	this->anchorpoint = anchorpoint;
 
@@ -453,7 +453,7 @@ void Sprite::SetAnchorPoint(XMFLOAT2 anchorpoint)
 	TransferVertices();
 }
 
-void Sprite::SetIsFlipX(bool isFlipX)
+void Image2d::SetIsFlipX(bool isFlipX)
 {
 	this->isFlipX = isFlipX;
 
@@ -461,7 +461,7 @@ void Sprite::SetIsFlipX(bool isFlipX)
 	TransferVertices();
 }
 
-void Sprite::SetIsFlipY(bool isFlipY)
+void Image2d::SetIsFlipY(bool isFlipY)
 {
 	this->isFlipY = isFlipY;
 
@@ -469,7 +469,7 @@ void Sprite::SetIsFlipY(bool isFlipY)
 	TransferVertices();
 }
 
-void Sprite::SetTextureRect(XMFLOAT2 texBase, XMFLOAT2 texSize)
+void Image2d::SetTextureRect(XMFLOAT2 texBase, XMFLOAT2 texSize)
 {
 	this->texBase = texBase;
 	this->texSize = texSize;
@@ -478,7 +478,7 @@ void Sprite::SetTextureRect(XMFLOAT2 texBase, XMFLOAT2 texSize)
 	TransferVertices();
 }
 
-void Sprite::Draw()
+void Image2d::Draw()
 {
 	// ワールド行列の更新
 	this->matWorld = XMMatrixIdentity();
@@ -509,7 +509,7 @@ void Sprite::Draw()
 	cmdList->DrawInstanced(4, 1, 0, 0);
 }
 
-void Sprite::TransferVertices()
+void Image2d::TransferVertices()
 {
 	HRESULT result = S_FALSE;
 
