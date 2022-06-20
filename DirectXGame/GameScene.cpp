@@ -153,14 +153,15 @@ void GameScene::Draw() {
 	ID3D12GraphicsCommandList* cmdList = dxCommon->GetCommandList();
 #pragma region 背景画像描画
 	// 背景画像描画前処理
-	Image2d::PreDraw(dxCommon->GetCommandList());
+	//Image2d::PreDraw(dxCommon->GetCommandList());
 	// 背景画像描画
-	backGround->Draw();
+	//backGround->Draw();
 	// 画像描画後処理
-	Image2d::PostDraw();
+	//Image2d::PostDraw();
 	// 深度バッファクリア
-	dxCommon->ClearDepthBuffer();
+	//dxCommon->ClearDepthBuffer();
 #pragma endregion 背景画像描画
+
 #pragma region 3Dオブジェクト描画
 	// 3Dオブジェクト描画前処理
 	Object3d::PreDraw(dxCommon->GetCommandList());
@@ -173,6 +174,7 @@ void GameScene::Draw() {
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
 #pragma endregion 3Dオブジェクト描画
+
 #pragma region 前景画像描画
 	// 前景画像描画前処理
 	Image2d::PreDraw(dxCommon->GetCommandList());

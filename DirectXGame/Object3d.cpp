@@ -19,7 +19,7 @@ ID3D12GraphicsCommandList* Object3d::cmdList = nullptr;
 ComPtr<ID3D12RootSignature> Object3d::rootsignature;
 ComPtr<ID3D12PipelineState> Object3d::pipelinestate;
 
-bool Object3d::StaticInitialize(ID3D12Device* device, int window_width, int window_height)
+bool Object3d::StaticInitialize(ID3D12Device* device)
 {
 	// nullptrチェック
 	assert(device);
@@ -27,7 +27,7 @@ bool Object3d::StaticInitialize(ID3D12Device* device, int window_width, int wind
 	Object3d::device = device;
 
 	// パイプライン初期化
-	InitializeGraphicsPipeline();
+	CreateGraphicsPipeline();
 
 	Model::StaticInitialize(device);
 
@@ -80,7 +80,7 @@ Object3d* Object3d::Create()
 	return object3d;
 }
 
-bool Object3d::InitializeGraphicsPipeline()
+bool Object3d::CreateGraphicsPipeline()
 {
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
@@ -227,7 +227,7 @@ bool Object3d::InitializeGraphicsPipeline()
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	gpipeline.pRootSignature = rootsignature.Get();
@@ -238,7 +238,7 @@ bool Object3d::InitializeGraphicsPipeline()
 	if (FAILED(result))
 	{
 		assert(0);
-		return result;
+		return false;
 	}
 
 	return true;
@@ -259,7 +259,7 @@ bool Object3d::Initialize()
 		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB0) + 0xff) & ~0xff),
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(&constBuffB0)
+		IID_PPV_ARGS(&constBufferB0)
 	);
 
 	return true;
@@ -295,9 +295,9 @@ void Object3d::Update()
 
 	// 定数バッファへデータ転送
 	ConstBufferDataB0* constMap0 = nullptr;
-	result = constBuffB0->Map(0, nullptr, (void**)&constMap0);
+	result = constBufferB0->Map(0, nullptr, (void**)&constMap0);
 	constMap0->mat = matWorld * matViewProjection; // 行列の合成
-	constBuffB0->Unmap(0, nullptr);
+	constBufferB0->Unmap(0, nullptr);
 }
 
 void Object3d::Draw()
@@ -307,7 +307,7 @@ void Object3d::Draw()
 	assert(Object3d::cmdList);
 
 	// 定数バッファビューをセット
-	cmdList->SetGraphicsRootConstantBufferView(0, constBuffB0->GetGPUVirtualAddress());
+	cmdList->SetGraphicsRootConstantBufferView(0, constBufferB0->GetGPUVirtualAddress());
 
 	model->Draw(cmdList);
 }

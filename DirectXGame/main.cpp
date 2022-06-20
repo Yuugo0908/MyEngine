@@ -46,24 +46,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		return 1;
 	}
 	// 画像静的初期化
-	if (!Image2d::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height))
+	if (!Image2d::StaticInitialize(dxCommon->GetDevice()))
 	{
 		assert(0);
 		return 1;
 	}
 
 	// 3Dオブジェクト静的初期化
-	if (!Object3d::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height))
+	if (!Object3d::StaticInitialize(dxCommon->GetDevice()))
 	{
 		assert(0);
 		return 1;
 	}
 
 	// ポストエフェクト用のテクスチャ読み込み
-	Image2d::LoadTexture(100, L"Resources/white1x1.png");
+	//Image2d::LoadTexture(100, L"Resources/white1x1.png");
 	// ポストエフェクトの初期化
 	postEffect = new PostEffect();
-	postEffect->Initialize();
+	postEffect->Initialize(dxCommon->GetDevice());
 
 #pragma endregion 汎用機能初期化
 

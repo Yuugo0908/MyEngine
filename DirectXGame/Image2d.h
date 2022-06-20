@@ -33,7 +33,7 @@ public: // サブクラス
 
 public: // 静的メンバ関数
 	// 静的初期化
-	static bool StaticInitialize(ID3D12Device* device, int window_width, int window_height);
+	static bool StaticInitialize(ID3D12Device* device);
 	// テクスチャ読み込み
 	static bool LoadTexture(UINT texnumber, const wchar_t* filename);
 	// 描画前処理
@@ -42,6 +42,8 @@ public: // 静的メンバ関数
 	static void PostDraw();
 	// 画像生成
 	static Image2d* Create(UINT texNumber, XMFLOAT2 position, XMFLOAT4 color = { 1, 1, 1, 1 }, XMFLOAT2 anchorpoint = { 0.0f, 0.0f }, bool isFlipX = false, bool isFlipY = false);
+	// グラフィックパイプライン生成
+	static bool CreateGraphicsPipeline();
 
 protected: // 静的メンバ変数
 	// テクスチャの最大枚数
@@ -63,7 +65,7 @@ protected: // 静的メンバ変数
 	// デスクリプタヒープ
 	static ComPtr<ID3D12DescriptorHeap> descHeap;
 	// テクスチャバッファ
-	static ComPtr<ID3D12Resource> texBuff[srvCount];
+	static ComPtr<ID3D12Resource> texBuffer[srvCount];
 
 public: // メンバ関数
 	// コンストラクタ
@@ -91,9 +93,9 @@ public: // メンバ関数
 
 protected: // メンバ変数
 	// 頂点バッファ
-	ComPtr<ID3D12Resource> vertBuff;
+	ComPtr<ID3D12Resource> vertBuffer;
 	// 定数バッファ
-	ComPtr<ID3D12Resource> constBuff;
+	ComPtr<ID3D12Resource> constBuffer;
 	// 頂点バッファビュー
 	D3D12_VERTEX_BUFFER_VIEW vbView{};
 	// テクスチャ番号

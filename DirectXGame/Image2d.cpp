@@ -1,4 +1,5 @@
 #include "Image2d.h"
+#include "WinApp.h"
 #include <cassert>
 #include <d3dx12.h>
 #include <d3dcompiler.h>
@@ -17,9 +18,9 @@ ComPtr<ID3D12RootSignature> Image2d::rootSignature;
 ComPtr<ID3D12PipelineState> Image2d::pipelineState;
 XMMATRIX Image2d::matProjection;
 ComPtr<ID3D12DescriptorHeap> Image2d::descHeap;
-ComPtr<ID3D12Resource> Image2d::texBuff[srvCount];
+ComPtr<ID3D12Resource> Image2d::texBuffer[srvCount];
 
-bool Image2d::StaticInitialize(ID3D12Device* device, int window_width, int window_height)
+bool Image2d::StaticInitialize(ID3D12Device* device)
 {
 	// nullptrチェック
 	assert(device);
@@ -29,6 +30,150 @@ bool Image2d::StaticInitialize(ID3D12Device* device, int window_width, int windo
 	// デスクリプタサイズを取得
 	descriptorHandleIncrementSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
+	// パイプライン初期化
+	CreateGraphicsPipeline();
+
+	return true;
+}
+
+bool Image2d::LoadTexture(UINT texnumber, const wchar_t* filename)
+{
+	// nullptrチェック
+	assert(device);
+
+	HRESULT result;
+	// WICテクスチャのロード
+	TexMetadata metadata{};
+	ScratchImage scratchImg{};
+
+	result = LoadFromWICFile
+	(
+		filename, WIC_FLAGS_NONE,
+		&metadata, scratchImg
+	);
+	if (FAILED(result))
+	{
+		assert(0);
+		return false;
+	}
+
+	const Image* img = scratchImg.GetImage(0, 0, 0); // 生データ抽出
+
+	// リソース設定
+	CD3DX12_RESOURCE_DESC texresDesc = CD3DX12_RESOURCE_DESC::Tex2D
+	(
+		metadata.format,
+		metadata.width,
+		(UINT)metadata.height,
+		(UINT16)metadata.arraySize,
+		(UINT16)metadata.mipLevels
+	);
+
+	// テクスチャ用バッファの生成
+	result = device->CreateCommittedResource
+	(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0),
+		D3D12_HEAP_FLAG_NONE,
+		&texresDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ, // テクスチャ用指定
+		nullptr,
+		IID_PPV_ARGS(&texBuffer[texnumber])
+	);
+	if (FAILED(result))
+	{
+		assert(0);
+		return false;
+	}
+
+	// テクスチャバッファにデータ転送
+	result = texBuffer[texnumber]->WriteToSubresource
+	(
+		0,
+		nullptr, // 全領域へコピー
+		img->pixels,    // 元データアドレス
+		(UINT)img->rowPitch,  // 1ラインサイズ
+		(UINT)img->slicePitch // 1枚サイズ
+	);
+	if (FAILED(result))
+	{
+		assert(0);
+		return false;
+	}
+
+	// シェーダリソースビュー作成
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{}; // 設定構造体
+	D3D12_RESOURCE_DESC resDesc = texBuffer[texnumber]->GetDesc();
+
+	srvDesc.Format = resDesc.Format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+	srvDesc.Texture2D.MipLevels = 1;
+
+	device->CreateShaderResourceView
+	(
+		texBuffer[texnumber].Get(), //ビューと関連付けるバッファ
+		&srvDesc, //テクスチャ設定情報
+		CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap->GetCPUDescriptorHandleForHeapStart(), texnumber, descriptorHandleIncrementSize)
+	);
+
+	return true;
+}
+
+void Image2d::PreDraw(ID3D12GraphicsCommandList* cmdList)
+{
+	// PreDrawとPostDrawがペアで呼ばれていなければエラー
+	assert(Image2d::cmdList == nullptr);
+
+	// コマンドリストをセット
+	Image2d::cmdList = cmdList;
+
+	// パイプラインステートの設定
+	cmdList->SetPipelineState(pipelineState.Get());
+	// ルートシグネチャの設定
+	cmdList->SetGraphicsRootSignature(rootSignature.Get());
+	// プリミティブ形状を設定
+	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+}
+
+void Image2d::PostDraw()
+{
+	// コマンドリストを解除
+	Image2d::cmdList = nullptr;
+}
+
+Image2d* Image2d::Create(UINT texNumber, XMFLOAT2 position, XMFLOAT4 color, XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)
+{
+	// 仮サイズ
+	XMFLOAT2 size = { 100.0f, 100.0f };
+
+	if (texBuffer[texNumber])
+	{
+		// テクスチャ情報取得
+		D3D12_RESOURCE_DESC resDesc = texBuffer[texNumber]->GetDesc();
+		// スプライトのサイズをテクスチャのサイズに設定
+		size = { (float)resDesc.Width, (float)resDesc.Height };
+	}
+
+	// Image2dのインスタンスを生成
+	Image2d* image2d = new Image2d(texNumber, position, size, color, anchorpoint, isFlipX, isFlipY);
+	if (image2d == nullptr)
+	{
+		return nullptr;
+	}
+
+	// 初期化
+	if (!image2d->Initialize())
+	{
+		delete image2d;
+		assert(0);
+		return nullptr;
+	}
+
+	return image2d;
+}
+
+bool Image2d::CreateGraphicsPipeline()
+{
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
 	ComPtr<ID3DBlob> psBlob; // ピクセルシェーダオブジェクト
@@ -192,8 +337,8 @@ bool Image2d::StaticInitialize(ID3D12Device* device, int window_width, int windo
 	// 射影行列計算
 	matProjection = XMMatrixOrthographicOffCenterLH
 	(
-		0.0f, (float)window_width,
-		(float)window_height, 0.0f,
+		0.0f, (float)WinApp::window_width,
+		(float)WinApp::window_height, 0.0f,
 		0.0f, 1.0f
 	);
 
@@ -208,144 +353,7 @@ bool Image2d::StaticInitialize(ID3D12Device* device, int window_width, int windo
 		assert(0);
 		return false;
 	}
-
 	return true;
-}
-
-bool Image2d::LoadTexture(UINT texnumber, const wchar_t* filename)
-{
-	// nullptrチェック
-	assert(device);
-
-	HRESULT result;
-	// WICテクスチャのロード
-	TexMetadata metadata{};
-	ScratchImage scratchImg{};
-
-	result = LoadFromWICFile
-	(
-		filename, WIC_FLAGS_NONE,
-		&metadata, scratchImg
-	);
-	if (FAILED(result))
-	{
-		assert(0);
-		return false;
-	}
-
-	const Image* img = scratchImg.GetImage(0, 0, 0); // 生データ抽出
-
-	// リソース設定
-	CD3DX12_RESOURCE_DESC texresDesc = CD3DX12_RESOURCE_DESC::Tex2D
-	(
-		metadata.format,
-		metadata.width,
-		(UINT)metadata.height,
-		(UINT16)metadata.arraySize,
-		(UINT16)metadata.mipLevels
-	);
-
-	// テクスチャ用バッファの生成
-	result = device->CreateCommittedResource
-	(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0),
-		D3D12_HEAP_FLAG_NONE,
-		&texresDesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ, // テクスチャ用指定
-		nullptr,
-		IID_PPV_ARGS(&texBuff[texnumber])
-	);
-	if (FAILED(result))
-	{
-		assert(0);
-		return false;
-	}
-
-	// テクスチャバッファにデータ転送
-	result = texBuff[texnumber]->WriteToSubresource
-	(
-		0,
-		nullptr, // 全領域へコピー
-		img->pixels,    // 元データアドレス
-		(UINT)img->rowPitch,  // 1ラインサイズ
-		(UINT)img->slicePitch // 1枚サイズ
-	);
-	if (FAILED(result))
-	{
-		assert(0);
-		return false;
-	}
-
-	// シェーダリソースビュー作成
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{}; // 設定構造体
-	D3D12_RESOURCE_DESC resDesc = texBuff[texnumber]->GetDesc();
-
-	srvDesc.Format = resDesc.Format;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-	srvDesc.Texture2D.MipLevels = 1;
-
-	device->CreateShaderResourceView
-	(
-		texBuff[texnumber].Get(), //ビューと関連付けるバッファ
-		&srvDesc, //テクスチャ設定情報
-		CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap->GetCPUDescriptorHandleForHeapStart(), texnumber, descriptorHandleIncrementSize)
-	);
-
-	return true;
-}
-
-void Image2d::PreDraw(ID3D12GraphicsCommandList* cmdList)
-{
-	// PreDrawとPostDrawがペアで呼ばれていなければエラー
-	assert(Image2d::cmdList == nullptr);
-
-	// コマンドリストをセット
-	Image2d::cmdList = cmdList;
-
-	// パイプラインステートの設定
-	cmdList->SetPipelineState(pipelineState.Get());
-	// ルートシグネチャの設定
-	cmdList->SetGraphicsRootSignature(rootSignature.Get());
-	// プリミティブ形状を設定
-	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-}
-
-void Image2d::PostDraw()
-{
-	// コマンドリストを解除
-	Image2d::cmdList = nullptr;
-}
-
-Image2d* Image2d::Create(UINT texNumber, XMFLOAT2 position, XMFLOAT4 color, XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)
-{
-	// 仮サイズ
-	XMFLOAT2 size = { 100.0f, 100.0f };
-
-	if (texBuff[texNumber])
-	{
-		// テクスチャ情報取得
-		D3D12_RESOURCE_DESC resDesc = texBuff[texNumber]->GetDesc();
-		// スプライトのサイズをテクスチャのサイズに設定
-		size = { (float)resDesc.Width, (float)resDesc.Height };
-	}
-
-	// Image2dのインスタンスを生成
-	Image2d* image2d = new Image2d(texNumber, position, size, color, anchorpoint, isFlipX, isFlipY);
-	if (image2d == nullptr)
-	{
-		return nullptr;
-	}
-
-	// 初期化
-	if (!image2d->Initialize())
-	{
-		delete image2d;
-		assert(0);
-		return nullptr;
-	}
-
-	return image2d;
 }
 
 Image2d::Image2d(UINT texNumber, XMFLOAT2 position, XMFLOAT2 size, XMFLOAT4 color, XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)
@@ -376,7 +384,7 @@ bool Image2d::Initialize()
 		&CD3DX12_RESOURCE_DESC::Buffer(sizeof(VertexPosUv) * vertNum),
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(&vertBuff)
+		IID_PPV_ARGS(&vertBuffer)
 	);
 	if (FAILED(result))
 	{
@@ -388,7 +396,7 @@ bool Image2d::Initialize()
 	TransferVertices();
 
 	// 頂点バッファビューの作成
-	vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
+	vbView.BufferLocation = vertBuffer->GetGPUVirtualAddress();
 	vbView.SizeInBytes = sizeof(VertexPosUv) * 4;
 	vbView.StrideInBytes = sizeof(VertexPosUv);
 
@@ -400,7 +408,7 @@ bool Image2d::Initialize()
 		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xff) & ~0xff),
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(&constBuff)
+		IID_PPV_ARGS(&constBuffer)
 	);
 	if (FAILED(result))
 	{
@@ -410,12 +418,12 @@ bool Image2d::Initialize()
 
 	// 定数バッファにデータ転送
 	ConstBufferData* constMap = nullptr;
-	result = constBuff->Map(0, nullptr, (void**)&constMap);
+	result = constBuffer->Map(0, nullptr, (void**)&constMap);
 	if (SUCCEEDED(result))
 	{
 		constMap->color = color;
 		constMap->mat = matProjection;
-		constBuff->Unmap(0, nullptr);
+		constBuffer->Unmap(0, nullptr);
 	}
 
 	return true;
@@ -487,12 +495,12 @@ void Image2d::Draw()
 
 	// 定数バッファにデータ転送
 	ConstBufferData* constMap = nullptr;
-	HRESULT result = this->constBuff->Map(0, nullptr, (void**)&constMap);
+	HRESULT result = this->constBuffer->Map(0, nullptr, (void**)&constMap);
 	if (SUCCEEDED(result))
 	{
 		constMap->color = this->color;
 		constMap->mat = this->matWorld * matProjection;	// 行列の合成	
-		this->constBuff->Unmap(0, nullptr);
+		this->constBuffer->Unmap(0, nullptr);
 	}
 
 	// 頂点バッファの設定
@@ -502,7 +510,7 @@ void Image2d::Draw()
 	// デスクリプタヒープをセット
 	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 	// 定数バッファビューをセット
-	cmdList->SetGraphicsRootConstantBufferView(0, this->constBuff->GetGPUVirtualAddress());
+	cmdList->SetGraphicsRootConstantBufferView(0, this->constBuffer->GetGPUVirtualAddress());
 	// シェーダリソースビューをセット
 	cmdList->SetGraphicsRootDescriptorTable(1, CD3DX12_GPU_DESCRIPTOR_HANDLE(descHeap->GetGPUDescriptorHandleForHeapStart(), this->texNumber, descriptorHandleIncrementSize));
 	// 描画コマンド
@@ -542,9 +550,9 @@ void Image2d::TransferVertices()
 	vertices[RT].pos = { right,	top,	0.0f }; // 右上
 
 	// テクスチャ情報取得
-	if (texBuff[texNumber])
+	if (texBuffer[texNumber])
 	{
-		D3D12_RESOURCE_DESC resDesc = texBuff[texNumber]->GetDesc();
+		D3D12_RESOURCE_DESC resDesc = texBuffer[texNumber]->GetDesc();
 
 		float tex_left = texBase.x / resDesc.Width;
 		float tex_right = (texBase.x + texSize.x) / resDesc.Width;
@@ -559,10 +567,10 @@ void Image2d::TransferVertices()
 
 	// 頂点バッファへのデータ転送
 	VertexPosUv* vertMap = nullptr;
-	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
+	result = vertBuffer->Map(0, nullptr, (void**)&vertMap);
 	if (SUCCEEDED(result))
 	{
 		memcpy(vertMap, vertices, sizeof(vertices));
-		vertBuff->Unmap(0, nullptr);
+		vertBuffer->Unmap(0, nullptr);
 	}
 }

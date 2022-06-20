@@ -21,7 +21,6 @@ protected: // エイリアス
 	using XMMATRIX = DirectX::XMMATRIX;
 
 public: // サブクラス
-
 	// 定数バッファ用データ構造体B0
 	struct ConstBufferDataB0
 	{
@@ -29,17 +28,17 @@ public: // サブクラス
 		XMMATRIX mat; // ３Ｄ変換行列
 	};
 
-private: // 定数
-
 public: // 静的メンバ関数
 	// 静的初期化
-	static bool StaticInitialize(ID3D12Device* device, int window_width, int window_height);
+	static bool StaticInitialize(ID3D12Device* device);
 	// 描画前処理
 	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
 	// 描画後処理
 	static void PostDraw();
 	// 3Dオブジェクト生成
 	static Object3d* Create();
+	// グラフィックパイプライン生成
+	static bool CreateGraphicsPipeline();
 
 private: // 静的メンバ変数
 	// デバイス
@@ -50,10 +49,6 @@ private: // 静的メンバ変数
 	static ComPtr<ID3D12RootSignature> rootsignature;
 	// パイプラインステートオブジェクト
 	static ComPtr<ID3D12PipelineState> pipelinestate;
-
-private:// 静的メンバ関数
-	// グラフィックパイプライン生成
-	static bool InitializeGraphicsPipeline();
 
 public: // メンバ関数
 	bool Initialize();
@@ -77,7 +72,7 @@ public: // メンバ関数
 	void SetModel(Model* model) { this->model = model; };
 
 private: // メンバ変数
-	ComPtr<ID3D12Resource> constBuffB0; // 定数バッファ
+	ComPtr<ID3D12Resource> constBufferB0; // 定数バッファ
 	// 色
 	XMFLOAT4 color = { 1,1,1,1 };
 	// ローカルスケール

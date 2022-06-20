@@ -100,7 +100,7 @@ bool Model::LoadTexture(const std::string& directoryPath, const std::string& fil
 		&texresDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ, // テクスチャ用指定
 		nullptr,
-		IID_PPV_ARGS(&texbuff)
+		IID_PPV_ARGS(&texBuffer)
 	);
 	if (FAILED(result))
 	{
@@ -109,7 +109,7 @@ bool Model::LoadTexture(const std::string& directoryPath, const std::string& fil
 	}
 
 	// テクスチャバッファにデータ転送
-	result = texbuff->WriteToSubresource
+	result = texBuffer->WriteToSubresource
 	(
 		0,
 		nullptr, // 全領域へコピー
@@ -128,7 +128,7 @@ bool Model::LoadTexture(const std::string& directoryPath, const std::string& fil
 	gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(descHeap->GetGPUDescriptorHandleForHeapStart(), 0, descriptorHandleIncrementSize);
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{}; // 設定構造体
-	D3D12_RESOURCE_DESC resDesc = texbuff->GetDesc();
+	D3D12_RESOURCE_DESC resDesc = texBuffer->GetDesc();
 
 	srvDesc.Format = resDesc.Format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -137,7 +137,7 @@ bool Model::LoadTexture(const std::string& directoryPath, const std::string& fil
 
 	device->CreateShaderResourceView
 	(
-		texbuff.Get(), //ビューと関連付けるバッファ
+		texBuffer.Get(), //ビューと関連付けるバッファ
 		&srvDesc, //テクスチャ設定情報
 		cpuDescHandleSRV
 	);
@@ -268,7 +268,7 @@ void Model::CreateModel(const std::string& text)
 		&CD3DX12_RESOURCE_DESC::Buffer(sizeVB),
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(&vertBuff)
+		IID_PPV_ARGS(&vertBuffer)
 	);
 	if (FAILED(result))
 	{
@@ -283,7 +283,7 @@ void Model::CreateModel(const std::string& text)
 		&CD3DX12_RESOURCE_DESC::Buffer(sizeIB),
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(&indexBuff)
+		IID_PPV_ARGS(&indexBuffer)
 	);
 	if (FAILED(result))
 	{
@@ -292,31 +292,31 @@ void Model::CreateModel(const std::string& text)
 
 	// 頂点バッファへのデータ転送
 	VertexPosNormalUv* vertMap = nullptr;
-	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
+	result = vertBuffer->Map(0, nullptr, (void**)&vertMap);
 	if (SUCCEEDED(result))
 	{
 		std::copy(vertices.begin(), vertices.end(), vertMap);
-		vertBuff->Unmap(0, nullptr);
+		vertBuffer->Unmap(0, nullptr);
 	}
 
 	// インデックスバッファへのデータ転送
 	unsigned short* indexMap = nullptr;
-	result = indexBuff->Map(0, nullptr, (void**)&indexMap);
+	result = indexBuffer->Map(0, nullptr, (void**)&indexMap);
 	if (SUCCEEDED(result))
 	{
 		// 全インデックスに対して
 		std::copy(indices.begin(), indices.end(), indexMap);
 
-		indexBuff->Unmap(0, nullptr);
+		indexBuffer->Unmap(0, nullptr);
 	}
 
 	// 頂点バッファビューの作成
-	vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
+	vbView.BufferLocation = vertBuffer->GetGPUVirtualAddress();
 	vbView.SizeInBytes = sizeVB;
 	vbView.StrideInBytes = sizeof(vertices[0]);
 
 	// インデックスバッファビューの作成
-	ibView.BufferLocation = indexBuff->GetGPUVirtualAddress();
+	ibView.BufferLocation = indexBuffer->GetGPUVirtualAddress();
 	ibView.Format = DXGI_FORMAT_R16_UINT;
 	ibView.SizeInBytes = sizeIB;
 }
@@ -432,19 +432,19 @@ bool Model::Initialize(const std::string& text)
 		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB1) + 0xff) & ~0xff),
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(&constBuffB1)
+		IID_PPV_ARGS(&constBufferB1)
 	);
 
 	CreateModel(text);
 
 	// 定数バッファへデータ転送
 	ConstBufferDataB1* constMap1 = nullptr;
-	result = constBuffB1->Map(0, nullptr, (void**)&constMap1);
+	result = constBufferB1->Map(0, nullptr, (void**)&constMap1);
 	constMap1->ambient = material.ambient;
 	constMap1->diffuse = material.diffuse;
 	constMap1->specular = material.specular;
 	constMap1->alpha = material.alpha;
-	constBuffB1->Unmap(0, nullptr);
+	constBufferB1->Unmap(0, nullptr);
 
 	return true;
 }
@@ -464,7 +464,7 @@ void Model::Draw(ID3D12GraphicsCommandList* cmdList)
 	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 	// 定数バッファビューをセット
-	cmdList->SetGraphicsRootConstantBufferView(1, constBuffB1->GetGPUVirtualAddress());
+	cmdList->SetGraphicsRootConstantBufferView(1, constBufferB1->GetGPUVirtualAddress());
 	// シェーダリソースビューをセット
 	cmdList->SetGraphicsRootDescriptorTable(2, gpuDescHandleSRV);
 
