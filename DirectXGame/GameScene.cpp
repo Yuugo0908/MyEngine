@@ -98,8 +98,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	playerObj->SetModel(playerModel);
 	skydomeObj->SetModel(skydomeModel);
 
-	playerObj->SetPosition({ 0.0f, 0.0f, 0.0f });
-	playerObj->SetScale({ 5.0f,5.0f,5.0f });
+	playerObj->SetPosition({ 5.0f, 5.0f, 0.0f });
+	playerObj->SetScale({ 1.0f,1.0f,1.0f });
 	skydomeObj->SetScale({ 1.0f, 1.0f, 1.0f });
 	fbxObject->SetPosition({ 0.0f, 0.0f, 0.0f });
 	fbxObject->SetScale({ 1.0f, 1.0f, 1.0f });
@@ -119,22 +119,7 @@ void GameScene::Update() {
 	XMFLOAT3 cameraEye = camera->GetEye();
 	XMFLOAT3 cameraTarget = camera->GetTarget();
 
-	if (keyboard->TriggerKey(DIK_SPACE))
-	{
-		p_flag = true;
-	}
-
-	if (p_flag == true) {
-		p_pos.y -= p_val;
-		p_val += p_gra;
-	}
-
-	if (p_pos.y <= -60.0f)
-	{
-		p_flag = false;
-		p_pos.y = 30.0f;
-		p_val = 0.0f;
-	}
+	Move();
 
 	playerObj->SetPosition(p_pos);
 	camera->SetEye(cameraEye);
@@ -167,7 +152,7 @@ void GameScene::Draw() {
 	Object3d::PreDraw(dxCommon->GetCommandList());
 	// 3Dオブクジェクトの描画
 
-	//playerObj->Draw();
+	playerObj->Draw();
 	//skydomeObj->Draw();
 	fbxObject->Draw(dxCommon->GetCommandList());
 
@@ -186,4 +171,24 @@ void GameScene::Draw() {
 	// 画像描画後処理
 	Image2d::PostDraw();
 #pragma endregion 前景画像描画
+}
+
+void GameScene::Move()
+{
+	if (keyboard->TriggerKey(DIK_SPACE))
+	{
+		p_flag = true;
+	}
+
+	if (p_flag == true) {
+		p_pos.y -= p_val;
+		p_val += p_gra;
+	}
+
+	if (p_pos.y <= -30.0f)
+	{
+		p_flag = false;
+		p_pos.y = 5.0f;
+		p_val = 0.0f;
+	}
 }

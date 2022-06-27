@@ -14,6 +14,7 @@
 #include "FbxLoader.h"
 #include "FbxObject3d.h"
 #include "Camera.h"
+#include "Easing.h"
 
 using namespace DirectX;
 
@@ -46,6 +47,8 @@ public: // メンバ関数
 	void reset();
 	// 描画
 	void Draw();
+	// 自機の移動
+	void Move();
 
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
