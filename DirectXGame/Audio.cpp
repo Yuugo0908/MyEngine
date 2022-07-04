@@ -4,6 +4,13 @@
 
 #pragma comment(lib,"xaudio2.lib")
 
+Audio* Audio::GetInstance()
+{
+	static Audio instance;
+
+	return &instance;
+}
+
 bool Audio::Initialize()
 {
 	HRESULT result;
@@ -70,7 +77,7 @@ void Audio::PlayWave(const char* filename, int loopCount, float volume)
 	wfex.wBitsPerSample = format.fmt.nBlockAlign * 8 / format.fmt.nChannels;
 
 	// 波形フォーマットを元にSourceVoiceの生成
-	result = xAudio2->CreateSourceVoice(&pSourceVoice, &wfex, 0, 2.0f, &voiceCallback);
+	result = xAudio2->CreateSourceVoice(&pSourceVoice, &wfex, 0, 2.0f);
 	if FAILED(result)
 	{
 		delete[] pBuffer;

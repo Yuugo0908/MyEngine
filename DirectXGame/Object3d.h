@@ -48,7 +48,13 @@ private: // 静的メンバ変数
 	// ルートシグネチャ
 	static ComPtr<ID3D12RootSignature> rootsignature;
 	// パイプラインステートオブジェクト
-	static ComPtr<ID3D12PipelineState> pipelinestate;
+	static ComPtr<ID3D12PipelineState> pipelinestate;	
+	// 頂点シェーダオブジェクト
+	static ComPtr<ID3DBlob> vsBlob;
+	// ピクセルシェーダオブジェクト
+	static ComPtr<ID3DBlob> psBlob;
+	// エラーオブジェクト
+	static ComPtr<ID3DBlob> errorBlob;
 
 public: // メンバ関数
 	bool Initialize();

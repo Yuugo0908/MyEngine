@@ -155,6 +155,7 @@
     <ClCompile Include="DebugText.cpp" />
     <ClCompile Include="DirectXCommon.cpp" />
     <ClCompile Include="Easing.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="FbxLoader.cpp" />
     <ClCompile Include="FbxModel.cpp" />
     <ClCompile Include="FbxObject3d.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Object3d.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="PostEffect.cpp" />
     <ClCompile Include="Image2d.cpp" />
     <ClCompile Include="WinApp.cpp" />
@@ -173,6 +175,7 @@
     <ClInclude Include="DebugText.h" />
     <ClInclude Include="DirectXCommon.h" />
     <ClInclude Include="Easing.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="FbxLoader.h" />
     <ClInclude Include="FbxModel.h" />
     <ClInclude Include="FbxObject3d.h" />
@@ -180,6 +183,7 @@
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Object3d.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="PostEffect.h" />
     <ClInclude Include="SafeDelete.h" />
     <ClInclude Include="Image2d.h" />

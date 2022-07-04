@@ -98,6 +98,7 @@ bool Object3d::CreateGraphicsPipeline()
 		0,
 		&vsBlob, &errorBlob
 	);
+
 	if (FAILED(result))
 	{
 		// errorBlobからエラー内容をstring型にコピー
