@@ -49,6 +49,9 @@ private: // メンバ変数
 	ComPtr<ID3D12Fence> fence;
 	UINT64 fenceVal = 0;
 
+	//imgui関連
+	ComPtr<ID3D12DescriptorHeap> imguiHeap; // ヒープ保持用
+
 private: // メンバ関数
 	// DXGIデバイス初期化
 	bool InitializeDXGIDevice();
@@ -62,4 +65,6 @@ private: // メンバ関数
 	bool CreateDepthBuffer();
 	// フェンス生成
 	bool CreateFence();
+	// imguiの初期化
+	bool InitImgui();
 };
