@@ -138,6 +138,9 @@ void GameScene::Draw() {
 	
 	ImGui::Begin("Test");
 	ImGui::SetWindowSize(ImVec2(500, 200));
+	ImGui::SliderFloat("p_pos.x", &p_pos.x, 0.0f, 10.0f);
+	ImGui::SliderFloat("p_pos.y", &p_pos.y, 0.0f, 10.0f);
+	ImGui::SliderFloat("p_pos.z", &p_pos.z, 0.0f, 10.0f);
 	ImGui::End();
 	
 	// コマンドリストの取得
