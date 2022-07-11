@@ -16,6 +16,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	GameScene* gameScene = nullptr;
 	Camera* camera = nullptr;
 	PostEffect* postEffect = nullptr;
+	Image2d* image2d = nullptr;
 
 	// ゲームウィンドウの作成
 	win = new WinApp();
@@ -61,6 +62,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	// ポストエフェクト用のテクスチャ読み込み
 	//Image2d::LoadTexture(100, L"Resources/white1x1.png");
+	
+	Image2d::LoadTexture(1, L"Resources/background.png");
+	image2d = Image2d::Create(1, { 0, 0 });
+	image2d->SetSize({ 1280.0f, 720.0f });
 	// ポストエフェクトの初期化
 	postEffect = new PostEffect();
 	postEffect->Initialize(dxCommon->GetDevice());
@@ -89,24 +94,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma endregion DirectX毎フレーム処理
 
 #pragma region グラフィックスコマンド
-		// 描画開始
-		dxCommon->PreDraw();
-
-		// ゲームシーンの描画
-		gameScene->Draw();
-
-		// 描画終了
-		dxCommon->PostDraw();
 
 		//レンダーテクスチャへの描画開始
 		postEffect->PreDraw(dxCommon->GetCommandList());
-
-		// ポストエフェクトの描画
-		postEffect->Draw(dxCommon->GetCommandList());
-
+		// ゲームシーンの描画
+		gameScene->Draw();
 		//レンダーテクスチャへの描画終了
 		postEffect->PostDraw(dxCommon->GetCommandList());
+		
+		//// 背景画像描画前処理
+		//Image2d::PreDraw(dxCommon->GetCommandList());
+		//// 背景画像描画
+		//image2d->Draw();
+		//// 画像描画後処理
+		//Image2d::PostDraw();
 
+		// 描画開始
+		dxCommon->PreDraw();
+		// ポストエフェクトの描画
+		postEffect->Draw(dxCommon->GetCommandList());
+		// 描画終了
+		dxCommon->PostDraw();
 #pragma endregion グラフィックスコマンド
 	}
 
@@ -118,6 +126,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	safe_delete(dxCommon);
 	safe_delete(camera);
 	safe_delete(postEffect);
+	safe_delete(image2d);
 	FbxLoader::GetInstance()->Finalize();
 
 	// ゲームウィンドウの破棄

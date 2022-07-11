@@ -4,6 +4,13 @@
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
+Keyboard* Keyboard::GetInstance()
+{
+	static Keyboard instance;
+
+	return &instance;
+}
+
 bool Keyboard::Initialize(HINSTANCE hInstance, HWND hwnd)
 {
 	HRESULT result = S_FALSE;

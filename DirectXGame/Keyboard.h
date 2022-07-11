@@ -22,6 +22,8 @@ public: //メンバ関数
 	// キーのトリガーをチェック
 	bool TriggerKey(BYTE keyNumber);
 
+	static Keyboard* GetInstance();
+
 private: //メンバ変数
 	ComPtr<IDirectInput8> dinput;
 	ComPtr<IDirectInputDevice8> devkeyboard;

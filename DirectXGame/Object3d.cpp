@@ -188,6 +188,8 @@ bool Object3d::CreateGraphicsPipeline()
 
 	// ブレンドステートの設定
 	gpipeline.BlendState.RenderTarget[0] = blenddesc;
+	// マルチレンダーターゲット用
+	//gpipeline.BlendState.RenderTarget[1] = blenddesc;
 
 	// 深度バッファのフォーマット
 	gpipeline.DSVFormat = DXGI_FORMAT_D32_FLOAT;
@@ -201,6 +203,8 @@ bool Object3d::CreateGraphicsPipeline()
 
 	gpipeline.NumRenderTargets = 1; // 描画対象は1つ
 	gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM; // 0～255指定のRGBA
+	// マルチレンダーターゲット用
+	// gpipeline.RTVFormats[1] = DXGI_FORMAT_R8G8B8A8_UNORM; // 0～255指定のRGBA
 	gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
 	// デスクリプタレンジ

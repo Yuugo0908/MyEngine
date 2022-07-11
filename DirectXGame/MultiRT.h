@@ -4,7 +4,7 @@
 #include <d3d12.h>
 #include <DirectXMath.h>
 
-class PostEffect
+class MultiRT
 {
 protected: // エイリアス
 // Microsoft::WRL::を省略
@@ -120,7 +120,7 @@ private: // メンバ変数
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBuffer;
 	// テクスチャバッファ
-	ComPtr<ID3D12Resource> texBuffer;
+	ComPtr<ID3D12Resource> texBuffer[2];
 	// 深度バッファ
 	ComPtr<ID3D12Resource> depthBuffer;
 	// SRV用デスクリプタヒープ

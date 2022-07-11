@@ -78,7 +78,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 
 	// カメラの設定
 	camera->SetTarget({ 0, 2.5f, 0 });
-	camera->SetEye({ 0, 0, -8.0f });
+	camera->SetEye({ 0, 0, -30.0f });
 
 	// .objの名前を指定してモデルを読み込む
 	playerModel = playerModel->CreateFromObject("sphere");
@@ -101,7 +101,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 
 	playerObj->SetPosition({ 5.0f, 5.0f, 0.0f });
 	playerObj->SetScale({ 1.0f,1.0f,1.0f });
-	skydomeObj->SetScale({ 1.0f, 1.0f, 1.0f });
+	skydomeObj->SetScale({ 5.0f, 5.0f, 5.0f });
 	fbxObject->SetPosition({ 0.0f, 0.0f, 0.0f });
 	fbxObject->SetScale({ 1.0f, 1.0f, 1.0f });
 	fbxObject->SetRotation({0, 90, 0});
@@ -136,24 +136,22 @@ void GameScene::reset() {
 
 void GameScene::Draw() {	
 	
-	ImGui::Begin("Test");
-	ImGui::SetWindowSize(ImVec2(500, 200));
-	ImGui::SliderFloat("p_pos.x", &p_pos.x, 0.0f, 10.0f);
-	ImGui::SliderFloat("p_pos.y", &p_pos.y, 0.0f, 10.0f);
-	ImGui::SliderFloat("p_pos.z", &p_pos.z, 0.0f, 10.0f);
-	ImGui::End();
+	//ImGui::Begin("Test");
+	//ImGui::SetWindowSize(ImVec2(500, 200));
+	//ImGui::SliderFloat("p_pos.x", &p_pos.x, 0.0f, 10.0f);
+	//ImGui::SliderFloat("p_pos.y", &p_pos.y, 0.0f, 10.0f);
+	//ImGui::SliderFloat("p_pos.z", &p_pos.z, 0.0f, 10.0f);
+	//ImGui::End();
 	
-	// コマンドリストの取得
-	ID3D12GraphicsCommandList* cmdList = dxCommon->GetCommandList();
 #pragma region 背景画像描画
 	// 背景画像描画前処理
-	Image2d::PreDraw(dxCommon->GetCommandList());
+	//Image2d::PreDraw(dxCommon->GetCommandList());
 	// 背景画像描画
-	backGround->Draw();
+	//backGround->Draw();
 	// 画像描画後処理
-	Image2d::PostDraw();
+	//Image2d::PostDraw();
 	// 深度バッファクリア
-	dxCommon->ClearDepthBuffer();
+	//dxCommon->ClearDepthBuffer();
 #pragma endregion 背景画像描画
 
 #pragma region 3Dオブジェクト描画
@@ -174,7 +172,7 @@ void GameScene::Draw() {
 	Image2d::PreDraw(dxCommon->GetCommandList());
 
 	// 前景画像の描画
-
+	
 	// デバッグテキストの描画
 	debugText.DrawAll(dxCommon->GetCommandList());
 	// 画像描画後処理
