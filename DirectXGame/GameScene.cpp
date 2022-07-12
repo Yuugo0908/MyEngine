@@ -78,7 +78,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 
 	// カメラの設定
 	camera->SetTarget({ 0, 2.5f, 0 });
-	camera->SetEye({ 0, 0, -30.0f });
+	camera->SetEye({ 0, 0, -20.0f });
 
 	// .objの名前を指定してモデルを読み込む
 	playerModel = playerModel->CreateFromObject("sphere");
