@@ -102,12 +102,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 #pragma region グラフィックスコマンド
 
-		//レンダーテクスチャへの描画開始
-		multiTex->PreDraw(dxCommon->GetCommandList());
-		// ゲームシーンの描画
-		gameScene->Draw();
-		//レンダーテクスチャへの描画終了
-		multiTex->PostDraw(dxCommon->GetCommandList());
+		////レンダーテクスチャへの描画開始
+		//multiTex->PreDraw(dxCommon->GetCommandList());
+		//// ポストエフェクトの描画
+		//multiTex->Draw(dxCommon->GetCommandList());
+		////レンダーテクスチャへの描画終了
+		//multiTex->PostDraw(dxCommon->GetCommandList());
 		
 		//// 背景画像描画前処理
 		//Image2d::PreDraw(dxCommon->GetCommandList());
@@ -118,8 +118,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		// 描画開始
 		dxCommon->PreDraw();
-		// ポストエフェクトの描画
-		multiTex->Draw(dxCommon->GetCommandList());
+		// ゲームシーンの描画
+		gameScene->Draw();
 		// 描画終了
 		dxCommon->PostDraw();
 #pragma endregion グラフィックスコマンド

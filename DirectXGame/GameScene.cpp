@@ -78,7 +78,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 
 	// カメラの設定
 	camera->SetTarget({ 0, 2.5f, 0 });
-	camera->SetEye({ 0, 0, -20.0f });
+	camera->SetEye({ 0.0f, 0.0f, -20.0f });
 
 	// .objの名前を指定してモデルを読み込む
 	playerModel = playerModel->CreateFromObject("sphere");
@@ -99,7 +99,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	playerObj->SetModel(playerModel);
 	skydomeObj->SetModel(skydomeModel);
 
-	playerObj->SetPosition({ 5.0f, 5.0f, 0.0f });
+	playerObj->SetPosition({ 0.0f, 0.0f, 0.0f });
 	playerObj->SetScale({ 1.0f,1.0f,1.0f });
 	skydomeObj->SetScale({ 5.0f, 5.0f, 5.0f });
 	fbxObject->SetPosition({ 0.0f, 0.0f, 0.0f });
@@ -107,6 +107,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	fbxObject->SetRotation({0, 90, 0});
 
 	p_pos = playerObj->GetPosition();
+	p_sca = playerObj->GetScale();
 }
 
 void GameScene::Finalize()
@@ -123,6 +124,7 @@ void GameScene::Update() {
 	Move();
 
 	playerObj->SetPosition(p_pos);
+	playerObj->SetScale(p_sca);
 	camera->SetEye(cameraEye);
 	camera->SetTarget(cameraTarget);
 	fbxObject->Update();
@@ -136,32 +138,27 @@ void GameScene::reset() {
 
 void GameScene::Draw() {	
 	
-	//ImGui::Begin("Test");
-	//ImGui::SetWindowSize(ImVec2(500, 200));
-	//ImGui::SliderFloat("p_pos.x", &p_pos.x, 0.0f, 10.0f);
-	//ImGui::SliderFloat("p_pos.y", &p_pos.y, 0.0f, 10.0f);
-	//ImGui::SliderFloat("p_pos.z", &p_pos.z, 0.0f, 10.0f);
-	//ImGui::End();
+	SetImgui();
 	
 #pragma region 背景画像描画
-	// 背景画像描画前処理
-	//Image2d::PreDraw(dxCommon->GetCommandList());
-	// 背景画像描画
-	//backGround->Draw();
-	// 画像描画後処理
-	//Image2d::PostDraw();
-	// 深度バッファクリア
-	//dxCommon->ClearDepthBuffer();
+	 // 背景画像描画前処理
+	Image2d::PreDraw(dxCommon->GetCommandList());
+	 // 背景画像描画
+	backGround->Draw();
+	 // 画像描画後処理
+	Image2d::PostDraw();
+	 // 深度バッファクリア
+	dxCommon->ClearDepthBuffer();
 #pragma endregion 背景画像描画
 
 #pragma region 3Dオブジェクト描画
 	// 3Dオブジェクト描画前処理
 	Object3d::PreDraw(dxCommon->GetCommandList());
-	// 3Dオブクジェクトの描画
 
+	// 3Dオブクジェクトの描画
 	playerObj->Draw();
 	//skydomeObj->Draw();
-	fbxObject->Draw(dxCommon->GetCommandList());
+	//fbxObject->Draw(dxCommon->GetCommandList());
 
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
@@ -198,4 +195,17 @@ void GameScene::Move()
 		p_pos.y = 5.0f;
 		p_val = 0.0f;
 	}
+}
+
+void GameScene::SetImgui()
+{
+	ImGui::Begin("Test");
+	ImGui::SetWindowSize(ImVec2(500, 200));
+	ImGui::SliderFloat("p_pos.x", &p_pos.x, 0.0f, 10.0f);
+	ImGui::SliderFloat("p_pos.y", &p_pos.y, 0.0f, 10.0f);
+	ImGui::SliderFloat("p_pos.z", &p_pos.z, 0.0f, 10.0f);
+	ImGui::SliderFloat("p_sca.x", &p_sca.x, 0.0f, 10.0f);
+	ImGui::SliderFloat("p_sca.y", &p_sca.y, 0.0f, 10.0f);
+	ImGui::SliderFloat("p_sca.z", &p_sca.z, 0.0f, 10.0f);
+	ImGui::End();
 }

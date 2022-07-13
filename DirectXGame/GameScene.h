@@ -50,6 +50,8 @@ public: // メンバ関数
 	void Draw();
 	// 自機の移動
 	void Move();
+	// Imguiの設定
+	void SetImgui();
 
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
@@ -72,6 +74,7 @@ private: // メンバ変数
 	FbxObject3d* fbxObject = nullptr;
 
 	XMFLOAT3 p_pos = {};
+	XMFLOAT3 p_sca = {};
 	bool p_flag = false;//自由落下のフラグ
 	float p_val = 0.0f;//速度
 	float p_gra = 0.1f;//重力
