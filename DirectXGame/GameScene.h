@@ -4,6 +4,7 @@
 #include "DirectXCommon.h"
 #include <DirectXMath.h>
 #include "Keyboard.h"
+#include "Controller.h"
 #include "Image2d.h"
 #include "Object3d.h"
 #include "DebugText.h"
@@ -53,6 +54,7 @@ public: // メンバ関数
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
 	Keyboard* keyboard = nullptr;
+	Controller* controller = nullptr;
 	Audio* playAudio = nullptr;
 	DebugText debugText;
 	Camera* camera = nullptr;

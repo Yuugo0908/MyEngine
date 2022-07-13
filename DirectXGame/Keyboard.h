@@ -1,10 +1,9 @@
 #pragma once
-
 #include <Windows.h>
 #include <wrl.h>
-
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
+#include "WinApp.h"
 
 class Keyboard
 {
@@ -14,7 +13,7 @@ protected: // エイリアス
 
 public: //メンバ関数
 	//初期化
-	bool Initialize(HINSTANCE hInstance, HWND hwnd);
+	bool Initialize(WinApp* win);
 	//更新
 	void Update();
 	// キーの押下をチェック

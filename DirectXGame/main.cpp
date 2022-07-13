@@ -5,6 +5,7 @@
 #include "FbxLoader.h"
 #include "PostEffect.h"
 #include "MultiTex.h"
+#include "Controller.h"
 
 //# Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -19,6 +20,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	PostEffect* postEffect = nullptr;
 	Image2d* image2d = nullptr;
 	MultiTex* multiTex = nullptr;
+	Controller* controller = nullptr;
 
 	// ゲームウィンドウの作成
 	win = new WinApp();
@@ -31,8 +33,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma region 汎用機能初期化
 
 	//入力の初期化
-	keyboard = new Keyboard();
-	keyboard->Initialize(win->GetInstance(), win->GetHwnd());
+	keyboard = Keyboard::GetInstance();
+	keyboard->Initialize(win);
+	controller = Controller::GetInstance();
+	controller->Initialize(win);
 
 	// カメラ初期化
 	camera = new Camera();
@@ -90,6 +94,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		// 入力関連の毎フレーム処理
 		keyboard->Update();
+		controller->Update();
 		// ゲームシーンの毎フレーム処理
 		gameScene->Update();
 
@@ -124,7 +129,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// 各種解放
 	safe_delete(gameScene);
 	safe_delete(audio);
-	safe_delete(keyboard);
+	//safe_delete(keyboard);
+	//safe_delete(controller);
 	safe_delete(dxCommon);
 	safe_delete(camera);
 	safe_delete(postEffect);

@@ -11,14 +11,14 @@ Keyboard* Keyboard::GetInstance()
 	return &instance;
 }
 
-bool Keyboard::Initialize(HINSTANCE hInstance, HWND hwnd)
+bool Keyboard::Initialize(WinApp* win)
 {
 	HRESULT result = S_FALSE;
 
 	// 初期化（一度だけ行う処理）
 	result = DirectInput8Create
 	(
-		hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dinput, nullptr
+		win->GetInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dinput, nullptr
 	);
 	if (FAILED(result))
 	{
@@ -45,7 +45,7 @@ bool Keyboard::Initialize(HINSTANCE hInstance, HWND hwnd)
 	// 排他制御レベルのセット
 	result = devkeyboard->SetCooperativeLevel
 	(
-		hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
+		win->GetHwnd() , DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
 	);
 	if (FAILED(result))
 	{
