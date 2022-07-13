@@ -109,12 +109,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		////レンダーテクスチャへの描画終了
 		//multiTex->PostDraw(dxCommon->GetCommandList());
 		
-		//// 背景画像描画前処理
-		//Image2d::PreDraw(dxCommon->GetCommandList());
-		//// 背景画像描画
-		//image2d->Draw();
-		//// 画像描画後処理
-		//Image2d::PostDraw();
+		// 背景画像描画前処理
+		Image2d::PreDraw(dxCommon->GetCommandList());
+		// 背景画像描画
+		image2d->Draw();
+		// 画像描画後処理
+		Image2d::PostDraw();
 
 		// 描画開始
 		dxCommon->PreDraw();

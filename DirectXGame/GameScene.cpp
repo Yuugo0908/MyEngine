@@ -81,14 +81,16 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	camera->SetEye({ 0.0f, 0.0f, -20.0f });
 
 	// .objの名前を指定してモデルを読み込む
-	playerModel = playerModel->CreateFromObject("sphere");
+	playerModel = playerModel->CreateFromObject("RedBox");
+	enemyModel = enemyModel->CreateFromObject("GreenBox");
 	skydomeModel = skydomeModel->CreateFromObject("skydome");
 
 	//モデル名を指定して読み込み
 	fbxModel = FbxLoader::GetInstance()->LoadModelFromFile("boneTest");
 
 	// 3Dオブジェクト生成
-	playerObj = Object3d::Create();
+	player = Object3d::Create();
+	enemy = Object3d::Create();
 	skydomeObj = Object3d::Create();
 
 	fbxObject = new FbxObject3d;
@@ -96,18 +98,24 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	fbxObject->SetModel(fbxModel);
 
 	// 3Dオブジェクトにモデルを割り当てる
-	playerObj->SetModel(playerModel);
+	player->SetModel(playerModel);
+	enemy->SetModel(enemyModel);
 	skydomeObj->SetModel(skydomeModel);
 
-	playerObj->SetPosition({ 0.0f, 0.0f, 0.0f });
-	playerObj->SetScale({ 1.0f,1.0f,1.0f });
+	player->SetPosition({ 2.0f, 0.0f, 0.0f });
+	player->SetScale({ 0.5f,0.5f,0.5f });
+	enemy->SetPosition({ -2.0f, 0.0f, 0.0f });
+	enemy->SetScale({ 0.5f, 0.5f, 0.5f });
+
 	skydomeObj->SetScale({ 5.0f, 5.0f, 5.0f });
 	fbxObject->SetPosition({ 0.0f, 0.0f, 0.0f });
 	fbxObject->SetScale({ 1.0f, 1.0f, 1.0f });
 	fbxObject->SetRotation({0, 90, 0});
 
-	p_pos = playerObj->GetPosition();
-	p_sca = playerObj->GetScale();
+	p_pos = player->GetPosition();
+	p_sca = player->GetScale();
+	e_pos = enemy->GetPosition();
+	e_sca = enemy->GetScale();
 }
 
 void GameScene::Finalize()
@@ -122,13 +130,18 @@ void GameScene::Update() {
 	XMFLOAT3 cameraTarget = camera->GetTarget();
 
 	Move();
+	Collision::GetInstance()->CollisionObject(player, enemy);
 
-	playerObj->SetPosition(p_pos);
-	playerObj->SetScale(p_sca);
+	player->SetPosition(p_pos);
+	player->SetScale(p_sca);
+	enemy->SetPosition(e_pos);
+	enemy->SetScale(e_sca);
+
 	camera->SetEye(cameraEye);
 	camera->SetTarget(cameraTarget);
 	fbxObject->Update();
-	playerObj->Update();
+	player->Update();
+	enemy->Update();
 	skydomeObj->Update();
 }
 
@@ -138,7 +151,7 @@ void GameScene::reset() {
 
 void GameScene::Draw() {	
 	
-	SetImgui();
+	//SetImgui();
 	
 #pragma region 背景画像描画
 	 // 背景画像描画前処理
@@ -156,7 +169,8 @@ void GameScene::Draw() {
 	Object3d::PreDraw(dxCommon->GetCommandList());
 
 	// 3Dオブクジェクトの描画
-	playerObj->Draw();
+	player->Draw();
+	enemy->Draw();
 	//skydomeObj->Draw();
 	//fbxObject->Draw(dxCommon->GetCommandList());
 
@@ -208,4 +222,9 @@ void GameScene::SetImgui()
 	ImGui::SliderFloat("p_sca.y", &p_sca.y, 0.0f, 10.0f);
 	ImGui::SliderFloat("p_sca.z", &p_sca.z, 0.0f, 10.0f);
 	ImGui::End();
+}
+
+void GameScene::RopeMove(XMFLOAT3& pos)
+{
+
 }

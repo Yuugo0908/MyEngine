@@ -16,6 +16,7 @@
 #include "FbxObject3d.h"
 #include "Camera.h"
 #include "Easing.h"
+#include "Collision.h"
 
 using namespace DirectX;
 
@@ -52,6 +53,8 @@ public: // メンバ関数
 	void Move();
 	// Imguiの設定
 	void SetImgui();
+	// ロープのセット
+	void RopeMove(XMFLOAT3& pos);
 
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
@@ -60,21 +63,30 @@ private: // メンバ変数
 	Audio* playAudio = nullptr;
 	DebugText debugText;
 	Camera* camera = nullptr;
+	Collision* collision = nullptr;
 
 	// ゲームシーン用
 	Image2d* title = nullptr;
 	Image2d* GameClear = nullptr;
 	Image2d* GameOver = nullptr;
 	Image2d* backGround = nullptr;
+
 	Model* playerModel = nullptr;
-	Object3d* playerObj = nullptr;
+	std::unique_ptr<Object3d> player = nullptr;
+	Model* enemyModel = nullptr;
+	std::unique_ptr<Object3d> enemy = nullptr;
+
 	Model* skydomeModel = nullptr;
-	Object3d* skydomeObj = nullptr;
+	std::unique_ptr<Object3d> skydomeObj = nullptr;
+
 	FbxModel* fbxModel = nullptr;
 	FbxObject3d* fbxObject = nullptr;
 
 	XMFLOAT3 p_pos = {};
 	XMFLOAT3 p_sca = {};
+	XMFLOAT3 e_pos = {};
+	XMFLOAT3 e_sca = {};
+
 	bool p_flag = false;//自由落下のフラグ
 	float p_val = 0.0f;//速度
 	float p_gra = 0.1f;//重力
