@@ -6,6 +6,7 @@
 #include "PostEffect.h"
 #include "MultiTex.h"
 #include "Controller.h"
+#include "Light.h"
 
 //# Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -21,6 +22,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Image2d* image2d = nullptr;
 	MultiTex* multiTex = nullptr;
 	Controller* controller = nullptr;
+	Light* light = nullptr;
 
 	// ゲームウィンドウの作成
 	win = new WinApp();
@@ -65,6 +67,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		assert(0);
 		return 1;
 	}
+	// ライト静的初期化
+	Light::StaticInitialize(dxCommon->GetDevice());
 
 	// ポストエフェクト用のテクスチャ読み込み
 	//Image2d::LoadTexture(100, L"Resources/white1x1.png");

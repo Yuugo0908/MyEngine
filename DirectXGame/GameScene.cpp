@@ -1,6 +1,8 @@
 #include "GameScene.h"
 #include "imgui/imgui.h"
 #include <cassert>
+#include <sstream>
+#include <iomanip>
 
 GameScene::GameScene() {
 
@@ -80,8 +82,15 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	camera->SetTarget({ 0, 2.5f, 0 });
 	camera->SetEye({ 0.0f, 0.0f, -20.0f });
 
+	// ライトの生成
+	light = Light::Create();
+	// ライトの色を設定
+	light->SetLightColor({ 1, 1, 1 });
+	// 3Dオブジェクトにライトをセット
+	Object3d::SetLight(light);
+
 	// .objの名前を指定してモデルを読み込む
-	playerModel = playerModel->CreateFromObject("RedBox");
+	playerModel = playerModel->CreateFromObject("rider");
 	enemyModel = enemyModel->CreateFromObject("GreenBox");
 	skydomeModel = skydomeModel->CreateFromObject("skydome");
 
@@ -103,7 +112,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	skydomeObj->SetModel(skydomeModel);
 
 	player->SetPosition({ 2.0f, 0.0f, 0.0f });
-	player->SetScale({ 0.5f,0.5f,0.5f });
+	player->SetScale({ 1.5f,1.5f,1.5f });
 	enemy->SetPosition({ -2.0f, 0.0f, 0.0f });
 	enemy->SetScale({ 0.5f, 0.5f, 0.5f });
 
@@ -130,6 +139,7 @@ void GameScene::Update() {
 	XMFLOAT3 cameraTarget = camera->GetTarget();
 
 	Move();
+	LightUpdate();
 	Collision::GetInstance()->CollisionObject(player, enemy);
 
 	player->SetPosition(p_pos);
@@ -143,6 +153,7 @@ void GameScene::Update() {
 	player->Update();
 	enemy->Update();
 	skydomeObj->Update();
+	light->Update();
 }
 
 void GameScene::reset() {
@@ -227,4 +238,35 @@ void GameScene::SetImgui()
 void GameScene::RopeMove(XMFLOAT3& pos)
 {
 
+}
+
+void GameScene::LightUpdate()
+{
+	//光線方向初期値
+	static XMVECTOR lightDir = { 0, 1, 5, 0 };
+
+	if		(keyboard->PushKey(DIK_W)) { lightDir.m128_f32[1] += 1.0f; }
+	else if (keyboard->PushKey(DIK_S)) { lightDir.m128_f32[1] -= 1.0f; }
+	if		(keyboard->PushKey(DIK_D)) { lightDir.m128_f32[0] += 1.0f; }
+	else if (keyboard->PushKey(DIK_A)) { lightDir.m128_f32[0] -= 1.0f; }
+
+	light->SetLightDir(lightDir);
+
+	std::ostringstream debugstr;
+	debugstr << "lightDirFactor("
+		<< std::fixed << std::setprecision(2)
+		<< lightDir.m128_f32[0] << ","
+		<< lightDir.m128_f32[1] << ","
+		<< lightDir.m128_f32[2] << ")";
+	debugText.Print(debugstr.str(), 50, 50, 1.0f);
+	debugstr.str("");
+	debugstr.clear();
+
+	const XMFLOAT3& cameraPos = camera->GetEye();
+	debugstr << "cameraPos("
+		<< std::fixed << std::setprecision(2)
+		<< cameraPos.x << ","
+		<< cameraPos.y << ","
+		<< cameraPos.z << ")";
+	debugText.Print(debugstr.str(), 50, 70, 1.0f);
 }

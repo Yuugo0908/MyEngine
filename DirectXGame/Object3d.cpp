@@ -18,6 +18,7 @@ ID3D12Device* Object3d::device = nullptr;
 ID3D12GraphicsCommandList* Object3d::cmdList = nullptr;
 ComPtr<ID3D12RootSignature> Object3d::rootsignature;
 ComPtr<ID3D12PipelineState> Object3d::pipelinestate;
+Light* Object3d::light = nullptr;
 
 bool Object3d::StaticInitialize(ID3D12Device* device)
 {
@@ -212,10 +213,11 @@ bool Object3d::CreateGraphicsPipeline()
 	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
 
 	// ルートパラメータ
-	CD3DX12_ROOT_PARAMETER rootparams[3]{};
+	CD3DX12_ROOT_PARAMETER rootparams[4]{};
 	rootparams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
 	rootparams[1].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
 	rootparams[2].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
+	rootparams[3].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
 
 	// スタティックサンプラー
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0);
@@ -297,11 +299,14 @@ void Object3d::Update()
 	}
 
 	const XMMATRIX& matViewProjection = Camera::GetMatViewProjection();
+	const XMFLOAT3& cameraPos = Camera::GetEye();
 
 	// 定数バッファへデータ転送
 	ConstBufferDataB0* constMap0 = nullptr;
 	result = constBufferB0->Map(0, nullptr, (void**)&constMap0);
-	constMap0->mat = matWorld * matViewProjection; // 行列の合成
+	constMap0->viewproj = matViewProjection;
+	constMap0->world = matWorld;
+	constMap0->cameraPos = cameraPos;
 	constBufferB0->Unmap(0, nullptr);
 }
 
@@ -313,6 +318,7 @@ void Object3d::Draw()
 
 	// 定数バッファビューをセット
 	cmdList->SetGraphicsRootConstantBufferView(0, constBufferB0->GetGPUVirtualAddress());
-
+	// ライトの描画
+	light->Draw(cmdList, 3);
 	model->Draw(cmdList);
 }

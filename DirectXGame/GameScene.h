@@ -17,6 +17,7 @@
 #include "Camera.h"
 #include "Easing.h"
 #include "Collision.h"
+#include "Light.h"
 
 using namespace DirectX;
 
@@ -55,6 +56,8 @@ public: // メンバ関数
 	void SetImgui();
 	// ロープのセット
 	void RopeMove(XMFLOAT3& pos);
+	// ライトの更新
+	void LightUpdate();
 
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
@@ -64,6 +67,7 @@ private: // メンバ変数
 	DebugText debugText;
 	Camera* camera = nullptr;
 	Collision* collision = nullptr;
+	Light* light = nullptr;
 
 	// ゲームシーン用
 	Image2d* title = nullptr;

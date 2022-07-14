@@ -7,6 +7,7 @@
 #include <d3dx12.h>
 #include "Model.h"
 #include "Camera.h"
+#include "Light.h"
 
 class Object3d
 {
@@ -24,8 +25,9 @@ public: // サブクラス
 	// 定数バッファ用データ構造体B0
 	struct ConstBufferDataB0
 	{
-		//XMFLOAT4 color; // 色 (RGBA)
-		XMMATRIX mat; // ３Ｄ変換行列
+		XMMATRIX viewproj; // ビュープロジェクション行列
+		XMMATRIX world; // ワールド行列
+		XMFLOAT3 cameraPos; // カメラ座標(ワールド座標)
 	};
 
 public: // 静的メンバ関数
@@ -39,6 +41,11 @@ public: // 静的メンバ関数
 	static std::unique_ptr<Object3d> Create();
 	// グラフィックパイプライン生成
 	static bool CreateGraphicsPipeline();
+	// ライトのセット
+	static void SetLight(Light* light)
+	{
+		Object3d::light = light;
+	}
 
 private: // 静的メンバ変数
 	// デバイス
@@ -55,6 +62,8 @@ private: // 静的メンバ変数
 	static ComPtr<ID3DBlob> psBlob;
 	// エラーオブジェクト
 	static ComPtr<ID3DBlob> errorBlob;
+	// ライト
+	static Light* light;
 
 public: // メンバ関数
 	bool Initialize();
