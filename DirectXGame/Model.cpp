@@ -247,6 +247,7 @@ void Model::CreateModel(const std::string& text)
 				vertices.emplace_back(vertex);
 				// インデックスデータの追加
 				indices.emplace_back((unsigned short)indices.size());
+
 			}
 		}
 	}

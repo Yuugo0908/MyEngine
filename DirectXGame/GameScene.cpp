@@ -1,8 +1,6 @@
 #include "GameScene.h"
 #include "imgui/imgui.h"
 #include <cassert>
-#include <sstream>
-#include <iomanip>
 
 GameScene::GameScene() {
 
@@ -79,18 +77,11 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	GameOver->SetSize({ 1280.0f,720.0f });
 
 	// カメラの設定
-	camera->SetTarget({ 0, 2.5f, 0 });
-	camera->SetEye({ 0.0f, 0.0f, -20.0f });
-
-	// ライトの生成
-	light = Light::Create();
-	// ライトの色を設定
-	light->SetLightColor({ 1, 1, 1 });
-	// 3Dオブジェクトにライトをセット
-	Object3d::SetLight(light);
+	camera->SetTarget({ 0, 1.0f, 0 });
+	camera->SetEye({ 0.0f, 3.0f, -10.0f });
 
 	// .objの名前を指定してモデルを読み込む
-	playerModel = playerModel->CreateFromObject("rider");
+	playerModel = playerModel->CreateFromObject("sphere");
 	enemyModel = enemyModel->CreateFromObject("GreenBox");
 	skydomeModel = skydomeModel->CreateFromObject("skydome");
 
@@ -111,9 +102,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	enemy->SetModel(enemyModel);
 	skydomeObj->SetModel(skydomeModel);
 
-	player->SetPosition({ 2.0f, 0.0f, 0.0f });
+	player->SetPosition({ 4.0f, 0.0f, 0.0f });
 	player->SetScale({ 1.5f,1.5f,1.5f });
-	enemy->SetPosition({ -2.0f, 0.0f, 0.0f });
+	enemy->SetPosition({ -4.0f, 0.0f, 0.0f });
 	enemy->SetScale({ 0.5f, 0.5f, 0.5f });
 
 	skydomeObj->SetScale({ 5.0f, 5.0f, 5.0f });
@@ -125,6 +116,14 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	p_sca = player->GetScale();
 	e_pos = enemy->GetPosition();
 	e_sca = enemy->GetScale();
+
+	// ライトの生成
+	light = Light::Create();
+	// ライトの色を設定
+	light->SetLightColor({ 1, 1, 1 });
+	// 3Dオブジェクトにライトをセット
+	Object3d::SetLight(light);
+	FbxObject3d::SetLight(light);
 }
 
 void GameScene::Finalize()
@@ -140,7 +139,11 @@ void GameScene::Update() {
 
 	Move();
 	LightUpdate();
-	Collision::GetInstance()->CollisionObject(player, enemy);
+
+	if (Collision::GetInstance()->CollisionObject(player, enemy))
+	{
+		p_flag = true;
+	}
 
 	player->SetPosition(p_pos);
 	player->SetScale(p_sca);
@@ -165,14 +168,14 @@ void GameScene::Draw() {
 	//SetImgui();
 	
 #pragma region 背景画像描画
-	 // 背景画像描画前処理
-	Image2d::PreDraw(dxCommon->GetCommandList());
-	 // 背景画像描画
-	backGround->Draw();
-	 // 画像描画後処理
-	Image2d::PostDraw();
-	 // 深度バッファクリア
-	dxCommon->ClearDepthBuffer();
+	// // 背景画像描画前処理
+	//Image2d::PreDraw(dxCommon->GetCommandList());
+	// // 背景画像描画
+	//backGround->Draw();
+	// // 画像描画後処理
+	//Image2d::PostDraw();
+	// // 深度バッファクリア
+	//dxCommon->ClearDepthBuffer();
 #pragma endregion 背景画像描画
 
 #pragma region 3Dオブジェクト描画
@@ -182,7 +185,7 @@ void GameScene::Draw() {
 	// 3Dオブクジェクトの描画
 	player->Draw();
 	enemy->Draw();
-	//skydomeObj->Draw();
+	skydomeObj->Draw();
 	//fbxObject->Draw(dxCommon->GetCommandList());
 
 	// 3Dオブジェクト描画後処理
@@ -204,6 +207,15 @@ void GameScene::Draw() {
 
 void GameScene::Move()
 {
+	// オブジェクトの回転
+	//{
+	//	XMFLOAT3 rot = player->GetRotation();
+	//	rot.y += 1.0f;
+	//	player->SetRotation(rot);
+	//	enemy->SetRotation(rot);
+	//	fbxObject->SetRotation(rot);
+	//}
+
 	if (keyboard->TriggerKey(DIK_SPACE))
 	{
 		p_flag = true;
@@ -217,8 +229,17 @@ void GameScene::Move()
 	if (p_pos.y <= -30.0f)
 	{
 		p_flag = false;
-		p_pos.y = 5.0f;
+		p_pos.y = 0.0f;
 		p_val = 0.0f;
+	}
+
+	if (keyboard->PushKey(DIK_D))
+	{
+		e_pos.x += 0.2f;
+	}
+	if (keyboard->PushKey(DIK_A))
+	{
+		e_pos.x -= 0.2f;
 	}
 }
 
@@ -245,28 +266,10 @@ void GameScene::LightUpdate()
 	//光線方向初期値
 	static XMVECTOR lightDir = { 0, 1, 5, 0 };
 
-	if		(keyboard->PushKey(DIK_W)) { lightDir.m128_f32[1] += 1.0f; }
-	else if (keyboard->PushKey(DIK_S)) { lightDir.m128_f32[1] -= 1.0f; }
-	if		(keyboard->PushKey(DIK_D)) { lightDir.m128_f32[0] += 1.0f; }
-	else if (keyboard->PushKey(DIK_A)) { lightDir.m128_f32[0] -= 1.0f; }
+	if		(keyboard->PushKey(DIK_UP)) { lightDir.m128_f32[1] += 1.0f; }
+	else if (keyboard->PushKey(DIK_DOWN)) { lightDir.m128_f32[1] -= 1.0f; }
+	if		(keyboard->PushKey(DIK_RIGHT)) { lightDir.m128_f32[0] += 1.0f; }
+	else if (keyboard->PushKey(DIK_LEFT)) { lightDir.m128_f32[0] -= 1.0f; }
 
 	light->SetLightDir(lightDir);
-
-	std::ostringstream debugstr;
-	debugstr << "lightDirFactor("
-		<< std::fixed << std::setprecision(2)
-		<< lightDir.m128_f32[0] << ","
-		<< lightDir.m128_f32[1] << ","
-		<< lightDir.m128_f32[2] << ")";
-	debugText.Print(debugstr.str(), 50, 50, 1.0f);
-	debugstr.str("");
-	debugstr.clear();
-
-	const XMFLOAT3& cameraPos = camera->GetEye();
-	debugstr << "cameraPos("
-		<< std::fixed << std::setprecision(2)
-		<< cameraPos.x << ","
-		<< cameraPos.y << ","
-		<< cameraPos.z << ")";
-	debugText.Print(debugstr.str(), 50, 70, 1.0f);
 }

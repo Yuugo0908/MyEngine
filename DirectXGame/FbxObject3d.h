@@ -9,6 +9,7 @@
 #include <d3dx12.h>
 #include <string>
 #include <DirectXMath.h>
+#include "Light.h"
 
 class FbxObject3d
 {
@@ -45,6 +46,8 @@ protected: // エイリアス
 public: // 定数
 	// ボーンの最大数
 	static const int MAX_BONES = 32;
+	// ライト
+	static Light* light;
 public: // 定数バッファ用データ構造体(スキニング)
 	struct ConstBufferDataSkin
 	{
@@ -54,6 +57,7 @@ public: // 静的メンバ関数
 	// setter
 	static void SetDevice(ID3D12Device* device) { FbxObject3d::device = device; }
 	static void SetCamera(Camera* camera) { FbxObject3d::camera = camera; }
+	static void SetLight(Light* light) { FbxObject3d::light = light; }
 private:
 	// デバイス
 	static ID3D12Device* device;

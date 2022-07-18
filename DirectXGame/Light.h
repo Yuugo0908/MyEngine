@@ -43,7 +43,7 @@ private: // メンバ変数
 	// ライト光線方向(単位ベクトル)
 	XMVECTOR lightdir = { 1, 0, 0, 0 };
 	// ライト色
-	XMFLOAT3 lightColor = { 1, 1, 1 };
+	XMFLOAT3 lightColor = { 1, 0, 0 };
 	// ダーティフラグ
 	bool dirty = false;
 public: // メンバ関数

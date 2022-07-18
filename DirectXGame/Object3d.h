@@ -20,7 +20,6 @@ protected: // エイリアス
 	using XMFLOAT4 = DirectX::XMFLOAT4;
 	using XMVECTOR = DirectX::XMVECTOR;
 	using XMMATRIX = DirectX::XMMATRIX;
-
 public: // サブクラス
 	// 定数バッファ用データ構造体B0
 	struct ConstBufferDataB0
@@ -29,7 +28,6 @@ public: // サブクラス
 		XMMATRIX world; // ワールド行列
 		XMFLOAT3 cameraPos; // カメラ座標(ワールド座標)
 	};
-
 public: // 静的メンバ関数
 	// 静的初期化
 	static bool StaticInitialize(ID3D12Device* device);
@@ -46,7 +44,6 @@ public: // 静的メンバ関数
 	{
 		Object3d::light = light;
 	}
-
 private: // 静的メンバ変数
 	// デバイス
 	static ID3D12Device* device;
@@ -64,7 +61,6 @@ private: // 静的メンバ変数
 	static ComPtr<ID3DBlob> errorBlob;
 	// ライト
 	static Light* light;
-
 public: // メンバ関数
 	bool Initialize();
 	// 毎フレーム処理
@@ -85,7 +81,6 @@ public: // メンバ関数
 	void SetPosition(XMFLOAT3 position) { this->position = position; }
 	// モデルの設定
 	void SetModel(Model* model) { this->model = model; };
-
 private: // メンバ変数
 	ComPtr<ID3D12Resource> constBufferB0; // 定数バッファ
 	// 色
@@ -100,6 +95,5 @@ private: // メンバ変数
 	XMMATRIX matWorld;
 	// 親オブジェクト
 	Object3d* parent = nullptr;
-
 	Model* model = nullptr;
 };
