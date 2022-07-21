@@ -29,7 +29,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	FbxObject3d::CreateGraphicsPipeline();
 
 	// デバッグテキスト用テクスチャ読み込み
-	if (!Image2d::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png")) {
+	if (!Image2d::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png"))
+	{
 		assert(0);
 	}
 	// デバッグテキスト初期化
@@ -208,13 +209,13 @@ void GameScene::Draw() {
 void GameScene::Move()
 {
 	// オブジェクトの回転
-	//{
-	//	XMFLOAT3 rot = player->GetRotation();
-	//	rot.y += 1.0f;
-	//	player->SetRotation(rot);
-	//	enemy->SetRotation(rot);
-	//	fbxObject->SetRotation(rot);
-	//}
+	{
+		XMFLOAT3 rot = player->GetRotation();
+		rot.y += 1.0f;
+		player->SetRotation(rot);
+		enemy->SetRotation(rot);
+		fbxObject->SetRotation(rot);
+	}
 
 	if (keyboard->TriggerKey(DIK_SPACE))
 	{

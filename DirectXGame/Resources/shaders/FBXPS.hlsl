@@ -9,7 +9,7 @@ struct PSOutput
 	float4 target1 : SV_TARGET1;
 };
 
-PSOutput main(VSOutput input)
+float4 main(VSOutput input) : SV_TARGET
 {
 	PSOutput output;
 	// テクスチャマッピング
@@ -23,5 +23,5 @@ PSOutput main(VSOutput input)
 	// 陰影とテクスチャの色を合成
 	output.target0 = shadecolor * texcolor;
 	output.target1 = float4(1 - (shadecolor * texcolor).rgb, 1);
-	return output;
+	return shadecolor * texcolor;
 }

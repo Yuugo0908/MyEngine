@@ -9,9 +9,8 @@ struct PSOutput
 	float4 target1 : SV_TARGET1;
 };
 
-PSOutput main(VSOutput input) : SV_TARGET
+float4 main(VSOutput input) : SV_TARGET
 {
-	PSOutput output;
 	//テクスチャマッピング
 	float4 texcolor = tex.Sample(smp, input.uv);
 
@@ -36,8 +35,5 @@ PSOutput main(VSOutput input) : SV_TARGET
 	shadecolor.rbg = (ambient + diffuse + specular) * lightColor;
 	shadecolor.a = m_alpha;
 
-	output.target0 = shadecolor * texcolor;
-	output.target1 = float4(1 - (shadecolor * texcolor).rgb, 1);
-
-	return output;
+	return shadecolor * texcolor;
 }

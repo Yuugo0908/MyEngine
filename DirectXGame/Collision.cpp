@@ -17,22 +17,48 @@ float Collision::GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b)
 bool Collision::CollisionObject(const std::unique_ptr<Object3d>& object_a, const std::unique_ptr<Object3d>& object_b)
 {
 	//ç¿ïW
-	XMFLOAT3 A = object_a->GetPosition();
-	XMFLOAT3 B = object_b->GetPosition();
+	XMFLOAT3 p_a = object_a->GetPosition();
+	XMFLOAT3 p_b = object_b->GetPosition();
 
 	//îºåa
-	float a_r = 1.0f * object_a->GetScale().x;
-	float b_r = 1.0f * object_a->GetScale().x;
+	float r_a = object_a->GetScale().x;
+	float r_b = object_a->GetScale().x;
 
 	//í∑Ç≥
-	float l_x = sqrtf(powf(A.x - B.x, 2));
-	float l_y = sqrtf(powf(A.y - B.y, 2));
+	float l_x = sqrtf(powf(p_a.x - p_b.x, 2));
+	float l_y = sqrtf(powf(p_a.y - p_b.y, 2));
+	float l_z = sqrtf(powf(p_a.z - p_b.z, 2));
 
 	//îºåaÇÃçáåvÇÊÇËíZÇØÇÍÇŒ
-	if (l_x < a_r + b_r && l_y < a_r + b_r)
+	if (l_x < r_a + r_b && l_y < r_a + r_b && l_z < r_a + r_b)
 	{
 		return true;
 	}
 
+	return false;
+}
+
+bool Collision::CollisionSpherePlane(const Sphere& sphere, const Plane* plane, XMVECTOR* inter)
+{
+	return false;
+}
+
+bool Collision::CollisionSphereTriangle(const Sphere& sphere, const Triangle* triangle, XMVECTOR* closest)
+{
+	return false;
+}
+
+bool Collision::CollisionRayPlane(const Ray& ray, const Plane& plane, float* distance, XMVECTOR* inter)
+{
+	return false;
+}
+
+bool Collision::CollisionRayTriangle(const Ray& ray, const Triangle& triangle, float* distance, XMVECTOR* inter)
+{
+	return false;
+}
+
+bool Collision::CollisionRaySphere(const Ray& ray, const Sphere& sphere, float* distance, XMVECTOR* inter)
+{
 	return false;
 }

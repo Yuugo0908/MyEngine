@@ -172,10 +172,13 @@
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="MultiRT.cpp" />
     <ClCompile Include="MultiTex.cpp" />
     <ClCompile Include="Object3d.cpp" />
+    <ClCompile Include="Operator.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PostEffect.cpp" />
     <ClCompile Include="Image2d.cpp" />
@@ -204,10 +207,13 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="MultiRT.h" />
     <ClInclude Include="MultiTex.h" />
     <ClInclude Include="Object3d.h" />
+    <ClInclude Include="Operator.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PostEffect.h" />
     <ClInclude Include="SafeDelete.h" />
