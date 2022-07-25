@@ -37,45 +37,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	debugText.Initialize(debugTextTexNumber);
 
 	// テクスチャ読み込み
-	if (!Image2d::LoadTexture(0, L"Resources/title.png")) {
-		assert(0);
-	}
 
 	if (!Image2d::LoadTexture(1, L"Resources/background.png")) {
 		assert(0);
 	}
-
-	if (!Image2d::LoadTexture(2, L"Resources/HPBar.png")) {
-		assert(0);
-	}
-
-	if (!Image2d::LoadTexture(3, L"Resources/PlayerHPGauge.png")) {
-		assert(0);
-	}
-
-	if (!Image2d::LoadTexture(4, L"Resources/TimerGauge.png")) {
-		assert(0);
-	}
-
-	if (!Image2d::LoadTexture(5, L"Resources/GameClear.png")) {
-		assert(0);
-	}
-
-	if (!Image2d::LoadTexture(6, L"Resources/GameOver.png")) {
-		assert(0);
-	}
-	//画像
-	title = Image2d::Create(0, { 0.0f,0.0f });
-	title->SetSize({ 1280.0f,720.0f });
-
-	backGround = Image2d::Create(1, { 0, 0 });
-	backGround->SetSize({ 1280.0f, 720.0f });
-
-	GameClear = Image2d::Create(5, { 0.0f,0.0f });
-	GameClear->SetSize({ 1280.0f,720.0f });
-
-	GameOver = Image2d::Create(6, { 0.0f,0.0f });
-	GameOver->SetSize({ 1280.0f,720.0f });
 
 	// カメラの設定
 	camera->SetTarget({ 0, 1.0f, 0 });

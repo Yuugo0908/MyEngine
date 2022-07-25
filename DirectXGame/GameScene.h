@@ -70,11 +70,6 @@ private: // メンバ変数
 	Light* light = nullptr;
 
 	// ゲームシーン用
-	Image2d* title = nullptr;
-	Image2d* GameClear = nullptr;
-	Image2d* GameOver = nullptr;
-	Image2d* backGround = nullptr;
-
 	Model* playerModel = nullptr;
 	std::unique_ptr<Object3d> player = nullptr;
 	Model* enemyModel = nullptr;

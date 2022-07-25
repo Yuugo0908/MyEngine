@@ -47,9 +47,9 @@ public: // 静的メンバ関数
 	//オブジェクト同士の当たり判定
 	static bool CollisionObject(const std::unique_ptr<Object3d>& object_a, const std::unique_ptr<Object3d>& object_b);
 	// 球と平面の当たり判定
-	static bool CollisionSpherePlane(const Sphere& sphere, const Plane* plane, XMVECTOR* inter);
+	static bool CollisionSpherePlane(const Sphere& sphere, const Plane& plane, XMVECTOR* inter);
 	// 球と三角形の当たり判定
-	static bool CollisionSphereTriangle(const Sphere& sphere, const Triangle* triangle, XMVECTOR* closest);
+	static bool CollisionSphereTriangle(const Sphere& sphere, const Triangle& triangle, XMVECTOR* closest);
 
 	// レイと平面の当たり判定
 	static bool CollisionRayPlane(const Ray& ray, const Plane& plane, float* distance = nullptr, XMVECTOR* inter = nullptr);
