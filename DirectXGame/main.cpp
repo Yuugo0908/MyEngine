@@ -71,13 +71,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	}
 	// ライト静的初期化
 	Light::StaticInitialize(dxCommon->GetDevice());
-
-	// ポストエフェクト用のテクスチャ読み込み
-	//Image2d::LoadTexture(100, L"Resources/white1x1.png");
 	
-	Image2d::LoadTexture(1, L"Resources/background.png");
-	image2d = Image2d::Create(1, { 0, 0 });
-	image2d->SetSize({ 1280.0f, 720.0f });
 	// ポストエフェクトの初期化
 	multiTex = new MultiTex();
 	multiTex->Initialize(dxCommon->GetDevice());

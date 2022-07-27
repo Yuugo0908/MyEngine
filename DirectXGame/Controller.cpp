@@ -13,7 +13,7 @@ Controller* Controller::GetInstance()
 	return &instance;
 }
 
-bool Controller::Initialize(WinApp* win_app)
+void Controller::Initialize(WinApp* win_app)
 {
 	HRESULT result = S_FALSE;
 
@@ -25,7 +25,6 @@ bool Controller::Initialize(WinApp* win_app)
 	if (FAILED(result))
 	{
 		assert(0);
-		return false;
 	}
 
 	//ゲームパッドの生成

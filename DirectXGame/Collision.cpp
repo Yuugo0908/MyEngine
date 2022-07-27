@@ -25,7 +25,7 @@ bool Collision::CollisionObject(const std::unique_ptr<Object3d>& object_a, const
 
 	//半径
 	float r_a = object_a->GetScale().x;
-	float r_b = object_a->GetScale().x;
+	float r_b = object_b->GetScale().x;
 
 	//長さ
 	float l_x = sqrtf(powf(p_a.x - p_b.x, 2));
@@ -41,12 +41,12 @@ bool Collision::CollisionObject(const std::unique_ptr<Object3d>& object_a, const
 	return false;
 }
 
-bool Collision::CollisionSpherePlane(const Sphere& sphere, const Plane& plane, XMVECTOR* inter)
+bool Collision::CollisionSpherePlane(const Sphere& sphere, const Plane& plane, XMFLOAT3* inter)
 {
 	// 座標系の原点から球の中心座標への距離
-	XMVECTOR distV = XMVector3Dot(sphere.center, plane.normal);
+	float distV = Operator::dot(sphere.center, plane.normal);
 	// 平面の原点距離を減算することで、平面と球の中心との距離が出る
-	float dist = distV.m128_f32[0] - plane.distance;
+	float dist = distV - plane.distance;
 	// 距離の絶対値が半径より大きければ当たっていない
 	if (fabsf(dist) > sphere.radius) return false;
 
@@ -54,7 +54,7 @@ bool Collision::CollisionSpherePlane(const Sphere& sphere, const Plane& plane, X
 	if (inter)
 	{
 		// 平面上の最近接点を擬似交点とする
-		*inter = -dist * plane.normal * sphere.center;
+		*inter =  plane.normal * sphere.center * -dist;
 	}
 	return true;
 }

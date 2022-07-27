@@ -47,7 +47,7 @@ public: // サブクラス
 	};
 public: //メンバ関数
 	//初期化
-	bool Initialize(WinApp* win_app);
+	void Initialize(WinApp* win_app);
 	//更新
 	void Update();
 	//ゲームパッドスティック

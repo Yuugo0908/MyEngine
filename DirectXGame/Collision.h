@@ -1,6 +1,6 @@
 #pragma once
 #include "Object3d.h"
-#include <DirectXMath.h>
+#include "Operator.h"
 class Collision
 {
 private: // エイリアス
@@ -14,32 +14,32 @@ public: // サブクラス
 	struct Sphere
 	{
 		// 中心座標
-		XMVECTOR center = { 0, 0, 0, 1 };
+		XMFLOAT3 center = { 0, 0, 0 };
 		// 半径
 		float radius = 1.0f;
 	};
 	struct Plane
 	{
 		// 法線ベクトル
-		XMVECTOR normal = { 0, 1, 0, 0 };
+		XMFLOAT3 normal = { 0, 0, 0 };
 		// 原点からの距離
 		float distance = 0.0f;
 	};
 	struct Ray
 	{
 		// 始点座標
-		XMVECTOR start = { 0, 0, 0, 1};
+		XMFLOAT3 start = { 0, 0, 0 };
 		// 方向
-		XMVECTOR dir = { 1, 0, 0, 0};
+		XMFLOAT3 dir = { 1, 0, 0 };
 	};
 	struct Triangle
 	{
 		// 頂点座標
-		XMVECTOR p0;
-		XMVECTOR p1;
-		XMVECTOR p2;
+		XMFLOAT3 p0;
+		XMFLOAT3 p1;
+		XMFLOAT3 p2;
 		// 法線ベクトル
-		XMVECTOR normal;
+		XMFLOAT3 normal;
 	};
 public: // 静的メンバ関数
 
@@ -47,7 +47,7 @@ public: // 静的メンバ関数
 	//オブジェクト同士の当たり判定
 	static bool CollisionObject(const std::unique_ptr<Object3d>& object_a, const std::unique_ptr<Object3d>& object_b);
 	// 球と平面の当たり判定
-	static bool CollisionSpherePlane(const Sphere& sphere, const Plane& plane, XMVECTOR* inter);
+	static bool CollisionSpherePlane(const Sphere& sphere, const Plane& plane, XMFLOAT3* inter);
 	// 球と三角形の当たり判定
 	static bool CollisionSphereTriangle(const Sphere& sphere, const Triangle& triangle, XMVECTOR* closest);
 
@@ -58,9 +58,13 @@ public: // 静的メンバ関数
 	// レイと球の当たり判定
 	static bool CollisionRaySphere(const Ray& ray, const Sphere& sphere, float* distance = nullptr, XMVECTOR* inter = nullptr);
 
-private: // メンバ関数
+public: // メンバ関数
 
 	// オブジェクト同士の距離を取得
 	float GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b);
+
+private: // メンバ変数
+
+	Operator* ope = nullptr;
 };
 

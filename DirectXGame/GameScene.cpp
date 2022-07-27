@@ -36,57 +36,47 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	// デバッグテキスト初期化
 	debugText.Initialize(debugTextTexNumber);
 
-	// テクスチャ読み込み
-
-	if (!Image2d::LoadTexture(1, L"Resources/background.png")) {
-		assert(0);
-	}
-
-	// カメラの設定
-	camera->SetTarget({ 0, 1.0f, 0 });
-	camera->SetEye({ 0.0f, 3.0f, -10.0f });
-
 	// .objの名前を指定してモデルを読み込む
-	playerModel = playerModel->CreateFromObject("sphere");
-	enemyModel = enemyModel->CreateFromObject("GreenBox");
-	skydomeModel = skydomeModel->CreateFromObject("skydome");
-
-	//モデル名を指定して読み込み
-	fbxModel = FbxLoader::GetInstance()->LoadModelFromFile("boneTest");
+	playerModel		= playerModel->CreateFromObject("sphere");
+	enemyModel		= enemyModel->CreateFromObject("sphere");
+	skydomeModel	= skydomeModel->CreateFromObject("skydome");
+	stageModel		= stageModel->CreateFromObject("stage");
+	ropeModel		= ropeModel->CreateFromObject("rope");
 
 	// 3Dオブジェクト生成
 	player = Object3d::Create();
 	enemy = Object3d::Create();
-	skydomeObj = Object3d::Create();
-
-	fbxObject = new FbxObject3d;
-	fbxObject->Initialize();
-	fbxObject->SetModel(fbxModel);
+	skydome = Object3d::Create();
+	stage = Object3d::Create();
+	rope = Object3d::Create();
 
 	// 3Dオブジェクトにモデルを割り当てる
 	player->SetModel(playerModel);
 	enemy->SetModel(enemyModel);
-	skydomeObj->SetModel(skydomeModel);
+	skydome->SetModel(skydomeModel);
+	stage->SetModel(stageModel);
+	rope->SetModel(ropeModel);
 
 	player->SetPosition({ 4.0f, 0.0f, 0.0f });
-	player->SetScale({ 1.5f,1.5f,1.5f });
+	player->SetScale({ 1.0f,1.0f,1.0f });
 	enemy->SetPosition({ -4.0f, 0.0f, 0.0f });
-	enemy->SetScale({ 0.5f, 0.5f, 0.5f });
+	enemy->SetScale({ 1.0f, 1.0f, 1.0f });
 
-	skydomeObj->SetScale({ 5.0f, 5.0f, 5.0f });
-	fbxObject->SetPosition({ 0.0f, 0.0f, 0.0f });
-	fbxObject->SetScale({ 1.0f, 1.0f, 1.0f });
-	fbxObject->SetRotation({0, 90, 0});
+	stage->SetPosition({ 0.0f, -1.5f, 0.0f });
+	skydome->SetPosition({ 0.0f, 12.0f, 0.0f });
+	skydome->SetScale({ 5.0f, 5.0f, 5.0f });
 
 	p_pos = player->GetPosition();
-	p_sca = player->GetScale();
 	e_pos = enemy->GetPosition();
-	e_sca = enemy->GetScale();
+
+	// カメラの設定
+	camera->SetTarget(p_pos);
+	camera->SetEye({0, 3.0f, -10.0f});
 
 	// ライトの生成
 	light = Light::Create();
 	// ライトの色を設定
-	light->SetLightColor({ 1, 1, 1 });
+	light->SetLightColor({ 0.8f, 0.0f, 0.6f });
 	// 3Dオブジェクトにライトをセット
 	Object3d::SetLight(light);
 	FbxObject3d::SetLight(light);
@@ -94,35 +84,22 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 
 void GameScene::Finalize()
 {
-	safe_delete(fbxModel);
-	safe_delete(fbxObject);
 }
 
 void GameScene::Update() {
-	// 現在の座標を取得
-	XMFLOAT3 cameraEye = camera->GetEye();
-	XMFLOAT3 cameraTarget = camera->GetTarget();
 
-	Move();
+	CameraUpdate();
+	PlayerMove();
 	LightUpdate();
 
-	if (Collision::GetInstance()->CollisionObject(player, enemy))
-	{
-		p_flag = true;
-	}
-
 	player->SetPosition(p_pos);
-	player->SetScale(p_sca);
 	enemy->SetPosition(e_pos);
-	enemy->SetScale(e_sca);
+	rope->SetPosition(r_pos);
 
-	camera->SetEye(cameraEye);
-	camera->SetTarget(cameraTarget);
-	fbxObject->Update();
 	player->Update();
 	enemy->Update();
-	skydomeObj->Update();
-	light->Update();
+	skydome->Update();
+	stage->Update();
 }
 
 void GameScene::reset() {
@@ -151,8 +128,8 @@ void GameScene::Draw() {
 	// 3Dオブクジェクトの描画
 	player->Draw();
 	enemy->Draw();
-	skydomeObj->Draw();
-	//fbxObject->Draw(dxCommon->GetCommandList());
+	skydome->Draw();
+	stage->Draw();
 
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
@@ -171,42 +148,70 @@ void GameScene::Draw() {
 #pragma endregion 前景画像描画
 }
 
-void GameScene::Move()
+void GameScene::PlayerMove()
 {
-	// オブジェクトの回転
-	{
-		XMFLOAT3 rot = player->GetRotation();
-		rot.y += 1.0f;
-		player->SetRotation(rot);
-		enemy->SetRotation(rot);
-		fbxObject->SetRotation(rot);
-	}
-
-	if (keyboard->TriggerKey(DIK_SPACE))
+	// ジャンプ
+	if (keyboard->TriggerKey(DIK_SPACE) && p_flag == false)
 	{
 		p_flag = true;
+		// 上昇率の更新
+		p_val = 1.25f;
 	}
-
 	if (p_flag == true) {
-		p_pos.y -= p_val;
-		p_val += p_gra;
+		p_val -= gra;
+		p_pos.y += p_val;
+		if (p_pos.y <= 0.0f)
+		{
+			p_flag = false;
+			p_pos.y = 0.0f;
+			p_val = 0.0f;
+		}
 	}
 
-	if (p_pos.y <= -30.0f)
-	{
-		p_flag = false;
-		p_pos.y = 0.0f;
-		p_val = 0.0f;
-	}
-
+	// 移動
 	if (keyboard->PushKey(DIK_D))
 	{
-		e_pos.x += 0.2f;
+		p_pos.x += 0.2f;
 	}
-	if (keyboard->PushKey(DIK_A))
+	else if (keyboard->PushKey(DIK_A))
 	{
-		e_pos.x -= 0.2f;
+		p_pos.x -= 0.2f;
 	}
+	if (keyboard->PushKey(DIK_W))
+	{
+		p_pos.z += 0.2f;
+	}
+	else if (keyboard->PushKey(DIK_S))
+	{
+		p_pos.z -= 0.2f;
+	}
+
+	// 自機の突進
+	if (keyboard->TriggerKey(DIK_Q) && easeFlag == false)
+	{
+		easeFlag = true;
+		startPos = p_pos;
+		endPos = e_pos;
+	}
+
+	if (easeFlag == true)
+	{
+		avoidTime += 0.05f;
+		avoidTimeRate = min(avoidTime / avoidEndTime, 1);
+
+		p_pos = Easing::easeOut(startPos, endPos, avoidTimeRate);
+	}
+
+	if (avoidTimeRate == 1.0f)
+	{
+		avoidTime = 0.0f;
+		avoidTimeRate = 0.0f;
+		easeFlag = false;
+	}
+}
+
+void GameScene::EnemyMove()
+{
 }
 
 void GameScene::SetImgui()
@@ -216,26 +221,83 @@ void GameScene::SetImgui()
 	ImGui::SliderFloat("p_pos.x", &p_pos.x, 0.0f, 10.0f);
 	ImGui::SliderFloat("p_pos.y", &p_pos.y, 0.0f, 10.0f);
 	ImGui::SliderFloat("p_pos.z", &p_pos.z, 0.0f, 10.0f);
-	ImGui::SliderFloat("p_sca.x", &p_sca.x, 0.0f, 10.0f);
-	ImGui::SliderFloat("p_sca.y", &p_sca.y, 0.0f, 10.0f);
-	ImGui::SliderFloat("p_sca.z", &p_sca.z, 0.0f, 10.0f);
 	ImGui::End();
 }
 
-void GameScene::RopeMove(XMFLOAT3& pos)
+void GameScene::RopeUpdate()
 {
+	// ロープの位置を更新
+	rope->SetPosition({ r_pos });
+	rope->Update();
 
+	//ロープの位置を取得
+	XMFLOAT3 get_r_pos = rope->GetPosition();
+
+	//プレイヤーとエネミーの距離
+	XMFLOAT3 length = { p_pos.x - e_pos.x, p_pos.y - e_pos.y, p_pos.z - e_pos.z };
+	float len = GetLength(p_pos, e_pos);
+
+	//最大値より大きいなら
+	if (len > max_rope)
+	{
+		float wq = len / max_rope;
+		len = max_rope;
+		e_pos = { p_pos.x - length.x / wq, p_pos.y - length.y / wq, p_pos.z - length.z / wq };
+	}
+
+	angleX = PosForAngle(p_pos.y, r_pos.z, r_pos.y, p_pos.z);
+
+	rope->SetPosition({ (p_pos.x + e_pos.x) / 2, (p_pos.y + e_pos.y) / 2, (p_pos.z + e_pos.z) / 2});
+	rope->SetScale({ 0.1f, len / 2 , 0.1f });
+	rope->SetRotation({ 0, XMConvertToDegrees(angleX), 0 });
+	rope->Update();
 }
 
 void GameScene::LightUpdate()
 {
 	//光線方向初期値
-	static XMVECTOR lightDir = { 0, 1, 5, 0 };
-
-	if		(keyboard->PushKey(DIK_UP)) { lightDir.m128_f32[1] += 1.0f; }
-	else if (keyboard->PushKey(DIK_DOWN)) { lightDir.m128_f32[1] -= 1.0f; }
-	if		(keyboard->PushKey(DIK_RIGHT)) { lightDir.m128_f32[0] += 1.0f; }
-	else if (keyboard->PushKey(DIK_LEFT)) { lightDir.m128_f32[0] -= 1.0f; }
+	static XMVECTOR lightDir = { 5, -5, 5, 0 };
 
 	light->SetLightDir(lightDir);
+	light->Update();
+}
+
+void GameScene::CameraUpdate()
+{
+	// 現在の座標を取得
+	XMFLOAT3 cameraEye = camera->GetEye();
+	XMFLOAT3 cameraTarget = camera->GetTarget();
+
+	camera->SetEye({ p_pos.x, p_pos.y + 3.0f, p_pos.z - 10.0f });
+	camera->SetTarget(p_pos);
+}
+
+float GameScene::GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b)
+{
+	XMFLOAT3 len = { pos_a.x - pos_b.x, pos_a.y - pos_b.y, pos_a.z - pos_b.z };
+
+	return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
+}
+
+float GameScene::PosForAngle(float startPosX, float startPosY, float endPosX, float endPosY)
+{
+	float angleX = endPosX - startPosX;
+	float angleY = endPosY - startPosY;
+
+	float resultAngle = (float)atan2(angleX, angleY);
+
+	return resultAngle;
+}
+
+float GameScene::ease_in(float t, float b, float c, float d)
+{
+	float x = t / d;
+	float v = ease_in_cubic(x);
+	float ret = c * v + b;
+	return ret;
+}
+
+float GameScene::ease_in_cubic(float x)
+{
+	return x * x * x;
 }
