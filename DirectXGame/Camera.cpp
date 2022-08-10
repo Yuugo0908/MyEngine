@@ -18,11 +18,6 @@ void Camera::Initialize(const int window_width, const int window_height)
 		XMLoadFloat3(&up)
 	);
 
-	// •½s“Š‰e‚É‚æ‚éË‰es—ñ‚Ì¶¬
-	//constMap->mat = XMMatrixOrthographicOffCenterLH(
-	//0, window_width,
-	//window_height, 0,
-	//0, 1);
 	// “§‹“Š‰e‚É‚æ‚éË‰es—ñ‚Ì¶¬
 	matProjection = XMMatrixPerspectiveFovLH
 	(
@@ -30,7 +25,6 @@ void Camera::Initialize(const int window_width, const int window_height)
 		(float)window_width / (float)window_height,
 		0.1f, 1000.0f
 	);
-
 }
 
 void Camera::SetEye(XMFLOAT3 eye)
@@ -86,14 +80,3 @@ const XMMATRIX& Camera::GetMatViewProjection()
 	matViewProjection = matView * matProjection;
 	return matViewProjection;
 }
-
-//void Camera::UpdateProjectionMatrix()
-//{
-//	// “§‹“Š‰e‚É‚æ‚éË‰es—ñ‚Ì¶¬
-//	matProjection = XMMatrixPerspectiveFovLH
-//	(
-//		XMConvertToRadians(60.0f),
-//		(float)window_width / (float)window_height,
-//		0.1f, 1000.0f
-//	);
-//}
