@@ -78,12 +78,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)lib\fbx_sdk\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)lib\fbx_sdk\include;$(ProjectDir)imgui;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)lib\fbx_sdk\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)lib\fbx_sdk\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)lib\fbx_sdk\include;$(ProjectDir)imgui;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)lib\fbx_sdk\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -122,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(ProjectDir)Code\2d;$(ProjectDir)Code\3d;$(ProjectDir)Code\win;$(ProjectDir)Code\audio;$(ProjectDir)Code\operator;$(ProjectDir)Code\postEffect;$(ProjectDir)Code\game;$(ProjectDir)Code\input;$(ProjectDir)Code\fbx</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -139,7 +139,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(ProjectDir)Code\2d;$(ProjectDir)Code\3d;$(ProjectDir)Code\win;$(ProjectDir)Code\audio;$(ProjectDir)Code\operator;$(ProjectDir)Code\postEffect;$(ProjectDir)Code\game;$(ProjectDir)Code\input;$(ProjectDir)Code\fbx</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -152,18 +152,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Audio.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Collision.cpp" />
-    <ClCompile Include="Controller.cpp" />
-    <ClCompile Include="DebugText.cpp" />
-    <ClCompile Include="DirectXCommon.cpp" />
-    <ClCompile Include="Easing.cpp" />
-    <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="FbxLoader.cpp" />
-    <ClCompile Include="FbxModel.cpp" />
-    <ClCompile Include="FbxObject3d.cpp" />
-    <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="Code\2d\DebugText.cpp" />
+    <ClCompile Include="Code\2d\Image2d.cpp" />
+    <ClCompile Include="Code\3d\Material.cpp" />
+    <ClCompile Include="Code\3d\Mesh.cpp" />
+    <ClCompile Include="Code\3d\Model.cpp" />
+    <ClCompile Include="Code\3d\Object3d.cpp" />
+    <ClCompile Include="Code\audio\Audio.cpp" />
+    <ClCompile Include="Code\fbx\FbxLoader.cpp" />
+    <ClCompile Include="Code\fbx\FbxModel.cpp" />
+    <ClCompile Include="Code\fbx\FbxObject3d.cpp" />
+    <ClCompile Include="Code\game\Camera.cpp" />
+    <ClCompile Include="Code\game\Collision.cpp" />
+    <ClCompile Include="Code\game\Easing.cpp" />
+    <ClCompile Include="Code\game\Enemy.cpp" />
+    <ClCompile Include="Code\game\GameScene.cpp" />
+    <ClCompile Include="Code\game\Light.cpp" />
+    <ClCompile Include="Code\game\Player.cpp" />
+    <ClCompile Include="Code\input\Controller.cpp" />
+    <ClCompile Include="Code\input\Keyboard.cpp" />
+    <ClCompile Include="Code\input\Mouse.cpp" />
+    <ClCompile Include="Code\operator\Operator.cpp" />
+    <ClCompile Include="Code\postEffect\MultiRT.cpp" />
+    <ClCompile Include="Code\postEffect\MultiTex.cpp" />
+    <ClCompile Include="Code\postEffect\PostEffect.cpp" />
+    <ClCompile Include="Code\win\DirectXCommon.cpp" />
+    <ClCompile Include="Code\win\main.cpp" />
+    <ClCompile Include="Code\win\WinApp.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -171,35 +186,35 @@
     <ClCompile Include="imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
-    <ClCompile Include="Keyboard.cpp" />
-    <ClCompile Include="Light.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Material.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="Mouse.cpp" />
-    <ClCompile Include="MultiRT.cpp" />
-    <ClCompile Include="MultiTex.cpp" />
-    <ClCompile Include="Object3d.cpp" />
-    <ClCompile Include="Operator.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PostEffect.cpp" />
-    <ClCompile Include="Image2d.cpp" />
-    <ClCompile Include="WinApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Audio.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Collision.h" />
-    <ClInclude Include="Controller.h" />
-    <ClInclude Include="DebugText.h" />
-    <ClInclude Include="DirectXCommon.h" />
-    <ClInclude Include="Easing.h" />
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="FbxLoader.h" />
-    <ClInclude Include="FbxModel.h" />
-    <ClInclude Include="FbxObject3d.h" />
-    <ClInclude Include="GameScene.h" />
+    <ClInclude Include="Code\2d\DebugText.h" />
+    <ClInclude Include="Code\2d\Image2d.h" />
+    <ClInclude Include="Code\3d\Material.h" />
+    <ClInclude Include="Code\3d\Mesh.h" />
+    <ClInclude Include="Code\3d\Model.h" />
+    <ClInclude Include="Code\3d\Object3d.h" />
+    <ClInclude Include="Code\audio\Audio.h" />
+    <ClInclude Include="Code\fbx\FbxLoader.h" />
+    <ClInclude Include="Code\fbx\FbxModel.h" />
+    <ClInclude Include="Code\fbx\FbxObject3d.h" />
+    <ClInclude Include="Code\game\Camera.h" />
+    <ClInclude Include="Code\game\Collision.h" />
+    <ClInclude Include="Code\game\Easing.h" />
+    <ClInclude Include="Code\game\Enemy.h" />
+    <ClInclude Include="Code\game\GameScene.h" />
+    <ClInclude Include="Code\game\Light.h" />
+    <ClInclude Include="Code\game\Player.h" />
+    <ClInclude Include="Code\input\Controller.h" />
+    <ClInclude Include="Code\input\Keyboard.h" />
+    <ClInclude Include="Code\input\Mouse.h" />
+    <ClInclude Include="Code\operator\Operator.h" />
+    <ClInclude Include="Code\postEffect\MultiRT.h" />
+    <ClInclude Include="Code\postEffect\MultiTex.h" />
+    <ClInclude Include="Code\postEffect\PostEffect.h" />
+    <ClInclude Include="Code\win\DirectXCommon.h" />
+    <ClInclude Include="Code\win\SafeDelete.h" />
+    <ClInclude Include="Code\win\WinApp.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx12.h" />
@@ -208,21 +223,6 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
-    <ClInclude Include="Keyboard.h" />
-    <ClInclude Include="Light.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="Mouse.h" />
-    <ClInclude Include="MultiRT.h" />
-    <ClInclude Include="MultiTex.h" />
-    <ClInclude Include="Object3d.h" />
-    <ClInclude Include="Operator.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="PostEffect.h" />
-    <ClInclude Include="SafeDelete.h" />
-    <ClInclude Include="Image2d.h" />
-    <ClInclude Include="WinApp.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DirectXTex\DirectXTex_Desktop_2019_Win10.vcxproj">

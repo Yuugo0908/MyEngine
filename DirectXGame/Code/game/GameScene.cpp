@@ -1,5 +1,5 @@
 #include "GameScene.h"
-#include "imgui/imgui.h"
+#include <imgui.h>
 #include <cassert>
 
 GameScene::GameScene() {

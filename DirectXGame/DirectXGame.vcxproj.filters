@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ソース ファイル">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="ヘッダー ファイル">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="リソース ファイル">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -19,62 +11,70 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{2e0368b1-cbaa-4512-ad35-1cc742487754}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダーファイル">
+      <UniqueIdentifier>{a2c9f1f6-a0fe-4194-a0cb-97d79aa9c865}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="ソースファイル">
+      <UniqueIdentifier>{11444b1d-47fe-4eaa-ab54-923c004630ac}</UniqueIdentifier>
+      <Extensions>cpp</Extensions>
+    </Filter>
+    <Filter Include="ソースファイル\3d">
+      <UniqueIdentifier>{5e887772-beca-48f6-8e23-3b26c9cfa712}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダーファイル\3d">
+      <UniqueIdentifier>{8556744f-fae4-4544-9292-0ed6b2a9ac66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソースファイル\2d">
+      <UniqueIdentifier>{ce525e3a-7a11-49b2-b454-87935aa768e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソースファイル\audio">
+      <UniqueIdentifier>{c81c6db3-5ef0-438c-9bda-a634d8439b07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソースファイル\math">
+      <UniqueIdentifier>{5a6546e3-b902-4f40-81af-3942b33045c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソースファイル\game">
+      <UniqueIdentifier>{cca2c0cc-dbcf-49eb-b8df-cd221dac1fff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソースファイル\fbx">
+      <UniqueIdentifier>{78eda3b9-d558-4fa2-9155-fb8c700c4fbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソースファイル\postEffect">
+      <UniqueIdentifier>{a40b30a6-e501-4b18-a8c1-6a0afcd8a170}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソースファイル\input">
+      <UniqueIdentifier>{ee34d55c-dce9-4d5f-a91b-8795a156720f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソースファイル\win">
+      <UniqueIdentifier>{2baf8bc2-cf1e-4f89-9604-63d33a80c142}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダーファイル\2d">
+      <UniqueIdentifier>{499d524e-a5b0-4795-8b72-18534b34ba58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダーファイル\audio">
+      <UniqueIdentifier>{8810465a-4c46-415f-a1cd-74117ec3ab2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダーファイル\math">
+      <UniqueIdentifier>{bdbf0d64-04dd-4f66-94ff-3be8c82ffaf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダーファイル\game">
+      <UniqueIdentifier>{b5b818f0-054f-4355-93c9-e9380aa1e04d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダーファイル\fbx">
+      <UniqueIdentifier>{bf16e4b7-da25-418b-9bce-547a9805fbfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダーファイル\input">
+      <UniqueIdentifier>{df0ac184-0eff-4929-94c1-62b6463e4b4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダーファイル\win">
+      <UniqueIdentifier>{504eb5d3-301f-4753-b1f5-0247be9795fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダーファイル\postEffect">
+      <UniqueIdentifier>{25fc5caf-7be8-4399-89f0-15cfc53c8fc0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Keyboard.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="WinApp.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectXCommon.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Object3d.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Image2d.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugText.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="GameScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="FbxLoader.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="FbxModel.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="FbxObject3d.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="PostEffect.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Easing.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Enemy.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="imgui\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
@@ -96,89 +96,89 @@
     <ClCompile Include="imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="MultiRT.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Code\win\main.cpp">
+      <Filter>ソースファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Controller.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Code\3d\Material.cpp">
+      <Filter>ソースファイル\3d</Filter>
     </ClCompile>
-    <ClCompile Include="MultiTex.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Code\3d\Mesh.cpp">
+      <Filter>ソースファイル\3d</Filter>
     </ClCompile>
-    <ClCompile Include="Collision.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Code\3d\Model.cpp">
+      <Filter>ソースファイル\3d</Filter>
     </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Code\3d\Object3d.cpp">
+      <Filter>ソースファイル\3d</Filter>
     </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Code\game\Camera.cpp">
+      <Filter>ソースファイル\game</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Code\game\Collision.cpp">
+      <Filter>ソースファイル\game</Filter>
     </ClCompile>
-    <ClCompile Include="Operator.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Code\game\Easing.cpp">
+      <Filter>ソースファイル\game</Filter>
     </ClCompile>
-    <ClCompile Include="Mouse.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Code\game\Enemy.cpp">
+      <Filter>ソースファイル\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\game\GameScene.cpp">
+      <Filter>ソースファイル\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\game\Light.cpp">
+      <Filter>ソースファイル\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\operator\Operator.cpp">
+      <Filter>ソースファイル\math</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\game\Player.cpp">
+      <Filter>ソースファイル\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\fbx\FbxLoader.cpp">
+      <Filter>ソースファイル\fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\fbx\FbxModel.cpp">
+      <Filter>ソースファイル\fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\fbx\FbxObject3d.cpp">
+      <Filter>ソースファイル\fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\audio\Audio.cpp">
+      <Filter>ソースファイル\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\postEffect\MultiRT.cpp">
+      <Filter>ソースファイル\postEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\postEffect\MultiTex.cpp">
+      <Filter>ソースファイル\postEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\postEffect\PostEffect.cpp">
+      <Filter>ソースファイル\postEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\2d\Image2d.cpp">
+      <Filter>ソースファイル\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\2d\DebugText.cpp">
+      <Filter>ソースファイル\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\input\Controller.cpp">
+      <Filter>ソースファイル\input</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\input\Keyboard.cpp">
+      <Filter>ソースファイル\input</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\input\Mouse.cpp">
+      <Filter>ソースファイル\input</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\win\DirectXCommon.cpp">
+      <Filter>ソースファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\win\WinApp.cpp">
+      <Filter>ソースファイル\win</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Keyboard.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="WinApp.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectXCommon.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="SafeDelete.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Object3d.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Image2d.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugText.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Audio.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="GameScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="FbxLoader.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="FbxModel.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="FbxObject3d.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="PostEffect.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Easing.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Enemy.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="imgui\imconfig.h">
       <Filter>imgui</Filter>
     </ClInclude>
@@ -203,32 +203,86 @@
     <ClInclude Include="imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="MultiRT.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Code\win\SafeDelete.h">
+      <Filter>ヘッダーファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Controller.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Code\3d\Material.h">
+      <Filter>ヘッダーファイル\3d</Filter>
     </ClInclude>
-    <ClInclude Include="MultiTex.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Code\3d\Mesh.h">
+      <Filter>ヘッダーファイル\3d</Filter>
     </ClInclude>
-    <ClInclude Include="Collision.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Code\3d\Model.h">
+      <Filter>ヘッダーファイル\3d</Filter>
     </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Code\3d\Object3d.h">
+      <Filter>ヘッダーファイル\3d</Filter>
     </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Code\audio\Audio.h">
+      <Filter>ヘッダーファイル\audio</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Code\game\Camera.h">
+      <Filter>ヘッダーファイル\game</Filter>
     </ClInclude>
-    <ClInclude Include="Operator.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Code\game\Collision.h">
+      <Filter>ヘッダーファイル\game</Filter>
     </ClInclude>
-    <ClInclude Include="Mouse.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Code\input\Controller.h">
+      <Filter>ヘッダーファイル\input</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\2d\DebugText.h">
+      <Filter>ヘッダーファイル\2d</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\win\DirectXCommon.h">
+      <Filter>ヘッダーファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\game\Easing.h">
+      <Filter>ヘッダーファイル\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\game\Enemy.h">
+      <Filter>ヘッダーファイル\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\fbx\FbxLoader.h">
+      <Filter>ヘッダーファイル\fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\fbx\FbxModel.h">
+      <Filter>ヘッダーファイル\fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\fbx\FbxObject3d.h">
+      <Filter>ヘッダーファイル\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\game\GameScene.h">
+      <Filter>ヘッダーファイル\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\game\Light.h">
+      <Filter>ヘッダーファイル\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\game\Player.h">
+      <Filter>ヘッダーファイル\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\2d\Image2d.h">
+      <Filter>ヘッダーファイル\2d</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\input\Keyboard.h">
+      <Filter>ヘッダーファイル\input</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\input\Mouse.h">
+      <Filter>ヘッダーファイル\input</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\postEffect\MultiRT.h">
+      <Filter>ヘッダーファイル\postEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\postEffect\MultiTex.h">
+      <Filter>ヘッダーファイル\postEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\postEffect\PostEffect.h">
+      <Filter>ヘッダーファイル\postEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\operator\Operator.h">
+      <Filter>ヘッダーファイル\math</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\win\WinApp.h">
+      <Filter>ヘッダーファイル\win</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
