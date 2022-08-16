@@ -10,14 +10,14 @@ Mouse* Mouse::GetInstance()
 	return &instance;
 }
 
-bool Mouse::Initialize(HINSTANCE hInstance, HWND hwnd)
+bool Mouse::Initialize(WinApp* win_app)
 {
 	HRESULT result = S_FALSE;
 
 	assert(!dinput);
 
 	// DirectInputオブジェクトの生成	
-	result = DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dinput, nullptr);
+	result = DirectInput8Create(win_app->GetInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dinput, nullptr);
 	if (FAILED(result)) {
 		assert(0);
 		return false;
@@ -38,7 +38,7 @@ bool Mouse::Initialize(HINSTANCE hInstance, HWND hwnd)
 	}
 
 	// 排他制御レベルのセット
-	result = devMouse->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	result = devMouse->SetCooperativeLevel(win_app->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	if (FAILED(result)) {
 		assert(0);
 		return false;

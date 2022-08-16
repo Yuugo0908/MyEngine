@@ -8,6 +8,7 @@
 #include "MultiTex.h"
 #include "Controller.h"
 #include "Light.h"
+#include "Mouse.h"
 
 //# Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -16,6 +17,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	WinApp* win = nullptr;
 	DirectXCommon* dxCommon = nullptr;
 	Keyboard* keyboard = nullptr;
+	Mouse* mouse = nullptr;
 	Audio* audio = nullptr;
 	GameScene* gameScene = nullptr;
 	Camera* camera = nullptr;
@@ -41,6 +43,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	keyboard->Initialize(win);
 	controller = Controller::GetInstance();
 	controller->Initialize(win);
+	mouse = Mouse::GetInstance();
+	mouse->Initialize(win);
 
 	// カメラ初期化
 	camera = new Camera();
@@ -95,6 +99,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		// 入力関連の毎フレーム処理
 		keyboard->Update();
 		controller->Update();
+		mouse->Update();
 		// ゲームシーンの毎フレーム処理
 		gameScene->Update();
 
@@ -108,19 +113,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//// 画像描画後処理
 		//Image2d::PostDraw();
 
-		//レンダーテクスチャへの描画開始
-		multiTex->PreDraw(dxCommon->GetCommandList());
-		// ゲームシーンの描画
-		gameScene->Draw();
-		//レンダーテクスチャへの描画終了
-		multiTex->PostDraw(dxCommon->GetCommandList());
-
 		// 描画開始
 		dxCommon->PreDraw();
-		// ポストエフェクトの描画
-		multiTex->Draw(dxCommon->GetCommandList());
+		// ゲームシーンの描画
+		gameScene->Draw();
 		// 描画終了
 		dxCommon->PostDraw();
+
+		////レンダーテクスチャへの描画開始
+		//multiTex->PreDraw(dxCommon->GetCommandList());
+		//// ポストエフェクトの描画
+		//multiTex->Draw(dxCommon->GetCommandList());
+		////レンダーテクスチャへの描画終了
+		//multiTex->PostDraw(dxCommon->GetCommandList());
 #pragma endregion グラフィックスコマンド
 	}
 

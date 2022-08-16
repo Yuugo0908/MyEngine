@@ -14,6 +14,8 @@ public:
 	XMFLOAT3 normalize();
 	static float dot(const XMFLOAT3& v1, const XMFLOAT3& v2);
 	XMFLOAT3 cross(const XMFLOAT3& v);
+	XMFLOAT3 cross3D(const XMFLOAT3& v1, XMFLOAT3& v2);
+	XMFLOAT3 Degrees(XMFLOAT3 Radians);
 
 	//単項演算子オーバーロード
 	Operator operator+();

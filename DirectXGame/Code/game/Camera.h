@@ -13,6 +13,7 @@ protected: // エイリアス
 public: // 静的メンバ関数
 	// カメラ初期化
 	static void Initialize(const int window_width, const int window_height);
+
 	// 視点座標の取得
 	static const XMFLOAT3& GetEye() { return eye; }
 	// 視点座標の設定
@@ -21,6 +22,11 @@ public: // 静的メンバ関数
 	static const XMFLOAT3& GetTarget() { return target; }
 	// 注視点座標の設定
 	static void SetTarget(XMFLOAT3 target);
+	// 上方向ベクトルの取得
+	static const XMFLOAT3& GetUp() { return up; }
+	// 上方向ベクトルの設定
+	static void SetUp(XMFLOAT3 up);
+
 	// ベクトルによる移動
 	static void CameraMoveVector(XMFLOAT3 move);
 	static void CameraMoveEyeVector(XMFLOAT3 move);

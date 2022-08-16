@@ -4,6 +4,7 @@
 
 #define DIRECTINPUT_VERSION     0x0800          // DirectInputのバージョン指定
 #include <dinput.h>
+#include "WinApp.h"
 class Mouse
 {
 public:
@@ -23,7 +24,7 @@ public: // 静的メンバ変数
 public: // メンバ関数
 
 	// 初期化
-	bool Initialize(HINSTANCE hInstance, HWND hwnd);
+	bool Initialize(WinApp* win_app);
 
 	// 更新
 	void Update();

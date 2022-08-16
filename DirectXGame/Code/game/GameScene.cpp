@@ -21,6 +21,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	this->playAudio = audio;
 
 	camera = new Camera();
+	mouse = new Mouse();
 	// デバイスのセット
 	FbxObject3d::SetDevice(dxCommon->GetDevice());
 	// カメラのセット
@@ -57,9 +58,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	stage->SetModel(stageModel);
 	rope->SetModel(ropeModel);
 
-	player->SetPosition({ 4.0f, 0.0f, 0.0f });
+	player->SetPosition({ 0.0f, 0.0f, -5.0f });
 	player->SetScale({ 1.0f,1.0f,1.0f });
-	enemy->SetPosition({ -4.0f, 0.0f, 0.0f });
+	enemy->SetPosition({ 0.0f, 0.0f, 5.0f });
 	enemy->SetScale({ 1.0f, 1.0f, 1.0f });
 
 	stage->SetPosition({ 0.0f, -1.5f, 0.0f });
@@ -71,7 +72,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 
 	// カメラの設定
 	camera->SetTarget(p_pos);
-	camera->SetEye({0, 3.0f, -10.0f});
+	camera->SetEye({ p_pos.x, p_pos.y + 3.0f, p_pos.z - 10.0f });
 
 	// ライトの生成
 	light = Light::Create();
@@ -91,6 +92,12 @@ void GameScene::Update() {
 	CameraUpdate();
 	PlayerMove();
 	LightUpdate();
+	if (Collision::CollisionObject(player, enemy))
+	{
+		r_flag = true;
+	}
+
+	RopeUpdate();
 
 	player->SetPosition(p_pos);
 	enemy->SetPosition(e_pos);
@@ -130,6 +137,10 @@ void GameScene::Draw() {
 	enemy->Draw();
 	skydome->Draw();
 	stage->Draw();
+	if (r_flag)
+	{
+		rope->Draw();
+	}
 
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
@@ -169,21 +180,24 @@ void GameScene::PlayerMove()
 	}
 
 	// 移動
-	if (keyboard->PushKey(DIK_D))
+	if (!easeFlag)
 	{
-		p_pos.x += 0.2f;
-	}
-	else if (keyboard->PushKey(DIK_A))
-	{
-		p_pos.x -= 0.2f;
-	}
-	if (keyboard->PushKey(DIK_W))
-	{
-		p_pos.z += 0.2f;
-	}
-	else if (keyboard->PushKey(DIK_S))
-	{
-		p_pos.z -= 0.2f;
+		if (keyboard->PushKey(DIK_D))
+		{
+			p_pos.x += 0.2f;
+		}
+		else if (keyboard->PushKey(DIK_A))
+		{
+			p_pos.x -= 0.2f;
+		}
+		if (keyboard->PushKey(DIK_W))
+		{
+			p_pos.z += 0.2f;
+		}
+		else if (keyboard->PushKey(DIK_S))
+		{
+			p_pos.z -= 0.2f;
+		}
 	}
 
 	// 自機の突進
@@ -191,17 +205,34 @@ void GameScene::PlayerMove()
 	{
 		easeFlag = true;
 		startPos = p_pos;
-		endPos = e_pos;
+		endPos = p_pos;
+		if (keyboard->PushKey(DIK_D))
+		{
+			endPos.x += avoidMove;
+		}
+		else if (keyboard->PushKey(DIK_A))
+		{
+			endPos.x -= avoidMove;
+		}
+		if (keyboard->PushKey(DIK_W))
+		{
+			endPos.z += avoidMove;
+		}
+		else if (keyboard->PushKey(DIK_S))
+		{
+			endPos.z -= avoidMove;
+		}
 	}
+
+	player->SetPosition(p_pos);
 
 	if (easeFlag == true)
 	{
-		avoidTime += 0.05f;
+		avoidTime += 0.2f;
 		avoidTimeRate = min(avoidTime / avoidEndTime, 1);
 
-		p_pos = Easing::easeOut(startPos, endPos, avoidTimeRate);
+		p_pos = Easing::easeInOut(startPos, endPos, avoidTimeRate);
 	}
-
 	if (avoidTimeRate == 1.0f)
 	{
 		avoidTime = 0.0f;
@@ -217,10 +248,13 @@ void GameScene::EnemyMove()
 void GameScene::SetImgui()
 {
 	ImGui::Begin("Test");
-	ImGui::SetWindowSize(ImVec2(500, 200));
-	ImGui::SliderFloat("p_pos.x", &p_pos.x, 0.0f, 10.0f);
-	ImGui::SliderFloat("p_pos.y", &p_pos.y, 0.0f, 10.0f);
-	ImGui::SliderFloat("p_pos.z", &p_pos.z, 0.0f, 10.0f);
+	ImGui::SetWindowSize(ImVec2(300, 200));
+	ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
+
+	ImGui::Text("playerPosX: %6.2f", p_pos.x);
+	ImGui::Text("playerPosY: %6.2f", p_pos.y);
+	ImGui::Text("playerPosZ: %6.2f", p_pos.z);
+	ImGui::Text("playerPos = cameraPos");
 	ImGui::End();
 }
 
@@ -245,11 +279,11 @@ void GameScene::RopeUpdate()
 		e_pos = { p_pos.x - length.x / wq, p_pos.y - length.y / wq, p_pos.z - length.z / wq };
 	}
 
-	angleX = PosForAngle(p_pos.y, r_pos.z, r_pos.y, p_pos.z);
+	angle = PosForAngle(p_pos, e_pos);
 
 	rope->SetPosition({ (p_pos.x + e_pos.x) / 2, (p_pos.y + e_pos.y) / 2, (p_pos.z + e_pos.z) / 2});
 	rope->SetScale({ 0.1f, len / 2 , 0.1f });
-	rope->SetRotation({ 0, XMConvertToDegrees(angleX), 0 });
+	rope->SetRotation({ ope->Degrees(angle) });
 	rope->Update();
 }
 
@@ -264,12 +298,53 @@ void GameScene::LightUpdate()
 
 void GameScene::CameraUpdate()
 {
-	// 現在の座標を取得
-	XMFLOAT3 cameraEye = camera->GetEye();
-	XMFLOAT3 cameraTarget = camera->GetTarget();
+	c_pos = camera->GetEye();
 
 	camera->SetEye({ p_pos.x, p_pos.y + 3.0f, p_pos.z - 10.0f });
 	camera->SetTarget(p_pos);
+
+	//bool dirty = false;
+	//float angleX = 0;
+	//float angleY = 0;
+
+	//// マウスの入力を取得
+	//Mouse::MouseMove mouseMove = mouse->GetMouseMove();
+
+	//// マウスの左ボタンが押されていたらカメラを回転させる
+	//if (mouse->PushMouseLeft())
+	//{
+	//	float dy = mouseMove.MouseX * scaleY;
+	//	float dx = mouseMove.MouseY * scaleX;
+
+	//	angleX = -dx * XM_PI;
+	//	angleY = -dy * XM_PI;
+	//	dirty = true;
+	//}
+
+	//if (dirty) {
+	//	// 追加回転分の回転行列を生成
+	//	XMMATRIX matRotNew = XMMatrixIdentity();
+	//	matRotNew *= XMMatrixRotationX(-angleX);
+	//	matRotNew *= XMMatrixRotationY(-angleY);
+	//	// 累積の回転行列を合成
+	//	// ※回転行列を累積していくと、誤差でスケーリングがかかる危険がある為
+	//	// クォータニオンを使用する方が望ましい
+	//	matRot = matRotNew * matRot;
+
+	//	// 注視点から視点へのベクトルと、上方向ベクトル
+	//	XMVECTOR vTargetEye = { 0.0f, 0.0f, -distance, 1.0f };
+	//	XMVECTOR vUp = { 0.0f, 1.0f, 0.0f, 0.0f };
+
+	//	// ベクトルを回転
+	//	vTargetEye = XMVector3Transform(vTargetEye, matRot);
+	//	vUp = XMVector3Transform(vUp, matRot);
+
+	//	// 注視点からずらした位置に視点座標を決定
+	//	const XMFLOAT3& target = camera->GetTarget();
+	//	camera->SetEye({ target.x + vTargetEye.m128_f32[0], target.y + vTargetEye.m128_f32[1], target.z + vTargetEye.m128_f32[2] });
+	//	camera->SetUp({ vUp.m128_f32[0], vUp.m128_f32[1], vUp.m128_f32[2] });
+	//}
+	//camera->UpdateViewMatrix();
 }
 
 float GameScene::GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b)
@@ -279,25 +354,11 @@ float GameScene::GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b)
 	return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
 }
 
-float GameScene::PosForAngle(float startPosX, float startPosY, float endPosX, float endPosY)
+XMFLOAT3 GameScene::PosForAngle(XMFLOAT3 startPos, XMFLOAT3 endPos)
 {
-	float angleX = endPosX - startPosX;
-	float angleY = endPosY - startPosY;
+	XMFLOAT3 resultAngle = {};
+	resultAngle = ope->cross3D(startPos, endPos);
 
-	float resultAngle = (float)atan2(angleX, angleY);
 
 	return resultAngle;
-}
-
-float GameScene::ease_in(float t, float b, float c, float d)
-{
-	float x = t / d;
-	float v = ease_in_cubic(x);
-	float ret = c * v + b;
-	return ret;
-}
-
-float GameScene::ease_in_cubic(float x)
-{
-	return x * x * x;
 }

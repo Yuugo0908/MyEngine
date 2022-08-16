@@ -32,6 +32,24 @@ XMFLOAT3 Operator::cross(const XMFLOAT3& v)
 	return temp;
 }
 
+XMFLOAT3 Operator::cross3D(const XMFLOAT3& v1, XMFLOAT3& v2)
+{
+	XMFLOAT3 temp = {};
+	temp.x = v1.y * v2.z - v1.z * v2.y;
+	temp.y = v1.z * v2.x - v1.x * v2.z;
+	temp.z = v1.x * v2.y - v1.y * v2.x;
+	return temp;
+}
+
+XMFLOAT3 Operator::Degrees(XMFLOAT3 Radians)
+{
+	XMFLOAT3 resultRad = Radians;
+	resultRad.x * (180.0 / XM_PI);
+	resultRad.y * (180.0 / XM_PI);
+	resultRad.z * (180.0 / XM_PI);
+	return resultRad;
+}
+
 Operator Operator::operator+()
 {
 	return *this;

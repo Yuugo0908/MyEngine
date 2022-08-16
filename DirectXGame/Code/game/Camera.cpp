@@ -41,6 +41,13 @@ void Camera::SetTarget(XMFLOAT3 target)
 	UpdateViewMatrix();
 }
 
+void Camera::SetUp(XMFLOAT3 up)
+{
+	Camera::up = up;
+
+	UpdateViewMatrix();
+}
+
 void Camera::CameraMoveVector(XMFLOAT3 move)
 {
 	XMFLOAT3 eye_moved = GetEye();

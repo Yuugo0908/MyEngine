@@ -5,6 +5,7 @@
 #include <DirectXMath.h>
 #include "Keyboard.h"
 #include "Controller.h"
+#include "Mouse.h"
 #include "Image2d.h"
 #include "Object3d.h"
 #include "DebugText.h"
@@ -66,22 +67,20 @@ public: // メンバ関数
 	// オブジェクト同士の距離を取得
 	float GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b);
 	// ロープの角度を変更
-	float PosForAngle(float startPosX, float startPosY, float endPosX, float endPosY);
-
-	float ease_in(float t, float b, float c, float d);
-
-	float ease_in_cubic(float x);
+	XMFLOAT3 PosForAngle(XMFLOAT3 startPos, XMFLOAT3 endPos);
 
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
 	Keyboard* keyboard = nullptr;
 	Controller* controller = nullptr;
+	Mouse* mouse = nullptr;
 	Audio* playAudio = nullptr;
 	DebugText debugText;
 	Camera* camera = nullptr;
 	Collision* collision = nullptr;
 	Light* light = nullptr;
 	Easing* easing = nullptr;
+	Operator* ope = nullptr;
 
 	// ゲームシーン用
 	Model* playerModel = nullptr;
@@ -99,25 +98,30 @@ private: // メンバ変数
 	XMFLOAT3 e_pos = {};
 	XMFLOAT3 r_pos = {};
 
-	// 球と平面の交点
-	XMFLOAT3 inter = {};
-
 	bool p_flag = false;//自由落下のフラグ
-
-	float p_val = 0.0f;//速度
+	float p_val = 0.2f;//速度
 
 	float gra = 0.1f;//重力
-	float angleX;
-	float angleZ;
+	XMFLOAT3 angle;
 	float max_rope = 15.0f;
 	bool r_flag = false;
+
+	// カメラ
+		XMFLOAT3 c_pos = {};
+		// カメラ注視点までの距離
+		float distance = 20;
+		// スケーリング
+		const float scaleX = 1.0f / WinApp::window_width;
+		const float scaleY = 1.0f / WinApp::window_height;
+		// 回転行列
+		XMMATRIX matRot = DirectX::XMMatrixIdentity();
 
 	// 突進用
 	XMFLOAT3 startPos;
 	XMFLOAT3 endPos;
+	float avoidMove = 10.0f;
 	float avoidTime = 0.0f;
-	const float avoidEndTime = 0.5f;
+	const float avoidEndTime = 5.0f;
 	float avoidTimeRate = 0.0f;
-
 	bool easeFlag = false;
 };
