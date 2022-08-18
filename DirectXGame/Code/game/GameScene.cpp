@@ -42,7 +42,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	enemyModel		= enemyModel->CreateFromObject("sphere");
 	skydomeModel	= skydomeModel->CreateFromObject("skydome");
 	stageModel		= stageModel->CreateFromObject("stage");
-	ropeModel		= ropeModel->CreateFromObject("rope");
+	ropeModel		= ropeModel->CreateFromObject("redBox");
 
 	// 3Dオブジェクト生成
 	player = Object3d::Create();
@@ -278,12 +278,11 @@ void GameScene::RopeUpdate()
 		len = max_rope;
 		e_pos = { p_pos.x - length.x / wq, p_pos.y - length.y / wq, p_pos.z - length.z / wq };
 	}
-
-	angle = PosForAngle(p_pos, e_pos);
+	
 
 	rope->SetPosition({ (p_pos.x + e_pos.x) / 2, (p_pos.y + e_pos.y) / 2, (p_pos.z + e_pos.z) / 2});
-	rope->SetScale({ 0.1f, len / 2 , 0.1f });
-	rope->SetRotation({ ope->Degrees(angle) });
+	rope->SetScale({ 0.05f, 0.05f , len / 7 });
+	rope->SetRotation({ 0, 0, 0 });
 	rope->Update();
 }
 
@@ -358,7 +357,6 @@ XMFLOAT3 GameScene::PosForAngle(XMFLOAT3 startPos, XMFLOAT3 endPos)
 {
 	XMFLOAT3 resultAngle = {};
 	resultAngle = ope->cross3D(startPos, endPos);
-
 
 	return resultAngle;
 }
