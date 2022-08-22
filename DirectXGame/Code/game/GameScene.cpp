@@ -274,10 +274,13 @@ void GameScene::RopeUpdate()
 	
 	// Y軸周りの角度
 	angleY = (float)atan2(p_pos.x - e_pos.x, p_pos.z - e_pos.z);
+	vecXZ = sqrtf((p_pos.x - e_pos.x) * (p_pos.x - e_pos.x) + (p_pos.z - e_pos.z) * (p_pos.z - e_pos.z));
+	// X軸周りの角度
+	angleX = (float)atan2(e_pos.y - p_pos.y, vecXZ);
 
 	rope->SetPosition({ (p_pos.x + e_pos.x) / 2, (p_pos.y + e_pos.y) / 2, (p_pos.z + e_pos.z) / 2});
 	rope->SetScale({ 0.05f, 0.05f , len / 7 });
-	rope->SetRotation({ 0, XMConvertToDegrees(angleY), 0});
+	rope->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0});
 	rope->Update();
 }
 

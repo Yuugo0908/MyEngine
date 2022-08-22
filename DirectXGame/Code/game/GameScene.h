@@ -102,7 +102,9 @@ private: // メンバ変数
 	float p_val = 0.2f;//速度
 
 	float gra = 0.1f;//重力
+	float angleX;
 	float angleY;
+	float vecXZ;
 	float max_rope = 15.0f;
 	bool r_flag = false;
 
