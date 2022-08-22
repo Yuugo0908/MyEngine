@@ -260,13 +260,6 @@ void GameScene::SetImgui()
 
 void GameScene::RopeUpdate()
 {
-	// ロープの位置を更新
-	rope->SetPosition({ r_pos });
-	rope->Update();
-
-	//ロープの位置を取得
-	XMFLOAT3 get_r_pos = rope->GetPosition();
-
 	//プレイヤーとエネミーの距離
 	XMFLOAT3 length = { p_pos.x - e_pos.x, p_pos.y - e_pos.y, p_pos.z - e_pos.z };
 	float len = GetLength(p_pos, e_pos);
@@ -279,10 +272,12 @@ void GameScene::RopeUpdate()
 		e_pos = { p_pos.x - length.x / wq, p_pos.y - length.y / wq, p_pos.z - length.z / wq };
 	}
 	
+	// Y軸周りの角度
+	angleY = (float)atan2(p_pos.x - e_pos.x, p_pos.z - e_pos.z);
 
 	rope->SetPosition({ (p_pos.x + e_pos.x) / 2, (p_pos.y + e_pos.y) / 2, (p_pos.z + e_pos.z) / 2});
 	rope->SetScale({ 0.05f, 0.05f , len / 7 });
-	rope->SetRotation({ 0, 0, 0 });
+	rope->SetRotation({ 0, XMConvertToDegrees(angleY), 0});
 	rope->Update();
 }
 
@@ -353,10 +348,12 @@ float GameScene::GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b)
 	return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
 }
 
-XMFLOAT3 GameScene::PosForAngle(XMFLOAT3 startPos, XMFLOAT3 endPos)
+float GameScene::PosForAngle(float startPos1, float startPos2, float endPos1, float endPos2)
 {
-	XMFLOAT3 resultAngle = {};
-	resultAngle = ope->cross3D(startPos, endPos);
+	float angle1 = endPos1 - startPos1;
+	float angle2 = endPos2 - startPos2;
 
-	return resultAngle;
+	float resultangle = atan2(angle2, angle1);
+
+	return resultangle;
 }

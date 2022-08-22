@@ -67,7 +67,7 @@ public: // メンバ関数
 	// オブジェクト同士の距離を取得
 	float GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b);
 	// ロープの角度を変更
-	XMFLOAT3 PosForAngle(XMFLOAT3 startPos, XMFLOAT3 endPos);
+	float PosForAngle(float startPos1, float startPos2, float endPos1, float endPos2);
 
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
@@ -102,23 +102,23 @@ private: // メンバ変数
 	float p_val = 0.2f;//速度
 
 	float gra = 0.1f;//重力
-	XMFLOAT3 angle;
+	float angleY;
 	float max_rope = 15.0f;
 	bool r_flag = false;
 
 	// カメラ
-		XMFLOAT3 c_pos = {};
-		// カメラ注視点までの距離
-		float distance = 20;
-		// スケーリング
-		const float scaleX = 1.0f / WinApp::window_width;
-		const float scaleY = 1.0f / WinApp::window_height;
-		// 回転行列
-		XMMATRIX matRot = DirectX::XMMatrixIdentity();
+	XMFLOAT3 c_pos = {};
+	// カメラ注視点までの距離
+	float distance = 20;
+	// スケーリング
+	const float scaleX = 1.0f / WinApp::window_width;
+	const float scaleY = 1.0f / WinApp::window_height;
+	// 回転行列
+	XMMATRIX matRot = DirectX::XMMatrixIdentity();
 
 	// 突進用
-	XMFLOAT3 startPos;
-	XMFLOAT3 endPos;
+	XMFLOAT3 startPos = {};
+	XMFLOAT3 endPos = {};
 	float avoidMove = 10.0f;
 	float avoidTime = 0.0f;
 	const float avoidEndTime = 5.0f;
