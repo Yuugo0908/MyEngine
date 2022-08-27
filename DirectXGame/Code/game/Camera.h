@@ -15,23 +15,31 @@ public: // 静的メンバ関数
 	static void Initialize(const int window_width, const int window_height);
 
 	// 視点座標の取得
-	static const XMFLOAT3& GetEye() { return eye; }
+	const XMFLOAT3& GetEye() { return eye; }
 	// 視点座標の設定
-	static void SetEye(XMFLOAT3 eye);
+	void SetEye(XMFLOAT3 eye);
 	// 注視点座標の取得
-	static const XMFLOAT3& GetTarget() { return target; }
+	const XMFLOAT3& GetTarget() { return target; }
 	// 注視点座標の設定
-	static void SetTarget(XMFLOAT3 target);
+	void SetTarget(XMFLOAT3 target);
 	// 上方向ベクトルの取得
-	static const XMFLOAT3& GetUp() { return up; }
+	const XMFLOAT3& GetUp() { return up; }
 	// 上方向ベクトルの設定
-	static void SetUp(XMFLOAT3 up);
+	void SetUp(XMFLOAT3 up);
+
+	/// ビュー射影行列の取得
+	const XMMATRIX& GetMatViewProjection();
 
 	// ベクトルによる移動
-	static void CameraMoveVector(XMFLOAT3 move);
-	static void CameraMoveEyeVector(XMFLOAT3 move);
-	// ビュー行列を更新
-	static void UpdateViewMatrix();
+	void CameraMoveVector(XMFLOAT3 move);
+	void CameraMoveEyeVector(XMFLOAT3 move);
+
+	/// 毎フレーム更新
+	void Update();
+	/// ビュー行列を更新
+	void UpdateViewMatrix();
+	/// 射影行列を更新
+	void UpdateProjectionMatrix();
 
 private: // 静的メンバ変数
 	// ビュー行列
@@ -47,6 +55,10 @@ private: // 静的メンバ変数
 	// 上方向ベクトル
 	static XMFLOAT3 up;
 
-public: // メンバ関数
-	static const XMMATRIX& GetMatViewProjection();
+public: // メンバ変数
+
+	// ビュー行列ダーティフラグ
+	bool viewDirty = false;
+	// 射影行列ダーティフラグ
+	bool projectionDirty = false;
 };

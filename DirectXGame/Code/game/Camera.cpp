@@ -30,22 +30,22 @@ void Camera::Initialize(const int window_width, const int window_height)
 void Camera::SetEye(XMFLOAT3 eye)
 {
 	Camera::eye = eye;
-
-	UpdateViewMatrix();
+	viewDirty = true;
+	Update();
 }
 
 void Camera::SetTarget(XMFLOAT3 target)
 {
 	Camera::target = target;
-
-	UpdateViewMatrix();
+	viewDirty = true;
+	Update();
 }
 
 void Camera::SetUp(XMFLOAT3 up)
 {
 	Camera::up = up;
-
-	UpdateViewMatrix();
+	viewDirty = true;
+	Update();
 }
 
 void Camera::CameraMoveVector(XMFLOAT3 move)
@@ -76,10 +76,33 @@ void Camera::CameraMoveEyeVector(XMFLOAT3 move)
 	SetEye(eye_moved);
 }
 
+void Camera::Update()
+{
+	if (viewDirty || projectionDirty) {
+		// 再計算必要なら
+		if (viewDirty) {
+			// ビュー行列更新
+			UpdateViewMatrix();
+			viewDirty = false;
+		}
+
+		// 再計算必要なら
+		if (projectionDirty) {
+			// ビュー行列更新
+			UpdateProjectionMatrix();
+			projectionDirty = false;
+		}
+		// ビュープロジェクションの合成
+		matViewProjection = matView * matProjection;
+	}
+}
+
 void Camera::UpdateViewMatrix()
 {
-	// ビュー行列の更新
-	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
+}
+
+void Camera::UpdateProjectionMatrix()
+{
 }
 
 const XMMATRIX& Camera::GetMatViewProjection()
