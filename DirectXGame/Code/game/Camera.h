@@ -11,9 +11,9 @@ protected: // エイリアス
 	using XMMATRIX = DirectX::XMMATRIX;
 
 public: // 静的メンバ関数
-	// カメラ初期化
-	static void Initialize(const int window_width, const int window_height);
 
+	// カメラ初期化
+	void Initialize(const int window_width, const int window_height);
 	// 視点座標の取得
 	const XMFLOAT3& GetEye() { return eye; }
 	// 視点座標の設定
@@ -41,24 +41,26 @@ public: // 静的メンバ関数
 	/// 射影行列を更新
 	void UpdateProjectionMatrix();
 
-private: // 静的メンバ変数
-	// ビュー行列
-	static XMMATRIX matView;
-	// 射影行列
-	static XMMATRIX matProjection;
-	// ビュー射影行列
-	static XMMATRIX matViewProjection;
-	// 視点座標
-	static XMFLOAT3 eye;
-	// 注視点座標
-	static XMFLOAT3 target;
-	// 上方向ベクトル
-	static XMFLOAT3 up;
 
 public: // メンバ変数
-
+	// ビュー行列
+	XMMATRIX matView = DirectX::XMMatrixIdentity();
+	// 射影行列
+	XMMATRIX matProjection = DirectX::XMMatrixIdentity();
+	// ビュー射影行列
+	XMMATRIX matViewProjection = DirectX::XMMatrixIdentity();
+	//対象とカメラの距離
+	float distance = 60.0f;
+	// 視点座標
+	XMFLOAT3 eye = { 0, 0, distance };
+	// 注視点座標
+	XMFLOAT3 target = { 0, 0, 0 };
+	// 上方向ベクトル
+	XMFLOAT3 up = { 0, 1, 0 };
 	// ビュー行列ダーティフラグ
 	bool viewDirty = false;
 	// 射影行列ダーティフラグ
 	bool projectionDirty = false;
+	// アスペクト比
+	float aspectRatio = 1.0f;
 };

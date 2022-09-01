@@ -96,4 +96,5 @@ private: // メンバ変数
 	// 親オブジェクト
 	Object3d* parent = nullptr;
 	Model* model = nullptr;
+	Camera* camera = nullptr;
 };

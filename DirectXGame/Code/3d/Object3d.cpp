@@ -294,8 +294,9 @@ void Object3d::Update()
 		matWorld *= parent->matWorld;
 	}
 
-	const XMMATRIX& matViewProjection = Camera::GetMatViewProjection();
-	const XMFLOAT3& cameraPos = Camera::GetEye();
+	camera = new Camera();
+	const XMMATRIX& matViewProjection = camera->GetMatViewProjection();
+	const XMFLOAT3& cameraPos = camera->GetEye();
 
 	// 定数バッファへデータ転送
 	ConstBufferDataB0* constMap0 = nullptr;
