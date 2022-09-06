@@ -68,6 +68,8 @@ public: // メンバ関数
 	float GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b);
 	// ロープの角度を変更
 	float PosForAngle(float startPos1, float startPos2, float endPos1, float endPos2);
+	// 円運動
+	void CircularMotion(XMFLOAT3& pos, const XMFLOAT3 center_pos, const float r, int& angle, const int add);
 
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
@@ -102,21 +104,14 @@ private: // メンバ変数
 	float p_val = 0.2f;//速度
 
 	float gra = 0.1f;//重力
-	float angleX;
-	float angleY;
-	float vecXZ;
-	float max_rope = 15.0f;
-	bool r_flag = false;
+	float angleX; // X軸
+	float angleY; // Y軸
+	float vecXZ; // XZ平面上のベクトル
+	float max_rope = 15.0f; // ロープの最大
+	bool r_flag = false; // 接触フラグ
 
 	// カメラ
 	XMFLOAT3 c_pos = {};
-	// カメラ注視点までの距離
-	float distance = 20;
-	// スケーリング
-	const float scaleX = 1.0f / WinApp::window_width;
-	const float scaleY = 1.0f / WinApp::window_height;
-	// 回転行列
-	XMMATRIX matRot = DirectX::XMMatrixIdentity();
 
 	// 突進用
 	XMFLOAT3 startPos = {};

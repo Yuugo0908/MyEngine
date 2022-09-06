@@ -101,7 +101,10 @@ void GameScene::Update() {
 		r_flag = true;
 	}
 
-	RopeUpdate();
+	if (r_flag)
+	{
+		RopeUpdate();
+	}
 
 	player->SetPosition(p_pos);
 	enemy->SetPosition(e_pos);
@@ -111,7 +114,6 @@ void GameScene::Update() {
 	enemy->Update();
 	skydome->Update();
 	stage->Update();
-	camera->Update();
 }
 
 void GameScene::reset() {
@@ -287,6 +289,11 @@ void GameScene::RopeUpdate()
 	rope->SetScale({ 0.05f, 0.05f , len / 7 });
 	rope->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0});
 	rope->Update();
+
+	if (keyboard->PushKey(DIK_E))
+	{
+		r_flag = false;
+	}
 }
 
 void GameScene::LightUpdate()
@@ -304,49 +311,7 @@ void GameScene::CameraUpdate()
 
 	camera->SetEye({ p_pos.x, p_pos.y + 3.0f, p_pos.z - 10.0f });
 	camera->SetTarget(p_pos);
-
-	//bool dirty = false;
-	//float angleX = 0;
-	//float angleY = 0;
-
-	//// マウスの入力を取得
-	//Mouse::MouseMove mouseMove = mouse->GetMouseMove();
-
-	//// マウスの左ボタンが押されていたらカメラを回転させる
-	//if (mouse->PushMouseLeft())
-	//{
-	//	float dy = mouseMove.MouseX * scaleY;
-	//	float dx = mouseMove.MouseY * scaleX;
-
-	//	angleX = -dx * XM_PI;
-	//	angleY = -dy * XM_PI;
-	//	dirty = true;
-	//}
-
-	//if (dirty) {
-	//	// 追加回転分の回転行列を生成
-	//	XMMATRIX matRotNew = XMMatrixIdentity();
-	//	matRotNew *= XMMatrixRotationX(-angleX);
-	//	matRotNew *= XMMatrixRotationY(-angleY);
-	//	// 累積の回転行列を合成
-	//	// ※回転行列を累積していくと、誤差でスケーリングがかかる危険がある為
-	//	// クォータニオンを使用する方が望ましい
-	//	matRot = matRotNew * matRot;
-
-	//	// 注視点から視点へのベクトルと、上方向ベクトル
-	//	XMVECTOR vTargetEye = { 0.0f, 0.0f, -distance, 1.0f };
-	//	XMVECTOR vUp = { 0.0f, 1.0f, 0.0f, 0.0f };
-
-	//	// ベクトルを回転
-	//	vTargetEye = XMVector3Transform(vTargetEye, matRot);
-	//	vUp = XMVector3Transform(vUp, matRot);
-
-	//	// 注視点からずらした位置に視点座標を決定
-	//	const XMFLOAT3& target = camera->GetTarget();
-	//	camera->SetEye({ target.x + vTargetEye.m128_f32[0], target.y + vTargetEye.m128_f32[1], target.z + vTargetEye.m128_f32[2] });
-	//	camera->SetUp({ vUp.m128_f32[0], vUp.m128_f32[1], vUp.m128_f32[2] });
-	//}
-	//camera->UpdateViewMatrix();
+	camera->Update();
 }
 
 float GameScene::GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b)
@@ -364,4 +329,13 @@ float GameScene::PosForAngle(float startPos1, float startPos2, float endPos1, fl
 	float resultangle = atan2(angle2, angle1);
 
 	return resultangle;
+}
+
+void GameScene::CircularMotion(XMFLOAT3& pos, const XMFLOAT3 center_pos, const float r, int& angle, const int add)
+{
+	angle += add;
+
+	pos.x = (cosf(3.14 / 180.0f * angle) * r) + center_pos.x; // 円運動の処理
+	pos.y = (sinf(3.14 / 180.0f * angle) * r) + center_pos.y;
+	pos.z = (tanf(3.14 / 180.0f * angle) * r) + center_pos.z;
 }
