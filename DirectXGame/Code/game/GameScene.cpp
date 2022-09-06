@@ -20,14 +20,18 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* a
 	this->keyboard = keyboard;
 	this->playAudio = audio;
 
-	camera = new Camera();
+	camera = new Camera(WinApp::window_width, WinApp::window_height);
 	mouse = new Mouse();
+
 	// デバイスのセット
 	FbxObject3d::SetDevice(dxCommon->GetDevice());
 	// カメラのセット
 	FbxObject3d::SetCamera(camera);
 	// グラフィックスパイプライン生成
 	FbxObject3d::CreateGraphicsPipeline();
+
+	// 3Dオブジェクトにカメラをセット
+	Object3d::SetCamera(camera);
 
 	// デバッグテキスト用テクスチャ読み込み
 	if (!Image2d::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png"))
@@ -107,6 +111,7 @@ void GameScene::Update() {
 	enemy->Update();
 	skydome->Update();
 	stage->Update();
+	camera->Update();
 }
 
 void GameScene::reset() {

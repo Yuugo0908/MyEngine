@@ -13,7 +13,7 @@ protected: // エイリアス
 public: // 静的メンバ関数
 
 	// カメラ初期化
-	void Initialize(const int window_width, const int window_height);
+	Camera(const int window_width, const int window_height);
 	// 視点座標の取得
 	const XMFLOAT3& GetEye() { return eye; }
 	// 視点座標の設定
@@ -27,8 +27,20 @@ public: // 静的メンバ関数
 	// 上方向ベクトルの設定
 	void SetUp(XMFLOAT3 up);
 
-	/// ビュー射影行列の取得
-	const XMMATRIX& GetMatViewProjection();
+	// ビュー行列の取得
+	const XMMATRIX& GetMatView() {
+		return matView;
+	}
+
+	// 射影行列の取得
+	const XMMATRIX& GetMatProjection() {
+		return matProjection;
+	}
+
+	// ビュー射影行列の取得
+	const XMMATRIX& GetMatViewProjection() {
+		return matViewProjection;
+	}
 
 	// ベクトルによる移動
 	void CameraMoveVector(XMFLOAT3 move);
@@ -50,7 +62,7 @@ public: // メンバ変数
 	// ビュー射影行列
 	XMMATRIX matViewProjection = DirectX::XMMatrixIdentity();
 	//対象とカメラの距離
-	float distance = 60.0f;
+	float distance = 20.0f;
 	// 視点座標
 	XMFLOAT3 eye = { 0, 0, distance };
 	// 注視点座標

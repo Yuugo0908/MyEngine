@@ -30,7 +30,7 @@ public: // サブクラス
 	};
 public: // 静的メンバ関数
 	// 静的初期化
-	static bool StaticInitialize(ID3D12Device* device);
+	static bool StaticInitialize(ID3D12Device* device, Camera* camera = nullptr);
 	// 描画前処理
 	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
 	// 描画後処理
@@ -43,6 +43,11 @@ public: // 静的メンバ関数
 	static void SetLight(Light* light)
 	{
 		Object3d::light = light;
+	}
+	// カメラのセット
+	static void SetCamera(Camera* camera)
+	{
+		Object3d::camera = camera;
 	}
 private: // 静的メンバ変数
 	// デバイス
@@ -61,6 +66,8 @@ private: // 静的メンバ変数
 	static ComPtr<ID3DBlob> errorBlob;
 	// ライト
 	static Light* light;
+	// カメラ
+	static Camera* camera;
 public: // メンバ関数
 	bool Initialize();
 	// 毎フレーム処理
@@ -96,5 +103,4 @@ private: // メンバ変数
 	// 親オブジェクト
 	Object3d* parent = nullptr;
 	Model* model = nullptr;
-	Camera* camera = nullptr;
 };

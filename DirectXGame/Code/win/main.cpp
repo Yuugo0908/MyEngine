@@ -47,8 +47,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	mouse->Initialize(win);
 
 	// カメラ初期化
-	camera = new Camera();
-	camera->Initialize(WinApp::window_width, WinApp::window_height);
+	//camera = new Camera();
+	//camera->Initialize(WinApp::window_width, WinApp::window_height);
 
 	// FBXの初期化
 	FbxLoader::GetInstance()->Initialize(dxCommon->GetDevice());

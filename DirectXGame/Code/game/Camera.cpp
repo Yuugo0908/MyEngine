@@ -1,7 +1,7 @@
 #include "Camera.h"
 using namespace DirectX;
 
-void Camera::Initialize(const int window_width, const int window_height)
+Camera::Camera(const int window_width, const int window_height)
 {
 	aspectRatio = (float)window_width / window_height;
 
@@ -19,21 +19,18 @@ void Camera::SetEye(XMFLOAT3 eye)
 {
 	Camera::eye = eye;
 	viewDirty = true;
-	Update();
 }
 
 void Camera::SetTarget(XMFLOAT3 target)
 {
 	Camera::target = target;
 	viewDirty = true;
-	Update();
 }
 
 void Camera::SetUp(XMFLOAT3 up)
 {
 	Camera::up = up;
 	viewDirty = true;
-	Update();
 }
 
 void Camera::CameraMoveVector(XMFLOAT3 move)
@@ -148,10 +145,4 @@ void Camera::UpdateProjectionMatrix()
 		XMConvertToRadians(60.0f),
 		aspectRatio,
 		0.1f, 1000.0f);
-}
-
-const XMMATRIX& Camera::GetMatViewProjection()
-{
-	matViewProjection = matView * matProjection;
-	return matViewProjection;
 }

@@ -19,13 +19,15 @@ ID3D12GraphicsCommandList* Object3d::cmdList = nullptr;
 ComPtr<ID3D12RootSignature> Object3d::rootsignature;
 ComPtr<ID3D12PipelineState> Object3d::pipelinestate;
 Light* Object3d::light = nullptr;
+Camera* Object3d::camera = nullptr;
 
-bool Object3d::StaticInitialize(ID3D12Device* device)
+bool Object3d::StaticInitialize(ID3D12Device* device, Camera* camera)
 {
 	// nullptrチェック
 	assert(device);
 
 	Object3d::device = device;
+	Object3d::camera = camera;
 
 	// パイプライン初期化
 	CreateGraphicsPipeline();
@@ -270,6 +272,8 @@ bool Object3d::Initialize()
 
 void Object3d::Update()
 {
+	assert(camera);
+
 	HRESULT result;
 	XMMATRIX matScale, matRot, matTrans;
 
@@ -294,7 +298,6 @@ void Object3d::Update()
 		matWorld *= parent->matWorld;
 	}
 
-	camera = new Camera();
 	const XMMATRIX& matViewProjection = camera->GetMatViewProjection();
 	const XMFLOAT3& cameraPos = camera->GetEye();
 
