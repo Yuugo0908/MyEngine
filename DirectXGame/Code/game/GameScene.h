@@ -23,7 +23,7 @@
 using namespace DirectX;
 
 class GameScene {
-protected: // エイリアス
+private: // エイリアス
 // Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	// DirectX::を省略

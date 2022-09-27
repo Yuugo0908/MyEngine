@@ -177,6 +177,9 @@
     <ClCompile Include="Code\win\WinApp.cpp">
       <Filter>ソースファイル\win</Filter>
     </ClCompile>
+    <ClCompile Include="Rope.cpp">
+      <Filter>ソースファイル\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h">
@@ -283,6 +286,9 @@
     </ClInclude>
     <ClInclude Include="Code\win\WinApp.h">
       <Filter>ヘッダーファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="Rope.h">
+      <Filter>ヘッダーファイル\game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
