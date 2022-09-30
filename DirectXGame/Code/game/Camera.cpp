@@ -1,8 +1,14 @@
 #include "Camera.h"
 using namespace DirectX;
 
-Camera::Camera(const int window_width, const int window_height)
+Camera::Camera(const int window_width, const int window_height, Mouse* mouse)
 {
+	assert(mouse);
+
+	this->mouse = mouse;
+	// 画面サイズに対する相対的なスケールに調整
+	scaleX = 1.0f / (float)window_width;
+	scaleY = 1.0f / (float)window_height;
 	aspectRatio = (float)window_width / window_height;
 
 	//ビュー行列の計算
@@ -50,6 +56,24 @@ void Camera::CameraMoveVector(XMFLOAT3 move)
 	SetTarget(target_moved);
 }
 
+void Camera::CameraMoveVector(const XMVECTOR& move)
+{
+	// 視点と注視点座標を移動し、反映
+	XMFLOAT3 eye_moved = GetEye();
+	XMFLOAT3 target_moved = GetTarget();
+
+	eye_moved.x += move.m128_f32[0];
+	eye_moved.y += move.m128_f32[1];
+	eye_moved.z += move.m128_f32[2];
+
+	target_moved.x += move.m128_f32[0];
+	target_moved.y += move.m128_f32[1];
+	target_moved.z += move.m128_f32[2];
+
+	SetEye(eye_moved);
+	SetTarget(target_moved);
+}
+
 void Camera::CameraMoveEyeVector(XMFLOAT3 move)
 {
 	XMFLOAT3 eye_moved = GetEye();
@@ -61,8 +85,80 @@ void Camera::CameraMoveEyeVector(XMFLOAT3 move)
 	SetEye(eye_moved);
 }
 
+void Camera::CameraMoveEyeVector(const XMVECTOR& move)
+{
+	// 視点座標を移動し、反映
+	XMFLOAT3 eye_moved = GetEye();
+
+	eye_moved.x += move.m128_f32[0];
+	eye_moved.y += move.m128_f32[1];
+	eye_moved.z += move.m128_f32[2];
+
+	SetEye(eye_moved);
+}
+
 void Camera::Update()
 {
+	bool dirty = false;
+	float angleX = 0;
+	float angleY = 0;
+
+	// マウスの入力を取得
+	Mouse::MouseMove mouseMove = mouse->GetMouseMove();
+
+	// マウスの左ボタンが押されていたらカメラを回転させる
+	if (mouse->PushMouseLeft())
+	{
+		float dy = mouseMove.MouseX * scaleY;
+		float dx = mouseMove.MouseY * scaleX;
+
+		angleX = -dx * XM_PI;
+		angleY = -dy * XM_PI;
+		dirty = true;
+	}
+
+	// マウスの中ボタンが押されていたらカメラを並行移動させる
+	if (mouse->PushMouseMiddle())
+	{
+		float dx = mouseMove.MouseX / 100.0f;
+		float dy = mouseMove.MouseY / 100.0f;
+
+		XMVECTOR move = { -dx, +dy, 0, 0 };
+		move = XMVector3Transform(move, matRot);
+
+		CameraMoveVector(move);
+		dirty = true;
+	}
+
+	// ホイール入力で距離を変更
+	if (mouseMove.MouseZ != 0) {
+		distance -= mouseMove.MouseZ / 100.0f;
+		distance = max(distance, 1.0f);
+		dirty = true;
+	}
+
+	if (dirty || viewDirty) {
+		// 追加回転分の回転行列を生成
+		XMMATRIX matRotNew = XMMatrixIdentity();
+		matRotNew *= XMMatrixRotationX(-angleX);
+		matRotNew *= XMMatrixRotationY(-angleY);
+		// 累積の回転行列を合成
+		matRot = matRotNew * matRot;
+
+		// 注視点から視点へのベクトルと、上方向ベクトル
+		XMVECTOR vTargetEye = { 0.0f, 0.0f, -distance, 1.0f };
+		XMVECTOR vUp = { 0.0f, 1.0f, 0.0f, 0.0f };
+
+		// ベクトルを回転
+		vTargetEye = XMVector3Transform(vTargetEye, matRot);
+		vUp = XMVector3Transform(vUp, matRot);
+
+		// 注視点からずらした位置に視点座標を決定
+		const XMFLOAT3& target = GetTarget();
+		SetEye({ target.x + vTargetEye.m128_f32[0], target.y + vTargetEye.m128_f32[1], target.z + vTargetEye.m128_f32[2] });
+		SetUp({ vUp.m128_f32[0], vUp.m128_f32[1], vUp.m128_f32[2] });
+	}
+
 	if (viewDirty || projectionDirty) {
 		// 再計算必要なら
 		if (viewDirty) {

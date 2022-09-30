@@ -1,5 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
+#include "Mouse.h"
 class Camera
 {
 protected: // エイリアス
@@ -13,7 +14,7 @@ protected: // エイリアス
 public: // 静的メンバ関数
 
 	// カメラ初期化
-	Camera(const int window_width, const int window_height);
+	Camera(const int window_width, const int window_height, Mouse* mouse);
 	// 視点座標の取得
 	const XMFLOAT3& GetEye() { return eye; }
 	// 視点座標の設定
@@ -45,6 +46,8 @@ public: // 静的メンバ関数
 	// ベクトルによる移動
 	void CameraMoveVector(XMFLOAT3 move);
 	void CameraMoveEyeVector(XMFLOAT3 move);
+	void CameraMoveVector(const XMVECTOR& move);
+	void CameraMoveEyeVector(const XMVECTOR& move);
 
 	/// 毎フレーム更新
 	void Update();
@@ -54,15 +57,22 @@ public: // 静的メンバ関数
 	void UpdateProjectionMatrix();
 
 
-public: // メンバ変数
+private: // メンバ変数
+	// 入力クラスのポインタ
+	Mouse* mouse;
 	// ビュー行列
 	XMMATRIX matView = DirectX::XMMatrixIdentity();
 	// 射影行列
 	XMMATRIX matProjection = DirectX::XMMatrixIdentity();
 	// ビュー射影行列
 	XMMATRIX matViewProjection = DirectX::XMMatrixIdentity();
+	// 回転行列
+	XMMATRIX matRot = DirectX::XMMatrixIdentity();
 	//対象とカメラの距離
 	float distance = 20.0f;
+	// スケーリング
+	float scaleX = 1.0f;
+	float scaleY = 1.0f;
 	// 視点座標
 	XMFLOAT3 eye = { 0, 0, distance };
 	// 注視点座標

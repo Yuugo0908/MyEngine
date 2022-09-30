@@ -10,18 +10,19 @@ GameScene::~GameScene() {
 
 }
 
-void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* audio) {
+void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Mouse* mouse, Audio* audio) {
 	// nullptrチェック
 	assert(dxCommon);
 	assert(keyboard);
+	assert(mouse);
 	assert(audio);
 
 	this->dxCommon = dxCommon;
 	this->keyboard = keyboard;
+	this->mouse = mouse;
 	this->playAudio = audio;
 
-	camera = new Camera(WinApp::window_width, WinApp::window_height);
-	mouse = new Mouse();
+	camera = new Camera(WinApp::window_width, WinApp::window_height, mouse);
 
 	// デバイスのセット
 	FbxObject3d::SetDevice(dxCommon->GetDevice());
@@ -189,7 +190,7 @@ void GameScene::PlayerMove()
 	// 移動
 	if (!easeFlag)
 	{
-		if (keyboard->PushKey(DIK_D))
+		if (keyboard->PushKey(DIK_W))
 		{
 			p_pos.x += 0.2f;
 		}

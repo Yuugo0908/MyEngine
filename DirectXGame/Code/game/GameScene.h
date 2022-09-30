@@ -42,7 +42,7 @@ public: // メンバ関数
 	// デストラクタ
 	~GameScene();
 	// 初期化
-	void Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Audio* audio);
+	void Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Mouse* mouse, Audio* audio);
 	// 解放
 	void Finalize();
 	// 毎フレーム処理

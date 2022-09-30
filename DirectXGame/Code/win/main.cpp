@@ -84,7 +84,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	// ゲームシーンの初期化
 	gameScene = new GameScene();
-	gameScene->Initialize(dxCommon, keyboard, audio);
+	gameScene->Initialize(dxCommon, keyboard, mouse, audio);
 
 	while (true)  // ゲームループ
 	{
@@ -133,8 +133,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// 各種解放
 	safe_delete(gameScene);
 	safe_delete(audio);
-	//safe_delete(keyboard);
-	//safe_delete(controller);
 	safe_delete(dxCommon);
 	safe_delete(camera);
 	safe_delete(postEffect);
