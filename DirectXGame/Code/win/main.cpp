@@ -84,7 +84,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	// ゲームシーンの初期化
 	gameScene = new GameScene();
-	gameScene->Initialize(dxCommon, keyboard, mouse, audio);
+	gameScene->Initialize(dxCommon, keyboard, controller, mouse, audio);
 
 	while (true)  // ゲームループ
 	{

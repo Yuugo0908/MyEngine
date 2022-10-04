@@ -110,15 +110,15 @@ void Camera::Update()
 	if (mouse->PushMouseLeft())
 	{
 		float dy = mouseMove.MouseX * scaleY;
-		float dx = mouseMove.MouseY * scaleX;
+		//float dx = mouseMove.MouseY * scaleX;
 
-		angleX = -dx * XM_PI;
+		//angleX = -dx * XM_PI;
 		angleY = -dy * XM_PI;
 		dirty = true;
 	}
 
 	// マウスの中ボタンが押されていたらカメラを並行移動させる
-	if (mouse->PushMouseMiddle())
+	/*if (mouse->PushMouseMiddle())
 	{
 		float dx = mouseMove.MouseX / 100.0f;
 		float dy = mouseMove.MouseY / 100.0f;
@@ -128,7 +128,7 @@ void Camera::Update()
 
 		CameraMoveVector(move);
 		dirty = true;
-	}
+	}*/
 
 	// ホイール入力で距離を変更
 	if (mouseMove.MouseZ != 0) {
@@ -155,7 +155,7 @@ void Camera::Update()
 
 		// 注視点からずらした位置に視点座標を決定
 		const XMFLOAT3& target = GetTarget();
-		SetEye({ target.x + vTargetEye.m128_f32[0], target.y + vTargetEye.m128_f32[1], target.z + vTargetEye.m128_f32[2] });
+		SetEye({ target.x + vTargetEye.m128_f32[0], target.y + vTargetEye.m128_f32[1] + 3.0f, target.z + vTargetEye.m128_f32[2] });
 		SetUp({ vUp.m128_f32[0], vUp.m128_f32[1], vUp.m128_f32[2] });
 	}
 

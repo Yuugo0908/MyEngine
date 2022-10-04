@@ -42,7 +42,7 @@ public: // メンバ関数
 	// デストラクタ
 	~GameScene();
 	// 初期化
-	void Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Mouse* mouse, Audio* audio);
+	void Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controller* controller, Mouse* mouse, Audio* audio);
 	// 解放
 	void Finalize();
 	// 毎フレーム処理
@@ -51,32 +51,37 @@ public: // メンバ関数
 	void reset();
 	// 描画
 	void Draw();
-
-	// 自機の移動
-	void PlayerMove();
-	// 敵の移動
-	void EnemyMove();
 	// Imguiの設定
 	void SetImgui();
+
+	// 自機の移動
+	void PlayerUpdate();
+	// 自機の突進
+	void PlayerRush();
+	// 敵の移動
+	void EnemyUpdate();
 	// ロープの更新
 	void RopeUpdate();
 	// ライトの更新
 	void LightUpdate();
 	// カメラの更新
 	void CameraUpdate();
+
 	// オブジェクト同士の距離を取得
 	float GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b);
 	// ロープの角度を変更
 	float PosForAngle(float startPos1, float startPos2, float endPos1, float endPos2);
 	// 円運動
 	void CircularMotion(XMFLOAT3& pos, const XMFLOAT3 center_pos, const float r, int& angle, const int add);
+	// 正規化
+	XMFLOAT3 normalize(XMFLOAT3 p1, XMFLOAT3 p2);
 
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
 	Keyboard* keyboard = nullptr;
 	Controller* controller = nullptr;
 	Mouse* mouse = nullptr;
-	Audio* playAudio = nullptr;
+	Audio* audio = nullptr;
 	DebugText debugText;
 	Camera* camera = nullptr;
 	Collision* collision = nullptr;
@@ -96,22 +101,30 @@ private: // メンバ変数
 	Model* ropeModel = nullptr;
 	std::unique_ptr<Object3d> rope = nullptr;
 
-	XMFLOAT3 p_pos = {};
-	XMFLOAT3 e_pos = {};
-	XMFLOAT3 r_pos = {};
-
+	// プレイヤー
+	XMFLOAT3 p_pos = {};//座標
 	bool p_flag = false;//自由落下のフラグ
+	float p_move = 0.0f;
 	float p_val = 0.2f;//速度
+	float p_gra = 0.1f;//重力
 
-	float gra = 0.1f;//重力
+	// エネミー
+	XMFLOAT3 e_pos = {};
+	bool e_flag = false;//自由落下のフラグ
+	float e_val = 0.2f;//速度
+	float e_gra = 0.1f;//重力
+
+	// ロープ
+	XMFLOAT3 r_pos = {};
 	float angleX; // X軸
 	float angleY; // Y軸
 	float vecXZ; // XZ平面上のベクトル
-	float max_rope = 15.0f; // ロープの最大
+	const float max_rope = 10.0f; // ロープの最大
 	bool r_flag = false; // 接触フラグ
 
 	// カメラ
 	XMFLOAT3 c_pos = {};
+
 
 	// 突進用
 	XMFLOAT3 startPos = {};

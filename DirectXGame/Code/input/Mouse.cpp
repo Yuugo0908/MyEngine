@@ -110,7 +110,7 @@ bool Mouse::TriggerMouseMiddle()
 
 Mouse::MouseMove Mouse::GetMouseMove()
 {
-	MouseMove tmp;
+	MouseMove tmp = {};
 	tmp.MouseX = mouseState.lX;
 	tmp.MouseY = mouseState.lY;
 	tmp.MouseZ = mouseState.lZ;
