@@ -68,11 +68,11 @@ public: // メンバ関数
 	void CameraUpdate();
 
 	// オブジェクト同士の距離を取得
-	float GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b);
+	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB);
 	// ロープの角度を変更
 	float PosForAngle(float startPos1, float startPos2, float endPos1, float endPos2);
 	// 円運動
-	void CircularMotion(XMFLOAT3& pos, const XMFLOAT3 center_pos, const float r, int& angle, const int add);
+	void CircularMotion(XMFLOAT3& pos, const XMFLOAT3 centerPos, const float r, int& angle, const int add);
 	// 正規化
 	XMFLOAT3 normalize(XMFLOAT3 p1, XMFLOAT3 p2);
 
@@ -102,28 +102,28 @@ private: // メンバ変数
 	std::unique_ptr<Object3d> rope = nullptr;
 
 	// プレイヤー
-	XMFLOAT3 p_pos = {};//座標
-	bool p_flag = false;//自由落下のフラグ
-	float p_move = 0.0f;
-	float p_val = 0.2f;//速度
-	float p_gra = 0.1f;//重力
+	XMFLOAT3 pPos = {};//座標
+	bool pFlag = false;//自由落下のフラグ
+	float pMove = 0.0f;
+	float pVal = 0.2f;//速度
+	float pGra = 0.1f;//重力
 
 	// エネミー
-	XMFLOAT3 e_pos = {};
-	bool e_flag = false;//自由落下のフラグ
-	float e_val = 0.2f;//速度
-	float e_gra = 0.1f;//重力
+	XMFLOAT3 ePos = {};
+	bool eFlag = false;//自由落下のフラグ
+	float eVal = 0.2f;//速度
+	float eGra = 0.1f;//重力
 
 	// ロープ
-	XMFLOAT3 r_pos = {};
+	XMFLOAT3 rPos = {};
 	float angleX; // X軸
 	float angleY; // Y軸
 	float vecXZ; // XZ平面上のベクトル
-	const float max_rope = 10.0f; // ロープの最大
-	bool r_flag = false; // 接触フラグ
+	const float maxRope = 10.0f; // ロープの最大
+	bool rFlag = false; // 接触フラグ
 
 	// カメラ
-	XMFLOAT3 c_pos = {};
+	XMFLOAT3 cPos = {};
 
 
 	// 突進用
