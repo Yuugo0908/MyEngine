@@ -190,7 +190,7 @@ void GameScene::PlayerUpdate()
 	}
 
 	// 移動
-	if (!easeFlag)
+	if (!easeFlag && !pEaseFlag && !eEaseFlag)
 	{
 		float rate = 1.0f;
 		// 移動量の倍数計算
@@ -202,7 +202,7 @@ void GameScene::PlayerUpdate()
 			}
 		}
 
-		pMove = 0.2f * rate;
+		pMove = pAcc * rate;
 
 		if (keyboard->PushKey(DIK_D))
 		{
@@ -233,34 +233,46 @@ void GameScene::PlayerRush()
 	// ロープがついている場合、敵を引き寄せる
 	if (rFlag)
 	{
-		if (keyboard->PushKey(DIK_Q) && easeFlag == false)
+		//pAcc = 0.05f;
+		if (keyboard->TriggerKey(DIK_UP))
 		{
-			if (keyboard->TriggerKey(DIK_DOWN))
-			{
-				easeFlag = true;
-				startPos = ePos;
-				endPos = pPos;
-			}
+			pEaseFlag = true;
+			startPos = pPos;
+			endPos = ePos;
+		}
+		else if (keyboard->TriggerKey(DIK_DOWN))
+		{
+			eEaseFlag = true;
+			startPos = ePos;
+			endPos = pPos;
 		}
 
-		if (easeFlag == true)
+		if (pEaseFlag || eEaseFlag)
 		{
 			avoidTime += 0.5f;
 			avoidTimeRate = min(avoidTime / avoidEndTime, 1);
 
-			ePos = Easing::easeIn(startPos, endPos, avoidTimeRate);
+			if (pEaseFlag)
+			{
+				pPos = Easing::easeIn(startPos, endPos, avoidTimeRate);
+			}
+			else if (eEaseFlag)
+			{
+				ePos = Easing::easeIn(startPos, endPos, avoidTimeRate);
+			}
 		}
 		if (avoidTimeRate == 1.0f)
 		{
 			avoidTime = 0.0f;
 			avoidTimeRate = 0.0f;
-			easeFlag = false;
+			pEaseFlag = false;
+			eEaseFlag = false;
 		}
 		return;
 	}
 
 	// 自機の突進
-	if (keyboard->TriggerKey(DIK_Q) && easeFlag == false)
+	if (keyboard->TriggerKey(DIK_UP) && easeFlag == false)
 	{
 		easeFlag = true;
 		startPos = pPos;
@@ -285,15 +297,17 @@ void GameScene::PlayerRush()
 
 	if (easeFlag == true)
 	{
-		avoidTime += 0.5f;
+		maxRope = 15.0f;
+		avoidTime += 0.25f;
 		avoidTimeRate = min(avoidTime / avoidEndTime, 1);
 
 		pPos = Easing::easeIn(startPos, endPos, avoidTimeRate);
 	}
-	if (avoidTimeRate == 1.0f)
+	if (avoidTimeRate >= 1.0f)
 	{
 		avoidTime = 0.0f;
 		avoidTimeRate = 0.0f;
+		maxRope = 10.0f;
 		easeFlag = false;
 	}
 }
@@ -375,7 +389,7 @@ void GameScene::LightUpdate()
 
 void GameScene::CameraUpdate()
 {
-	camera->SetEye({ pPos.x, pPos.y + 3.0f, pPos.z - 10.0f });
+	camera->SetEye({ pPos.x, pPos.y + 10.0f, pPos.z - 10.0f });
 	camera->SetTarget(pPos);
 	cPos = camera->GetEye();
 	camera->Update();
@@ -407,11 +421,30 @@ void GameScene::CircularMotion(XMFLOAT3& pos, const XMFLOAT3 centerPos, const fl
 	pos.z = (tanf(3.14 / 180.0f * angle) * r) + centerPos.z;
 }
 
+void GameScene::easeUpdate(const std::unique_ptr<Object3d>& object, XMFLOAT3 reflectPos)
+{
+	if (easeFlag == true)
+	{
+		avoidTime += 0.5f;
+		avoidTimeRate = min(avoidTime / avoidEndTime, 1);
+
+		reflectPos = Easing::easeIn(startPos, endPos, avoidTimeRate);
+	}
+	if (avoidTimeRate == 1.0f)
+	{
+		avoidTime = 0.0f;
+		avoidTimeRate = 0.0f;
+		easeFlag = false;
+	}
+	object->SetPosition(reflectPos);
+	object->Update();
+}
+
 XMFLOAT3 GameScene::normalize(XMFLOAT3 p1, XMFLOAT3 p2)
 {
 	float length = GetLength(p1, p2);
 
-	XMFLOAT3 identity;
+	XMFLOAT3 identity = {};
 	identity.x = p2.x - p1.x / length;
 	identity.y = p2.y - p1.y / length;
 	identity.z = p2.z - p1.z / length;

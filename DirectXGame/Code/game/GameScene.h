@@ -2,7 +2,6 @@
 
 #include "SafeDelete.h"
 #include "DirectXCommon.h"
-#include <DirectXMath.h>
 #include "Keyboard.h"
 #include "Controller.h"
 #include "Mouse.h"
@@ -19,6 +18,8 @@
 #include "Easing.h"
 #include "Collision.h"
 #include "Light.h"
+
+#include <DirectXMath.h>
 
 using namespace DirectX;
 
@@ -73,6 +74,8 @@ public: // メンバ関数
 	float PosForAngle(float startPos1, float startPos2, float endPos1, float endPos2);
 	// 円運動
 	void CircularMotion(XMFLOAT3& pos, const XMFLOAT3 centerPos, const float r, int& angle, const int add);
+	// イージング用関数
+	void easeUpdate(const std::unique_ptr<Object3d>& object, XMFLOAT3 reflectPos);
 	// 正規化
 	XMFLOAT3 normalize(XMFLOAT3 p1, XMFLOAT3 p2);
 
@@ -104,7 +107,8 @@ private: // メンバ変数
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
 	bool pFlag = false;//自由落下のフラグ
-	float pMove = 0.0f;
+	float pMove = 0.0f;//移動量
+	float pAcc = 0.2f;//加速
 	float pVal = 0.2f;//速度
 	float pGra = 0.1f;//重力
 
@@ -119,7 +123,7 @@ private: // メンバ変数
 	float angleX; // X軸
 	float angleY; // Y軸
 	float vecXZ; // XZ平面上のベクトル
-	const float maxRope = 10.0f; // ロープの最大
+	float maxRope = 10.0f; // ロープの最大
 	bool rFlag = false; // 接触フラグ
 
 	// カメラ
@@ -127,11 +131,13 @@ private: // メンバ変数
 
 
 	// 突進用
-	XMFLOAT3 startPos = {};
-	XMFLOAT3 endPos = {};
-	float avoidMove = 10.0f;
-	float avoidTime = 0.0f;
-	const float avoidEndTime = 5.0f;
+	XMFLOAT3 startPos = {}; // 開始位置
+	XMFLOAT3 endPos = {}; // 終点位置
+	float avoidMove = 5.0f; // 距離
+	float avoidTime = 0.0f; // 経過時間
+	const float avoidEndTime = 5.0f; // かかる時間
 	float avoidTimeRate = 0.0f;
-	bool easeFlag = false;
+	bool easeFlag = false; // イージング開始フラグ
+	bool pEaseFlag = false; // 敵に突進
+	bool eEaseFlag = false; // 敵を引き寄せる
 };
