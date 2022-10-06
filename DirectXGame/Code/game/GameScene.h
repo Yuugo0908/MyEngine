@@ -67,6 +67,8 @@ public: // メンバ関数
 	void LightUpdate();
 	// カメラの更新
 	void CameraUpdate();
+	// イージングの更新
+	void EaseUpdate(const XMFLOAT3 startPos, const XMFLOAT3 endPos, XMFLOAT3& reflectPos, bool& flag);
 
 	// オブジェクト同士の距離を取得
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB);
@@ -74,8 +76,6 @@ public: // メンバ関数
 	float PosForAngle(float startPos1, float startPos2, float endPos1, float endPos2);
 	// 円運動
 	void CircularMotion(XMFLOAT3& pos, const XMFLOAT3 centerPos, const float r, int& angle, const int add);
-	// イージング用関数
-	void easeUpdate(const std::unique_ptr<Object3d>& object, XMFLOAT3 reflectPos);
 	// 正規化
 	XMFLOAT3 normalize(XMFLOAT3 p1, XMFLOAT3 p2);
 
@@ -120,15 +120,14 @@ private: // メンバ変数
 
 	// ロープ
 	XMFLOAT3 rPos = {};
-	float angleX; // X軸
-	float angleY; // Y軸
-	float vecXZ; // XZ平面上のベクトル
-	float maxRope = 10.0f; // ロープの最大
+	float angleX = 0.0f; // X軸
+	float angleY = 0.0f; // Y軸
+	float vecXZ = 0.0f; // XZ平面上のベクトル
+	const float maxRope = 10.0f; // ロープの最大
 	bool rFlag = false; // 接触フラグ
 
 	// カメラ
 	XMFLOAT3 cPos = {};
-
 
 	// 突進用
 	XMFLOAT3 startPos = {}; // 開始位置
@@ -140,4 +139,7 @@ private: // メンバ変数
 	bool easeFlag = false; // イージング開始フラグ
 	bool pEaseFlag = false; // 敵に突進
 	bool eEaseFlag = false; // 敵を引き寄せる
+
+	// ゲーム用変数
+	int collisionCount = 0;
 };

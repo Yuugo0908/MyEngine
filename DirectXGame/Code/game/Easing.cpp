@@ -15,12 +15,12 @@ XMFLOAT3 Easing::easeIn(const XMFLOAT3& start, const XMFLOAT3& end, const float 
 
 XMFLOAT3 Easing::easeOut(const XMFLOAT3& start, const XMFLOAT3& end, const float time)
 {
-	float y = time * (2 - time);
-	return start * (1.0f - y) + end * y;
+	float t = time * (2 - time);
+	return start * (1.0f - t) + end * t;
 }
 
 XMFLOAT3 Easing::easeInOut(const XMFLOAT3& start, const XMFLOAT3& end, const float time)
 {
-	float y = time * time * (3 - 2 * time);
-	return start * (1.0f - y) + end * y;
+	float t = time * time * (3 - 2 * time);
+	return start * (1.0f - t) + end * t;
 }

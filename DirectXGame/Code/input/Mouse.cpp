@@ -86,6 +86,17 @@ bool Mouse::PushMouseMiddle()
 	return false;
 }
 
+bool Mouse::PushMouseRight()
+{
+	// 0でなければ押している
+	if (mouseState.rgbButtons[1]) {
+		return true;
+	}
+
+	// 押していない
+	return false;
+}
+
 bool Mouse::TriggerMouseLeft()
 {
 	// 前回が0で、今回が0でなければトリガー
@@ -101,6 +112,17 @@ bool Mouse::TriggerMouseMiddle()
 {
 	// 前回が0で、今回が0でなければトリガー
 	if (!mouseStatePre.rgbButtons[2] && mouseState.rgbButtons[2]) {
+		return true;
+	}
+
+	// トリガーでない
+	return false;
+}
+
+bool Mouse::TriggerMouseRight()
+{
+	// 前回が0で、今回が0でなければトリガー
+	if (!mouseStatePre.rgbButtons[1] && mouseState.rgbButtons[1]) {
 		return true;
 	}
 

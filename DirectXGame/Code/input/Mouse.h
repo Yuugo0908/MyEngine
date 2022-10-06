@@ -29,17 +29,23 @@ public: // メンバ関数
 	// 更新
 	void Update();
 
-	// キーの左ボタン押下をチェック
+	// キーの左クリックをチェック
 	bool PushMouseLeft();
 
 	// キーの中ボタン押下をチェック
 	bool PushMouseMiddle();
 
-	// キーの左ボタントリガーをチェック
+	// キーの右クリックをチェック
+	bool PushMouseRight();
+
+	// キーの左クリックトリガーをチェック
 	bool TriggerMouseLeft();
 
 	// キーの中ボタントリガーをチェック
 	bool TriggerMouseMiddle();
+
+	// キーの右クリックトリガーをチェック
+	bool TriggerMouseRight();
 
 	// マウス移動量を取得
 	MouseMove GetMouseMove();
