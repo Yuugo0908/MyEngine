@@ -24,8 +24,8 @@ bool Collision::CollisionObject(const std::unique_ptr<Object3d>& object_a, const
 	XMFLOAT3 p_b = object_b->GetPosition();
 
 	//îºåa
-	float r_a = object_a->GetScale().x;
-	float r_b = object_b->GetScale().x;
+	XMFLOAT3 r_a = object_a->GetScale();
+	XMFLOAT3 r_b = object_b->GetScale();
 
 	//í∑Ç≥
 	float l_x = sqrtf(powf(p_a.x - p_b.x, 2));
@@ -33,7 +33,7 @@ bool Collision::CollisionObject(const std::unique_ptr<Object3d>& object_a, const
 	float l_z = sqrtf(powf(p_a.z - p_b.z, 2));
 
 	//îºåaÇÃçáåvÇÊÇËíZÇØÇÍÇŒ
-	if (l_x < r_a + r_b && l_y < r_a + r_b && l_z < r_a + r_b)
+	if (l_x < r_a.x + r_b.x && l_y < r_a.y + r_b.y && l_z < r_a.z + r_b.z)
 	{
 		return true;
 	}

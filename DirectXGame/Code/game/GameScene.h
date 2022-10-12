@@ -63,6 +63,8 @@ public: // メンバ関数
 	void EnemyUpdate();
 	// ロープの更新
 	void RopeUpdate();
+	// ロープを投げる
+	void RopeThrow(XMFLOAT3& rPos, XMFLOAT3& rScale, bool& flag);
 	// ライトの更新
 	void LightUpdate();
 	// カメラの更新
@@ -120,14 +122,21 @@ private: // メンバ変数
 
 	// ロープ
 	XMFLOAT3 rPos = {};
+	XMFLOAT3 rScale = {};
 	float angleX = 0.0f; // X軸
 	float angleY = 0.0f; // Y軸
 	float vecXZ = 0.0f; // XZ平面上のベクトル
 	const float maxRope = 10.0f; // ロープの最大
 	bool rFlag = false; // 接触フラグ
 
+	bool rEaseFlag = false; // ロープを飛ばす
+	bool rEaseBackFlag = false; // ロープを戻す
+	XMFLOAT3 manageRopePos = {}; // ロープ位置管理用
+	XMFLOAT3 manageRopeScale = {}; // ロープスケール管理用
+
 	// カメラ
 	XMFLOAT3 cPos = {};
+	XMVECTOR cameraLength = {};
 
 	// 突進用
 	XMFLOAT3 startPos = {}; // 開始位置
@@ -140,6 +149,6 @@ private: // メンバ変数
 	bool pEaseFlag = false; // 敵に突進
 	bool eEaseFlag = false; // 敵を引き寄せる
 
-	// ゲーム用変数
+	// 当たり判定フラグ
 	int collisionCount = 0;
 };

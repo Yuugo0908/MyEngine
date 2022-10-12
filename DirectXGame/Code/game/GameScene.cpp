@@ -49,7 +49,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 	enemyModel		= enemyModel->CreateFromObject("sphere");
 	skydomeModel	= skydomeModel->CreateFromObject("skydome");
 	stageModel		= stageModel->CreateFromObject("stage");
-	ropeModel		= ropeModel->CreateFromObject("redBox");
+	ropeModel		= ropeModel->CreateFromObject("rope");
 
 	// 3Dオブジェクト生成
 	player = Object3d::Create();
@@ -79,7 +79,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 	ePos = enemy->GetPosition();
 
 	rope->SetPosition(pPos);
-	rope->SetScale({ 0.0f, 0.0f, 0.0f });
+	rope->SetScale({ 0.2f, 0.2f, 0.2f });
+
+	rPos = rope->GetPosition();
+	rScale = rope->GetScale();
 
 	// カメラの設定
 	camera->SetTarget(pPos);
@@ -104,18 +107,7 @@ void GameScene::Update() {
 	EnemyUpdate();
 	LightUpdate();
 	RopeUpdate();
-
-	if (collisionCount > 0)
-	{
-		collisionCount -= 1;
-	}
-	if (Collision::CollisionObject(player, enemy) && collisionCount == 0)
-	{
-		rFlag = true;
-	}
-
-	player->SetPosition(pPos);
-	enemy->SetPosition(ePos);
+	rPos = rope->GetPosition();
 
 	skydome->Update();
 	stage->Update();
@@ -125,20 +117,20 @@ void GameScene::Update() {
 void GameScene::reset()
 {
 	// 各オブジェクトの位置や大きさを初期化
-	player->SetPosition({ 0.0f, 0.0f, -5.0f });
-	player->SetScale({ 1.0f,1.0f,1.0f });
-	enemy->SetPosition({ 0.0f, 0.0f, 5.0f });
-	enemy->SetScale({ 1.0f, 1.0f, 1.0f });
+	//player->SetPosition({ 0.0f, 0.0f, -5.0f });
+	//player->SetScale({ 1.0f,1.0f,1.0f });
+	//enemy->SetPosition({ 0.0f, 0.0f, 5.0f });
+	//enemy->SetScale({ 1.0f, 1.0f, 1.0f });
 
-	stage->SetPosition({ 0.0f, -1.0f, 0.0f });
-	skydome->SetPosition({ 0.0f, 12.0f, 0.0f });
-	skydome->SetScale({ 5.0f, 5.0f, 5.0f });
+	//stage->SetPosition({ 0.0f, -1.0f, 0.0f });
+	//skydome->SetPosition({ 0.0f, 12.0f, 0.0f });
+	//skydome->SetScale({ 5.0f, 5.0f, 5.0f });
 
-	pPos = player->GetPosition();
-	ePos = enemy->GetPosition();
+	//pPos = player->GetPosition();
+	//ePos = enemy->GetPosition();
 
-	rope->SetPosition(pPos);
-	rope->SetScale({ 0.0f, 0.0f, 0.0f });
+	//rope->SetPosition(pPos);
+	//rope->SetScale({ 0.0f, 0.0f, 0.0f });
 }
 
 void GameScene::Draw() {	
@@ -164,11 +156,8 @@ void GameScene::Draw() {
 	player->Draw();
 	enemy->Draw();
 	skydome->Draw();
-	stage->Draw();
-	if (rFlag)
-	{
-		rope->Draw();
-	}
+	stage->Draw(); 
+	rope->Draw();
 
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
@@ -253,21 +242,17 @@ void GameScene::PlayerRush()
 	if (rFlag)
 	{
 		//pAcc = 0.05f;
-		if (keyboard->TriggerKey(DIK_UP))
+		if (mouse->TriggerMouseLeft() && keyboard->PushKey(DIK_W))
 		{
 			pEaseFlag = true;
-			startPos = pPos;
-			endPos = ePos;
 		}
-		else if (keyboard->TriggerKey(DIK_DOWN))
+		else if (mouse->TriggerMouseLeft() && keyboard->PushKey(DIK_S))
 		{
 			eEaseFlag = true;
-			startPos = ePos;
-			endPos = pPos;
 		}
 
-		EaseUpdate(startPos, endPos, pPos, pEaseFlag);
-		EaseUpdate(startPos, endPos, ePos, eEaseFlag);
+		EaseUpdate(pPos, ePos, pPos, pEaseFlag);
+		EaseUpdate(ePos, pPos, ePos, eEaseFlag);
 
 		return;
 	}
@@ -311,15 +296,39 @@ void GameScene::EnemyUpdate()
 			eVal = 0.0f;
 		}
 	}
+	enemy->SetPosition(ePos);
 	enemy->Update();
 }
 
 void GameScene::RopeUpdate()
 {
+	if (collisionCount >= 0)
+	{
+		collisionCount--;
+	}
+
+	if (Collision::CollisionObject(enemy, rope) && collisionCount <= 0)
+	{
+		rFlag = true;
+		rEaseFlag = false;
+	}
+
 	if (rFlag == false)
 	{
-		rope->SetPosition(pPos);
-		rope->SetScale({ 0.0f, 0.0f, 0.0f });
+		rPos = player->GetPosition() + manageRopePos;
+		rScale = manageRopeScale;
+		rope->SetPosition(rPos);
+		rope->SetScale(rScale);
+		rope->SetRotation({ 0.0f, 0.0f, 0.0f });
+		rope->Update();
+
+		if (keyboard->TriggerKey(DIK_Q) && !rEaseFlag && !rEaseBackFlag)
+		{
+			rEaseFlag = true;
+		}
+
+		RopeThrow(rPos, rScale, rEaseFlag);
+
 		return;
 	}
 
@@ -341,10 +350,61 @@ void GameScene::RopeUpdate()
 	// X軸周りの角度
 	angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
 
-	rope->SetPosition({ (pPos.x + ePos.x) / 2, (pPos.y + ePos.y) / 2, (pPos.z + ePos.z) / 2});
-	rope->SetScale({ 0.05f, 0.05f , len / 7 });
+	rPos = { (pPos.x + ePos.x) / 2, (pPos.y + ePos.y) / 2, (pPos.z + ePos.z) / 2 };
+	rScale = { 0.2f, 0.2f , len / 2 };
+	rope->SetPosition(rPos);
+	rope->SetScale(rScale);
 	rope->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0});
 	rope->Update();
+}
+
+void GameScene::RopeThrow(XMFLOAT3& rPos, XMFLOAT3& rScale, bool& flag)
+{
+	if (!flag && !rEaseBackFlag)
+	{
+		manageRopePos = {};
+		manageRopeScale = { 0.2f, 0.2f, 0.0f };
+		return;
+	}
+
+	if (flag && !rEaseBackFlag)
+	{
+		manageRopePos.z += 0.5f;
+		manageRopeScale.z += 0.5f;
+
+		avoidTime += 0.5f;
+		avoidTimeRate = min(avoidTime / avoidEndTime, 1);
+
+		rPos = Easing::easeOut(rPos, manageRopePos, avoidTimeRate);
+		rScale = Easing::easeOut(rScale, manageRopeScale, avoidTimeRate);
+
+		if (avoidTimeRate >= 1.0f && flag)
+		{
+			avoidTime = 0.0f;
+			avoidTimeRate = 0.0f;
+			rEaseBackFlag = true;
+			flag = false;
+		}
+	}
+	else
+	{
+		manageRopePos.z -= 0.2f;
+		manageRopeScale.z -= 0.2f;
+
+		avoidTime += 0.2f;
+		avoidTimeRate = min(avoidTime / avoidEndTime, 1);
+
+		rPos = Easing::easeOut(rPos, manageRopePos, avoidTimeRate);
+		rScale = Easing::easeOut(rScale, manageRopeScale, avoidTimeRate);
+
+		if (avoidTimeRate >= 1.0f && !flag)
+		{
+			avoidTime = 0.0f;
+			avoidTimeRate = 0.0f;
+			rEaseBackFlag = false;
+			flag = false;
+		}
+	}
 }
 
 void GameScene::LightUpdate()
@@ -358,16 +418,17 @@ void GameScene::LightUpdate()
 
 void GameScene::CameraUpdate()
 {
-	camera->SetEye({ pPos.x, pPos.y + 10.0f, pPos.z - 10.0f });
 	camera->SetTarget(pPos);
 	cPos = camera->GetEye();
+	cameraLength = { cPos.x, cPos.y, cPos.z, 1.0f };
+	cameraLength = XMVector3Normalize(cameraLength);
 	camera->Update();
 }
 
 void GameScene::EaseUpdate(const XMFLOAT3 startPos, const XMFLOAT3 endPos, XMFLOAT3& reflectPos, bool& flag)
 {
 	// フラグがtrueじゃない場合はリターンする
-	if (!flag){ return; }
+	if (!flag) { return; }
 
 	if (flag == true)
 	{
@@ -381,7 +442,7 @@ void GameScene::EaseUpdate(const XMFLOAT3 startPos, const XMFLOAT3 endPos, XMFLO
 		avoidTime = 0.0f;
 		avoidTimeRate = 0.0f;
 		flag = false;
-		// ロープを解除、当たり判定の無効時間をカウント
+
 		rFlag = false;
 		collisionCount = 60;
 	}
@@ -393,9 +454,17 @@ void GameScene::SetImgui()
 	ImGui::SetWindowSize(ImVec2(300, 200));
 	ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
 
-	ImGui::Text("cameraPosX: %6.2f", cPos.x);
-	ImGui::Text("cameraPosY: %6.2f", cPos.y);
-	ImGui::Text("cameraPosZ: %6.2f", cPos.z);
+	ImGui::Text("cameraPosX : %6.2f", rPos.x);
+	ImGui::Text("cameraPosY : %6.2f", rPos.y);
+	ImGui::Text("cameraPosZ : %6.2f", rPos.z);
+
+	ImGui::Text("cameraPosX : %6.2f", rScale.x);
+	ImGui::Text("cameraPosY : %6.2f", rScale.y);
+	ImGui::Text("cameraPosZ : %6.2f", rScale.z);
+
+	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[0]);
+	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[1]);
+	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[2]);
 	ImGui::End();
 }
 
