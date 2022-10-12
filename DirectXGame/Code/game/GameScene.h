@@ -71,6 +71,8 @@ public: // メンバ関数
 	void CameraUpdate();
 	// イージングの更新
 	void EaseUpdate(const XMFLOAT3 startPos, const XMFLOAT3 endPos, XMFLOAT3& reflectPos, bool& flag);
+	// 当たり判定
+	void CollisionUpdate();
 
 	// オブジェクト同士の距離を取得
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB);
@@ -78,8 +80,6 @@ public: // メンバ関数
 	float PosForAngle(float startPos1, float startPos2, float endPos1, float endPos2);
 	// 円運動
 	void CircularMotion(XMFLOAT3& pos, const XMFLOAT3 centerPos, const float r, int& angle, const int add);
-	// 正規化
-	XMFLOAT3 normalize(XMFLOAT3 p1, XMFLOAT3 p2);
 
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
@@ -113,6 +113,7 @@ private: // メンバ変数
 	float pAcc = 0.2f;//加速
 	float pVal = 0.2f;//速度
 	float pGra = 0.1f;//重力
+	float rate = 1.0f; // 斜め移動時の制限
 
 	// エネミー
 	XMFLOAT3 ePos = {};
@@ -129,8 +130,8 @@ private: // メンバ変数
 	const float maxRope = 10.0f; // ロープの最大
 	bool rFlag = false; // 接触フラグ
 
-	bool rEaseFlag = false; // ロープを飛ばす
-	bool rEaseBackFlag = false; // ロープを戻す
+	bool rThrowFlag = false; // ロープを飛ばす
+	bool rBackFlag = false; // ロープを戻す
 	XMFLOAT3 manageRopePos = {}; // ロープ位置管理用
 	XMFLOAT3 manageRopeScale = {}; // ロープスケール管理用
 
@@ -149,6 +150,8 @@ private: // メンバ変数
 	bool pEaseFlag = false; // 敵に突進
 	bool eEaseFlag = false; // 敵を引き寄せる
 
-	// 当たり判定フラグ
-	int collisionCount = 0;
+	// 当たり判定
+	int cCount = 0;
+	bool cFlag = false;
+
 };

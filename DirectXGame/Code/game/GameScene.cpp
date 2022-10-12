@@ -102,12 +102,12 @@ void GameScene::Finalize()
 
 void GameScene::Update() {
 
+	CollisionUpdate();
+	LightUpdate();
 	CameraUpdate();
+	RopeUpdate();
 	PlayerUpdate();
 	EnemyUpdate();
-	LightUpdate();
-	RopeUpdate();
-	rPos = rope->GetPosition();
 
 	skydome->Update();
 	stage->Update();
@@ -176,17 +176,39 @@ void GameScene::Draw() {
 #pragma endregion 前景画像描画
 }
 
+void GameScene::SetImgui()
+{
+	ImGui::Begin("DebugText");
+	ImGui::SetWindowSize(ImVec2(300, 200));
+	ImGui::Separator();
+	ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
+
+	ImGui::Separator();
+	ImGui::Text("cameraPosX : %6.2f", cPos.x);
+	ImGui::Text("cameraPosY : %6.2f", cPos.y);
+	ImGui::Text("cameraPosZ : %6.2f", cPos.z);
+
+	ImGui::Separator();
+	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[0]);
+	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[1]);
+	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[2]);
+	ImGui::Separator();
+	ImGui::Text("cCount : %d", cCount);
+
+	ImGui::End();
+}
+
 void GameScene::PlayerUpdate()
 {
 	pPos = player->GetPosition();
 	// ジャンプ
-	if (keyboard->TriggerKey(DIK_SPACE) && pFlag == false)
+	if (keyboard->TriggerKey(DIK_SPACE) && !pFlag)
 	{
 		pFlag = true;
 		// 上昇率の更新
 		pVal = 1.25f;
 	}
-	if (pFlag == true) {
+	if (pFlag) {
 		pVal -= pGra;
 		pPos.y += pVal;
 		if (pPos.y <= 0.0f)
@@ -200,7 +222,7 @@ void GameScene::PlayerUpdate()
 	// 移動
 	if (!easeFlag && !pEaseFlag && !eEaseFlag)
 	{
-		float rate = 1.0f;
+		rate = 1.0f;
 		// 移動量の倍数計算
 		if (keyboard->PushKey(DIK_A) || keyboard->PushKey(DIK_D))
 		{
@@ -251,33 +273,37 @@ void GameScene::PlayerRush()
 			eEaseFlag = true;
 		}
 
-		EaseUpdate(pPos, ePos, pPos, pEaseFlag);
-		EaseUpdate(ePos, pPos, ePos, eEaseFlag);
-
+		if (!easeFlag)
+		{
+			EaseUpdate(pPos, ePos, pPos, pEaseFlag);
+			EaseUpdate(ePos, pPos, ePos, eEaseFlag);
+		}
 		return;
 	}
 
 	// 自機の突進
-	if (mouse->TriggerMouseRight() && easeFlag == false)
+	pMove = avoidMove * rate;
+	if (mouse->TriggerMouseRight() && cCount == 0)
 	{
+		cCount = 60;
 		easeFlag = true;
 		startPos = pPos;
 		endPos = pPos;
 		if (keyboard->PushKey(DIK_D))
 		{
-			endPos.x += avoidMove;
+			endPos.x += pMove;
 		}
 		else if (keyboard->PushKey(DIK_A))
 		{
-			endPos.x -= avoidMove;
+			endPos.x -= pMove;
 		}
 		if (keyboard->PushKey(DIK_W))
 		{
-			endPos.z += avoidMove;
+			endPos.z += pMove;
 		}
 		else if (keyboard->PushKey(DIK_S))
 		{
-			endPos.z -= avoidMove;
+			endPos.z -= pMove;
 		}
 	}
 
@@ -302,18 +328,7 @@ void GameScene::EnemyUpdate()
 
 void GameScene::RopeUpdate()
 {
-	if (collisionCount >= 0)
-	{
-		collisionCount--;
-	}
-
-	if (Collision::CollisionObject(enemy, rope) && collisionCount <= 0)
-	{
-		rFlag = true;
-		rEaseFlag = false;
-	}
-
-	if (rFlag == false)
+	if (!rFlag)
 	{
 		rPos = player->GetPosition() + manageRopePos;
 		rScale = manageRopeScale;
@@ -322,12 +337,13 @@ void GameScene::RopeUpdate()
 		rope->SetRotation({ 0.0f, 0.0f, 0.0f });
 		rope->Update();
 
-		if (keyboard->TriggerKey(DIK_Q) && !rEaseFlag && !rEaseBackFlag)
+		if (mouse->TriggerMouseLeft() && !rThrowFlag && !rBackFlag && cCount == 0)
 		{
-			rEaseFlag = true;
+			cCount = 30;
+			rThrowFlag = true;
 		}
 
-		RopeThrow(rPos, rScale, rEaseFlag);
+		RopeThrow(rPos, rScale, rThrowFlag);
 
 		return;
 	}
@@ -351,7 +367,7 @@ void GameScene::RopeUpdate()
 	angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
 
 	rPos = { (pPos.x + ePos.x) / 2, (pPos.y + ePos.y) / 2, (pPos.z + ePos.z) / 2 };
-	rScale = { 0.2f, 0.2f , len / 2 };
+	rScale = { 0.2f, 0.2f , len / 2.0f };
 	rope->SetPosition(rPos);
 	rope->SetScale(rScale);
 	rope->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0});
@@ -360,14 +376,15 @@ void GameScene::RopeUpdate()
 
 void GameScene::RopeThrow(XMFLOAT3& rPos, XMFLOAT3& rScale, bool& flag)
 {
-	if (!flag && !rEaseBackFlag)
+	// フラグがtrueじゃない場合は初期化してリターンする
+	if (!flag && !rBackFlag)
 	{
 		manageRopePos = {};
 		manageRopeScale = { 0.2f, 0.2f, 0.0f };
 		return;
 	}
 
-	if (flag && !rEaseBackFlag)
+	if (flag && !rBackFlag)
 	{
 		manageRopePos.z += 0.5f;
 		manageRopeScale.z += 0.5f;
@@ -382,7 +399,7 @@ void GameScene::RopeThrow(XMFLOAT3& rPos, XMFLOAT3& rScale, bool& flag)
 		{
 			avoidTime = 0.0f;
 			avoidTimeRate = 0.0f;
-			rEaseBackFlag = true;
+			rBackFlag = true;
 			flag = false;
 		}
 	}
@@ -401,7 +418,7 @@ void GameScene::RopeThrow(XMFLOAT3& rPos, XMFLOAT3& rScale, bool& flag)
 		{
 			avoidTime = 0.0f;
 			avoidTimeRate = 0.0f;
-			rEaseBackFlag = false;
+			rBackFlag = false;
 			flag = false;
 		}
 	}
@@ -420,7 +437,8 @@ void GameScene::CameraUpdate()
 {
 	camera->SetTarget(pPos);
 	cPos = camera->GetEye();
-	cameraLength = { cPos.x, cPos.y, cPos.z, 1.0f };
+
+	cameraLength = { cPos.x - pPos.x, cPos.y - pPos.y, cPos.z - pPos.z, 1.0f };
 	cameraLength = XMVector3Normalize(cameraLength);
 	camera->Update();
 }
@@ -430,13 +448,10 @@ void GameScene::EaseUpdate(const XMFLOAT3 startPos, const XMFLOAT3 endPos, XMFLO
 	// フラグがtrueじゃない場合はリターンする
 	if (!flag) { return; }
 
-	if (flag == true)
-	{
-		avoidTime += 0.5f;
-		avoidTimeRate = min(avoidTime / avoidEndTime, 1);
+	avoidTime += 0.5f;
+	avoidTimeRate = min(avoidTime / avoidEndTime, 1);
+	reflectPos = Easing::easeIn(startPos, endPos, avoidTimeRate);
 
-		reflectPos = Easing::easeIn(startPos, endPos, avoidTimeRate);
-	}
 	if (avoidTimeRate >= 1.0f)
 	{
 		avoidTime = 0.0f;
@@ -444,28 +459,24 @@ void GameScene::EaseUpdate(const XMFLOAT3 startPos, const XMFLOAT3 endPos, XMFLO
 		flag = false;
 
 		rFlag = false;
-		collisionCount = 60;
+		cCount = 60;
 	}
 }
 
-void GameScene::SetImgui()
+void GameScene::CollisionUpdate()
 {
-	ImGui::Begin("Test");
-	ImGui::SetWindowSize(ImVec2(300, 200));
-	ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
+	if (cCount)
+	{
+		rFlag = false;
+		cCount--;
+		return;
+	}
 
-	ImGui::Text("cameraPosX : %6.2f", rPos.x);
-	ImGui::Text("cameraPosY : %6.2f", rPos.y);
-	ImGui::Text("cameraPosZ : %6.2f", rPos.z);
-
-	ImGui::Text("cameraPosX : %6.2f", rScale.x);
-	ImGui::Text("cameraPosY : %6.2f", rScale.y);
-	ImGui::Text("cameraPosZ : %6.2f", rScale.z);
-
-	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[0]);
-	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[1]);
-	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[2]);
-	ImGui::End();
+	if (Collision::CollisionObject(enemy, rope))
+	{
+		rFlag = true;
+		avoidTimeRate = 2.0f;
+	}
 }
 
 float GameScene::GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
@@ -492,16 +503,4 @@ void GameScene::CircularMotion(XMFLOAT3& pos, const XMFLOAT3 centerPos, const fl
 	pos.x = (cosf(3.14f / 180.0f * angle) * r) + centerPos.x; // 円運動の処理
 	pos.y = (sinf(3.14f / 180.0f * angle) * r) + centerPos.y;
 	pos.z = (tanf(3.14f / 180.0f * angle) * r) + centerPos.z;
-}
-
-XMFLOAT3 GameScene::normalize(XMFLOAT3 p1, XMFLOAT3 p2)
-{
-	float length = GetLength(p1, p2);
-
-	XMFLOAT3 identity = {};
-	identity.x = p2.x - p1.x / length;
-	identity.y = p2.y - p1.y / length;
-	identity.z = p2.z - p1.z / length;
-
-	return identity;
 }
