@@ -72,6 +72,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 	enemy->SetScale({ 1.0f, 1.0f, 1.0f });
 
 	stage->SetPosition({ 0.0f, -1.0f, 0.0f });
+	stage->SetScale({ 0.5f, 0.5f, 1.0f });
 	skydome->SetPosition({ 0.0f, 12.0f, 0.0f });
 	skydome->SetScale({ 5.0f, 5.0f, 5.0f });
 
@@ -94,6 +95,12 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 	// 3Dオブジェクトにライトをセット
 	Object3d::SetLight(light);
 	FbxObject3d::SetLight(light);
+	// レイの初期値を設定
+	ray.start = XMVectorSet(pPos.x, pPos.y, pPos.z, 1);
+	ray.dir = XMVectorSet(0, -1, 0, 0);
+	// 平面の初期値を設定
+	plane.normal = XMVectorSet(0, 1, 0, 0);
+	plane.distance = 0.0f; // 原点からの距離
 }
 
 void GameScene::Finalize()
@@ -109,6 +116,10 @@ void GameScene::Update() {
 	PlayerUpdate();
 	EnemyUpdate();
 
+	player->Update();
+	enemy->Update();
+	rope->Update();
+	camera->Update();
 	skydome->Update();
 	stage->Update();
 	mouse->Update();
@@ -201,6 +212,7 @@ void GameScene::SetImgui()
 void GameScene::PlayerUpdate()
 {
 	pPos = player->GetPosition();
+	rPos = pPos + manageRopePos;
 	// ジャンプ
 	if (keyboard->TriggerKey(DIK_SPACE) && !pFlag)
 	{
@@ -211,16 +223,27 @@ void GameScene::PlayerUpdate()
 	if (pFlag) {
 		pVal -= pGra;
 		pPos.y += pVal;
-		if (pPos.y <= 0.0f)
-		{
-			pPos.y = 0.0f;
-			pVal = 0.0f;
-			pFlag = false;
-		}
 	}
 
+
+	if (!rFlag)
+	{
+		PlayerRush();
+	}
+
+	player->SetPosition(pPos);
+
 	// 移動
-	if (!easeFlag && !pEaseFlag && !eEaseFlag)
+	if (rThrowFlag)
+	{
+		return;
+	}
+	if (rBackFlag)
+	{
+		return;
+	}
+
+
 	{
 		rate = 1.0f;
 		// 移動量の倍数計算
@@ -252,40 +275,15 @@ void GameScene::PlayerUpdate()
 		}
 	}
 
-	PlayerRush();
-
 	player->SetPosition(pPos);
-	player->Update();
 }
 
 void GameScene::PlayerRush()
 {
-	// ロープがついている場合、敵を引き寄せる
-	if (rFlag)
-	{
-		//pAcc = 0.05f;
-		if (mouse->TriggerMouseLeft() && keyboard->PushKey(DIK_W))
-		{
-			pEaseFlag = true;
-		}
-		else if (mouse->TriggerMouseLeft() && keyboard->PushKey(DIK_S))
-		{
-			eEaseFlag = true;
-		}
-
-		if (!easeFlag)
-		{
-			EaseUpdate(pPos, ePos, pPos, pEaseFlag);
-			EaseUpdate(ePos, pPos, ePos, eEaseFlag);
-		}
-		return;
-	}
-
 	// 自機の突進
 	pMove = avoidMove * rate;
-	if (mouse->TriggerMouseRight() && cCount == 0)
+	if (keyboard->TriggerKey(DIK_K) && cCount == 0)
 	{
-		cCount = 60;
 		easeFlag = true;
 		startPos = pPos;
 		endPos = pPos;
@@ -306,7 +304,6 @@ void GameScene::PlayerRush()
 			endPos.z -= pMove;
 		}
 	}
-
 	EaseUpdate(startPos, endPos, pPos, easeFlag);
 }
 
@@ -323,24 +320,23 @@ void GameScene::EnemyUpdate()
 		}
 	}
 	enemy->SetPosition(ePos);
-	enemy->Update();
 }
 
 void GameScene::RopeUpdate()
 {
+	rPos = player->GetPosition() + manageRopePos;
+	rScale = manageRopeScale;
+	rope->SetPosition(rPos);
+	rope->SetScale(rScale);
+	rope->SetRotation({ 0.0f, 0.0f, 0.0f });
+	rope->Update();
 	if (!rFlag)
 	{
-		rPos = player->GetPosition() + manageRopePos;
-		rScale = manageRopeScale;
-		rope->SetPosition(rPos);
-		rope->SetScale(rScale);
-		rope->SetRotation({ 0.0f, 0.0f, 0.0f });
-		rope->Update();
-
-		if (mouse->TriggerMouseLeft() && !rThrowFlag && !rBackFlag && cCount == 0)
+		if (keyboard->TriggerKey(DIK_J) && !rThrowFlag && !rBackFlag && cCount == 0)
 		{
-			cCount = 30;
 			rThrowFlag = true;
+			avoidTime = 0.0f;
+			avoidTimeRate = 0.0f;
 		}
 
 		RopeThrow(rPos, rScale, rThrowFlag);
@@ -348,30 +344,64 @@ void GameScene::RopeUpdate()
 		return;
 	}
 
-	//プレイヤーとエネミーの距離
-	XMFLOAT3 length = { pPos.x - ePos.x, pPos.y - ePos.y, pPos.z - ePos.z };
-	float len = GetLength(pPos, ePos);
-
-	//最大値より大きいなら
-	if (len > maxRope)
+	if (rFlag)
 	{
-		float wq = len / maxRope;
-		len = maxRope;
-		ePos = { pPos.x - length.x / wq, pPos.y - length.y / wq, pPos.z - length.z / wq };
-	}
-	
-	// Y軸周りの角度
-	angleY = (float)atan2(pPos.x - ePos.x, pPos.z - ePos.z);
-	vecXZ = sqrtf((pPos.x - ePos.x) * (pPos.x - ePos.x) + (pPos.z - ePos.z) * (pPos.z - ePos.z));
-	// X軸周りの角度
-	angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
+		// ロープがついている場合、敵を引き寄せる
+		if (keyboard->TriggerKey(DIK_K) && keyboard->PushKey(DIK_W))
+		{
+			easeFlag = true;
+			pEaseFlag = true;
+			avoidTime = 0.0f;
+			avoidTimeRate = 0.0f;
+		}
+		else if (keyboard->TriggerKey(DIK_K) && keyboard->PushKey(DIK_S))
+		{
+			easeFlag = true;
+			eEaseFlag = true;
+			avoidTime = 0.0f;
+			avoidTimeRate = 0.0f;
+		}
 
-	rPos = { (pPos.x + ePos.x) / 2, (pPos.y + ePos.y) / 2, (pPos.z + ePos.z) / 2 };
-	rScale = { 0.2f, 0.2f , len / 2.0f };
-	rope->SetPosition(rPos);
-	rope->SetScale(rScale);
-	rope->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0});
-	rope->Update();
+		if (pEaseFlag)
+		{
+			EaseUpdate(pPos, ePos, pPos, easeFlag);
+		}
+		if (eEaseFlag)
+		{
+			EaseUpdate(ePos, pPos, ePos, easeFlag);
+		}
+		player->SetPosition(pPos);
+		enemy->SetPosition(ePos);
+		player->Update();
+		enemy->Update();
+	}
+
+
+	{
+		//プレイヤーとエネミーの距離
+		XMFLOAT3 length = { pPos.x - ePos.x, pPos.y - ePos.y, pPos.z - ePos.z };
+		float len = GetLength(pPos, ePos);
+
+		//最大値より大きいなら
+		if (len > maxRope)
+		{
+			float wq = len / maxRope;
+			len = maxRope;
+			ePos = { pPos.x - length.x / wq, pPos.y - length.y / wq, pPos.z - length.z / wq };
+		}
+
+		// Y軸周りの角度
+		angleY = (float)atan2(pPos.x - ePos.x, pPos.z - ePos.z);
+		vecXZ = sqrtf((pPos.x - ePos.x) * (pPos.x - ePos.x) + (pPos.z - ePos.z) * (pPos.z - ePos.z));
+		// X軸周りの角度
+		angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
+
+		rPos = { (pPos.x + ePos.x) / 2, (pPos.y + ePos.y) / 2, (pPos.z + ePos.z) / 2 };
+		rScale = { 0.2f, 0.2f , len / 2.0f };
+		rope->SetPosition(rPos);
+		rope->SetScale(rScale);
+		rope->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
+	}
 }
 
 void GameScene::RopeThrow(XMFLOAT3& rPos, XMFLOAT3& rScale, bool& flag)
@@ -380,46 +410,97 @@ void GameScene::RopeThrow(XMFLOAT3& rPos, XMFLOAT3& rScale, bool& flag)
 	if (!flag && !rBackFlag)
 	{
 		manageRopePos = {};
-		manageRopeScale = { 0.2f, 0.2f, 0.0f };
+		manageRopeScale = {};
 		return;
 	}
 
-	if (flag && !rBackFlag)
+	// Y軸周りの角度
+	angleY = (float)atan2(pPos.x - ePos.x, pPos.z - ePos.z);
+	vecXZ = sqrtf((pPos.x - ePos.x) * (pPos.x - ePos.x) + (pPos.z - ePos.z) * (pPos.z - ePos.z));
+	// X軸周りの角度
+	angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
+	rope->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
+
+
+	XMVECTOR playerPos = { player->GetPosition().x, player->GetPosition().y, player->GetPosition().z, 1};
+	XMVECTOR enemyPos = { enemy->GetPosition().x, enemy->GetPosition().y, enemy->GetPosition().z, 1};
+
+	XMVECTOR subPlayerEnemy = XMVectorSubtract(enemyPos, playerPos);
+	XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
+
+	XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2]};
+
+	if (flag)
 	{
-		manageRopePos.z += 0.5f;
+		manageRopePos.x += subPE.x;
+		manageRopePos.y += subPE.y;
+		manageRopePos.z += subPE.z;
+
+		manageRopeScale.x += 0.02f;
+		manageRopeScale.y += 0.02f;
 		manageRopeScale.z += 0.5f;
 
 		avoidTime += 0.5f;
 		avoidTimeRate = min(avoidTime / avoidEndTime, 1);
 
+		cFlag = true;
+
 		rPos = Easing::easeOut(rPos, manageRopePos, avoidTimeRate);
 		rScale = Easing::easeOut(rScale, manageRopeScale, avoidTimeRate);
 
-		if (avoidTimeRate >= 1.0f && flag)
+		if (Collision::CollisionObject(enemy, rope))
+		{
+			manageRopePos = {};
+			manageRopeScale = {};
+			avoidTime = 0.0f;
+			avoidTimeRate = 0.0f;
+			flag = false;
+			rBackFlag = false;
+			rFlag = true;
+		}
+
+		if (avoidTimeRate >= 1.0f)
 		{
 			avoidTime = 0.0f;
 			avoidTimeRate = 0.0f;
-			rBackFlag = true;
 			flag = false;
+			rBackFlag = true;
 		}
 	}
-	else
-	{
-		manageRopePos.z -= 0.2f;
-		manageRopeScale.z -= 0.2f;
 
-		avoidTime += 0.2f;
+	if(rBackFlag)
+	{
+		manageRopePos.x -= subPE.x / 2;
+		manageRopePos.y -= subPE.y / 2;
+		manageRopePos.z -= subPE.z / 2;
+
+		manageRopeScale.x -= 0.01f;
+		manageRopeScale.y -= 0.01f;
+		manageRopeScale.z -= 0.25f;
+
+		avoidTime += 0.25f;
 		avoidTimeRate = min(avoidTime / avoidEndTime, 1);
 
 		rPos = Easing::easeOut(rPos, manageRopePos, avoidTimeRate);
 		rScale = Easing::easeOut(rScale, manageRopeScale, avoidTimeRate);
 
-		if (avoidTimeRate >= 1.0f && !flag)
+		if (Collision::CollisionObject(enemy, rope))
+		{
+			manageRopePos = {};
+			manageRopeScale = {};
+			avoidTime = 0.0f;
+			avoidTimeRate = 0.0f;
+			flag = false;
+			rBackFlag = false;
+			rFlag = true;
+		}
+
+		if (avoidTimeRate >= 1.0f)
 		{
 			avoidTime = 0.0f;
 			avoidTimeRate = 0.0f;
 			rBackFlag = false;
-			flag = false;
+			cFlag = false;
 		}
 	}
 }
@@ -440,7 +521,6 @@ void GameScene::CameraUpdate()
 
 	cameraLength = { cPos.x - pPos.x, cPos.y - pPos.y, cPos.z - pPos.z, 1.0f };
 	cameraLength = XMVector3Normalize(cameraLength);
-	camera->Update();
 }
 
 void GameScene::EaseUpdate(const XMFLOAT3 startPos, const XMFLOAT3 endPos, XMFLOAT3& reflectPos, bool& flag)
@@ -454,28 +534,60 @@ void GameScene::EaseUpdate(const XMFLOAT3 startPos, const XMFLOAT3 endPos, XMFLO
 
 	if (avoidTimeRate >= 1.0f)
 	{
+		rFlag = false;
+		pEaseFlag = false;
+		eEaseFlag = false;
 		avoidTime = 0.0f;
 		avoidTimeRate = 0.0f;
 		flag = false;
-
-		rFlag = false;
-		cCount = 60;
 	}
 }
 
 void GameScene::CollisionUpdate()
 {
-	if (cCount)
+	CollisionRay();
+
+	if (easeFlag || rThrowFlag || rBackFlag)
 	{
-		rFlag = false;
-		cCount--;
-		return;
+		cCount = 30;
+	}
+	else
+	{
+		if (cCount > 0)
+		{
+			cCount--;
+		}
 	}
 
-	if (Collision::CollisionObject(enemy, rope))
+	//if (!rFlag && cFlag && Collision::CollisionObject(enemy, rope))
+	//{
+	//	avoidTime = 0.0f;
+	//	avoidTimeRate = 0.0f;
+	//	rThrowFlag = false;
+	//	rBackFlag = false;
+	//	cFlag = false;
+	//	rFlag = true;
+	//}
+}
+
+void GameScene::CollisionRay()
+{
+	pPos = player->GetPosition();
+
+	ray.start = XMVectorSet(pPos.x, pPos.y + 1.0f, pPos.z, 1);
+	ray.dir = XMVectorSet(pPos.x, pPos.y - 1.0f, pPos.z, 1);
+
+	// レイと平面の当たり判定
+	XMVECTOR inter;
+	float distance;
+	bool hit = Collision::CollisionRayPlane(ray, plane, &distance, &inter);
+
+	if (pFlag && hit && pPos.y < 0.0f)
 	{
-		rFlag = true;
-		avoidTimeRate = 2.0f;
+		pPos.y = 0.0f;
+		rPos.y = 0.0f;
+		pVal = 0.0f;
+		pFlag = false;
 	}
 }
 

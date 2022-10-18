@@ -14,40 +14,41 @@ public: // サブクラス
 	struct Sphere
 	{
 		// 中心座標
-		XMFLOAT3 center = { 0, 0, 0 };
+		XMVECTOR center = { 0, 0, 0 };
 		// 半径
 		float radius = 1.0f;
 	};
 	struct Plane
 	{
 		// 法線ベクトル
-		XMFLOAT3 normal = { 0, 0, 0 };
+		XMVECTOR normal = { 0, 0, 0 };
 		// 原点からの距離
 		float distance = 0.0f;
 	};
 	struct Ray
 	{
 		// 始点座標
-		XMFLOAT3 start = { 0, 0, 0 };
+		XMVECTOR start = { 0, 0, 0 };
 		// 方向
-		XMFLOAT3 dir = { 1, 0, 0 };
+		XMVECTOR dir = { 1, 0, 0 };
 	};
 	struct Triangle
 	{
 		// 頂点座標
-		XMFLOAT3 p0;
-		XMFLOAT3 p1;
-		XMFLOAT3 p2;
+		XMVECTOR p0;
+		XMVECTOR p1;
+		XMVECTOR p2;
 		// 法線ベクトル
-		XMFLOAT3 normal;
+		XMVECTOR normal;
 	};
+
 public: // 静的メンバ関数
 
 	static Collision* GetInstance();
 	//オブジェクト同士の当たり判定
 	static bool CollisionObject(const std::unique_ptr<Object3d>& object_a, const std::unique_ptr<Object3d>& object_b);
 	// 球と平面の当たり判定
-	static bool CollisionSpherePlane(const Sphere& sphere, const Plane& plane, XMFLOAT3* inter);
+	static bool CollisionSpherePlane(const Sphere& sphere, const Plane& plane, XMVECTOR* inter);
 	// 球と三角形の当たり判定
 	static bool CollisionSphereTriangle(const Sphere& sphere, const Triangle& triangle, XMVECTOR* closest);
 

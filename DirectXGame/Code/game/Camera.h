@@ -69,7 +69,7 @@ private: // メンバ変数
 	// 回転行列
 	XMMATRIX matRot = DirectX::XMMatrixIdentity();
 	//対象とカメラの距離
-	float distance = 20.0f;
+	float distance = 15.0f;
 	// スケーリング
 	float scaleX = 1.0f;
 	float scaleY = 1.0f;

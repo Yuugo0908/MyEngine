@@ -20,6 +20,7 @@
 #include "Light.h"
 
 #include <DirectXMath.h>
+#include <Collision.h>
 
 using namespace DirectX;
 
@@ -73,6 +74,8 @@ public: // メンバ関数
 	void EaseUpdate(const XMFLOAT3 startPos, const XMFLOAT3 endPos, XMFLOAT3& reflectPos, bool& flag);
 	// 当たり判定
 	void CollisionUpdate();
+	// レイの当たり判定
+	void CollisionRay();
 
 	// オブジェクト同士の距離を取得
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB);
@@ -93,6 +96,9 @@ private: // メンバ変数
 	Light* light = nullptr;
 	Easing* easing = nullptr;
 	Operator* ope = nullptr;
+
+	Collision::Ray ray;
+	Collision::Plane plane;
 
 	// ゲームシーン用
 	Model* playerModel = nullptr;
@@ -142,13 +148,14 @@ private: // メンバ変数
 	// 突進用
 	XMFLOAT3 startPos = {}; // 開始位置
 	XMFLOAT3 endPos = {}; // 終点位置
+	XMFLOAT3 reflectPos = {};
 	float avoidMove = 5.0f; // 距離
 	float avoidTime = 0.0f; // 経過時間
 	const float avoidEndTime = 5.0f; // かかる時間
 	float avoidTimeRate = 0.0f;
 	bool easeFlag = false; // イージング開始フラグ
-	bool pEaseFlag = false; // 敵に突進
-	bool eEaseFlag = false; // 敵を引き寄せる
+	bool pEaseFlag = false;
+	bool eEaseFlag = false;
 
 	// 当たり判定
 	int cCount = 0;

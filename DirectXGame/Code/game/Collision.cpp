@@ -41,12 +41,12 @@ bool Collision::CollisionObject(const std::unique_ptr<Object3d>& object_a, const
 	return false;
 }
 
-bool Collision::CollisionSpherePlane(const Sphere& sphere, const Plane& plane, XMFLOAT3* inter)
+bool Collision::CollisionSpherePlane(const Sphere& sphere, const Plane& plane, XMVECTOR* inter)
 {
 	// 座標系の原点から球の中心座標への距離
-	float distV = Operator::dot(sphere.center, plane.normal);
+	XMVECTOR distV = XMVector3Dot(sphere.center, plane.normal);
 	// 平面の原点距離を減算することで、平面と球の中心との距離が出る
-	float dist = distV - plane.distance;
+	float dist = distV.m128_f32[0] - plane.distance;
 	// 距離の絶対値が半径より大きければ当たっていない
 	if (fabsf(dist) > sphere.radius) return false;
 
@@ -54,7 +54,7 @@ bool Collision::CollisionSpherePlane(const Sphere& sphere, const Plane& plane, X
 	if (inter)
 	{
 		// 平面上の最近接点を擬似交点とする
-		*inter =  plane.normal * sphere.center * -dist;
+		*inter = -dist * plane.normal * sphere.center;
 	}
 	return true;
 }
@@ -66,7 +66,41 @@ bool Collision::CollisionSphereTriangle(const Sphere& sphere, const Triangle& tr
 
 bool Collision::CollisionRayPlane(const Ray& ray, const Plane& plane, float* distance, XMVECTOR* inter)
 {
-	return false;
+	const float epsilon = 1.0e-5f; // 誤差吸収用の微小な値
+
+	// 面法線とレイの方向ベクトルの内積
+	float d1 = XMVector3Dot(plane.normal, ray.dir).m128_f32[0];
+	// 裏面には当たらない
+	if (d1 > epsilon)
+	{
+		return false;
+	}
+
+	// 始点と原点の距離(平面の法線方向)
+	// 面法線とレイの始点座標(位置ベクトル)の内積
+	float d2 = XMVector3Dot(plane.normal, ray.start).m128_f32[0];
+	// 始点と平面の距離(平面の法線方向)
+	float dist = d2 - plane.distance;
+	// 始点と平面の距離(レイ方向)
+	float t = dist / -d1;
+
+	// 交点が始点より後ろにある場合、当たらない
+	if (t < 0)
+	{
+		return false;
+	}
+	// 距離を書き込む
+	if (distance)
+	{
+		*distance = t;
+	}
+	// 交点を計算
+	if (inter)
+	{
+		*inter = ray.start + t * ray.dir;
+	}
+
+	return true;
 }
 
 bool Collision::CollisionRayTriangle(const Ray& ray, const Triangle& triangle, float* distance, XMVECTOR* inter)
