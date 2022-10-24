@@ -90,7 +90,6 @@ private: // メンバ変数
 	Controller* controller = nullptr;
 	Mouse* mouse = nullptr;
 	Audio* audio = nullptr;
-	DebugText debugText;
 	Camera* camera = nullptr;
 	Collision* collision = nullptr;
 	Light* light = nullptr;
@@ -101,6 +100,7 @@ private: // メンバ変数
 	Collision::Plane plane;
 
 	// ゲームシーン用
+	// 3dモデル
 	Model* playerModel = nullptr;
 	std::unique_ptr<Object3d> player = nullptr;
 	Model* enemyModel = nullptr;
@@ -112,20 +112,27 @@ private: // メンバ変数
 	Model* ropeModel = nullptr;
 	std::unique_ptr<Object3d> rope = nullptr;
 
+	// 画像
+	Image2d* title = nullptr;
+	Image2d* result = nullptr;
+
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
-	bool pFlag = false;//自由落下のフラグ
+	bool jumpFlag = false;//自由落下のフラグ
 	float pMove = 0.0f;//移動量
 	float pAcc = 0.2f;//加速
 	float pVal = 0.2f;//速度
-	float pGra = 0.1f;//重力
+	const float pGra = 0.1f;//重力
 	float rate = 1.0f; // 斜め移動時の制限
 
 	// エネミー
 	XMFLOAT3 ePos = {};
-	bool eFlag = false;//自由落下のフラグ
-	float eVal = 0.2f;//速度
-	float eGra = 0.1f;//重力
+	bool eFlag = false; // 自由落下のフラグ
+	float eVal = 0.2f; // 速度
+	float eGra = 0.1f; // 重力
+	bool eAlive = false;// 生きているかのフラグ
+	int eAliveCount = 0;
+	int enemyCount = 0; // 倒した数
 
 	// ロープ
 	XMFLOAT3 rPos = {};
@@ -143,6 +150,7 @@ private: // メンバ変数
 
 	// カメラ
 	XMFLOAT3 cPos = {};
+	XMFLOAT3 cTarget = {};
 	XMVECTOR cameraLength = {};
 
 	// 突進用
@@ -161,4 +169,11 @@ private: // メンバ変数
 	int cCount = 0;
 	bool cFlag = false;
 
+	// シーン管理用
+	int nowScene = 0;
+
+	// シェイク用
+	bool shakeFlag = false;
+	XMFLOAT2 shakeXY = {};
+	int shakeTime = 0;
 };

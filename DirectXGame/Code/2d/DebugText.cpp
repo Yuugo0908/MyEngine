@@ -1,15 +1,10 @@
 #include "DebugText.h"
 
-DebugText::DebugText()
+DebugText* DebugText::GetInstance()
 {
-}
+	static DebugText instance;
 
-DebugText::~DebugText()
-{
-	for (int i = 0; i < _countof(image2dDatas); i++)
-	{
-		delete image2dDatas[i];
-	}
+	return &instance;
 }
 
 void DebugText::Initialize(UINT texnumber)
@@ -23,7 +18,7 @@ void DebugText::Initialize(UINT texnumber)
 }
 
 // 1•¶Žš—ñ’Ç‰Á
-void DebugText::Print(const std::string& text, float x, float y, float scale = 1.0f)
+void DebugText::Print(float x, float y, float scale, std::string text, ...)
 {
 	// ‘S‚Ä‚Ì•¶Žš‚É‚Â‚¢‚Ä
 	for (int i = 0; i < text.size(); i++)

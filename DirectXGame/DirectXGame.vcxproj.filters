@@ -180,6 +180,12 @@
     <ClCompile Include="Rope.cpp">
       <Filter>ソースファイル\game</Filter>
     </ClCompile>
+    <ClCompile Include="TitleScene.cpp">
+      <Filter>ソースファイル\game</Filter>
+    </ClCompile>
+    <ClCompile Include="EndScene.cpp">
+      <Filter>ソースファイル\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h">
@@ -288,6 +294,12 @@
       <Filter>ヘッダーファイル\win</Filter>
     </ClInclude>
     <ClInclude Include="Rope.h">
+      <Filter>ヘッダーファイル\game</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleScene.h">
+      <Filter>ヘッダーファイル\game</Filter>
+    </ClInclude>
+    <ClInclude Include="EndScene.h">
       <Filter>ヘッダーファイル\game</Filter>
     </ClInclude>
   </ItemGroup>

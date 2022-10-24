@@ -179,6 +179,7 @@
     <ClCompile Include="Code\win\DirectXCommon.cpp" />
     <ClCompile Include="Code\win\main.cpp" />
     <ClCompile Include="Code\win\WinApp.cpp" />
+    <ClCompile Include="EndScene.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -187,6 +188,7 @@
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Rope.cpp" />
+    <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\2d\DebugText.h" />
@@ -216,6 +218,7 @@
     <ClInclude Include="Code\win\DirectXCommon.h" />
     <ClInclude Include="Code\win\SafeDelete.h" />
     <ClInclude Include="Code\win\WinApp.h" />
+    <ClInclude Include="EndScene.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx12.h" />
@@ -225,6 +228,7 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="Rope.h" />
+    <ClInclude Include="TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DirectXTex\DirectXTex_Desktop_2019_Win10.vcxproj">

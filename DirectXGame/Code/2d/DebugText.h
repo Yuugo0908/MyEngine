@@ -13,12 +13,11 @@ public:
 	static const int fontHeight = 18; // フォント画像内1文字分の縦幅
 	static const int fontLineCount = 14; // フォント画像内1行分の文字数
 
-	DebugText();
-	~DebugText();
+	static DebugText* GetInstance();
 
 	void Initialize(UINT texnumber);
 
-	void Print(const std::string& text, float x, float y, float size);
+	void Print(float x, float y, float scale, std::string text, ...);
 
 	void DrawAll(ID3D12GraphicsCommandList* cmdList);
 
