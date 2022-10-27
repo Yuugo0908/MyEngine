@@ -169,6 +169,7 @@
     <ClCompile Include="Code\game\GameScene.cpp" />
     <ClCompile Include="Code\game\Light.cpp" />
     <ClCompile Include="Code\game\Player.cpp" />
+    <ClCompile Include="Code\game\Rope.cpp" />
     <ClCompile Include="Code\input\Controller.cpp" />
     <ClCompile Include="Code\input\Keyboard.cpp" />
     <ClCompile Include="Code\input\Mouse.cpp" />
@@ -187,7 +188,6 @@
     <ClCompile Include="imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
-    <ClCompile Include="Rope.cpp" />
     <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -208,6 +208,7 @@
     <ClInclude Include="Code\game\GameScene.h" />
     <ClInclude Include="Code\game\Light.h" />
     <ClInclude Include="Code\game\Player.h" />
+    <ClInclude Include="Code\game\Rope.h" />
     <ClInclude Include="Code\input\Controller.h" />
     <ClInclude Include="Code\input\Keyboard.h" />
     <ClInclude Include="Code\input\Mouse.h" />
@@ -227,7 +228,6 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
-    <ClInclude Include="Rope.h" />
     <ClInclude Include="TitleScene.h" />
   </ItemGroup>
   <ItemGroup>

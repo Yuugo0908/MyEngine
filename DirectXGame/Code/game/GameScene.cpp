@@ -10,6 +10,8 @@ GameScene::~GameScene() {
 
 }
 
+Rope* rope = new Rope;
+
 void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controller* controller, Mouse* mouse, Audio* audio) {
 	// nullptrチェック
 	assert(dxCommon);
@@ -25,6 +27,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 	this->audio = audio;
 
 	camera = new Camera(WinApp::window_width, WinApp::window_height, mouse);
+	easing = new Easing;
 
 	// デバイスのセット
 	FbxObject3d::SetDevice(dxCommon->GetDevice());
@@ -35,8 +38,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 
 	// 3Dオブジェクトにカメラをセット
 	Object3d::SetCamera(camera);
-
-
 
 	// デバッグテキスト用テクスチャ読み込み
 	if (!Image2d::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png"))
@@ -63,26 +64,25 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 	result = Image2d::Create(2, { 0.0f,0.0f });
 	result->SetSize({ 1280.0f,720.0f });
 
+	rope->Initialize(keyboard);
+
 	// .objの名前を指定してモデルを読み込む
 	playerModel		= playerModel->CreateFromObject("cube");
 	enemyModel		= enemyModel->CreateFromObject("sphere");
 	skydomeModel	= skydomeModel->CreateFromObject("skydome");
 	stageModel		= stageModel->CreateFromObject("stage");
-	ropeModel		= ropeModel->CreateFromObject("rope");
 
 	// 3Dオブジェクト生成
 	player = Object3d::Create();
 	enemy = Object3d::Create();
 	skydome = Object3d::Create();
 	stage = Object3d::Create();
-	rope = Object3d::Create();
 
 	// 3Dオブジェクトにモデルを割り当てる
 	player->SetModel(playerModel);
 	enemy->SetModel(enemyModel);
 	skydome->SetModel(skydomeModel);
 	stage->SetModel(stageModel);
-	rope->SetModel(ropeModel);
 
 	// 各オブジェクトの位置や大きさを初期化
 	player->SetPosition({ 0.0f, 5.0f, -5.0f });
@@ -97,12 +97,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 
 	pPos = player->GetPosition();
 	ePos = enemy->GetPosition();
-
-	rope->SetPosition(pPos);
-	rope->SetScale({ 0.2f, 0.2f, 0.2f });
-
-	rPos = rope->GetPosition();
-	rScale = rope->GetScale();
 
 	// カメラの設定
 	camera->SetTarget(pPos);
@@ -124,6 +118,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 
 void GameScene::Finalize()
 {
+	rope->Finalize();
 }
 
 void GameScene::Update() {
@@ -141,14 +136,13 @@ void GameScene::Update() {
 		CollisionUpdate();
 		LightUpdate();
 		CameraUpdate();
-		RopeUpdate();
 		PlayerUpdate();
 		EnemyUpdate();
 
-		player->Update();
-		enemy->Update();
-		rope->Update();
-		camera->Update();
+		rFlag = rope->GetrFlag();
+		moveFlag = rope->GetmoveFlag();
+		rope->Update(pPos, ePos, enemy);
+
 		skydome->Update();
 		stage->Update();
 		mouse->Update();
@@ -156,6 +150,14 @@ void GameScene::Update() {
 		if (enemyCount == 5)
 		{
 			nowScene = 2;
+		}
+	}
+
+	if (nowScene == 2)
+	{
+		if (keyboard->TriggerKey(DIK_SPACE))
+		{
+			reset();
 		}
 	}
 }
@@ -179,19 +181,6 @@ void GameScene::reset()
 	eAliveCount = 0;
 	enemyCount = 0; // 倒した数
 
-	// ロープ
-	rPos = {};
-	rScale = {};
-	angleX = 0.0f; // X軸
-	angleY = 0.0f; // Y軸
-	vecXZ = 0.0f; // XZ平面上のベクトル
-	rFlag = false; // 接触フラグ
-
-	rThrowFlag = false; // ロープを飛ばす
-	rBackFlag = false; // ロープを戻す
-	manageRopePos = {}; // ロープ位置管理用
-	manageRopeScale = {}; // ロープスケール管理用
-
 	// カメラ
 	cPos = {};
 	cTarget = {};
@@ -200,13 +189,8 @@ void GameScene::reset()
 	// 突進用
 	startPos = {}; // 開始位置
 	endPos = {}; // 終点位置
-	reflectPos = {};
 	avoidMove = 5.0f; // 距離
-	avoidTime = 0.0f; // 経過時間
-	avoidTimeRate = 0.0f;
 	easeFlag = false; // イージング開始フラグ
-	pEaseFlag = false;
-	eEaseFlag = false;
 
 	// 当たり判定
 	cCount = 0;
@@ -223,7 +207,7 @@ void GameScene::reset()
 
 void GameScene::Draw() {	
 	
-	// SetImgui();
+	SetImgui();
 	
 #pragma region 背景画像描画
 	// // 背景画像描画前処理
@@ -289,9 +273,9 @@ void GameScene::SetImgui()
 	ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
 
 	ImGui::Separator();
-	ImGui::Text("cameraPosX : %6.2f", cPos.x);
-	ImGui::Text("cameraPosY : %6.2f", cPos.y);
-	ImGui::Text("cameraPosZ : %6.2f", cPos.z);
+	ImGui::Text("playerPosX : %6.2f", pPos.x);
+	ImGui::Text("playerPosY : %6.2f", pPos.y);
+	ImGui::Text("playerPosZ : %6.2f", pPos.z);
 
 	ImGui::Separator();
 	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[0]);
@@ -308,8 +292,17 @@ void GameScene::SetImgui()
 
 void GameScene::PlayerUpdate()
 {
-	pPos = player->GetPosition();
-	rPos = pPos + manageRopePos;
+	if (pPos.y > 0.0f)
+	{
+		jumpFlag = true;
+	}
+	else
+	{
+		pPos.y = 0.0f;
+		pVal = 0.0f;
+		jumpFlag = false;
+	}
+
 	// ジャンプ
 	if (keyboard->TriggerKey(DIK_SPACE) && !jumpFlag)
 	{
@@ -317,34 +310,16 @@ void GameScene::PlayerUpdate()
 		// 上昇率の更新
 		pVal = 1.25f;
 	}
-	if (jumpFlag) {
-
-		if (!easeFlag)
-		{
-			pVal -= pGra;
-			pPos.y += pVal;
-		}
-	}
-
-
-	if (!rFlag)
+	if (jumpFlag && !easeFlag)
 	{
-		PlayerRush();
+		pVal -= pGra;
+		pPos.y += pVal;
 	}
 
-	player->SetPosition(pPos);
+	PlayerRush();
 
 	// 移動
-	if (rThrowFlag)
-	{
-		return;
-	}
-	if (rBackFlag)
-	{
-		return;
-	}
-
-
+	if(moveFlag) 
 	{
 		rate = 1.0f;
 		// 移動量の倍数計算
@@ -377,13 +352,14 @@ void GameScene::PlayerUpdate()
 	}
 
 	player->SetPosition(pPos);
+	player->Update();
 }
 
 void GameScene::PlayerRush()
 {
 	// 自機の突進
 	pMove = avoidMove * rate;
-	if (keyboard->TriggerKey(DIK_K) && cCount == 0)
+	if (!rFlag && keyboard->TriggerKey(DIK_K) && cCount == 0)
 	{
 		easeFlag = true;
 		startPos = pPos;
@@ -405,7 +381,7 @@ void GameScene::PlayerRush()
 			endPos.z -= pMove;
 		}
 	}
-	EaseUpdate(startPos, endPos, pPos, easeFlag);
+	easing->EaseInUpdate(startPos, endPos, pPos, easeFlag, avoidTime);
 }
 
 void GameScene::EnemyUpdate()
@@ -442,187 +418,7 @@ void GameScene::EnemyUpdate()
 		eVal = 0.0f;
 	}
 	enemy->SetPosition(ePos);
-}
-
-void GameScene::RopeUpdate()
-{
-	rPos = player->GetPosition() + manageRopePos;
-	rScale = manageRopeScale;
-	rope->SetPosition(rPos);
-	rope->SetScale(rScale);
-	rope->Update();
-	if (!rFlag)
-	{
-		if (keyboard->TriggerKey(DIK_J) && !rThrowFlag && !rBackFlag && cCount == 0)
-		{
-			rThrowFlag = true;
-			avoidTime = 0.0f;
-			avoidTimeRate = 0.0f;
-		}
-
-		RopeThrow(rPos, rScale, rThrowFlag);
-
-		return;
-	}
-
-	if (rFlag)
-	{
-		// ロープがついている場合、敵を引き寄せる
-		if (keyboard->TriggerKey(DIK_K) && keyboard->PushKey(DIK_W))
-		{
-			easeFlag = true;
-			pEaseFlag = true;
-			avoidTime = 0.0f;
-			avoidTimeRate = 0.0f;
-		}
-		else if (keyboard->TriggerKey(DIK_K) && keyboard->PushKey(DIK_S))
-		{
-			easeFlag = true;
-			eEaseFlag = true;
-			avoidTime = 0.0f;
-			avoidTimeRate = 0.0f;
-		}
-
-		if (pEaseFlag)
-		{
-			EaseUpdate(pPos, ePos, pPos, easeFlag);
-		}
-		if (eEaseFlag)
-		{
-			EaseUpdate(ePos, pPos, ePos, easeFlag);
-		}
-		player->SetPosition(pPos);
-		enemy->SetPosition(ePos);
-		player->Update();
-		enemy->Update();
-	}
-
-
-	{
-		//プレイヤーとエネミーの距離
-		XMFLOAT3 length = { pPos.x - ePos.x, pPos.y - ePos.y, pPos.z - ePos.z };
-		float len = GetLength(pPos, ePos);
-
-		//最大値より大きいなら
-		if (len > maxRope)
-		{
-			float wq = len / maxRope;
-			len = maxRope;
-			ePos = { pPos.x - length.x / wq, pPos.y - length.y / wq, pPos.z - length.z / wq };
-		}
-
-		// Y軸周りの角度
-		angleY = (float)atan2(pPos.x - ePos.x, pPos.z - ePos.z);
-		vecXZ = sqrtf((pPos.x - ePos.x) * (pPos.x - ePos.x) + (pPos.z - ePos.z) * (pPos.z - ePos.z));
-		// X軸周りの角度
-		angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
-
-		rPos = { (pPos.x + ePos.x) / 2, (pPos.y + ePos.y) / 2, (pPos.z + ePos.z) / 2 };
-		rScale = { 0.2f, 0.2f , len / 2.0f };
-		rope->SetPosition(rPos);
-		rope->SetScale(rScale);
-		rope->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
-	}
-}
-
-void GameScene::RopeThrow(XMFLOAT3& rPos, XMFLOAT3& rScale, bool& flag)
-{
-	// フラグがtrueじゃない場合は初期化してリターンする
-	if (!flag && !rBackFlag)
-	{
-		manageRopePos = {};
-		manageRopeScale = {};
-		return;
-	}
-
-	// Y軸周りの角度
-	angleY = (float)atan2(pPos.x - ePos.x, pPos.z - ePos.z);
-	vecXZ = sqrtf((pPos.x - ePos.x) * (pPos.x - ePos.x) + (pPos.z - ePos.z) * (pPos.z - ePos.z));
-	// X軸周りの角度
-	angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
-	rope->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
-
-	XMVECTOR playerPos = { player->GetPosition().x, player->GetPosition().y, player->GetPosition().z, 1};
-	XMVECTOR enemyPos = { enemy->GetPosition().x, enemy->GetPosition().y, enemy->GetPosition().z, 1};
-
-	XMVECTOR subPlayerEnemy = XMVectorSubtract(enemyPos, playerPos);
-	XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
-
-	XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2]};
-
-	if (flag)
-	{
-		manageRopePos.x += subPE.x;
-		manageRopePos.y += subPE.y;
-		manageRopePos.z += subPE.z;
-
-		manageRopeScale.x += 0.02f;
-		manageRopeScale.y += 0.02f;
-		manageRopeScale.z += 0.5f;
-
-		avoidTime += 0.5f;
-		avoidTimeRate = min(avoidTime / avoidEndTime, 1);
-
-		cFlag = true;
-
-		rPos = Easing::easeOut(rPos, manageRopePos, avoidTimeRate);
-		rScale = Easing::easeOut(rScale, manageRopeScale, avoidTimeRate);
-
-		if (Collision::CollisionObject(enemy, rope))
-		{
-			manageRopePos = {};
-			manageRopeScale = {};
-			avoidTime = 0.0f;
-			avoidTimeRate = 0.0f;
-			flag = false;
-			rBackFlag = false;
-			rFlag = true;
-		}
-
-		if (avoidTimeRate >= 1.0f)
-		{
-			avoidTime = 0.0f;
-			avoidTimeRate = 0.0f;
-			flag = false;
-			rBackFlag = true;
-		}
-	}
-
-	if(rBackFlag)
-	{
-		manageRopePos.x -= subPE.x / 2;
-		manageRopePos.y -= subPE.y / 2;
-		manageRopePos.z -= subPE.z / 2;
-
-		manageRopeScale.x -= 0.01f;
-		manageRopeScale.y -= 0.01f;
-		manageRopeScale.z -= 0.25f;
-
-		avoidTime += 0.25f;
-		avoidTimeRate = min(avoidTime / avoidEndTime, 1);
-
-		rPos = Easing::easeOut(rPos, manageRopePos, avoidTimeRate);
-		rScale = Easing::easeOut(rScale, manageRopeScale, avoidTimeRate);
-
-		if (Collision::CollisionObject(enemy, rope))
-		{
-			manageRopePos = {};
-			manageRopeScale = {};
-			avoidTime = 0.0f;
-			avoidTimeRate = 0.0f;
-			flag = false;
-			rBackFlag = false;
-			rFlag = true;
-		}
-
-		if (avoidTimeRate >= 1.0f)
-		{
-			avoidTime = 0.0f;
-			avoidTimeRate = 0.0f;
-			rBackFlag = false;
-			cFlag = false;
-		}
-	}
+	enemy->Update();
 }
 
 void GameScene::LightUpdate()
@@ -646,66 +442,14 @@ void GameScene::CameraUpdate()
 	//カメラ更新
 	if (shakeFlag == true)
 	{
-		int power = 5;
-		shakeXY.x = static_cast<float>(rand() % power) / 10;
-		shakeXY.y = static_cast<float>(rand() % power) / 10;
-		shakeTime++;
-		if (shakeTime > 20)
-		{
-			shakeXY.x = 0.0f;
-			shakeXY.y = 0.0f;
-			shakeTime = 0;
-			shakeFlag = false;
-		}
-
-		XMFLOAT3 cameraPos = cPos;
-		XMFLOAT3 cameraTarget = cTarget;
-		cameraPos.x += shakeXY.x;
-		cameraPos.y += shakeXY.y;
-		cameraTarget.x += shakeXY.x;
-		cameraTarget.y += shakeXY.y;
-		camera->SetTarget(cameraTarget);
-		camera->SetEye(cameraPos);
-		camera->Update();
+		camera->CameraShake(cPos, cTarget, shakeFlag);
 	}
-}
-
-void GameScene::EaseUpdate(const XMFLOAT3 startPos, const XMFLOAT3 endPos, XMFLOAT3& reflectPos, bool& flag)
-{
-	// フラグがtrueじゃない場合はリターンする
-	if (!flag) { return; }
-
-	avoidTime += 0.5f;
-	avoidTimeRate = min(avoidTime / avoidEndTime, 1);
-	reflectPos = Easing::easeIn(startPos, endPos, avoidTimeRate);
-
-	if (Collision::CollisionObject(player, enemy))
-	{
-		rFlag = false;
-		pEaseFlag = false;
-		eEaseFlag = false;
-		avoidTime = 0.0f;
-		avoidTimeRate = 0.0f;
-		flag = false;
-		return;
-	}
-
-	if (avoidTimeRate >= 1.0f)
-	{
-		rFlag = false;
-		pEaseFlag = false;
-		eEaseFlag = false;
-		avoidTime = 0.0f;
-		avoidTimeRate = 0.0f;
-		flag = false;
-	}
+	camera->Update();
 }
 
 void GameScene::CollisionUpdate()
 {
-	CollisionRay();
-
-	if (easeFlag || rThrowFlag || rBackFlag)
+	if (easeFlag)
 	{
 		cCount = 30;
 	}
@@ -721,32 +465,10 @@ void GameScene::CollisionUpdate()
 	{
 		shakeFlag = true;
 		eAlive = false;
-		enemyCount = enemyCount + 1;
-	}
-}
-
-void GameScene::CollisionRay()
-{
-	pPos = player->GetPosition();
-
-	ray.start = XMVectorSet(pPos.x, pPos.y + 2.0f, pPos.z, 1);
-	ray.dir = XMVectorSet(pPos.x, pPos.y - 2.0f, pPos.z, 1);
-
-	// レイと平面の当たり判定
-	XMVECTOR inter;
-	float distance;
-	bool hit = Collision::CollisionRayPlane(ray, plane, &distance, &inter);
-
-	if (pPos.y <= 0.0f)
-	{
-		pPos.y = 0.0f;
-		rPos.y = 0.0f;
-		pVal = 0.0f;
-		jumpFlag = false;
-	}
-	else
-	{
-		jumpFlag = true;
+		rFlag = false;
+		moveFlag = true;
+		rope->SetrFlag(rFlag);
+		rope->SetmoveFlag(moveFlag);
 	}
 }
 

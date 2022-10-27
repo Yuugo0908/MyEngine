@@ -242,3 +242,32 @@ void Camera::UpdateProjectionMatrix()
 		aspectRatio,
 		0.1f, 1000.0f);
 }
+
+void Camera::CameraShake(XMFLOAT3& eye, XMFLOAT3& target, bool& flag)
+{
+	//ƒJƒƒ‰XV
+	int power = 5;
+	shake.x = static_cast<float>(rand() % power) / 10;
+	shake.y = static_cast<float>(rand() % power) / 10;
+
+	shakeCount++;
+	if (shakeCount > 20)
+	{
+		shake.x = 0.0f;
+		shake.y = 0.0f;
+		shakeCount = 0;
+		flag = false;
+	}
+
+	eye = GetEye();
+	target = GetTarget();
+
+	eye.x += shake.x;
+	eye.y += shake.y;
+	target.x += shake.x;
+	target.y += shake.y;
+
+	SetEye(eye);
+	SetTarget(target);
+	Update();
+}

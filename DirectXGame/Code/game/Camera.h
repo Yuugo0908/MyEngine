@@ -55,6 +55,8 @@ public: // 静的メンバ関数
 	void UpdateViewMatrix();
 	/// 射影行列を更新
 	void UpdateProjectionMatrix();
+	// カメラのシェイクを実行
+	void CameraShake(XMFLOAT3& eye, XMFLOAT3& taregt, bool& flag);
 
 
 private: // メンバ変数
@@ -85,4 +87,8 @@ private: // メンバ変数
 	bool projectionDirty = false;
 	// アスペクト比
 	float aspectRatio = 1.0f;
+	// シェイク座標
+	XMFLOAT3 shake = {};
+	// シェイク管理カウンター
+	int shakeCount = 0;
 };
