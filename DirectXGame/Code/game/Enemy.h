@@ -1,10 +1,5 @@
 #pragma once
 #include "Object3d.h"
-#include "Keyboard.h"
-#include "Easing.h"
-#include "Collision.h"
-#include "Operator.h"
-#include "Player.h"
 #include <DirectXMath.h>
 
 class Enemy
@@ -18,26 +13,27 @@ private: // エイリアス
 	using XMFLOAT4 = DirectX::XMFLOAT4;
 	using XMMATRIX = DirectX::XMMATRIX;
 	using XMVECTOR = DirectX::XMVECTOR;
-
-public: // メンバ関数
-
+public:
 	bool Initialize();
-
-	void Finalize();
 
 	void Update();
 
-	void Draw();
+	void Finalize() { delete enemyModel; }
 
-	const std::unique_ptr<Object3d>& GetObj() { return enemyObj; }
+	void Draw() { enemy->Draw(); }
 
-private: // メンバ変数
+	const std::unique_ptr<Object3d>& GetObj() { return enemy; }
 
-	Player* player = nullptr;
+	const XMFLOAT3& GetPos() { return ePos; }
+	void SetPos(XMFLOAT3 ePos) { this->ePos = ePos; }
 
-	// モデル
+	const bool& GetAlive() { return eAlive; }
+	void SetAlive(bool eAlive) { this->eAlive = eAlive; }
+
+private:
+
 	Model* enemyModel = nullptr;
-	std::unique_ptr<Object3d> enemyObj = nullptr;
+	std::unique_ptr<Object3d> enemy = nullptr;
 
 	// エネミー
 	XMFLOAT3 ePos = {};
@@ -47,8 +43,5 @@ private: // メンバ変数
 	bool eAlive = false;// 生きているかのフラグ
 	int eAliveCount = 0;
 	int enemyCount = 0; // 倒した数
-
-	// 回避管理フラグ
-	bool easeFlag = false;
 };
 

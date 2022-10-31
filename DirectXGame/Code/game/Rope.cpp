@@ -1,8 +1,9 @@
 #include "Rope.h"
 
-bool Rope::Initialize()
+bool Rope::Initialize(Keyboard* keyboard)
 {
-	keyboard = new Keyboard;
+	assert(keyboard);
+	this->keyboard = keyboard;
 	easing = new Easing;
 
 	// ƒ‚ƒfƒ‹‚Ì¶¬
@@ -186,6 +187,7 @@ void Rope::Collision(const std::unique_ptr<Object3d>& object)
 	avoidTime = 0.0f;
 	rThrowFlag = false;
 	rBackFlag = false;
+	moveFlag = true;
 	if (keyboard->PushKey(DIK_S))
 	{
 		eEaseFlag = true;

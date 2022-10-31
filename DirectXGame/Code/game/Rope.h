@@ -21,7 +21,7 @@ private: // エイリアス
 
 public: // メンバ関数
 
-	bool Initialize();
+	bool Initialize(Keyboard* keyboard);
 
 	void Finalize()
 	{
