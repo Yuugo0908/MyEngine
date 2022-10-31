@@ -45,6 +45,9 @@ public: // メンバ関数
 		return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
 	}
 
+	// 円運動
+	void CircularMotion(XMFLOAT3& pos, const XMFLOAT3 centerPos, const float r, int& angle, const int add);
+
 	// 移動しているか
 	const bool& GetmoveFlag() { return moveFlag; }
 	void SetmoveFlag(bool moveFlag) { this->moveFlag = moveFlag; }
@@ -67,7 +70,7 @@ private: // メンバ変数
 	float angleX = 0.0f; // X軸
 	float angleY = 0.0f; // Y軸
 	float vecXZ = 0.0f; // XZ平面上のベクトル
-	const float maxRope = 10.0f; // ロープの最大
+	const float maxRope = 15.0f; // ロープの最大
 	bool rFlag = false; // 接触フラグ
 	bool rThrowFlag = false; // ロープを飛ばす
 	bool rBackFlag = false; // ロープを戻す

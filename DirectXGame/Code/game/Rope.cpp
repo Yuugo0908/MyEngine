@@ -111,12 +111,20 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 	}
 
 	moveFlag = false;
-	// Yé≤é¸ÇËÇÃäpìx
-	angleY = (float)atan2(pPos.x - ePos.x, pPos.z - ePos.z);
-	vecXZ = sqrtf((pPos.x - ePos.x) * (pPos.x - ePos.x) + (pPos.z - ePos.z) * (pPos.z - ePos.z));
-	// Xé≤é¸ÇËÇÃäpìx
-	angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
-	ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
+	float length = GetLength(pPos, ePos);
+	if (length <= 15.0f)
+	{
+		// Yé≤é¸ÇËÇÃäpìx
+		angleY = (float)atan2(pPos.x - ePos.x, pPos.z - ePos.z);
+		vecXZ = sqrtf((pPos.x - ePos.x) * (pPos.x - ePos.x) + (pPos.z - ePos.z) * (pPos.z - ePos.z));
+		// Xé≤é¸ÇËÇÃäpìx
+		angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
+		ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
+	}
+	else
+	{
+		ropeObj->SetRotation({ 0, 0, 0 });
+	}
 
 	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
 	XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
@@ -126,11 +134,19 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 
 	XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
 
+
 	if (rThrowFlag)
 	{
-		manageRopePos.x += subPE.x;
-		manageRopePos.y += subPE.y;
-		manageRopePos.z += subPE.z;
+		if (length <= 15.0f)
+		{
+			manageRopePos.x += subPE.x;
+			manageRopePos.y += subPE.y;
+			manageRopePos.z += subPE.z;
+		}
+		else
+		{
+			manageRopePos.z += 0.7f;
+		}
 
 		manageRopeScale.x += 0.02f;
 		manageRopeScale.y += 0.02f;
@@ -151,9 +167,16 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 
 	if (rBackFlag)
 	{
-		manageRopePos.x -= subPE.x;
-		manageRopePos.y -= subPE.y;
-		manageRopePos.z -= subPE.z;
+		if (length <= 15.0f)
+		{
+			manageRopePos.x -= subPE.x;
+			manageRopePos.y -= subPE.y;
+			manageRopePos.z -= subPE.z;
+		}
+		else
+		{
+			manageRopePos.z -= 0.7f;
+		}
 
 		manageRopeScale.x -= 0.02f;
 		manageRopeScale.y -= 0.02f;
@@ -198,4 +221,13 @@ void Rope::Collision(const std::unique_ptr<Object3d>& object)
 	}
 	throwCount = 0;
 	rFlag = true;
+}
+
+void Rope::CircularMotion(XMFLOAT3& pos, const XMFLOAT3 centerPos, const float r, int& angle, const int add)
+{
+	angle += add;
+
+	pos.x = (cosf(3.14f / 180.0f * angle) * r) + centerPos.x; // â~â^ìÆÇÃèàóù
+	pos.y = (sinf(3.14f / 180.0f * angle) * r) + centerPos.y;
+	pos.z = (tanf(3.14f / 180.0f * angle) * r) + centerPos.z;
 }

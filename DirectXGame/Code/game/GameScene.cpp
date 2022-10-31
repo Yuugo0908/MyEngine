@@ -102,6 +102,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 
 void GameScene::Finalize()
 {
+	player->Finalize();
+	enemy->Finalize();
 	rope->Finalize();
 }
 
@@ -156,45 +158,6 @@ void GameScene::Update() {
 
 void GameScene::reset()
 {
-	// プレイヤー
-	pPos = { 0.0f, 5.0f, -5.0f };//座標
-	jumpFlag = false;//自由落下のフラグ
-	pMove = 0.0f;//移動量
-	pAcc = 0.2f;//加速
-	pVal = 0.2f;//速度
-	rate = 1.0f; // 斜め移動時の制限
-
-	// エネミー
-	ePos = { 0.0f, 5.0f, 5.0f };
-	eFlag = false; // 自由落下のフラグ
-	eVal = 0.2f; // 速度
-	eGra = 0.1f; // 重力
-	eAlive = false;// 生きているかのフラグ
-	eAliveCount = 0;
-	enemyCount = 0; // 倒した数
-
-	// カメラ
-	cPos = {};
-	cTarget = {};
-	cameraLength = {};
-
-	// 突進用
-	startPos = {}; // 開始位置
-	endPos = {}; // 終点位置
-	avoidMove = 5.0f; // 距離
-	easeFlag = false; // イージング開始フラグ
-
-	// 当たり判定
-	cCount = 0;
-	cFlag = false;
-
-	// シーン管理用
-	nowScene = 0;
-
-	// シェイク用
-	shakeFlag = false;
-	shakeXY = {};
-	shakeTime = 0;
 }
 
 void GameScene::Draw() {
@@ -273,145 +236,9 @@ void GameScene::SetImgui()
 	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[0]);
 	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[1]);
 	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[2]);
-	ImGui::Separator();
-	ImGui::Text("cCount : %d", cCount);
-
-	ImGui::Separator();
-	ImGui::Text("enemyCount : %d", enemyCount);
 
 	ImGui::End();
 }
-
-//void GameScene::PlayerUpdate()
-//{
-//	if (pPos.y > 0.0f)
-//	{
-//		jumpFlag = true;
-//	}
-//	else
-//	{
-//		pPos.y = 0.0f;
-//		pVal = 0.0f;
-//		jumpFlag = false;
-//	}
-//
-//	// ジャンプ
-//	if (keyboard->TriggerKey(DIK_SPACE) && !jumpFlag)
-//	{
-//		jumpFlag = true;
-//		// 上昇率の更新
-//		pVal = 1.25f;
-//	}
-//	if (jumpFlag && !easeFlag)
-//	{
-//		pVal -= pGra;
-//		pPos.y += pVal;
-//	}
-//
-//	PlayerRush();
-//
-//	// 移動
-//	if(moveFlag) 
-//	{
-//	rate = 1.0f;
-//	// 移動量の倍数計算
-//	if (keyboard->PushKey(DIK_A) || keyboard->PushKey(DIK_D))
-//	{
-//		if (keyboard->PushKey(DIK_W) || keyboard->PushKey(DIK_S))
-//		{
-//			rate = 0.7f;
-//		}
-//	}
-//
-//	pMove = pAcc * rate;
-//
-//	if (keyboard->PushKey(DIK_D))
-//	{
-//		pPos.x += pMove;
-//	}
-//	else if (keyboard->PushKey(DIK_A))
-//	{
-//		pPos.x -= pMove;
-//	}
-//	if (keyboard->PushKey(DIK_W))
-//	{
-//		pPos.z += pMove;
-//	}
-//	else if (keyboard->PushKey(DIK_S))
-//	{
-//		pPos.z -= pMove;
-//	}
-//	}
-//
-//	player->SetPosition(pPos);
-//	player->Update();
-//}
-//
-//void GameScene::PlayerRush()
-//{
-//	// 自機の突進
-//	pMove = avoidMove * rate;
-//	if (!rFlag && keyboard->TriggerKey(DIK_K) && cCount == 0)
-//	{
-//		easeFlag = true;
-//		startPos = pPos;
-//		endPos = pPos;
-//		if (keyboard->PushKey(DIK_D))
-//		{
-//			endPos.x += pMove;
-//		}
-//		else if (keyboard->PushKey(DIK_A))
-//		{
-//			endPos.x -= pMove;
-//		}
-//		if (keyboard->PushKey(DIK_W))
-//		{
-//			endPos.z += pMove;
-//		}
-//		else if (keyboard->PushKey(DIK_S))
-//		{
-//			endPos.z -= pMove;
-//		}
-//	}
-//	easing->EaseInUpdate(startPos, endPos, pPos, easeFlag, avoidTime);
-//}
-
-//void GameScene::EnemyUpdate()
-//{
-//	if (!eAlive)
-//	{
-//		eAliveCount++;
-//		enemy->SetPosition({ 0.0f, 100.0f, 0.0f });
-//
-//		if (eAliveCount == 60)
-//		{
-//			enemy->SetPosition({ 0.0f, 5.0f, 5.0f });
-//			eAlive = true;
-//			eAliveCount = 0;
-//		}
-//
-//		ePos = enemy->GetPosition();
-//		enemy->Update();
-//		return;
-//	}
-//
-//	if (ePos.y > 0.0f)
-//	{
-//		if (!easeFlag)
-//		{
-//			eVal -= eGra;
-//			ePos.y += eVal;
-//		}
-//	}
-//
-//	else if (ePos.y <= 0.0f)
-//	{
-//		ePos.y = 0.0f;
-//		eVal = 0.0f;
-//	}
-//	enemy->SetPosition(ePos);
-//	enemy->Update();
-//}
 
 void GameScene::LightUpdate()
 {
@@ -441,18 +268,6 @@ void GameScene::CameraUpdate()
 
 void GameScene::CollisionUpdate()
 {
-	if (easeFlag)
-	{
-		cCount = 30;
-	}
-	else
-	{
-		if (cCount > 0)
-		{
-			cCount--;
-		}
-	}
-
 	if (rFlag && Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
 	{
 		shakeFlag = true;
@@ -463,30 +278,4 @@ void GameScene::CollisionUpdate()
 		rope->SetmoveFlag(moveFlag);
 		enemy->SetAlive(eAlive);
 	}
-}
-
-float GameScene::GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
-{
-	XMFLOAT3 len = { posA.x - posB.x, posA.y - posB.y, posA.z - posB.z };
-
-	return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
-}
-
-float GameScene::PosForAngle(float startPos1, float startPos2, float endPos1, float endPos2)
-{
-	float angle1 = endPos1 - startPos1;
-	float angle2 = endPos2 - startPos2;
-
-	float resultangle = (float)atan2(angle2, angle1);
-
-	return resultangle;
-}
-
-void GameScene::CircularMotion(XMFLOAT3& pos, const XMFLOAT3 centerPos, const float r, int& angle, const int add)
-{
-	angle += add;
-
-	pos.x = (cosf(3.14f / 180.0f * angle) * r) + centerPos.x; // 円運動の処理
-	pos.y = (sinf(3.14f / 180.0f * angle) * r) + centerPos.y;
-	pos.z = (tanf(3.14f / 180.0f * angle) * r) + centerPos.z;
 }
