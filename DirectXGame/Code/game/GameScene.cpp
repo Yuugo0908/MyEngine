@@ -11,6 +11,7 @@ GameScene::~GameScene() {
 }
 
 Rope* rope = new Rope;
+Player* player = new Player;
 Enemy* enemy = new Enemy;
 
 void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controller* controller, Mouse* mouse, Audio* audio) {
@@ -66,33 +67,26 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 	result->SetSize({ 1280.0f,720.0f });
 
 	rope->Initialize(keyboard);
+	player->Initialize(keyboard);
 	enemy->Initialize();
 
 	// .objの名前を指定してモデルを読み込む
-	playerModel = playerModel->CreateFromObject("cube");
 	skydomeModel = skydomeModel->CreateFromObject("skydome");
 	stageModel = stageModel->CreateFromObject("stage");
 
 	// 3Dオブジェクト生成
-	player = Object3d::Create();
 	skydome = Object3d::Create();
 	stage = Object3d::Create();
 
 	// 3Dオブジェクトにモデルを割り当てる
-	player->SetModel(playerModel);
 	skydome->SetModel(skydomeModel);
 	stage->SetModel(stageModel);
 
 	// 各オブジェクトの位置や大きさを初期化
-	player->SetPosition({ 0.0f, 5.0f, -5.0f });
-	player->SetScale({ 0.8f,0.8f,0.8f });
-
 	stage->SetPosition({ 0.0f, -1.0f, 0.0f });
 	stage->SetScale({ 0.5f, 0.5f, 1.0f });
 	skydome->SetPosition({ 0.0f, 12.0f, 0.0f });
 	skydome->SetScale({ 5.0f, 5.0f, 5.0f });
-
-	pPos = player->GetPosition();
 
 	// カメラの設定
 	camera->SetTarget(pPos);
@@ -126,16 +120,19 @@ void GameScene::Update() {
 		CollisionUpdate();
 		LightUpdate();
 		CameraUpdate();
-		PlayerUpdate();
 
 		rFlag = rope->GetrFlag();
 		moveFlag = rope->GetmoveFlag();
 		eAlive = enemy->GetAlive();
 
+		player->Update(rFlag, moveFlag);
 		enemy->Update();
+		pPos = player->GetPos();
 		ePos = enemy->GetPos();
+
 		rope->Update(pPos, ePos, enemy->GetObj());
 
+		player->SetPos(pPos);
 		enemy->SetPos(ePos);
 
 		skydome->Update();
@@ -285,99 +282,99 @@ void GameScene::SetImgui()
 	ImGui::End();
 }
 
-void GameScene::PlayerUpdate()
-{
-	if (pPos.y > 0.0f)
-	{
-		jumpFlag = true;
-	}
-	else
-	{
-		pPos.y = 0.0f;
-		pVal = 0.0f;
-		jumpFlag = false;
-	}
-
-	// ジャンプ
-	if (keyboard->TriggerKey(DIK_SPACE) && !jumpFlag)
-	{
-		jumpFlag = true;
-		// 上昇率の更新
-		pVal = 1.25f;
-	}
-	if (jumpFlag && !easeFlag)
-	{
-		pVal -= pGra;
-		pPos.y += pVal;
-	}
-
-	PlayerRush();
-
-	// 移動
-	if(moveFlag) 
-	{
-	rate = 1.0f;
-	// 移動量の倍数計算
-	if (keyboard->PushKey(DIK_A) || keyboard->PushKey(DIK_D))
-	{
-		if (keyboard->PushKey(DIK_W) || keyboard->PushKey(DIK_S))
-		{
-			rate = 0.7f;
-		}
-	}
-
-	pMove = pAcc * rate;
-
-	if (keyboard->PushKey(DIK_D))
-	{
-		pPos.x += pMove;
-	}
-	else if (keyboard->PushKey(DIK_A))
-	{
-		pPos.x -= pMove;
-	}
-	if (keyboard->PushKey(DIK_W))
-	{
-		pPos.z += pMove;
-	}
-	else if (keyboard->PushKey(DIK_S))
-	{
-		pPos.z -= pMove;
-	}
-	}
-
-	player->SetPosition(pPos);
-	player->Update();
-}
-
-void GameScene::PlayerRush()
-{
-	// 自機の突進
-	pMove = avoidMove * rate;
-	if (!rFlag && keyboard->TriggerKey(DIK_K) && cCount == 0)
-	{
-		easeFlag = true;
-		startPos = pPos;
-		endPos = pPos;
-		if (keyboard->PushKey(DIK_D))
-		{
-			endPos.x += pMove;
-		}
-		else if (keyboard->PushKey(DIK_A))
-		{
-			endPos.x -= pMove;
-		}
-		if (keyboard->PushKey(DIK_W))
-		{
-			endPos.z += pMove;
-		}
-		else if (keyboard->PushKey(DIK_S))
-		{
-			endPos.z -= pMove;
-		}
-	}
-	easing->EaseInUpdate(startPos, endPos, pPos, easeFlag, avoidTime);
-}
+//void GameScene::PlayerUpdate()
+//{
+//	if (pPos.y > 0.0f)
+//	{
+//		jumpFlag = true;
+//	}
+//	else
+//	{
+//		pPos.y = 0.0f;
+//		pVal = 0.0f;
+//		jumpFlag = false;
+//	}
+//
+//	// ジャンプ
+//	if (keyboard->TriggerKey(DIK_SPACE) && !jumpFlag)
+//	{
+//		jumpFlag = true;
+//		// 上昇率の更新
+//		pVal = 1.25f;
+//	}
+//	if (jumpFlag && !easeFlag)
+//	{
+//		pVal -= pGra;
+//		pPos.y += pVal;
+//	}
+//
+//	PlayerRush();
+//
+//	// 移動
+//	if(moveFlag) 
+//	{
+//	rate = 1.0f;
+//	// 移動量の倍数計算
+//	if (keyboard->PushKey(DIK_A) || keyboard->PushKey(DIK_D))
+//	{
+//		if (keyboard->PushKey(DIK_W) || keyboard->PushKey(DIK_S))
+//		{
+//			rate = 0.7f;
+//		}
+//	}
+//
+//	pMove = pAcc * rate;
+//
+//	if (keyboard->PushKey(DIK_D))
+//	{
+//		pPos.x += pMove;
+//	}
+//	else if (keyboard->PushKey(DIK_A))
+//	{
+//		pPos.x -= pMove;
+//	}
+//	if (keyboard->PushKey(DIK_W))
+//	{
+//		pPos.z += pMove;
+//	}
+//	else if (keyboard->PushKey(DIK_S))
+//	{
+//		pPos.z -= pMove;
+//	}
+//	}
+//
+//	player->SetPosition(pPos);
+//	player->Update();
+//}
+//
+//void GameScene::PlayerRush()
+//{
+//	// 自機の突進
+//	pMove = avoidMove * rate;
+//	if (!rFlag && keyboard->TriggerKey(DIK_K) && cCount == 0)
+//	{
+//		easeFlag = true;
+//		startPos = pPos;
+//		endPos = pPos;
+//		if (keyboard->PushKey(DIK_D))
+//		{
+//			endPos.x += pMove;
+//		}
+//		else if (keyboard->PushKey(DIK_A))
+//		{
+//			endPos.x -= pMove;
+//		}
+//		if (keyboard->PushKey(DIK_W))
+//		{
+//			endPos.z += pMove;
+//		}
+//		else if (keyboard->PushKey(DIK_S))
+//		{
+//			endPos.z -= pMove;
+//		}
+//	}
+//	easing->EaseInUpdate(startPos, endPos, pPos, easeFlag, avoidTime);
+//}
 
 //void GameScene::EnemyUpdate()
 //{
@@ -456,7 +453,7 @@ void GameScene::CollisionUpdate()
 		}
 	}
 
-	if (rFlag && Collision::CollisionObject(player, enemy->GetObj()))
+	if (rFlag && Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
 	{
 		shakeFlag = true;
 		eAlive = false;

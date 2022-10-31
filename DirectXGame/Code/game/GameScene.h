@@ -16,6 +16,7 @@
 #include "Collision.h"
 #include "Light.h"
 #include "Rope.h"
+#include "Player.h"
 #include "Enemy.h"
 
 #include <SafeDelete.h>
@@ -92,8 +93,6 @@ private: // メンバ変数
 
 	// ゲームシーン用
 	// 3dモデル
-	Model* playerModel = nullptr;
-	std::unique_ptr<Object3d> player = nullptr;
 	Model* skydomeModel = nullptr;
 	std::unique_ptr<Object3d> skydome = nullptr;
 	Model* stageModel = nullptr;

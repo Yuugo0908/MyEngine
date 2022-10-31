@@ -22,18 +22,10 @@ bool Player::Initialize(Keyboard* keyboard)
 	return true;
 }
 
-void Player::Finalize()
+void Player::Update(bool rFlag, bool moveFlag)
 {
-	delete playerModel;
-}
-
-void Player::Update(bool moveFlag)
-{
-	rFlag = rope->GetrFlag();
-	pPos = playerObj->GetPosition();
-
 	Jump();
-	Rush();
+	Rush(rFlag);
 
 	// ˆÚ“®
 	if (moveFlag)
@@ -72,12 +64,7 @@ void Player::Update(bool moveFlag)
 	playerObj->Update();
 }
 
-void Player::Draw()
-{
-	playerObj->Draw();
-}
-
-void Player::Rush()
+void Player::Rush(bool rFlag)
 {
 	if (rushCount <= 30)
 	{

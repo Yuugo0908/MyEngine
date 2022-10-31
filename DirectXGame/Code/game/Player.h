@@ -23,19 +23,23 @@ public: // メンバ関数
 
 	bool Initialize(Keyboard* keyboard);
 
-	void Finalize();
+	void Finalize() { delete playerModel; }
 
-	void Update(bool moveFlag);
+	void Update(bool rFlag, bool moveFlag);
 
-	void Draw();
+	void Draw() { playerObj->Draw(); }
 
-	void Rush();
+	void Rush(bool rFlag);
 
 	void Jump();
-
+	// オブジェクト
 	const std::unique_ptr<Object3d>& GetObj() { return playerObj; }
+	// 突進
 	const bool& GetEaseFlag() { return easeFlag; }
+
+	// 位置
 	const XMFLOAT3& GetPos() { return pPos; }
+	void SetPos(XMFLOAT3 pPos) { this->pPos = pPos; }
 
 private: // メンバ変数
 
