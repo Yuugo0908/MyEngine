@@ -1,6 +1,11 @@
 #pragma once
+
+#include "Object3d.h"
+#include "Keyboard.h"
+#include "Easing.h"
+#include "Collision.h"
+#include "Operator.h"
 #include <DirectXMath.h>
-#include "GameScene.h"
 
 class Rope
 {
@@ -16,7 +21,7 @@ private: // エイリアス
 
 public: // メンバ関数
 
-	bool Initialize(Keyboard* keyboard);
+	bool Initialize();
 
 	void Finalize()
 	{
@@ -25,7 +30,7 @@ public: // メンバ関数
 
 	void Draw()
 	{
-		ropeObject->Draw();
+		ropeObj->Draw();
 	}
 
 	void Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d>& object);
@@ -54,7 +59,7 @@ private: // メンバ変数
 
 	//ロープモデル
 	Model* ropeModel = nullptr;
-	std::unique_ptr<Object3d> ropeObject = nullptr;
+	std::unique_ptr<Object3d> ropeObj = nullptr;
 
 	// 変数
 	XMFLOAT3 rPos = {};
@@ -68,6 +73,7 @@ private: // メンバ変数
 	bool rBackFlag = false; // ロープを戻す
 	XMFLOAT3 manageRopePos = {}; // ロープ位置管理用
 	XMFLOAT3 manageRopeScale = {0.2f, 0.2f, 0.2f}; // ロープスケール管理用
+	int throwCount = 0;
 
 	// 突進用
 	XMFLOAT3 startPos = {}; // 開始位置

@@ -1,32 +1,37 @@
 #include "Rope.h"
 
-bool Rope::Initialize(Keyboard* keyboard)
+bool Rope::Initialize()
 {
-	assert(keyboard);
-	this->keyboard = keyboard;
+	keyboard = new Keyboard;
+	easing = new Easing;
 
 	// モデルの生成
 	ropeModel = ropeModel->CreateFromObject("rope");
-	ropeObject = Object3d::Create();
-	ropeObject->SetModel(ropeModel);
+	ropeObj = Object3d::Create();
+	ropeObj->SetModel(ropeModel);
 
 	// 位置、スケールを変数に格納
-	ropeObject->SetScale({ 0.2f, 0.2f, 0.2f });
-	rPos = ropeObject->GetPosition();
-	rScale = ropeObject->GetScale();
-	ropeObject->Update();
+	ropeObj->SetScale({ 0.2f, 0.2f, 0.2f });
+	rPos = ropeObj->GetPosition();
+	rScale = ropeObj->GetScale();
+	ropeObj->Update();
 
 	return true;
 }
 
 void Rope::Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d>& object)
 {
+	if (throwCount < 30)
+	{
+		throwCount++;
+	}
+
 	if (!rFlag)
 	{
 		rPos = pPos + manageRopePos;
 		rScale = manageRopeScale;
-		ropeObject->SetPosition(rPos);
-		ropeObject->SetScale(rScale);
+		ropeObj->SetPosition(rPos);
+		ropeObj->SetScale(rScale);
 		pEaseFlag = false;
 		eEaseFlag = false;
 
@@ -35,9 +40,12 @@ void Rope::Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d
 			rThrowFlag = true;
 			avoidTime = 0.0f;
 		}
-		Throw(pPos, ePos, rPos, rScale, object);
+		if (throwCount == 30)
+		{
+			Throw(pPos, ePos, rPos, rScale, object);
+		}
 
-		ropeObject->Update();
+		ropeObj->Update();
 		return;
 	}
 
@@ -83,10 +91,10 @@ void Rope::Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d
 
 		rPos = { (pPos.x + ePos.x) / 2, (pPos.y + ePos.y) / 2, (pPos.z + ePos.z) / 2 };
 		rScale = { 0.2f, 0.2f , len / 2.0f };
-		ropeObject->SetPosition(rPos);
-		ropeObject->SetScale(rScale);
-		ropeObject->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
-		ropeObject->Update();
+		ropeObj->SetPosition(rPos);
+		ropeObj->SetScale(rScale);
+		ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
+		ropeObj->Update();
 	}
 }
 
@@ -107,7 +115,7 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 	vecXZ = sqrtf((pPos.x - ePos.x) * (pPos.x - ePos.x) + (pPos.z - ePos.z) * (pPos.z - ePos.z));
 	// X軸周りの角度
 	angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
-	ropeObject->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
+	ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
 
 	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
 	XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
@@ -161,13 +169,14 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 			rThrowFlag = false;
 			rBackFlag = false;
 			moveFlag = true;
+			throwCount = 0;
 		}
 	}
 }
 
 void Rope::Collision(const std::unique_ptr<Object3d>& object)
 {
-	if (!Collision::CollisionObject(object, ropeObject))
+	if (!Collision::CollisionObject(object, ropeObj))
 	{
 		return;
 	}
@@ -185,5 +194,6 @@ void Rope::Collision(const std::unique_ptr<Object3d>& object)
 	{
 		pEaseFlag = true;
 	}
+	throwCount = 0;
 	rFlag = true;
 }

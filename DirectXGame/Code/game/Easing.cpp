@@ -1,5 +1,4 @@
 #include "Easing.h"
-#include "Operator.h"
 #include <cmath>
 
 XMFLOAT3 Easing::lerp(const XMFLOAT3& start, const XMFLOAT3& end, const float time)

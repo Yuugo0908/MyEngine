@@ -16,6 +16,8 @@
 #include "Collision.h"
 #include "Light.h"
 #include "Rope.h"
+#include "Player.h"
+#include "Enemy.h"
 
 #include <SafeDelete.h>
 #include <DirectXMath.h>
@@ -86,15 +88,12 @@ private: // メンバ変数
 	Easing* easing = nullptr;
 	Operator* ope = nullptr;
 
-	Collision::Ray ray;
-	Collision::Plane plane;
+	Player* player = nullptr;
+	Enemy* enemy = nullptr;
+	Rope* rope = nullptr;
 
 	// ゲームシーン用
 	// 3dモデル
-	Model* playerModel = nullptr;
-	std::unique_ptr<Object3d> player = nullptr;
-	Model* enemyModel = nullptr;
-	std::unique_ptr<Object3d> enemy = nullptr;
 	Model* skydomeModel = nullptr;
 	std::unique_ptr<Object3d> skydome = nullptr;
 	Model* stageModel = nullptr;
