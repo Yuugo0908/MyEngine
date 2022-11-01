@@ -1,9 +1,11 @@
 #include "Player.h"
 
-bool Player::Initialize(Keyboard* keyboard)
+bool Player::Initialize(Keyboard* keyboard, Mouse* mouse)
 {
 	assert(keyboard);
+	assert(mouse);
 	this->keyboard = keyboard;
+	this->mouse = mouse;
 
 	rope = new Rope;
 	easing = new Easing;
@@ -73,7 +75,7 @@ void Player::Rush(bool rFlag)
 
 	// Ž©‹@‚Ì“Ëi
 	pMove = avoidMove * rate;
-	if (!rFlag && keyboard->TriggerKey(DIK_K) && rushCount >= 30)
+	if (!rFlag && mouse->TriggerMouseRight() && rushCount >= 30)
 	{
 		easeFlag = true;
 		startPos = pPos;

@@ -89,7 +89,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	while (true)  // ゲームループ
 	{
 		// メッセージ処理
-		if (win->ProcessMessage())
+		if (win->ProcessMessage() || keyboard->PushKey(DIK_ESCAPE))
 		{
 			break;
 		}

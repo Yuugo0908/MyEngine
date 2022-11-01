@@ -1,9 +1,12 @@
 #include "Rope.h"
 
-bool Rope::Initialize(Keyboard* keyboard)
+bool Rope::Initialize(Keyboard* keyboard, Mouse* mouse)
 {
 	assert(keyboard);
+	assert(mouse);
 	this->keyboard = keyboard;
+	this->mouse = mouse;
+
 	easing = new Easing;
 
 	// モデルの生成
@@ -17,6 +20,9 @@ bool Rope::Initialize(Keyboard* keyboard)
 	rScale = ropeObj->GetScale();
 	ropeObj->Update();
 
+	ray.start = XMVectorSet(rPos.x, rPos.y, rPos.z, 1);
+	ray.dir = XMVectorSet(0, 0, 1, 0);
+
 	return true;
 }
 
@@ -27,6 +33,8 @@ void Rope::Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d
 		throwCount++;
 	}
 
+	objLength = GetLength(pPos, ePos);
+
 	if (!rFlag)
 	{
 		rPos = pPos + manageRopePos;
@@ -36,8 +44,9 @@ void Rope::Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d
 		pEaseFlag = false;
 		eEaseFlag = false;
 
-		if (!rThrowFlag && !rBackFlag && keyboard->TriggerKey(DIK_J))
+		if (!rThrowFlag && !rBackFlag && mouse->TriggerMouseLeft())
 		{
+			moveFlag = false;
 			rThrowFlag = true;
 			avoidTime = 0.0f;
 		}
@@ -48,18 +57,6 @@ void Rope::Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d
 
 		ropeObj->Update();
 		return;
-	}
-
-	// ロープがついている場合、敵を引き寄せる
-	if (keyboard->TriggerKey(DIK_K) && keyboard->PushKey(DIK_W))
-	{
-		pEaseFlag = true;
-		avoidTime = 0.0f;
-	}
-	else if (keyboard->TriggerKey(DIK_K) && keyboard->PushKey(DIK_S))
-	{
-		eEaseFlag = true;
-		avoidTime = 0.0f;
 	}
 
 	if (pEaseFlag)
@@ -74,13 +71,12 @@ void Rope::Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d
 	{
 		//プレイヤーとエネミーの距離
 		XMFLOAT3 length = { pPos.x - ePos.x, pPos.y - ePos.y, pPos.z - ePos.z };
-		float len = GetLength(pPos, ePos);
 
 		//最大値より大きいなら
-		if (len > maxRope)
+		if (objLength > maxRope)
 		{
-			float wq = len / maxRope;
-			len = maxRope;
+			float wq = objLength / maxRope;
+			objLength = maxRope;
 			ePos = { pPos.x - length.x / wq, pPos.y - length.y / wq, pPos.z - length.z / wq };
 		}
 
@@ -91,7 +87,7 @@ void Rope::Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d
 		angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
 
 		rPos = { (pPos.x + ePos.x) / 2, (pPos.y + ePos.y) / 2, (pPos.z + ePos.z) / 2 };
-		rScale = { 0.2f, 0.2f , len / 2.0f };
+		rScale = { 0.2f, 0.2f , objLength / 2.0f };
 		ropeObj->SetPosition(rPos);
 		ropeObj->SetScale(rScale);
 		ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
@@ -110,9 +106,7 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 		return;
 	}
 
-	moveFlag = false;
-	float length = GetLength(pPos, ePos);
-	if (length <= 15.0f)
+	if (objLength <= maxRope)
 	{
 		// Y軸周りの角度
 		angleY = (float)atan2(pPos.x - ePos.x, pPos.z - ePos.z);
@@ -120,6 +114,7 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 		// X軸周りの角度
 		angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
 		ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
+		ray.dir = XMVectorSet(XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0, 0);
 	}
 	else
 	{
@@ -134,10 +129,11 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 
 	XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
 
+	Collision(object);
 
 	if (rThrowFlag)
 	{
-		if (length <= 15.0f)
+		if (objLength <= maxRope)
 		{
 			manageRopePos.x += subPE.x;
 			manageRopePos.y += subPE.y;
@@ -147,6 +143,7 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 		{
 			manageRopePos.z += 0.7f;
 		}
+		ray.start = XMVectorSet(manageRopePos.x, manageRopePos.y, manageRopePos.z, 1);
 
 		manageRopeScale.x += 0.02f;
 		manageRopeScale.y += 0.02f;
@@ -154,8 +151,6 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 
 		easing->EaseOutUpdate(rPos, manageRopePos, rPos, rThrowFlag, avoidTime);
 		easing->EaseOutUpdate(rScale, manageRopeScale, rPos, rThrowFlag, avoidTime);
-
-		Collision(object);
 
 		if (avoidTime >= 1.0f)
 		{
@@ -167,7 +162,7 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 
 	if (rBackFlag)
 	{
-		if (length <= 15.0f)
+		if (objLength <= maxRope)
 		{
 			manageRopePos.x -= subPE.x;
 			manageRopePos.y -= subPE.y;
@@ -177,6 +172,7 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 		{
 			manageRopePos.z -= 0.7f;
 		}
+		ray.start = XMVectorSet(manageRopePos.x, manageRopePos.y, manageRopePos.z, 1);
 
 		manageRopeScale.x -= 0.02f;
 		manageRopeScale.y -= 0.02f;
@@ -184,8 +180,6 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 
 		easing->EaseOutUpdate(rPos, manageRopePos, rPos, rBackFlag, avoidTime);
 		easing->EaseOutUpdate(rScale, manageRopeScale, rPos, rBackFlag, avoidTime);
-
-		Collision(object);
 
 		if (avoidTime >= 1.0f)
 		{
@@ -210,7 +204,6 @@ void Rope::Collision(const std::unique_ptr<Object3d>& object)
 	avoidTime = 0.0f;
 	rThrowFlag = false;
 	rBackFlag = false;
-	moveFlag = true;
 	if (keyboard->PushKey(DIK_S))
 	{
 		eEaseFlag = true;
@@ -227,7 +220,8 @@ void Rope::CircularMotion(XMFLOAT3& pos, const XMFLOAT3 centerPos, const float r
 {
 	angle += add;
 
-	pos.x = (cosf(3.14f / 180.0f * angle) * r) + centerPos.x; // 円運動の処理
+	// 円運動の処理
+	pos.x = (cosf(3.14f / 180.0f * angle) * r) + centerPos.x;
 	pos.y = (sinf(3.14f / 180.0f * angle) * r) + centerPos.y;
 	pos.z = (tanf(3.14f / 180.0f * angle) * r) + centerPos.z;
 }

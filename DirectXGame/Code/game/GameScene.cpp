@@ -10,9 +10,6 @@ GameScene::~GameScene() {
 
 }
 
-Rope* rope = new Rope;
-Player* player = new Player;
-Enemy* enemy = new Enemy;
 
 void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controller* controller, Mouse* mouse, Audio* audio) {
 	// nullptrチェック
@@ -30,6 +27,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 
 	camera = new Camera(WinApp::window_width, WinApp::window_height, mouse);
 	easing = new Easing;
+	rope = new Rope;
+	player = new Player;
+	enemy = new Enemy;
 
 	// デバイスのセット
 	FbxObject3d::SetDevice(dxCommon->GetDevice());
@@ -66,9 +66,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 	result = Image2d::Create(2, { 0.0f,0.0f });
 	result->SetSize({ 1280.0f,720.0f });
 
-	rope->Initialize(keyboard);
-	player->Initialize(keyboard);
-	enemy->Initialize();
+	rope->Initialize(keyboard, mouse);
+	player->Initialize(keyboard, mouse);
+	enemy->Initialize(player);
 
 	// .objの名前を指定してモデルを読み込む
 	skydomeModel = skydomeModel->CreateFromObject("skydome");
@@ -94,7 +94,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 	// ライトの生成
 	light = Light::Create();
 	// ライトの色を設定
-	light->SetLightColor({ 0.8f, 0.0f, 0.6f });
+	//light->SetLightColor({ 0.8f, 0.0f, 0.6f });
 	// 3Dオブジェクトにライトをセット
 	Object3d::SetLight(light);
 	FbxObject3d::SetLight(light);
@@ -132,6 +132,8 @@ void GameScene::Update() {
 		pPos = player->GetPos();
 		ePos = enemy->GetPos();
 
+		length = rope->GetLength(pPos, ePos);
+
 		rope->Update(pPos, ePos, enemy->GetObj());
 
 		player->SetPos(pPos);
@@ -144,14 +146,6 @@ void GameScene::Update() {
 		if (enemyCount == 5)
 		{
 			nowScene = 2;
-		}
-	}
-
-	if (nowScene == 2)
-	{
-		if (keyboard->TriggerKey(DIK_SPACE))
-		{
-			reset();
 		}
 	}
 }
@@ -237,6 +231,9 @@ void GameScene::SetImgui()
 	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[1]);
 	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[2]);
 
+	ImGui::Separator();
+	ImGui::Text("length : %6.2f", length);
+
 	ImGui::End();
 }
 
@@ -277,5 +274,11 @@ void GameScene::CollisionUpdate()
 		rope->SetrFlag(rFlag);
 		rope->SetmoveFlag(moveFlag);
 		enemy->SetAlive(eAlive);
+		//enemyCount++;
+	}
+
+	if (Collision::CollisionObject(player->GetObj(), enemy->GetBullet()))
+	{
+		shakeFlag = true;
 	}
 }

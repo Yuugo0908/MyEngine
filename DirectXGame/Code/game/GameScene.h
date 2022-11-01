@@ -76,6 +76,10 @@ private: // メンバ変数
 	Easing* easing = nullptr;
 	Operator* ope = nullptr;
 
+	Rope* rope = nullptr;
+	Player* player = nullptr;
+	Enemy* enemy = nullptr;
+
 	// ゲームシーン用
 	// 3dモデル
 	Model* skydomeModel = nullptr;
@@ -98,7 +102,8 @@ private: // メンバ変数
 	bool eAlive = false;// 生きているかのフラグ
 	int enemyCount = 0; // 倒した数
 
-	// ロープ管理フラグ
+	// ロープ
+	XMFLOAT3 rPos = {};
 	bool rFlag = false;
 
 	// カメラ
@@ -124,4 +129,6 @@ private: // メンバ変数
 	bool shakeFlag = false;
 	XMFLOAT2 shakeXY = {};
 	int shakeTime = 0;
+
+	float length = 0.0f;
 };

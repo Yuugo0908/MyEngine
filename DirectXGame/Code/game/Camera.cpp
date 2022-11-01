@@ -107,15 +107,15 @@ void Camera::Update()
 	Mouse::MouseMove mouseMove = mouse->GetMouseMove();
 
 	// マウスの左ボタンが押されていたらカメラを回転させる
-	if (mouse->PushMouseLeft())
-	{
-		float dy = mouseMove.MouseX * scaleY;
-		//float dx = mouseMove.MouseY * scaleX;
+	//if (mouse->PushMouseLeft())
+	//{
+	//	float dy = mouseMove.MouseX * scaleY;
+	//	//float dx = mouseMove.MouseY * scaleX;
 
-		//angleX = -dx * XM_PI;
-		angleY = -dy * XM_PI;
-		dirty = true;
-	}
+	//	//angleX = -dx * XM_PI;
+	//	angleY = -dy * XM_PI;
+	//	dirty = true;
+	//}
 
 	// マウスの中ボタンが押されていたらカメラを並行移動させる
 	/*if (mouse->PushMouseMiddle())

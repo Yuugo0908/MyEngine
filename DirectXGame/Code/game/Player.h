@@ -21,7 +21,7 @@ private: // エイリアス
 
 public: // メンバ関数
 
-	bool Initialize(Keyboard* keyboard);
+	bool Initialize(Keyboard* keyboard, Mouse* mouse);
 
 	void Finalize() { delete playerModel; }
 
@@ -44,6 +44,7 @@ public: // メンバ関数
 private: // メンバ変数
 
 	Keyboard* keyboard = nullptr;
+	Mouse* mouse = nullptr;
 	Easing* easing = nullptr;
 	Rope* rope = nullptr;
 

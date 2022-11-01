@@ -21,7 +21,7 @@ private: // エイリアス
 
 public: // メンバ関数
 
-	bool Initialize(Keyboard* keyboard);
+	bool Initialize(Keyboard* keyboard, Mouse* mouse);
 
 	void Finalize()
 	{
@@ -58,7 +58,10 @@ public: // メンバ関数
 private: // メンバ変数
 
 	Keyboard* keyboard = nullptr;
+	Mouse* mouse = nullptr;
 	Easing* easing = nullptr;
+
+	Collision::Ray ray;
 
 	//ロープモデル
 	Model* ropeModel = nullptr;
@@ -70,6 +73,7 @@ private: // メンバ変数
 	float angleX = 0.0f; // X軸
 	float angleY = 0.0f; // Y軸
 	float vecXZ = 0.0f; // XZ平面上のベクトル
+	float objLength = 0.0f;
 	const float maxRope = 15.0f; // ロープの最大
 	bool rFlag = false; // 接触フラグ
 	bool rThrowFlag = false; // ロープを飛ばす
