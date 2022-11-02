@@ -27,6 +27,8 @@ public: // サブクラス
 		XMMATRIX viewproj; // ビュープロジェクション行列
 		XMMATRIX world; // ワールド行列
 		XMFLOAT3 cameraPos; // カメラ座標(ワールド座標)
+		float a;
+		XMFLOAT4 color;
 	};
 public: // 静的メンバ関数
 	// 静的初期化
@@ -49,6 +51,7 @@ public: // 静的メンバ関数
 	{
 		Object3d::camera = camera;
 	}
+
 private: // 静的メンバ変数
 	// デバイス
 	static ID3D12Device* device;
@@ -88,6 +91,8 @@ public: // メンバ関数
 	void SetPosition(XMFLOAT3 position) { this->position = position; }
 	// モデルの設定
 	void SetModel(Model* model) { this->model = model; };
+	// 色の設定
+	void SetColor(XMFLOAT4 color) { this->color = color; }
 private: // メンバ変数
 	ComPtr<ID3D12Resource> constBufferB0; // 定数バッファ
 	// 色

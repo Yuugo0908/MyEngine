@@ -18,6 +18,8 @@ bool Enemy::Initialize(Player* player)
 
 	bullet->SetPosition(ePos);
 	bullet->SetScale({ 0.5, 0.5, 0.5 });
+	bullet->SetColor({ 0.0f, 1.0f, 0.0f, 1.0f });
+	bPos = bullet->GetPosition();
 
 	return true;
 }

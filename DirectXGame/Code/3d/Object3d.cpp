@@ -307,6 +307,7 @@ void Object3d::Update()
 	constMap0->viewproj = matViewProjection;
 	constMap0->world = matWorld;
 	constMap0->cameraPos = cameraPos;
+	constMap0->color = color;
 	constBufferB0->Unmap(0, nullptr);
 }
 
