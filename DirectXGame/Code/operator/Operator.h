@@ -38,4 +38,3 @@ const XMFLOAT3 operator*(const XMFLOAT3& v1, const XMFLOAT3& v2);
 const XMFLOAT3 operator*(const XMFLOAT3& v, float s);
 const XMFLOAT3 operator/(const XMFLOAT3& v1, const XMFLOAT3& v2);
 const XMFLOAT3 operator/(const XMFLOAT3& v, float s);
-

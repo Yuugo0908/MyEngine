@@ -133,11 +133,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// 各種解放
 	safe_delete(gameScene);
 	safe_delete(audio);
-	safe_delete(dxCommon);
 	safe_delete(camera);
 	safe_delete(postEffect);
 	safe_delete(multiTex);
 	safe_delete(image2d);
+	//safe_delete(dxCommon);
 	FbxLoader::GetInstance()->Finalize();
 
 	// ゲームウィンドウの破棄

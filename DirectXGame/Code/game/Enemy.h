@@ -1,8 +1,12 @@
 #pragma once
 #include "Object3d.h"
-#include "Player.h"
 #include "Collision.h"
+#include "Player.h"
+#include "Bullet.h"
+
 #include <DirectXMath.h>
+#include <stdlib.h>
+#include <time.h>
 
 class Enemy
 {
@@ -24,7 +28,7 @@ public:
 		move,
 	};
 
-	bool Initialize(Player* player);
+	bool Initialize(Player* player, Bullet* bullet);
 
 	void Update();
 
@@ -36,14 +40,19 @@ public:
 
 	void Attack();
 
+	XMFLOAT3 spawnRandom(XMFLOAT3& rnadSpawn);
+
 	const std::unique_ptr<Object3d>& GetObj() { return enemy; }
-	const std::unique_ptr<Object3d>& GetBullet() { return bullet; }
+	//const std::unique_ptr<Object3d>& GetBullet() { return bullet; }
 
 	const XMFLOAT3& GetPos() { return ePos; }
 	void SetPos(XMFLOAT3 ePos) { this->ePos = ePos; }
 
 	const bool& GetAlive() { return eAlive; }
 	void SetAlive(bool eAlive) { this->eAlive = eAlive; }
+
+	//const bool& GetAttackFlag() { return attackFlag; }
+	//void SetAttackFlag(bool attackFlag) { this->attackFlag = attackFlag; }
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
@@ -53,11 +62,12 @@ public:
 
 private:
 	Player* player = nullptr;
+	Bullet* bullet = nullptr;
 
 	Model* enemyModel = nullptr;
 	std::unique_ptr<Object3d> enemy = nullptr;
-	Model* bulletModel = nullptr;
-	std::unique_ptr<Object3d> bullet = nullptr;
+	/*Model* bulletModel = nullptr;
+	std::unique_ptr<Object3d> bullet = nullptr;*/
 
 	// エネミー
 	XMFLOAT3 ePos = {};
@@ -70,10 +80,10 @@ private:
 	int enemyCount = 0; // 倒した数
 	bool attackFlag = false;
 	Phase phase = Enemy::Phase::move;
+	XMFLOAT3 spawnPos = {}; // ランダムなスポーン位置
 
 	// バレット
 	XMFLOAT3 bPos = {};
-	XMFLOAT3 bSpeed = {};
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};

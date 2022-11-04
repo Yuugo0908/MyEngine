@@ -18,6 +18,7 @@
 #include "Rope.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "Bullet.h"
 
 #include <SafeDelete.h>
 #include <DirectXMath.h>
@@ -64,6 +65,12 @@ public: // メンバ関数
 	// 当たり判定
 	void CollisionUpdate();
 
+	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
+	{
+		XMFLOAT3 len = { posA.x - posB.x, posA.y - posB.y, posA.z - posB.z };
+		return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
+	}
+
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
 	Keyboard* keyboard = nullptr;
@@ -79,6 +86,7 @@ private: // メンバ変数
 	Rope* rope = nullptr;
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
+	Bullet* bullet = nullptr;
 
 	// ゲームシーン用
 	// 3dモデル
@@ -101,6 +109,10 @@ private: // メンバ変数
 	bool eFlag = false; // 自由落下のフラグ
 	bool eAlive = false;// 生きているかのフラグ
 	int enemyCount = 0; // 倒した数
+
+	// バレット
+	XMFLOAT3 bPos = {};
+	bool attackFlag = false;
 
 	// ロープ
 	XMFLOAT3 rPos = {};

@@ -30,6 +30,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 	rope = new Rope;
 	player = new Player;
 	enemy = new Enemy;
+	bullet = new Bullet;
 
 	// デバイスのセット
 	FbxObject3d::SetDevice(dxCommon->GetDevice());
@@ -68,7 +69,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 
 	rope->Initialize(keyboard, mouse);
 	player->Initialize(keyboard, mouse);
-	enemy->Initialize(player);
+	bullet->Initialize();
+	enemy->Initialize(player, bullet);
 
 	// .objの名前を指定してモデルを読み込む
 	skydomeModel = skydomeModel->CreateFromObject("skydome");
@@ -84,7 +86,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 
 	// 各オブジェクトの位置や大きさを初期化
 	stage->SetPosition({ 0.0f, -1.0f, 0.0f });
-	stage->SetScale({ 0.5f, 0.5f, 1.0f });
+	stage->SetScale({ 1.0f, 1.0f, 1.0f });
 	skydome->SetPosition({ 0.0f, 12.0f, 0.0f });
 	skydome->SetScale({ 5.0f, 5.0f, 5.0f });
 
@@ -105,6 +107,7 @@ void GameScene::Finalize()
 	player->Finalize();
 	enemy->Finalize();
 	rope->Finalize();
+	bullet->Finalize();
 }
 
 void GameScene::Update() {
@@ -126,18 +129,22 @@ void GameScene::Update() {
 		rFlag = rope->GetrFlag();
 		moveFlag = rope->GetmoveFlag();
 		eAlive = enemy->GetAlive();
+		attackFlag = bullet->GetAttackFlag();
 
 		player->Update(rFlag, moveFlag);
 		enemy->Update();
 		pPos = player->GetPos();
 		ePos = enemy->GetPos();
+		bullet->Update(pPos, ePos);
+		bPos = bullet->GetPos();
 
-		length = rope->GetLength(pPos, ePos);
+		length = GetLength(pPos, ePos);
 
 		rope->Update(pPos, ePos, enemy->GetObj());
 
 		player->SetPos(pPos);
 		enemy->SetPos(ePos);
+		bullet->SetPos(bPos);
 
 		skydome->Update();
 		stage->Update();
@@ -179,6 +186,10 @@ void GameScene::Draw() {
 	if (eAlive)
 	{
 		enemy->Draw();
+	}
+	if (attackFlag)
+	{
+		bullet->Draw();
 	}
 	skydome->Draw();
 	stage->Draw();
@@ -277,8 +288,10 @@ void GameScene::CollisionUpdate()
 		//enemyCount++;
 	}
 
-	if (Collision::CollisionObject(player->GetObj(), enemy->GetBullet()))
+	if (Collision::CollisionObject(player->GetObj(), bullet->GetObj()))
 	{
 		shakeFlag = true;
+		attackFlag = false;
+		bullet->SetAttackFlag(attackFlag);
 	}
 }

@@ -162,6 +162,7 @@
     <ClCompile Include="Code\fbx\FbxLoader.cpp" />
     <ClCompile Include="Code\fbx\FbxModel.cpp" />
     <ClCompile Include="Code\fbx\FbxObject3d.cpp" />
+    <ClCompile Include="Code\game\Bullet.cpp" />
     <ClCompile Include="Code\game\Camera.cpp" />
     <ClCompile Include="Code\game\Collision.cpp" />
     <ClCompile Include="Code\game\Easing.cpp" />
@@ -201,6 +202,7 @@
     <ClInclude Include="Code\fbx\FbxLoader.h" />
     <ClInclude Include="Code\fbx\FbxModel.h" />
     <ClInclude Include="Code\fbx\FbxObject3d.h" />
+    <ClInclude Include="Code\game\Bullet.h" />
     <ClInclude Include="Code\game\Camera.h" />
     <ClInclude Include="Code\game\Collision.h" />
     <ClInclude Include="Code\game\Easing.h" />
