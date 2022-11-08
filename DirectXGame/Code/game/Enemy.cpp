@@ -20,23 +20,6 @@ bool Enemy::Initialize(Player* player, Bullet* bullet)
 
 void Enemy::Update()
 {
-	//if (!attackFlag)
-	//{
-	//	pPos = player->GetPos();
-	//	bPos = bullet->GetPosition();
-	//	bPos = ePos;
-	//	bullet->SetPosition(bPos);
-	//	bullet->Update();
-
-	//	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
-	//	XMVECTOR bulletPos = { bPos.x, bPos.y, bPos.z, 1 };
-
-	//	XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, bulletPos);
-	//	XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
-
-	//	bSpeed = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
-	//}
-
 	bPos = bullet->GetPos();
 	attackFlag = bullet->GetAttackFlag();
 
@@ -55,6 +38,8 @@ void Enemy::Update()
 			eAliveCount = 0;
 		}
 
+		attackFlag = false;
+		bullet->SetAttackFlag(attackFlag);
 		ePos = enemy->GetPosition();
 		enemy->Update();
 		bullet->SetPos(ePos);
@@ -97,8 +82,6 @@ void Enemy::Update()
 
 	enemy->SetPosition(ePos);
 	enemy->Update();
-	//bullet->SetPosition(bPos);
-	//bullet->Update();
 }
 
 void Enemy::Move()
@@ -119,19 +102,6 @@ void Enemy::Move()
 	bullet->SetPos(ePos);
 }
 
-void Enemy::Attack()
-{
-	//attackFlag = true;
-	//bPos.x += bSpeed.x / 3;
-	//bPos.y += bSpeed.y / 3;
-	//bPos.z += bSpeed.z / 3;
-
-	//if (Collision::CollisionObject(player->GetObj(), bullet) || GetLength(ePos, bPos) >= 30.0f)
-	//{
-	//	attackFlag = false;
-	//}
-}
-
 XMFLOAT3 Enemy::spawnRandom(XMFLOAT3& randSpawn)
 {
 	srand((unsigned int)time(NULL));
@@ -146,11 +116,9 @@ XMFLOAT3 Enemy::spawnRandom(XMFLOAT3& randSpawn)
 void Enemy::Draw()
 {
 	enemy->Draw();
-	//bullet->Draw();
 }
 
 void Enemy::Finalize()
 {
 	delete enemyModel;
-	//delete bulletModel;
 }

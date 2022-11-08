@@ -49,6 +49,10 @@ void Rope::Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d
 			moveFlag = false;
 			rThrowFlag = true;
 			avoidTime = 0.0f;
+			if (objLength <= maxRope)
+			{
+				rRotFlag = true;
+			}
 		}
 		if (throwCount == 30)
 		{
@@ -106,21 +110,6 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 		return;
 	}
 
-	if (objLength <= maxRope)
-	{
-		// YŽ²Žü‚è‚ÌŠp“x
-		angleY = (float)atan2(pPos.x - ePos.x, pPos.z - ePos.z);
-		vecXZ = sqrtf((pPos.x - ePos.x) * (pPos.x - ePos.x) + (pPos.z - ePos.z) * (pPos.z - ePos.z));
-		// XŽ²Žü‚è‚ÌŠp“x
-		angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
-		ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
-		ray.dir = XMVectorSet(XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0, 0);
-	}
-	else
-	{
-		ropeObj->SetRotation({ 0, 0, 0 });
-	}
-
 	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
 	XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
 
@@ -133,15 +122,25 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 
 	if (rThrowFlag)
 	{
-		if (objLength <= maxRope)
-		{
+		if (rRotFlag)
+		{	
+			// YŽ²Žü‚è‚ÌŠp“x
+			angleY = (float)atan2(pPos.x - ePos.x, pPos.z - ePos.z);
+			vecXZ = sqrtf((pPos.x - ePos.x) * (pPos.x - ePos.x) + (pPos.z - ePos.z) * (pPos.z - ePos.z));
+			// XŽ²Žü‚è‚ÌŠp“x
+			angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
+			ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
+			ray.dir = XMVectorSet(XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0, 0);
 			manageRopePos.x += subPE.x;
 			manageRopePos.y += subPE.y;
 			manageRopePos.z += subPE.z;
+			rRotFlag = true;
 		}
 		else
 		{
+			ropeObj->SetRotation({ 0, 0, 0 });
 			manageRopePos.z += 0.7f;
+			rRotFlag = false;
 		}
 		ray.start = XMVectorSet(manageRopePos.x, manageRopePos.y, manageRopePos.z, 1);
 
@@ -162,8 +161,15 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 
 	if (rBackFlag)
 	{
-		if (objLength <= maxRope)
+		if (rRotFlag)
 		{
+			// YŽ²Žü‚è‚ÌŠp“x
+			angleY = (float)atan2(pPos.x - ePos.x, pPos.z - ePos.z);
+			vecXZ = sqrtf((pPos.x - ePos.x) * (pPos.x - ePos.x) + (pPos.z - ePos.z) * (pPos.z - ePos.z));
+			// XŽ²Žü‚è‚ÌŠp“x
+			angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
+			ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
+			ray.dir = XMVectorSet(XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0, 0);
 			manageRopePos.x -= subPE.x;
 			manageRopePos.y -= subPE.y;
 			manageRopePos.z -= subPE.z;
@@ -187,6 +193,7 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 			rThrowFlag = false;
 			rBackFlag = false;
 			moveFlag = true;
+			rRotFlag = false;
 			throwCount = 0;
 		}
 	}
@@ -204,7 +211,8 @@ void Rope::Collision(const std::unique_ptr<Object3d>& object)
 	avoidTime = 0.0f;
 	rThrowFlag = false;
 	rBackFlag = false;
-	if (keyboard->PushKey(DIK_S))
+	rRotFlag = false;
+	if (mouse->PushMouseLeft())
 	{
 		eEaseFlag = true;
 	}

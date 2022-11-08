@@ -1,19 +1,12 @@
 #pragma once
 #include "Object3d.h"
 #include "Collision.h"
-#include <DirectXMath.h>
+#include "Operator.h"
+#include "Camera.h"
 
 class Bullet
 {
-private: // エイリアス
-	// DirectX::を省略
-	using XMFLOAT2 = DirectX::XMFLOAT2;
-	using XMFLOAT3 = DirectX::XMFLOAT3;
-	using XMFLOAT4 = DirectX::XMFLOAT4;
-	using XMMATRIX = DirectX::XMMATRIX;
-	using XMVECTOR = DirectX::XMVECTOR;
-
-public:
+public: // メンバ関数
 
 	bool Initialize();
 
@@ -39,7 +32,7 @@ public:
 		return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
 	}
 
-private:
+private: // メンバ変数
 	Model* bulletModel = nullptr;
 	std::unique_ptr<Object3d> bullet = nullptr;
 
@@ -47,5 +40,6 @@ private:
 	XMFLOAT3 bPos = {};
 	XMFLOAT3 bSpeed = {};
 	bool attackFlag = false;
+	bool shakeFlag = false; // カメラのシェイク
 };
 

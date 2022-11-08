@@ -1,24 +1,12 @@
 #pragma once
-
 #include "Object3d.h"
 #include "Keyboard.h"
 #include "Easing.h"
 #include "Collision.h"
 #include "Operator.h"
-#include <DirectXMath.h>
 
 class Rope
 {
-private: // エイリアス
-// Microsoft::WRL::を省略
-	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-	// DirectX::を省略
-	using XMFLOAT2 = DirectX::XMFLOAT2;
-	using XMFLOAT3 = DirectX::XMFLOAT3;
-	using XMFLOAT4 = DirectX::XMFLOAT4;
-	using XMMATRIX = DirectX::XMMATRIX;
-	using XMVECTOR = DirectX::XMVECTOR;
-
 public: // メンバ関数
 
 	bool Initialize(Keyboard* keyboard, Mouse* mouse);
@@ -81,6 +69,7 @@ private: // メンバ変数
 	XMFLOAT3 manageRopePos = {}; // ロープ位置管理用
 	XMFLOAT3 manageRopeScale = {0.2f, 0.2f, 0.2f}; // ロープスケール管理用
 	int throwCount = 0;
+	bool rRotFlag = false; // ロープの向き変更用フラグ
 
 	// 突進用
 	XMFLOAT3 startPos = {}; // 開始位置

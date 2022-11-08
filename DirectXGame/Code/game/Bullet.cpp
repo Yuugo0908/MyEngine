@@ -15,21 +15,24 @@ bool Bullet::Initialize()
 
 void Bullet::Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos)
 {
+	if (shakeFlag)
+	{
+		Camera::GetInstance()->CameraShake(shakeFlag);
+	}
+	if (!attackFlag)
+	{
+		bPos = ePos;
+
+		XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
+		XMVECTOR bulletPos = { ePos.x, ePos.y, ePos.z, 1 };
+
+		XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, bulletPos);
+		XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
+
+		bSpeed = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
+	}
 	bullet->SetPosition(bPos);
 	bullet->Update();
-
-	if (attackFlag) { return; }
-
-	bPos = bullet->GetPosition();
-	bPos = ePos;
-
-	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
-	XMVECTOR bulletPos = { bPos.x, bPos.y, bPos.z, 1 };
-
-	XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, bulletPos);
-	XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
-
-	bSpeed = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
 }
 
 void Bullet::Attack(const std::unique_ptr<Object3d>& object, const XMFLOAT3& ePos)
@@ -39,7 +42,13 @@ void Bullet::Attack(const std::unique_ptr<Object3d>& object, const XMFLOAT3& ePo
 	bPos.y += bSpeed.y / 3;
 	bPos.z += bSpeed.z / 3;
 
-	if (Collision::CollisionObject(object, bullet) || GetLength(ePos, bPos) >= 30.0f)
+	if (Collision::CollisionObject(object, bullet))
+	{
+		attackFlag = false;
+		shakeFlag = true;
+	}
+
+	if (GetLength(ePos, bPos) >= 30.0f)
 	{
 		attackFlag = false;
 	}

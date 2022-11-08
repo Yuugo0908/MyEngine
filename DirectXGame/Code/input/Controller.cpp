@@ -1,8 +1,6 @@
 #include "Controller.h"
 #include <cassert>
 
-using namespace DirectX;
-
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 

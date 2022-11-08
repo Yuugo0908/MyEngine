@@ -11,21 +11,18 @@ GameScene::~GameScene() {
 }
 
 
-void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controller* controller, Mouse* mouse, Audio* audio) {
+void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mouse* mouse, Audio* audio) {
 	// nullptrチェック
 	assert(dxCommon);
-	assert(keyboard);
 	assert(controller);
 	assert(mouse);
 	assert(audio);
 
 	this->dxCommon = dxCommon;
-	this->keyboard = keyboard;
 	this->controller = controller;
 	this->mouse = mouse;
 	this->audio = audio;
 
-	camera = new Camera(WinApp::window_width, WinApp::window_height, mouse);
 	easing = new Easing;
 	rope = new Rope;
 	player = new Player;
@@ -67,6 +64,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controll
 	result = Image2d::Create(2, { 0.0f,0.0f });
 	result->SetSize({ 1280.0f,720.0f });
 
+	item->Initialize();
 	rope->Initialize(keyboard, mouse);
 	player->Initialize(keyboard, mouse);
 	bullet->Initialize();
@@ -131,16 +129,18 @@ void GameScene::Update() {
 		eAlive = enemy->GetAlive();
 		attackFlag = bullet->GetAttackFlag();
 
+		bullet->Update(pPos, ePos);
 		player->Update(rFlag, moveFlag);
 		enemy->Update();
+
 		pPos = player->GetPos();
 		ePos = enemy->GetPos();
-		bullet->Update(pPos, ePos);
 		bPos = bullet->GetPos();
 
 		length = GetLength(pPos, ePos);
 
 		rope->Update(pPos, ePos, enemy->GetObj());
+		item->Update();
 
 		player->SetPos(pPos);
 		enemy->SetPos(ePos);
@@ -194,6 +194,7 @@ void GameScene::Draw() {
 	skydome->Draw();
 	stage->Draw();
 	rope->Draw();
+	item->Draw();
 
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
@@ -260,8 +261,8 @@ void GameScene::LightUpdate()
 void GameScene::CameraUpdate()
 {
 	camera->SetTarget(pPos);
-	cPos = camera->GetEye();
-	cTarget = camera->GetTarget();
+	//cPos = camera->GetEye();
+	//cTarget = camera->GetTarget();
 
 	cameraLength = { cPos.x - pPos.x, cPos.y - pPos.y, cPos.z - pPos.z, 1.0f };
 	cameraLength = XMVector3Normalize(cameraLength);
@@ -269,7 +270,7 @@ void GameScene::CameraUpdate()
 	//カメラ更新
 	if (shakeFlag == true)
 	{
-		camera->CameraShake(cPos, cTarget, shakeFlag);
+		camera->CameraShake(shakeFlag);
 	}
 	camera->Update();
 }
@@ -282,16 +283,16 @@ void GameScene::CollisionUpdate()
 		eAlive = false;
 		rFlag = false;
 		moveFlag = true;
+		attackFlag = false;
+		bullet->SetAttackFlag(attackFlag);
 		rope->SetrFlag(rFlag);
 		rope->SetmoveFlag(moveFlag);
 		enemy->SetAlive(eAlive);
 		//enemyCount++;
 	}
 
-	if (Collision::CollisionObject(player->GetObj(), bullet->GetObj()))
+	if (Collision::CollisionObject(player->GetObj(), item->GetObj()))
 	{
 		shakeFlag = true;
-		attackFlag = false;
-		bullet->SetAttackFlag(attackFlag);
 	}
 }

@@ -5,39 +5,29 @@
 #include "Controller.h"
 #include "Mouse.h"
 #include "Image2d.h"
-#include "Object3d.h"
 #include "DebugText.h"
-#include "Audio.h"
+#include "Object3d.h"
 #include "Model.h"
 #include "FbxLoader.h"
 #include "FbxObject3d.h"
+#include "Operator.h"
+
 #include "Camera.h"
-#include "Easing.h"
-#include "Collision.h"
-#include "Light.h"
+#include "Audio.h"
 #include "Rope.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "Bullet.h"
+#include "Item.h"
+#include "Collision.h"
+#include "Light.h"
+#include "Easing.h"
 
 #include <SafeDelete.h>
-#include <DirectXMath.h>
 #include <stdlib.h>
 #include <time.h>
 
-using namespace DirectX;
-
 class GameScene {
-private: // エイリアス
-// Microsoft::WRL::を省略
-	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-	// DirectX::を省略
-	using XMFLOAT2 = DirectX::XMFLOAT2;
-	using XMFLOAT3 = DirectX::XMFLOAT3;
-	using XMFLOAT4 = DirectX::XMFLOAT4;
-	using XMMATRIX = DirectX::XMMATRIX;
-	using XMVECTOR = DirectX::XMVECTOR;
-
 private: // 静的メンバ変数
 	static const int debugTextTexNumber = 0;
 
@@ -47,7 +37,7 @@ public: // メンバ関数
 	// デストラクタ
 	~GameScene();
 	// 初期化
-	void Initialize(DirectXCommon* dxCommon, Keyboard* keyboard, Controller* controller, Mouse* mouse, Audio* audio);
+	void Initialize(DirectXCommon* dxCommon, Controller* controller, Mouse* mouse, Audio* audio);
 	// 解放
 	void Finalize();
 	// 毎フレーム処理
@@ -73,20 +63,20 @@ public: // メンバ関数
 
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
-	Keyboard* keyboard = nullptr;
+	Keyboard* keyboard = Keyboard::GetInstance();
 	Controller* controller = nullptr;
 	Mouse* mouse = nullptr;
 	Audio* audio = nullptr;
-	Camera* camera = nullptr;
+	Camera* camera = Camera::GetInstance();
 	Collision* collision = nullptr;
 	Light* light = nullptr;
 	Easing* easing = nullptr;
-	Operator* ope = nullptr;
 
 	Rope* rope = nullptr;
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
 	Bullet* bullet = nullptr;
+	Item* item = Item::GetInstance();
 
 	// ゲームシーン用
 	// 3dモデル

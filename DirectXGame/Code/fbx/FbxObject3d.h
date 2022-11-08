@@ -2,26 +2,20 @@
 
 #include "FbxModel.h"
 #include "Camera.h"
+#include "Operator.h"
+#include "Light.h"
 
 #include <Windows.h>
 #include <wrl.h>
 #include <d3d12.h>
 #include <d3dx12.h>
 #include <string>
-#include <DirectXMath.h>
-#include "Light.h"
 
 class FbxObject3d
 {
 protected: // エイリアス
 	// Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-	// DirectX::を省略
-	using XMFLOAT2 = DirectX::XMFLOAT2;
-	using XMFLOAT3 = DirectX::XMFLOAT3;
-	using XMFLOAT4 = DirectX::XMFLOAT4;
-	using XMVECTOR = DirectX::XMVECTOR;
-	using XMMATRIX = DirectX::XMMATRIX;
 
 	// ローカルスケール
 	XMFLOAT3 scale = { 1, 1, 1 };

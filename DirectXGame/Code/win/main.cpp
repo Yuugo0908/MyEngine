@@ -3,9 +3,6 @@
 #include "Audio.h"
 #include "GameScene.h"
 #include "FbxLoader.h"
-#include "PostEffect.h"
-#include "MultiRT.h"
-#include "MultiTex.h"
 #include "Controller.h"
 #include "Light.h"
 #include "Mouse.h"
@@ -21,10 +18,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Audio* audio = nullptr;
 	GameScene* gameScene = nullptr;
 	Camera* camera = nullptr;
-	PostEffect* postEffect = nullptr;
 	Image2d* image2d = nullptr;
-	MultiTex* multiTex = nullptr;
-	MultiRT* multiRT = nullptr;
 	Controller* controller = nullptr;
 	Light* light = nullptr;
 
@@ -47,8 +41,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	mouse->Initialize(win);
 
 	// カメラ初期化
-	//camera = new Camera();
-	//camera->Initialize(WinApp::window_width, WinApp::window_height);
+	camera = Camera::GetInstance();
+	camera->Initialize(WinApp::window_width, WinApp::window_height, mouse);
 
 	// FBXの初期化
 	FbxLoader::GetInstance()->Initialize(dxCommon->GetDevice());
@@ -68,23 +62,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	}
 
 	// 3Dオブジェクト静的初期化
-	if (!Object3d::StaticInitialize(dxCommon->GetDevice()))
+	if (!Object3d::StaticInitialize(dxCommon->GetDevice(), camera))
 	{
 		assert(0);
 		return 1;
 	}
 	// ライト静的初期化
 	Light::StaticInitialize(dxCommon->GetDevice());
-	
-	// ポストエフェクトの初期化
-	multiTex = new MultiTex();
-	multiTex->Initialize(dxCommon->GetDevice());
 
 #pragma endregion 汎用機能初期化
 
 	// ゲームシーンの初期化
 	gameScene = new GameScene();
-	gameScene->Initialize(dxCommon, keyboard, controller, mouse, audio);
+	gameScene->Initialize(dxCommon, controller, mouse, audio);
 
 	while (true)  // ゲームループ
 	{
@@ -133,11 +123,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// 各種解放
 	safe_delete(gameScene);
 	safe_delete(audio);
-	safe_delete(camera);
-	safe_delete(postEffect);
-	safe_delete(multiTex);
 	safe_delete(image2d);
-	//safe_delete(dxCommon);
+	safe_delete(dxCommon);
 	FbxLoader::GetInstance()->Finalize();
 
 	// ゲームウィンドウの破棄

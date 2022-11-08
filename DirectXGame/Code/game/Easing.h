@@ -1,9 +1,7 @@
 #pragma once
 #include "Operator.h"
-#include <DirectXMath.h>
 #include <stdlib.h>
 #include <time.h>
-using namespace DirectX;
 class Easing
 {
 public:

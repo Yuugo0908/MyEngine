@@ -1,7 +1,21 @@
 #include "Camera.h"
-using namespace DirectX;
 
-Camera::Camera(const int window_width, const int window_height, Mouse* mouse)
+Camera::Camera()
+{
+}
+
+Camera::~Camera()
+{
+}
+
+Camera* Camera::GetInstance()
+{
+	static Camera instance;
+
+	return &instance;
+}
+
+bool Camera::Initialize(const int window_width, const int window_height, Mouse* mouse)
 {
 	assert(mouse);
 
@@ -19,6 +33,8 @@ Camera::Camera(const int window_width, const int window_height, Mouse* mouse)
 
 	// ビュープロジェクションの合成
 	matViewProjection = matView * matProjection;
+
+	return true;
 }
 
 void Camera::SetEye(XMFLOAT3 eye)
@@ -107,28 +123,15 @@ void Camera::Update()
 	Mouse::MouseMove mouseMove = mouse->GetMouseMove();
 
 	// マウスの左ボタンが押されていたらカメラを回転させる
-	//if (mouse->PushMouseLeft())
-	//{
-	//	float dy = mouseMove.MouseX * scaleY;
-	//	//float dx = mouseMove.MouseY * scaleX;
-
-	//	//angleX = -dx * XM_PI;
-	//	angleY = -dy * XM_PI;
-	//	dirty = true;
-	//}
-
-	// マウスの中ボタンが押されていたらカメラを並行移動させる
-	/*if (mouse->PushMouseMiddle())
+	if (mouse->PushMouseLeft())
 	{
-		float dx = mouseMove.MouseX / 100.0f;
-		float dy = mouseMove.MouseY / 100.0f;
+		float dy = mouseMove.MouseX * scaleY;
+		//float dx = mouseMove.MouseY * scaleX;
 
-		XMVECTOR move = { -dx, +dy, 0, 0 };
-		move = XMVector3Transform(move, matRot);
-
-		CameraMoveVector(move);
+		//angleX = -dx * XM_PI;
+		angleY = -dy * XM_PI;
 		dirty = true;
-	}*/
+	}
 
 	// ホイール入力で距離を変更
 	if (mouseMove.MouseZ != 0) {
@@ -243,7 +246,7 @@ void Camera::UpdateProjectionMatrix()
 		0.1f, 1000.0f);
 }
 
-void Camera::CameraShake(XMFLOAT3& eye, XMFLOAT3& target, bool& flag)
+void Camera::CameraShake(bool& flag)
 {
 	//カメラ更新
 	int power = 5;
@@ -258,9 +261,6 @@ void Camera::CameraShake(XMFLOAT3& eye, XMFLOAT3& target, bool& flag)
 		shakeCount = 0;
 		flag = false;
 	}
-
-	eye = GetEye();
-	target = GetTarget();
 
 	eye.x += shake.x;
 	eye.y += shake.y;

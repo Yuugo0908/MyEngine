@@ -5,20 +5,9 @@
 #include "Collision.h"
 #include "Operator.h"
 #include "Rope.h"
-#include <DirectXMath.h>
 
 class Player
 {
-private: // エイリアス
-// Microsoft::WRL::を省略
-	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-	// DirectX::を省略
-	using XMFLOAT2 = DirectX::XMFLOAT2;
-	using XMFLOAT3 = DirectX::XMFLOAT3;
-	using XMFLOAT4 = DirectX::XMFLOAT4;
-	using XMMATRIX = DirectX::XMMATRIX;
-	using XMVECTOR = DirectX::XMVECTOR;
-
 public: // メンバ関数
 
 	bool Initialize(Keyboard* keyboard, Mouse* mouse);
@@ -32,6 +21,7 @@ public: // メンバ関数
 	void Rush(bool rFlag);
 
 	void Jump();
+
 	// オブジェクト
 	const std::unique_ptr<Object3d>& GetObj() { return playerObj; }
 	// 突進

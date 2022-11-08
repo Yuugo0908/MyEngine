@@ -6,7 +6,7 @@ Operator::Operator(float x, float y, float z) : XMFLOAT3{ x,y,z } {}
 
 float Operator::length()
 {
-	return sqrt(x * x + y * y + z * z);
+	return sqrtf(x * x + y * y + z * z);
 }
 
 XMFLOAT3 Operator::normalize()
@@ -39,15 +39,6 @@ XMFLOAT3 Operator::cross3D(const XMFLOAT3& v1, XMFLOAT3& v2)
 	temp.y = v1.z * v2.x - v1.x * v2.z;
 	temp.z = v1.x * v2.y - v1.y * v2.x;
 	return temp;
-}
-
-XMFLOAT3 Operator::Degrees(XMFLOAT3 Radians)
-{
-	XMFLOAT3 resultRad = Radians;
-	resultRad.x * (180.0 / XM_PI);
-	resultRad.y * (180.0 / XM_PI);
-	resultRad.z * (180.0 / XM_PI);
-	return resultRad;
 }
 
 Operator Operator::operator+()

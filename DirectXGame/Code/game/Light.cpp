@@ -1,7 +1,5 @@
 #include "Light.h"
 
-using namespace DirectX;
-
 /// <summary>
 /// Ã“Iƒƒ“ƒo•Ï”‚ÌÀ‘Ì
 /// </summary>

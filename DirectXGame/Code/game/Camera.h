@@ -1,20 +1,25 @@
 #pragma once
-#include <DirectXMath.h>
 #include "Mouse.h"
+#include "Operator.h"
 class Camera
 {
-protected: // エイリアス
-// DirectX::を省略
-	using XMFLOAT2 = DirectX::XMFLOAT2;
-	using XMFLOAT3 = DirectX::XMFLOAT3;
-	using XMFLOAT4 = DirectX::XMFLOAT4;
-	using XMVECTOR = DirectX::XMVECTOR;
-	using XMMATRIX = DirectX::XMMATRIX;
+private:
+	// カメラ初期化
+	Camera();
+
+	~Camera();
+
+public:
+	// コピーコンストラクタを無効化
+	Camera(const Camera& obj) = delete;
+	// 代入演算子を無効化
+	Camera& operator=(const Camera& obj) = delete;
 
 public: // 静的メンバ関数
 
-	// カメラ初期化
-	Camera(const int window_width, const int window_height, Mouse* mouse);
+	static Camera* GetInstance();
+	// 初期化
+	bool Initialize(const int window_width, const int window_height, Mouse* mouse);
 	// 視点座標の取得
 	const XMFLOAT3& GetEye() { return eye; }
 	// 視点座標の設定
@@ -56,7 +61,7 @@ public: // 静的メンバ関数
 	/// 射影行列を更新
 	void UpdateProjectionMatrix();
 	// カメラのシェイクを実行
-	void CameraShake(XMFLOAT3& eye, XMFLOAT3& taregt, bool& flag);
+	void CameraShake(bool& flag);
 
 
 private: // メンバ変数

@@ -5,17 +5,13 @@
 #include <d3d12.h>
 #include <d3dx12.h>
 #include <string>
-#include <DirectXMath.h>
 #include <vector>
 #include <DirectXTex.h>
 #include <fbxsdk.h>
 
+#include "Operator.h"
+
 // DirectX::Çè»ó™
-using XMFLOAT2 = DirectX::XMFLOAT2;
-using XMFLOAT3 = DirectX::XMFLOAT3;
-using XMFLOAT4 = DirectX::XMFLOAT4;
-using XMMATRIX = DirectX::XMMATRIX;
-using XMVECTOR = DirectX::XMVECTOR;
 using TexMetadata = DirectX::TexMetadata;
 using ScratchImage = DirectX::ScratchImage;
 

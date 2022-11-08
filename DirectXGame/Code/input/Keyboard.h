@@ -11,7 +11,19 @@ protected: // エイリアス
 // Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
+private:
+	Keyboard();
+
+	~Keyboard();
+public:
+	// コピーコンストラクタを無効化
+	Keyboard(const Keyboard& obj) = delete;
+	// 代入演算子を無効化
+	Keyboard& operator=(const Keyboard& obj) = delete;
+
 public: //メンバ関数
+
+	static Keyboard* GetInstance();
 	//初期化
 	bool Initialize(WinApp* win);
 	//更新
@@ -20,8 +32,6 @@ public: //メンバ関数
 	bool PushKey(BYTE keyNumber);
 	// キーのトリガーをチェック
 	bool TriggerKey(BYTE keyNumber);
-
-	static Keyboard* GetInstance();
 
 private: //メンバ変数
 	ComPtr<IDirectInput8> dinput;

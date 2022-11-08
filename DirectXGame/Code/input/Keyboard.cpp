@@ -4,6 +4,16 @@
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
+Keyboard::Keyboard()
+{
+
+}
+
+Keyboard::~Keyboard()
+{
+
+}
+
 Keyboard* Keyboard::GetInstance()
 {
 	static Keyboard instance;
