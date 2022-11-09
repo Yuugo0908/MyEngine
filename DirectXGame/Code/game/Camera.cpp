@@ -123,15 +123,12 @@ void Camera::Update()
 	Mouse::MouseMove mouseMove = mouse->GetMouseMove();
 
 	// マウスの左ボタンが押されていたらカメラを回転させる
-	if (mouse->PushMouseLeft())
-	{
-		float dy = mouseMove.MouseX * scaleY;
-		//float dx = mouseMove.MouseY * scaleX;
+	float dy = mouseMove.MouseX * scaleY;
+	//float dx = mouseMove.MouseY * scaleX;
 
-		//angleX = -dx * XM_PI;
-		angleY = -dy * XM_PI;
-		dirty = true;
-	}
+	//angleX = -dx * XM_PI;
+	angleY = -dy * XM_PI;
+	dirty = true;
 
 	// ホイール入力で距離を変更
 	if (mouseMove.MouseZ != 0) {
