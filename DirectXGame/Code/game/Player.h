@@ -4,6 +4,7 @@
 #include "Easing.h"
 #include "Collision.h"
 #include "Operator.h"
+#include "Camera.h"
 #include "Rope.h"
 
 class Player
@@ -37,6 +38,7 @@ private: // メンバ変数
 	Mouse* mouse = nullptr;
 	Easing* easing = nullptr;
 	Rope* rope = nullptr;
+	Camera* camera = Camera::GetInstance();
 
 	// モデル
 	Model* playerModel = nullptr;
@@ -44,6 +46,7 @@ private: // メンバ変数
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
+	float pSpeed = 0.35f;
 	bool jumpFlag = false;//自由落下のフラグ
 	bool moveFlag = false;//移動管理フラグ
 	float pMove = 0.0f;//移動量
@@ -55,12 +58,15 @@ private: // メンバ変数
 	// 突進用
 	XMFLOAT3 startPos = {}; // 開始位置
 	XMFLOAT3 endPos = {}; // 終点位置
-	float avoidMove = 5.0f; // 距離
+	float avoidMove = 20.0f; // 距離
 	float avoidTime = 0.0f; // 経過時間
 	bool easeFlag = false; // イージング開始フラグ
 	int rushCount = 0;
 
 	// ロープ管理用
 	bool rFlag = false;
+
+	// カメラ距離取得用
+	XMFLOAT3 cameraTrack = {};
 };
 

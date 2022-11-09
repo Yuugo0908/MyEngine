@@ -28,6 +28,10 @@ void Player::Update(bool rFlag, bool moveFlag)
 {
 	Jump();
 	Rush(rFlag);
+	playerObj->SetPosition(pPos);
+
+	cameraTrack = camera->CameraTrack(pPos);
+	cameraTrack = cameraTrack * pSpeed;
 
 	// ˆÚ“®
 	if (moveFlag)
@@ -43,26 +47,31 @@ void Player::Update(bool rFlag, bool moveFlag)
 		}
 
 		pMove = pAcc * rate;
+		cameraTrack = cameraTrack * rate;
 
 		if (keyboard->PushKey(DIK_D))
 		{
-			pPos.x += pMove;
+			pPos.x += cameraTrack.z;
+			pPos.z -= cameraTrack.x;
 		}
 		else if (keyboard->PushKey(DIK_A))
 		{
-			pPos.x -= pMove;
+			pPos.x -= cameraTrack.z;
+			pPos.z += cameraTrack.x;
 		}
 		if (keyboard->PushKey(DIK_W))
 		{
-			pPos.z += pMove;
+			pPos.x += cameraTrack.x;
+			pPos.z += cameraTrack.z;
 		}
 		else if (keyboard->PushKey(DIK_S))
 		{
-			pPos.z -= pMove;
+			pPos.x -= cameraTrack.x;
+			pPos.z -= cameraTrack.z;
 		}
 	}
 
-	playerObj->SetPosition(pPos);
+	//pPos = playerObj->GetPosition();
 	playerObj->Update();
 }
 
@@ -74,7 +83,7 @@ void Player::Rush(bool rFlag)
 	}
 
 	// Ž©‹@‚Ì“Ëi
-	pMove = avoidMove * rate;
+
 	if (!rFlag && mouse->TriggerMouseRight() && rushCount >= 30)
 	{
 		easeFlag = true;
@@ -82,19 +91,23 @@ void Player::Rush(bool rFlag)
 		endPos = pPos;
 		if (keyboard->PushKey(DIK_D))
 		{
-			endPos.x += pMove;
+			endPos.x += cameraTrack.z * avoidMove;
+			endPos.z -= cameraTrack.x * avoidMove;
 		}
 		else if (keyboard->PushKey(DIK_A))
 		{
-			endPos.x -= pMove;
+			endPos.x -= cameraTrack.z * avoidMove;
+			endPos.z += cameraTrack.x * avoidMove;
 		}
 		if (keyboard->PushKey(DIK_W))
 		{
-			endPos.z += pMove;
+			endPos.x += cameraTrack.x * avoidMove;
+			endPos.z += cameraTrack.z * avoidMove;
 		}
 		else if (keyboard->PushKey(DIK_S))
 		{
-			endPos.z -= pMove;
+			endPos.x -= cameraTrack.x * avoidMove;
+			endPos.z -= cameraTrack.z * avoidMove;
 		}
 	}
 	easing->EaseInUpdate(startPos, endPos, pPos, easeFlag, avoidTime);

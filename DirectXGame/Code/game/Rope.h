@@ -25,7 +25,7 @@ public: // ÉÅÉìÉoä÷êî
 
 	void Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScale, const std::unique_ptr<Object3d>& object);
 
-	void Collision(const std::unique_ptr<Object3d>& object);
+	void Collision();
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{

@@ -8,14 +8,19 @@ bool Enemy::Initialize(Player* player, Bullet* bullet)
 	this->bullet = bullet;
 
 	enemyModel = enemyModel->CreateFromObject("sphere");
-	enemy = Object3d::Create();
-	enemy->SetModel(enemyModel);
+	enemyObj = Object3d::Create();
+	enemyObj->SetModel(enemyModel);
 
-	enemy->SetPosition({ 0.0f, 100.0f, 0.0f });
-	enemy->SetScale({ 1.0f, 1.0f, 1.0f });
-	ePos = enemy->GetPosition();
+	enemyObj->SetPosition({ 0.0f, 100.0f, 0.0f });
+	enemyObj->SetScale({ 1.0f, 1.0f, 1.0f });
+	ePos = enemyObj->GetPosition();
 
 	return true;
+}
+
+bool Enemy::Create()
+{
+	return false;
 }
 
 void Enemy::Update()
@@ -26,22 +31,22 @@ void Enemy::Update()
 	if (!eAlive)
 	{
 		eAliveCount++;
-		enemy->SetPosition({ 0.0f, 100.0f, 0.0f });
+		enemyObj->SetPosition({ 0.0f, 100.0f, 0.0f });
 
 		if (eAliveCount == 60)
 		{
 			phase = Enemy::Phase::move;
 			pPos = player->GetPos();
 			spawnRandom(spawnPos);
-			enemy->SetPosition({ spawnPos.x, 5.0f, spawnPos.z });
+			enemyObj->SetPosition({ spawnPos.x, 5.0f, spawnPos.z });
 			eAlive = true;
 			eAliveCount = 0;
 		}
 
 		attackFlag = false;
 		bullet->SetAttackFlag(attackFlag);
-		ePos = enemy->GetPosition();
-		enemy->Update();
+		ePos = enemyObj->GetPosition();
+		enemyObj->Update();
 		bullet->SetPos(ePos);
 		return;
 	}
@@ -80,8 +85,8 @@ void Enemy::Update()
 		}
 	}
 
-	enemy->SetPosition(ePos);
-	enemy->Update();
+	enemyObj->SetPosition(ePos);
+	enemyObj->Update();
 }
 
 void Enemy::Move()
@@ -115,7 +120,7 @@ XMFLOAT3 Enemy::spawnRandom(XMFLOAT3& randSpawn)
 
 void Enemy::Draw()
 {
-	enemy->Draw();
+	enemyObj->Draw();
 }
 
 void Enemy::Finalize()

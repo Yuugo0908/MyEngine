@@ -271,3 +271,16 @@ void Camera::CameraShake(bool& flag)
 	SetTarget(target);
 	Update();
 }
+
+XMFLOAT3 Camera::CameraTrack(XMFLOAT3 pPos)
+{
+	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 0 };
+	XMVECTOR cameraPos = { eye.x, eye.y, eye.z, 0 };
+
+	XMVECTOR subCameraPlayer = XMVectorSubtract(playerPos, cameraPos);
+	cameraLength= XMVector3Normalize(subCameraPlayer);
+
+	XMFLOAT3 cameraTrack = { cameraLength.m128_f32[0], cameraLength.m128_f32[1], cameraLength.m128_f32[2] };
+
+	return cameraTrack;
+}

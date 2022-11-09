@@ -44,7 +44,7 @@ void Rope::Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d
 		pEaseFlag = false;
 		eEaseFlag = false;
 
-		if (!rThrowFlag && !rBackFlag && mouse->TriggerMouseLeft())
+		if (!rThrowFlag && !rBackFlag && keyboard->TriggerKey(DIK_F))
 		{
 			moveFlag = false;
 			rThrowFlag = true;
@@ -59,6 +59,10 @@ void Rope::Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d
 			Throw(pPos, ePos, rPos, rScale, object);
 		}
 
+		if (Collision::CollisionObject(object, ropeObj))
+		{
+			Collision();
+		}
 		ropeObj->Update();
 		return;
 	}
@@ -118,8 +122,6 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 
 	XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
 
-	Collision(object);
-
 	if (rThrowFlag)
 	{
 		if (rRotFlag)
@@ -134,19 +136,18 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 			manageRopePos.x += subPE.x;
 			manageRopePos.y += subPE.y;
 			manageRopePos.z += subPE.z;
-			rRotFlag = true;
 		}
 		else
 		{
 			ropeObj->SetRotation({ 0, 0, 0 });
-			manageRopePos.z += 0.7f;
+			manageRopePos.z += 0.6f;
 			rRotFlag = false;
 		}
 		ray.start = XMVectorSet(manageRopePos.x, manageRopePos.y, manageRopePos.z, 1);
 
 		manageRopeScale.x += 0.02f;
 		manageRopeScale.y += 0.02f;
-		manageRopeScale.z += 0.7f;
+		manageRopeScale.z += 0.6f;
 
 		easing->EaseOutUpdate(rPos, manageRopePos, rPos, rThrowFlag, avoidTime);
 		easing->EaseOutUpdate(rScale, manageRopeScale, rPos, rThrowFlag, avoidTime);
@@ -176,13 +177,13 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 		}
 		else
 		{
-			manageRopePos.z -= 0.7f;
+			manageRopePos.z -= 0.6f;
 		}
 		ray.start = XMVectorSet(manageRopePos.x, manageRopePos.y, manageRopePos.z, 1);
 
 		manageRopeScale.x -= 0.02f;
 		manageRopeScale.y -= 0.02f;
-		manageRopeScale.z -= 0.7f;
+		manageRopeScale.z -= 0.6f;
 
 		easing->EaseOutUpdate(rPos, manageRopePos, rPos, rBackFlag, avoidTime);
 		easing->EaseOutUpdate(rScale, manageRopeScale, rPos, rBackFlag, avoidTime);
@@ -199,20 +200,15 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 	}
 }
 
-void Rope::Collision(const std::unique_ptr<Object3d>& object)
+void Rope::Collision()
 {
-	if (!Collision::CollisionObject(object, ropeObj))
-	{
-		return;
-	}
-
 	manageRopePos = {};
 	manageRopeScale = {};
 	avoidTime = 0.0f;
 	rThrowFlag = false;
 	rBackFlag = false;
 	rRotFlag = false;
-	if (mouse->PushMouseLeft())
+	if (keyboard->PushKey(DIK_F))
 	{
 		eEaseFlag = true;
 	}

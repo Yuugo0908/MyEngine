@@ -261,8 +261,6 @@ void GameScene::LightUpdate()
 void GameScene::CameraUpdate()
 {
 	camera->SetTarget(pPos);
-	//cPos = camera->GetEye();
-	//cTarget = camera->GetTarget();
 
 	cameraLength = { cPos.x - pPos.x, cPos.y - pPos.y, cPos.z - pPos.z, 1.0f };
 	cameraLength = XMVector3Normalize(cameraLength);
@@ -272,6 +270,9 @@ void GameScene::CameraUpdate()
 	{
 		camera->CameraShake(shakeFlag);
 	}
+
+	cPos = camera->GetEye();
+	cTarget = camera->GetTarget();
 	camera->Update();
 }
 

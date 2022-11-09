@@ -62,6 +62,8 @@ public: // 静的メンバ関数
 	void UpdateProjectionMatrix();
 	// カメラのシェイクを実行
 	void CameraShake(bool& flag);
+	// カメラの追尾
+	XMFLOAT3 CameraTrack(XMFLOAT3 pPos);
 
 
 private: // メンバ変数
@@ -86,6 +88,8 @@ private: // メンバ変数
 	XMFLOAT3 target = { 0, 0, 0 };
 	// 上方向ベクトル
 	XMFLOAT3 up = { 0, 1, 0 };
+	// カメラと対象物までの距離
+	XMVECTOR cameraLength = {};
 	// ビュー行列ダーティフラグ
 	bool viewDirty = false;
 	// 射影行列ダーティフラグ

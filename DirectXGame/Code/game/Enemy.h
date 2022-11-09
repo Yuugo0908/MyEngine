@@ -20,6 +20,8 @@ public:
 
 	bool Initialize(Player* player, Bullet* bullet);
 
+	bool Create();
+
 	void Update();
 
 	void Finalize();
@@ -30,7 +32,7 @@ public:
 
 	XMFLOAT3 spawnRandom(XMFLOAT3& rnadSpawn);
 
-	const std::unique_ptr<Object3d>& GetObj() { return enemy; }
+	const std::unique_ptr<Object3d>& GetObj() { return enemyObj; }
 
 	const XMFLOAT3& GetPos() { return ePos; }
 	void SetPos(XMFLOAT3 ePos) { this->ePos = ePos; }
@@ -49,7 +51,8 @@ private:
 	Bullet* bullet = nullptr;
 
 	Model* enemyModel = nullptr;
-	std::unique_ptr<Object3d> enemy = nullptr;
+	std::unique_ptr<Object3d> enemyObj = nullptr;
+	std::list<Enemy> enemy;
 
 	// エネミー
 	XMFLOAT3 ePos = {};
