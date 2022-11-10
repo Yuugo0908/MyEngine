@@ -118,6 +118,7 @@ void Camera::Update()
 	bool dirty = false;
 	float angleX = 0;
 	float angleY = 0;
+	float speed = 0.75f;
 
 	// マウスの入力を取得
 	Mouse::MouseMove mouseMove = mouse->GetMouseMove();
@@ -127,7 +128,7 @@ void Camera::Update()
 	//float dx = mouseMove.MouseY * scaleX;
 
 	//angleX = -dx * XM_PI;
-	angleY = -dy * XM_PI;
+	angleY = -dy * XM_PI * speed;
 	dirty = true;
 
 	// ホイール入力で距離を変更

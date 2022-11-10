@@ -52,10 +52,18 @@ public: // メンバ関数
 
 private: // メンバ変数
 
+	WinApp* winApp = nullptr;
+
 	// デバイス関連
 	ComPtr<IDirectInput8> dinput;
 	ComPtr<IDirectInputDevice8> devMouse;
 	DIMOUSESTATE2 mouseState = {};
 	DIMOUSESTATE2 mouseStatePre = {};
+
+	// ウィンドウ座標取得用
+	HWND hwnd = NULL;
+	RECT rcClient;
+	POINT ptClientUL;
+	POINT ptClientLR;
 };
 

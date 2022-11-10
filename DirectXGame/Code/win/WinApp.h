@@ -20,9 +20,10 @@ public: // メンバ関数
 	void TerminateGameWindow();
 	// メッセージの処理
 	bool ProcessMessage();
+
 	// ウィンドウハンドルの取得
 	HWND GetHwnd() { return hwnd; }
-
+	// インスタンスの取得
 	HINSTANCE GetInstance() { return wndClass.hInstance; }
 
 private: // メンバ変数

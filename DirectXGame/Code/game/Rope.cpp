@@ -44,7 +44,7 @@ void Rope::Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d
 		pEaseFlag = false;
 		eEaseFlag = false;
 
-		if (!rThrowFlag && !rBackFlag && keyboard->TriggerKey(DIK_F))
+		if (!rThrowFlag && !rBackFlag && mouse->TriggerMouseLeft())
 		{
 			moveFlag = false;
 			rThrowFlag = true;
@@ -208,7 +208,7 @@ void Rope::Collision()
 	rThrowFlag = false;
 	rBackFlag = false;
 	rRotFlag = false;
-	if (keyboard->PushKey(DIK_F))
+	if (mouse->PushMouseLeft())
 	{
 		eEaseFlag = true;
 	}

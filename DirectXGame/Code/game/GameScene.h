@@ -133,4 +133,6 @@ private: // メンバ変数
 	int shakeTime = 0;
 
 	float length = 0.0f;
+
+	bool poseFlag = false;
 };

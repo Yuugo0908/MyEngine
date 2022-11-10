@@ -15,6 +15,9 @@ bool Mouse::Initialize(WinApp* win_app)
 	HRESULT result = S_FALSE;
 
 	assert(!dinput);
+	assert(win_app);
+
+	this->winApp = win_app;
 
 	// DirectInputオブジェクトの生成	
 	result = DirectInput8Create(win_app->GetInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dinput, nullptr);
@@ -62,6 +65,30 @@ void Mouse::Update()
 		// マウスの入力
 		result = devMouse->GetDeviceState(sizeof(mouseState), &mouseState);
 		ShowCursor(false);
+		hwnd = winApp->GetHwnd();
+		GetClientRect(hwnd, &rcClient);
+
+		ptClientUL.x = rcClient.left;
+		ptClientUL.y = rcClient.top;
+		ptClientLR.x = rcClient.right + 1;
+		ptClientLR.y = rcClient.bottom + 1;
+		ClientToScreen(hwnd, &ptClientUL);
+		ClientToScreen(hwnd, &ptClientLR);
+
+		SetRect(&rcClient, ptClientUL.x, ptClientUL.y,
+			ptClientLR.x, ptClientLR.y);
+
+		// アクティブ状態ならカーソル移動を制限
+		if (GetActiveWindow())
+		{
+			ClipCursor(&rcClient);
+			ShowCursor(false);
+		}
+		else
+		{
+			ClipCursor(NULL);
+			ShowCursor(true);
+		}
 	}
 }
 

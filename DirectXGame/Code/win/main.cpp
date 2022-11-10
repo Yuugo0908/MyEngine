@@ -90,8 +90,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		keyboard->Update();
 		controller->Update();
 		mouse->Update();
-		// ゲームシーンの毎フレーム処理
-		gameScene->Update();
+
+		if (GetActiveWindow())
+		{
+			// ゲームシーンの毎フレーム処理
+			gameScene->Update();
+		}
 
 #pragma endregion DirectX毎フレーム処理
 
@@ -121,6 +125,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//解放
 	// 各種解放
+	// 終了時にカーソル移動の制限を解除
+	ClipCursor(NULL);
 	safe_delete(gameScene);
 	safe_delete(audio);
 	safe_delete(image2d);
