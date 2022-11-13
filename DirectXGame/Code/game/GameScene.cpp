@@ -64,11 +64,17 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	result = Image2d::Create(2, { 0.0f,0.0f });
 	result->SetSize({ 1280.0f,720.0f });
 
-	item->Initialize();
-	rope->Initialize(keyboard, mouse);
+	//rope->Initialize(keyboard, mouse);
 	player->Initialize(keyboard, mouse);
 	bullet->Initialize();
-	enemy->Initialize(player, bullet);
+	for (int i = 0; i < enemyCount; i++)
+	{
+		std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
+		newEnemy->Initialize(bullet, player);
+
+		enemys.push_back(std::move(newEnemy));
+		eAlive = true;
+	}
 
 	// .objの名前を指定してモデルを読み込む
 	skydomeModel = skydomeModel->CreateFromObject("skydome");
@@ -104,7 +110,7 @@ void GameScene::Finalize()
 {
 	player->Finalize();
 	enemy->Finalize();
-	rope->Finalize();
+	//rope->Finalize();
 	bullet->Finalize();
 }
 
@@ -114,43 +120,54 @@ void GameScene::Update() {
 	{
 		if (keyboard->TriggerKey(DIK_SPACE))
 		{
+			for (std::unique_ptr<Enemy>& enemy : enemys)
+			{
+				oldrandPos = enemy->GetrandPos();
+				enemy->Spawn(oldrandPos);
+			}
 			nowScene = 1;
 		}
 	}
 
 	if (nowScene == 1)
 	{
-		CollisionUpdate();
+		//CollisionUpdate();
 		LightUpdate();
 		CameraUpdate();
 
-		rFlag = rope->GetrFlag();
-		moveFlag = rope->GetmoveFlag();
-		eAlive = enemy->GetAlive();
+		//rFlag = rope->GetrFlag();
+		//moveFlag = rope->GetmoveFlag();
+		//eAlive = enemy->GetAlive();
 		attackFlag = bullet->GetAttackFlag();
 
 		bullet->Update(pPos, ePos);
 		player->Update(rFlag, moveFlag);
-		enemy->Update();
+
+		if (eAlive)
+		{
+			for (std::unique_ptr<Enemy>& enemy : enemys)
+			{
+				enemy->Update(pPos, bPos);
+			}
+		}
 
 		pPos = player->GetPos();
-		ePos = enemy->GetPos();
+		//ePos = enemy->GetPos();
 		bPos = bullet->GetPos();
 
 		length = GetLength(pPos, ePos);
 
-		rope->Update(pPos, ePos, enemy->GetObj());
-		item->Update();
+		//rope->Update(pPos, ePos, enemy->GetObj());
 
 		player->SetPos(pPos);
-		enemy->SetPos(ePos);
+		//enemy->SetPos(ePos);
 		bullet->SetPos(bPos);
 
 		skydome->Update();
 		stage->Update();
 		mouse->Update();
 
-		if (enemyCount == 5)
+		if (enemyCount == 0)
 		{
 			nowScene = 2;
 		}
@@ -185,16 +202,19 @@ void GameScene::Draw() {
 
 	if (eAlive)
 	{
-		enemy->Draw();
+		for (std::unique_ptr<Enemy>& enemy : enemys)
+		{
+			enemy->Draw();
+		}
 	}
+
 	if (attackFlag)
 	{
 		bullet->Draw();
 	}
 	skydome->Draw();
 	stage->Draw();
-	rope->Draw();
-	item->Draw();
+	//rope->Draw();
 
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
@@ -278,7 +298,7 @@ void GameScene::CameraUpdate()
 
 void GameScene::CollisionUpdate()
 {
-	if (rFlag && Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
+	if (Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
 	{
 		shakeFlag = true;
 		eAlive = false;
@@ -286,14 +306,9 @@ void GameScene::CollisionUpdate()
 		moveFlag = true;
 		attackFlag = false;
 		bullet->SetAttackFlag(attackFlag);
-		rope->SetrFlag(rFlag);
-		rope->SetmoveFlag(moveFlag);
+		//rope->SetrFlag(rFlag);
+		//rope->SetmoveFlag(moveFlag);
 		enemy->SetAlive(eAlive);
 		//enemyCount++;
-	}
-
-	if (Collision::CollisionObject(player->GetObj(), item->GetObj()))
-	{
-		shakeFlag = true;
 	}
 }

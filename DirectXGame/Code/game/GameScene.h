@@ -78,6 +78,9 @@ private: // メンバ変数
 	Bullet* bullet = nullptr;
 	Item* item = Item::GetInstance();
 
+	// 複数生成用リスト
+	std::list<std::unique_ptr<Enemy>> enemys;
+
 	// ゲームシーン用
 	// 3dモデル
 	Model* skydomeModel = nullptr;
@@ -98,7 +101,8 @@ private: // メンバ変数
 	XMFLOAT3 ePos = {};
 	bool eFlag = false; // 自由落下のフラグ
 	bool eAlive = false;// 生きているかのフラグ
-	int enemyCount = 0; // 倒した数
+	int enemyCount = 5; // 生きている敵の数
+	float oldrandPos;
 
 	// バレット
 	XMFLOAT3 bPos = {};

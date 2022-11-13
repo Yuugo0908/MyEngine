@@ -34,8 +34,8 @@ void Player::Update(bool rFlag, bool moveFlag)
 	cameraTrack = cameraTrack * pSpeed;
 
 	// ˆÚ“®
-	if (moveFlag)
-	{
+	//if (moveFlag)
+	//{
 		rate = 1.0f;
 		// ˆÚ“®—Ê‚Ì”{”ŒvŽZ
 		if (keyboard->PushKey(DIK_A) || keyboard->PushKey(DIK_D))
@@ -69,7 +69,7 @@ void Player::Update(bool rFlag, bool moveFlag)
 			pPos.x -= cameraTrack.x;
 			pPos.z -= cameraTrack.z;
 		}
-	}
+	//}
 
 	//pPos = playerObj->GetPosition();
 	playerObj->Update();

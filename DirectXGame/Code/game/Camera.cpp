@@ -211,8 +211,7 @@ void Camera::UpdateViewMatrix()
 	cameraAxisY = XMVector3Cross(cameraAxisZ, cameraAxisX);
 
 	// ここまでで直交した3方向のベクトルが揃う
-	//（ワールド座標系でのカメラの右方向、上方向、前方向）	
-
+	// （ワールド座標系でのカメラの右方向、上方向、前方向）
 	// カメラ回転行列
 	XMMATRIX matCameraRot;
 	// カメラ座標系→ワールド座標系の変換行列

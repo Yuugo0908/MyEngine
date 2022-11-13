@@ -18,11 +18,9 @@ public:
 		move,
 	};
 
-	bool Initialize(Player* player, Bullet* bullet);
+	bool Initialize(Bullet* bullet, Player* player);
 
-	bool Create();
-
-	void Update();
+	void Update(const XMFLOAT3 pPos, const XMFLOAT3 bPos);
 
 	void Finalize();
 
@@ -30,7 +28,9 @@ public:
 
 	void Move();
 
-	XMFLOAT3 spawnRandom(XMFLOAT3& rnadSpawn);
+	void Spawn(float oldrandPos);
+
+	void Collision();
 
 	const std::unique_ptr<Object3d>& GetObj() { return enemyObj; }
 
@@ -40,6 +40,8 @@ public:
 	const bool& GetAlive() { return eAlive; }
 	void SetAlive(bool eAlive) { this->eAlive = eAlive; }
 
+	const float& GetrandPos() { return randPos.y; }
+
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
 		XMFLOAT3 len = { posA.x - posB.x, posA.y - posB.y, posA.z - posB.z };
@@ -47,12 +49,12 @@ public:
 	}
 
 private:
-	Player* player = nullptr;
+
 	Bullet* bullet = nullptr;
+	Player* player = nullptr;
 
 	Model* enemyModel = nullptr;
 	std::unique_ptr<Object3d> enemyObj = nullptr;
-	std::list<Enemy> enemy;
 
 	// エネミー
 	XMFLOAT3 ePos = {};
@@ -65,7 +67,10 @@ private:
 	int enemyCount = 0; // 倒した数
 	bool attackFlag = false;
 	Phase phase = Enemy::Phase::move;
-	XMFLOAT3 spawnPos = {}; // ランダムなスポーン位置
+	XMFLOAT3 randPos = {}; // ランダムなスポーン位置
+	float oldrandPos = 0.0f;
+	bool shakeFlag = false;
+	bool randFlag = false;
 
 	// バレット
 	XMFLOAT3 bPos = {};
