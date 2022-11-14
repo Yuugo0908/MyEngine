@@ -26,7 +26,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	easing = new Easing;
 	rope = new Rope;
 	player = new Player;
-	enemy = new Enemy;
+	//enemy = new Enemy;
 	bullet = new Bullet;
 
 	// デバイスのセット
@@ -71,9 +71,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	{
 		std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
 		newEnemy->Initialize(bullet, player);
+		eAlive = true;
+		newEnemy->SetAlive(eAlive);
 
 		enemys.push_back(std::move(newEnemy));
-		eAlive = true;
 	}
 
 	// .objの名前を指定してモデルを読み込む
@@ -109,7 +110,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 void GameScene::Finalize()
 {
 	player->Finalize();
-	enemy->Finalize();
+	//enemy->Finalize();
 	//rope->Finalize();
 	bullet->Finalize();
 }
@@ -122,8 +123,7 @@ void GameScene::Update() {
 		{
 			for (std::unique_ptr<Enemy>& enemy : enemys)
 			{
-				oldrandPos = enemy->GetrandPos();
-				enemy->Spawn(oldrandPos);
+				enemy->Spawn();
 			}
 			nowScene = 1;
 		}
@@ -131,7 +131,7 @@ void GameScene::Update() {
 
 	if (nowScene == 1)
 	{
-		//CollisionUpdate();
+		CollisionUpdate();
 		LightUpdate();
 		CameraUpdate();
 
@@ -143,9 +143,9 @@ void GameScene::Update() {
 		bullet->Update(pPos, ePos);
 		player->Update(rFlag, moveFlag);
 
-		if (eAlive)
+		for (std::unique_ptr<Enemy>& enemy : enemys)
 		{
-			for (std::unique_ptr<Enemy>& enemy : enemys)
+			if (enemy->GetAlive())
 			{
 				enemy->Update(pPos, bPos);
 			}
@@ -200,9 +200,9 @@ void GameScene::Draw() {
 	// 3Dオブクジェクトの描画
 	player->Draw();
 
-	if (eAlive)
+	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
-		for (std::unique_ptr<Enemy>& enemy : enemys)
+		if (enemy->GetAlive())
 		{
 			enemy->Draw();
 		}
@@ -298,17 +298,36 @@ void GameScene::CameraUpdate()
 
 void GameScene::CollisionUpdate()
 {
-	if (Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
+	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
+		if (!Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
+		{
+			continue;
+		}
+
 		shakeFlag = true;
 		eAlive = false;
-		rFlag = false;
-		moveFlag = true;
-		attackFlag = false;
-		bullet->SetAttackFlag(attackFlag);
-		//rope->SetrFlag(rFlag);
-		//rope->SetmoveFlag(moveFlag);
 		enemy->SetAlive(eAlive);
-		//enemyCount++;
+			//rFlag = false;
+			//moveFlag = true;
+			//attackFlag = false;
+			//bullet->SetAttackFlag(attackFlag);
+			//rope->SetrFlag(rFlag);
+			//rope->SetmoveFlag(moveFlag);
+			//enemyCount++;
+			//enemys.remove_if(enemyDelete(enemy));
+		enemys.remove(enemy);
+		break;
 	}
+
+}
+
+bool GameScene::enemyDelete(std::unique_ptr<Enemy>& enemy)
+{
+	eAlive = enemy->GetAlive();
+	if (!eAlive)
+	{
+		return true;
+	}
+	return false;
 }

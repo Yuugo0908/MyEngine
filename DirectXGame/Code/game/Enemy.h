@@ -28,7 +28,7 @@ public:
 
 	void Move();
 
-	void Spawn(float oldrandPos);
+	void Spawn();
 
 	void Collision();
 
@@ -63,12 +63,10 @@ private:
 	float eVal = 0.2f; // 速度
 	float eGra = 0.1f; // 重力
 	bool eAlive = false;// 生きているかのフラグ
-	int eAliveCount = 0;
-	int enemyCount = 0; // 倒した数
+	int eAliveCount = 5;
 	bool attackFlag = false;
 	Phase phase = Enemy::Phase::move;
 	XMFLOAT3 randPos = {}; // ランダムなスポーン位置
-	float oldrandPos = 0.0f;
 	bool shakeFlag = false;
 	bool randFlag = false;
 

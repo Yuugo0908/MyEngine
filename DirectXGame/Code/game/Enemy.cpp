@@ -72,19 +72,13 @@ void Enemy::Move()
 	ePos.z += subPE.z / 5;
 }
 
-void Enemy::Spawn(float oldrandPos)
+void Enemy::Spawn()
 {
-	srand((unsigned int)time(NULL));
-	while (1)
+	for (int i = 0; i < eAliveCount; i++)
 	{
 		randPos.x = (float)(-40 + rand() % 80);
 		randPos.y = (float)(-3 + rand() % 3);
 		randPos.z = (float)(-40 + rand() % 80);
-
-		if (ePos.y != randPos.y)
-		{
-			break;
-		}
 	}
 
 	phase = Enemy::Phase::move;
