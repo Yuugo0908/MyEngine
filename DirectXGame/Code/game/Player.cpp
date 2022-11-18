@@ -26,16 +26,15 @@ bool Player::Initialize(Keyboard* keyboard, Mouse* mouse)
 
 void Player::Update(bool rFlag, bool moveFlag)
 {
-	Jump();
-	Rush(rFlag);
-	playerObj->SetPosition(pPos);
-
 	cameraTrack = camera->CameraTrack(pPos);
 	cameraTrack = cameraTrack * pSpeed;
+	playerObj->SetPosition(pPos);
+	if (moveFlag)
+	{
+		Jump();
+		Rush(rFlag);
 
-	// ˆÚ“®
-	//if (moveFlag)
-	//{
+		// ˆÚ“®
 		rate = 1.0f;
 		// ˆÚ“®—Ê‚Ì”{”ŒvŽZ
 		if (keyboard->PushKey(DIK_A) || keyboard->PushKey(DIK_D))
@@ -69,7 +68,7 @@ void Player::Update(bool rFlag, bool moveFlag)
 			pPos.x -= cameraTrack.x;
 			pPos.z -= cameraTrack.z;
 		}
-	//}
+	}
 
 	//pPos = playerObj->GetPosition();
 	playerObj->Update();

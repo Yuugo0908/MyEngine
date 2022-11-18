@@ -15,7 +15,7 @@ bool Rope::Initialize(Keyboard* keyboard, Mouse* mouse)
 	ropeObj->SetModel(ropeModel);
 
 	// 位置、スケールを変数に格納
-	ropeObj->SetScale({ 0.2f, 0.2f, 0.2f });
+	ropeObj->SetScale({ 0.0f, 0.0f, 0.0f });
 	rPos = ropeObj->GetPosition();
 	rScale = ropeObj->GetScale();
 	ropeObj->Update();

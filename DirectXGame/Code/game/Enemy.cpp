@@ -1,25 +1,59 @@
 #include "Enemy.h"
 
-bool Enemy::Initialize(Bullet* bullet, Player* player)
+bool Enemy::Initialize(Player* player, Bullet* bullet)
 {
-	assert(bullet);
 	assert(player);
-	this->bullet = bullet;
+	assert(bullet);
 	this->player = player;
+	this->bullet = bullet;
 
 	enemyModel = enemyModel->CreateFromObject("sphere");
 	enemyObj = Object3d::Create();
 	enemyObj->SetModel(enemyModel);
 
+	enemyObj->SetPosition({ 0.0f, 100.0f, 0.0f });
+	enemyObj->SetScale({ 1.0f, 1.0f, 1.0f });
+	enemyObj->SetColor({ 0.0f, 0.8f, 0.0f, 1.0f});
+	ePos = enemyObj->GetPosition();
+
 	return true;
 }
 
-void Enemy::Update(const XMFLOAT3 pPos, const XMFLOAT3 bPos)
+bool Enemy::Create()
 {
-	this->pPos = pPos;
-	this->bPos = bPos;
+	return false;
+}
 
+void Enemy::Update()
+{
+	bPos = bullet->GetPos();
+	attackFlag = bullet->GetAttackFlag();
+	bullet->Update(pPos, ePos);
+
+	if (!eAlive)
+	{
+		eAliveCount++;
+		enemyObj->SetPosition({ 0.0f, 100.0f, 0.0f });
+
+		if (eAliveCount == 60)
+		{
+			pPos = player->GetPos();
+			Spawn();
+			eAlive = true;
+			eAliveCount = 0;
+		}
+
+		attackFlag = false;
+		bullet->SetAttackFlag(attackFlag);
+		ePos = enemyObj->GetPosition();
+		enemyObj->Update();
+		bullet->SetPos(ePos);
+		return;
+	}
+
+	pPos = player->GetPos();
 	PElength = GetLength(pPos, ePos);
+	lengthOld = GetLength(ePos, oldePos);
 
 	if (ePos.y > 0.0f)
 	{
@@ -32,23 +66,32 @@ void Enemy::Update(const XMFLOAT3 pPos, const XMFLOAT3 bPos)
 		ePos.y = 0.0f;
 		eVal = 0.0f;
 
+		if (!attackFlag && lengthOld > 50.0f)
+		{
+			phase = Enemy::Phase::stay;
+		}
+		else if (PElength <= 30.0f)
+		{
+			phase = Enemy::Phase::attack;
+			attackFlag = true;
+			bullet->SetAttackFlag(attackFlag);
+		}
+		else if (!attackFlag && PElength > 30.0f && PElength <= 50.0f)
+		{
+			phase = Enemy::Phase::move;
+		}
+
 		switch (phase)
 		{
-		case Enemy::Phase::attack:
 		default:
-			//if (!attackFlag && PElength >= 15.0f)
-			//{
-			//	phase = Enemy::Phase::move;
-			//}
-			//bullet->Attack(player->GetObj(), ePos);
+		case Enemy::Phase::attack:
+			bullet->Attack();
 			break;
 		case Enemy::Phase::move:
-			//if (PElength < 15.0f)
-			//{
-			//	phase = Enemy::Phase::attack;
-			//}
 			Move();
-			//Collision();
+			break;
+		case Enemy::Phase::stay:
+			Stay();
 			break;
 		}
 	}
@@ -72,28 +115,40 @@ void Enemy::Move()
 	ePos.z += subPE.z / 5;
 }
 
+void Enemy::Stay()
+{
+	XMVECTOR oldEnemyPos = { oldePos.x, oldePos.y, oldePos.z, 1 };
+	XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
+
+	XMVECTOR subOldEnemy = XMVectorSubtract(oldEnemyPos, enemyPos);
+	XMVECTOR NsubOldEnemy = XMVector3Normalize(subOldEnemy);
+
+	XMFLOAT3 subPE = { NsubOldEnemy.m128_f32[0], NsubOldEnemy.m128_f32[1], NsubOldEnemy.m128_f32[2] };
+
+	if (lengthOld <= 0.3f)
+	{
+		ePos = oldePos;
+	}
+	else
+	{
+		ePos.x += subPE.x / 5;
+		ePos.y += subPE.y / 5;
+		ePos.z += subPE.z / 5;
+	}
+}
+
 void Enemy::Spawn()
 {
-	for (int i = 0; i < eAliveCount; i++)
-	{
-		randPos.x = (float)(-40 + rand() % 80);
-		randPos.y = (float)(-3 + rand() % 3);
-		randPos.z = (float)(-40 + rand() % 80);
-	}
+	randPos.x = (float)(-40 + rand() % 80);
+	randPos.y = (float)(-3 + rand() % 3);
+	randPos.z = (float)(-40 + rand() % 80);
 
 	phase = Enemy::Phase::move;
 	enemyObj->SetPosition({ randPos.x, 5.0f, randPos.z });
 	enemyObj->SetScale({ 1.0f, 1.0f, 1.0f });
+	enemyObj->SetColor({ 0.0f, 0.8f, 0.0f, 1.0f });
 	ePos = enemyObj->GetPosition();
-}
-
-void Enemy::Collision()
-{
-	if (Collision::CollisionObject(player->GetObj(), enemyObj))
-	{
-		Camera::GetInstance()->CameraShake(shakeFlag);
-		eAlive = false;
-	}
+	oldePos = { ePos.x, 0.0f, ePos.z };
 }
 
 void Enemy::Draw()

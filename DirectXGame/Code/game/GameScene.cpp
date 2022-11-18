@@ -26,7 +26,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	easing = new Easing;
 	rope = new Rope;
 	player = new Player;
-	//enemy = new Enemy;
+	enemy = new Enemy;
 	bullet = new Bullet;
 
 	// デバイスのセット
@@ -64,18 +64,44 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	result = Image2d::Create(2, { 0.0f,0.0f });
 	result->SetSize({ 1280.0f,720.0f });
 
-	//rope->Initialize(keyboard, mouse);
+	if (!Image2d::LoadTexture(3, L"Resources/HPText.png")) {
+		assert(0);
+	}
+	HPText = Image2d::Create(3, { 0.0f,0.0f });
+	HPText->SetSize({ 1280.0f,720.0f });
+
+	if (!Image2d::LoadTexture(4, L"Resources/HPBar.png")) {
+		assert(0);
+	}
+	PlayerHPBar = Image2d::Create(4, { 0.0f,45.0f });
+	PlayerHPBar->SetSize({ 360.0f,60.0f });
+	EnemyHPBar = Image2d::Create(4, { 0.0f,160.0f });
+	EnemyHPBar->SetSize({ 360.0f,60.0f });
+
+	if (!Image2d::LoadTexture(5, L"Resources/PlayerHPGauge.png")) {
+		assert(0);
+	}
+	PlayerHPGauge = Image2d::Create(5, { 0.0f,45.0f });
+	PlayerHPGauge->SetSize({ 30.0f,60.0f });
+
+
+	if (!Image2d::LoadTexture(6, L"Resources/EnemyHPGauge.png")) {
+		assert(0);
+	}
+	EnemyHPGauge = Image2d::Create(6, { 0.0f,160.0f });
+	EnemyHPGauge->SetSize({ 30.0f,60.0f });
+
+	if (!Image2d::LoadTexture(7, L"Resources/GameOver.png")) {
+		assert(0);
+	}
+	GameOver = Image2d::Create(7, { 0.0f,0.0f });
+	GameOver->SetSize({ 1280.0f,720.0f });
+
+	//item->Initialize();
+	rope->Initialize(keyboard, mouse);
 	player->Initialize(keyboard, mouse);
 	bullet->Initialize();
-	for (int i = 0; i < enemyCount; i++)
-	{
-		std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
-		newEnemy->Initialize(bullet, player);
-		eAlive = true;
-		newEnemy->SetAlive(eAlive);
-
-		enemys.push_back(std::move(newEnemy));
-	}
+	enemy->Initialize(player, bullet);
 
 	// .objの名前を指定してモデルを読み込む
 	skydomeModel = skydomeModel->CreateFromObject("skydome");
@@ -110,8 +136,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 void GameScene::Finalize()
 {
 	player->Finalize();
-	//enemy->Finalize();
-	//rope->Finalize();
+	enemy->Finalize();
+	rope->Finalize();
 	bullet->Finalize();
 }
 
@@ -121,10 +147,6 @@ void GameScene::Update() {
 	{
 		if (keyboard->TriggerKey(DIK_SPACE))
 		{
-			for (std::unique_ptr<Enemy>& enemy : enemys)
-			{
-				enemy->Spawn();
-			}
 			nowScene = 1;
 		}
 	}
@@ -135,41 +157,40 @@ void GameScene::Update() {
 		LightUpdate();
 		CameraUpdate();
 
-		//rFlag = rope->GetrFlag();
-		//moveFlag = rope->GetmoveFlag();
-		//eAlive = enemy->GetAlive();
+		rFlag = rope->GetrFlag();
+		moveFlag = rope->GetmoveFlag();
+		eAlive = enemy->GetAlive();
 		attackFlag = bullet->GetAttackFlag();
 
-		bullet->Update(pPos, ePos);
+		//bullet->Update(pPos, ePos);
 		player->Update(rFlag, moveFlag);
-
-		for (std::unique_ptr<Enemy>& enemy : enemys)
-		{
-			if (enemy->GetAlive())
-			{
-				enemy->Update(pPos, bPos);
-			}
-		}
+		enemy->Update();
 
 		pPos = player->GetPos();
-		//ePos = enemy->GetPos();
+		ePos = enemy->GetPos();
 		bPos = bullet->GetPos();
 
 		length = GetLength(pPos, ePos);
 
-		//rope->Update(pPos, ePos, enemy->GetObj());
+		rope->Update(pPos, ePos, enemy->GetObj());
+		//item->Update();
 
 		player->SetPos(pPos);
-		//enemy->SetPos(ePos);
-		bullet->SetPos(bPos);
+		enemy->SetPos(ePos);
+		//bullet->SetPos(bPos);
 
 		skydome->Update();
 		stage->Update();
 		mouse->Update();
 
-		if (enemyCount == 0)
+		if (enemyHp == 0)
 		{
 			nowScene = 2;
+		}
+
+		if (playerHp == 0)
+		{
+			nowScene = 3;
 		}
 	}
 }
@@ -180,7 +201,7 @@ void GameScene::reset()
 
 void GameScene::Draw() {
 
-	SetImgui();
+	//SetImgui();
 
 #pragma region 背景画像描画
 	// // 背景画像描画前処理
@@ -200,21 +221,18 @@ void GameScene::Draw() {
 	// 3Dオブクジェクトの描画
 	player->Draw();
 
-	for (std::unique_ptr<Enemy>& enemy : enemys)
+	if (eAlive)
 	{
-		if (enemy->GetAlive())
-		{
-			enemy->Draw();
-		}
+		enemy->Draw();
 	}
-
 	if (attackFlag)
 	{
 		bullet->Draw();
 	}
 	skydome->Draw();
 	stage->Draw();
-	//rope->Draw();
+	rope->Draw();
+	//item->Draw();
 
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
@@ -229,14 +247,25 @@ void GameScene::Draw() {
 	{
 		title->Draw();
 	}
+	if (nowScene == 1)
+	{
+		HPText->Draw();
+		PlayerHPBar->Draw();
+		EnemyHPBar->Draw();
 
+		PlayerHPGauge->SetSize({ playerHp,60 });
+		PlayerHPGauge->Draw();
+
+		EnemyHPGauge->SetSize({ enemyHp,60 });
+		EnemyHPGauge->Draw();
+	}
 	if (nowScene == 2)
 	{
 		result->Draw();
-		if (keyboard->TriggerKey(DIK_SPACE))
-		{
-			reset();
-		}
+	}
+	if (nowScene == 3)
+	{
+		GameOver->Draw();
 	}
 
 	// デバッグテキストの描画
@@ -298,36 +327,42 @@ void GameScene::CameraUpdate()
 
 void GameScene::CollisionUpdate()
 {
-	for (std::unique_ptr<Enemy>& enemy : enemys)
+	if (Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
 	{
-		if (!Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
-		{
-			continue;
-		}
-
+		bPos = {0, 100, 0};
 		shakeFlag = true;
 		eAlive = false;
+		moveFlag = true;
+		attackFlag = false;
+		bullet->SetPos(bPos);
+		bullet->SetAttackFlag(attackFlag);
+		rope->SetmoveFlag(moveFlag);
 		enemy->SetAlive(eAlive);
-			//rFlag = false;
-			//moveFlag = true;
-			//attackFlag = false;
-			//bullet->SetAttackFlag(attackFlag);
-			//rope->SetrFlag(rFlag);
-			//rope->SetmoveFlag(moveFlag);
-			//enemyCount++;
-			//enemys.remove_if(enemyDelete(enemy));
-		enemys.remove(enemy);
-		break;
+		if (rFlag)
+		{
+			enemyHp -= 72;
+		}
+		else
+		{
+			playerHp -= 72;
+		}
+
+		rFlag = false;
+		rope->SetrFlag(rFlag);
 	}
-
-}
-
-bool GameScene::enemyDelete(std::unique_ptr<Enemy>& enemy)
-{
-	eAlive = enemy->GetAlive();
-	if (!eAlive)
+	if (Collision::CollisionObject(bullet->GetObj(), player->GetObj()))
 	{
-		return true;
+		bPos = ePos;
+		bullet->SetPos(bPos);
+		bullet->Collision();
+		if (enemy->GetAlive())
+		{
+			playerHp -= 72;
+		}
 	}
-	return false;
+
+	//if (Collision::CollisionObject(player->GetObj(), item->GetObj()))
+	//{
+	//	shakeFlag = true;
+	//}
 }

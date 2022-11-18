@@ -16,11 +16,14 @@ public:
 	{
 		attack,
 		move,
+		stay,
 	};
 
-	bool Initialize(Bullet* bullet, Player* player);
+	bool Initialize(Player* player, Bullet* bullet);
 
-	void Update(const XMFLOAT3 pPos, const XMFLOAT3 bPos);
+	bool Create();
+
+	void Update();
 
 	void Finalize();
 
@@ -28,9 +31,9 @@ public:
 
 	void Move();
 
-	void Spawn();
+	void Stay();
 
-	void Collision();
+	void Spawn();
 
 	const std::unique_ptr<Object3d>& GetObj() { return enemyObj; }
 
@@ -40,8 +43,6 @@ public:
 	const bool& GetAlive() { return eAlive; }
 	void SetAlive(bool eAlive) { this->eAlive = eAlive; }
 
-	const float& GetrandPos() { return randPos.y; }
-
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
 		XMFLOAT3 len = { posA.x - posB.x, posA.y - posB.y, posA.z - posB.z };
@@ -49,26 +50,28 @@ public:
 	}
 
 private:
-
-	Bullet* bullet = nullptr;
 	Player* player = nullptr;
+	Bullet* bullet = nullptr;
 
 	Model* enemyModel = nullptr;
 	std::unique_ptr<Object3d> enemyObj = nullptr;
+	std::list<Enemy> enemy;
 
 	// エネミー
 	XMFLOAT3 ePos = {};
-	float PElength = {};
+	XMFLOAT3 oldePos = {};
+	float PElength = 0.0f;
+	float lengthOld = 0.0f;
 	bool eFlag = false; // 自由落下のフラグ
 	float eVal = 0.2f; // 速度
 	float eGra = 0.1f; // 重力
 	bool eAlive = false;// 生きているかのフラグ
-	int eAliveCount = 5;
+	int eAliveCount = 0;
+	int enemyCount = 0; // 倒した数
 	bool attackFlag = false;
 	Phase phase = Enemy::Phase::move;
 	XMFLOAT3 randPos = {}; // ランダムなスポーン位置
-	bool shakeFlag = false;
-	bool randFlag = false;
+	int attackCount = 0;
 
 	// バレット
 	XMFLOAT3 bPos = {};

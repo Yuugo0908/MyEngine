@@ -3,25 +3,38 @@
 bool Bullet::Initialize()
 {
 	bulletModel = bulletModel->CreateFromObject("sphere");
-	bullet = Object3d::Create();
-	bullet->SetModel(bulletModel);
-
-	bullet->SetPosition({ 0.0f, 100.0f, 0.0f });
-	bullet->SetScale({ 0.5, 0.5, 0.5 });
-	bullet->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
-	bPos = bullet->GetPosition();
+	bulletObj = Object3d::Create();
+	bulletObj->SetModel(bulletModel);
+	bulletObj->SetPosition({ 0.0f, 100.0f, 0.0f });
+	bulletObj->SetScale({ 0.5, 0.5, 0.5 });
+	bulletObj->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
 	return true;
 }
 
 void Bullet::Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos)
 {
+	//bPos = bulletObj->GetPosition();
 	if (shakeFlag)
 	{
 		Camera::GetInstance()->CameraShake(shakeFlag);
 	}
+
+	if (attackCount <= 30)
+	{
+		attackCount++;
+	}
+
+	if (GetLength(oldePos, bPos) >= 30.0f)
+	{
+		attackFlag = false;
+		bPos = ePos;
+		attackCount = 0;
+	}
+
 	if (!attackFlag)
 	{
 		bPos = ePos;
+		oldePos = ePos;
 
 		XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
 		XMVECTOR bulletPos = { ePos.x, ePos.y, ePos.z, 1 };
@@ -31,26 +44,18 @@ void Bullet::Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos)
 
 		bSpeed = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
 	}
-	bullet->SetPosition(bPos);
-	bullet->Update();
+
+	bulletObj->SetPosition(bPos);
+	bulletObj->Update();
 }
 
-void Bullet::Attack(const std::unique_ptr<Object3d>& object, const XMFLOAT3& ePos)
+void Bullet::Attack()
 {
-	attackFlag = true;
-	bPos.x += bSpeed.x / 3;
-	bPos.y += bSpeed.y / 3;
-	bPos.z += bSpeed.z / 3;
-
-	if (Collision::CollisionObject(object, bullet))
+	if (attackCount >= 30)
 	{
-		attackFlag = false;
-		shakeFlag = true;
-	}
-
-	if (GetLength(ePos, bPos) >= 30.0f)
-	{
-		attackFlag = false;
+		bPos.x += bSpeed.x / 2;
+		bPos.y += bSpeed.y / 3;
+		bPos.z += bSpeed.z / 2;
 	}
 }
 
@@ -61,5 +66,12 @@ void Bullet::Finalize()
 
 void Bullet::Draw()
 {
-	bullet->Draw();
+	bulletObj->Draw();
+}
+
+void Bullet::Collision()
+{
+	shakeFlag = true;
+	attackFlag = false;
+	attackCount = 0;
 }

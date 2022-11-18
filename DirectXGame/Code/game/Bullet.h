@@ -12,13 +12,15 @@ public: // メンバ関数
 
 	void Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos);
 
-	void Attack(const std::unique_ptr<Object3d>& object, const XMFLOAT3& ePos);
+	void Attack();
 
 	void Finalize();
 
 	void Draw();
 
-	const std::unique_ptr<Object3d>& GetObj() { return bullet; }
+	void Collision();
+
+	const std::unique_ptr<Object3d>& GetObj() { return bulletObj; }
 
 	const XMFLOAT3& GetPos() { return bPos; }
 	void SetPos(XMFLOAT3 bPos) { this->bPos = bPos; }
@@ -34,12 +36,16 @@ public: // メンバ関数
 
 private: // メンバ変数
 	Model* bulletModel = nullptr;
-	std::unique_ptr<Object3d> bullet = nullptr;
+	std::unique_ptr<Object3d> bulletObj = nullptr;
 
 	// バレット
 	XMFLOAT3 bPos = {};
 	XMFLOAT3 bSpeed = {};
 	bool attackFlag = false;
 	bool shakeFlag = false; // カメラのシェイク
+	int attackCount = 0;
+
+	// エネミー
+	XMFLOAT3 oldePos = {};
 };
 

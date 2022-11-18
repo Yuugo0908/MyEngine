@@ -54,8 +54,6 @@ public: // メンバ関数
 	void CameraUpdate();
 	// 当たり判定
 	void CollisionUpdate();
-	// 敵の削除
-	bool enemyDelete(std::unique_ptr<Enemy>& enemy);
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
@@ -76,13 +74,9 @@ private: // メンバ変数
 
 	Rope* rope = nullptr;
 	Player* player = nullptr;
-	//Enemy* enemy = nullptr;
+	Enemy* enemy = nullptr;
 	Bullet* bullet = nullptr;
 	Item* item = Item::GetInstance();
-
-	// 複数生成用リスト
-	std::list<std::unique_ptr<Enemy>> enemys;
-	//std::unique_ptr<Enemy>& enemy;
 
 	// ゲームシーン用
 	// 3dモデル
@@ -94,18 +88,24 @@ private: // メンバ変数
 	// 画像
 	Image2d* title = nullptr;
 	Image2d* result = nullptr;
+	Image2d* GameOver = nullptr;
+	Image2d* HPText = nullptr;
+	Image2d* PlayerHPBar = nullptr;
+	Image2d* PlayerHPGauge = nullptr;
+	Image2d* EnemyHPBar = nullptr;
+	Image2d* EnemyHPGauge = nullptr;
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
 	bool jumpFlag = false;//自由落下のフラグ
 	bool moveFlag = false;//移動管理フラグ
+	float playerHp = 360;
 
 	// エネミー
 	XMFLOAT3 ePos = {};
 	bool eFlag = false; // 自由落下のフラグ
 	bool eAlive = false;// 生きているかのフラグ
-	int enemyCount = 5; // 生きている敵の数
-	XMFLOAT3 randPos;
+	float enemyHp = 360;
 
 	// バレット
 	XMFLOAT3 bPos = {};

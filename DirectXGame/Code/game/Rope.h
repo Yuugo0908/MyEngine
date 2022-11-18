@@ -67,7 +67,7 @@ private: // メンバ変数
 	bool rThrowFlag = false; // ロープを飛ばす
 	bool rBackFlag = false; // ロープを戻す
 	XMFLOAT3 manageRopePos = {}; // ロープ位置管理用
-	XMFLOAT3 manageRopeScale = {0.2f, 0.2f, 0.2f}; // ロープスケール管理用
+	XMFLOAT3 manageRopeScale = {0.0f, 0.0f, 0.0f}; // ロープスケール管理用
 	int throwCount = 0;
 	bool rRotFlag = false; // ロープの向き変更用フラグ
 
