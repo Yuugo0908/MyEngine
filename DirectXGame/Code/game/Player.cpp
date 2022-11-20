@@ -19,6 +19,7 @@ bool Player::Initialize(Keyboard* keyboard, Mouse* mouse)
 	playerObj->SetPosition({ 0.0f, 5.0f, -5.0f });
 	playerObj->SetScale({ 0.8f,0.8f,0.8f });
 	pPos = playerObj->GetPosition();
+	pScale = playerObj->GetScale();
 	playerObj->Update();
 
 	return true;
@@ -29,6 +30,7 @@ void Player::Update(bool rFlag, bool moveFlag)
 	cameraTrack = camera->CameraTrack(pPos);
 	cameraTrack = cameraTrack * pSpeed;
 	playerObj->SetPosition(pPos);
+	playerObj->SetScale(pScale);
 	if (moveFlag)
 	{
 		Jump();

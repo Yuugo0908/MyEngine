@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClCompile Include="Code\2d\DebugText.cpp" />
     <ClCompile Include="Code\2d\Image2d.cpp" />
+    <ClCompile Include="Code\3d\Mapchip.cpp" />
     <ClCompile Include="Code\3d\Material.cpp" />
     <ClCompile Include="Code\3d\Mesh.cpp" />
     <ClCompile Include="Code\3d\Model.cpp" />
@@ -195,6 +196,7 @@
   <ItemGroup>
     <ClInclude Include="Code\2d\DebugText.h" />
     <ClInclude Include="Code\2d\Image2d.h" />
+    <ClInclude Include="Code\3d\Mapchip.h" />
     <ClInclude Include="Code\3d\Material.h" />
     <ClInclude Include="Code\3d\Mesh.h" />
     <ClInclude Include="Code\3d\Model.h" />

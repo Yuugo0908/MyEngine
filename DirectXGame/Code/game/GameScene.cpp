@@ -28,6 +28,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	player = new Player;
 	enemy = new Enemy;
 	bullet = new Bullet;
+	mapchip = new Mapchip;
 
 	// デバイスのセット
 	FbxObject3d::SetDevice(dxCommon->GetDevice());
@@ -121,6 +122,27 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	skydome->SetPosition({ 0.0f, 12.0f, 0.0f });
 	skydome->SetScale({ 5.0f, 5.0f, 5.0f });
 
+	// オブジェクト生成
+	blockModel = blockModel->CreateFromObject("block");
+	//マップチップ用のCSV読み込み
+	//(map, "Resource/scv/なんたら.csv")で追加可能
+	Mapchip::CsvToVector(map, "Resources/csv/tutorial.csv");//mapNum=0
+
+	//マップチップ用のオブジェクトの初期化
+	for (int y = 0; y < map_max_y; y++)
+	{
+		for (int x = 0; x < map_max_x; x++)
+		{
+			if (Mapchip::GetChipNum(x, y, map[0]) == block)
+			{
+				blockObj[y][x] = Object3d::Create();
+				blockObj[y][x]->SetModel(blockModel);
+				blockObj[y][x]->SetScale({ 1.0f,1.0f,1.0f });
+				blockObj[y][x]->SetPosition({ 1000.0f,1000.0f,0.0f });
+			}
+		}
+	}
+
 	// カメラの設定
 	camera->SetTarget(pPos);
 
@@ -167,6 +189,18 @@ void GameScene::Update() {
 		enemy->Update();
 
 		pPos = player->GetPos();
+		pPosOld = pPos;
+		pRadiusX = 0.5f * player->GetScale().x;
+		pRadiusY = 0.5f * player->GetScale().y;
+		MapCreate(0);
+		MapUpdate(0);
+		// マップチップ当たり判定
+		if (MapCollide(pPos, pRadiusX, pRadiusY, 0, pPosOld))
+		{
+			Mapchip::ChangeChipNum(width, height, map[0]);
+			DebugText::GetInstance()->Print(50, 30 * 3, 2, "ObjectHit");
+		}
+
 		ePos = enemy->GetPos();
 		bPos = bullet->GetPos();
 
@@ -233,6 +267,7 @@ void GameScene::Draw() {
 	stage->Draw();
 	rope->Draw();
 	//item->Draw();
+	MapDraw(0);
 
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
@@ -365,4 +400,146 @@ void GameScene::CollisionUpdate()
 	//{
 	//	shakeFlag = true;
 	//}
+}
+
+void GameScene::MapCreate(int mapNumber)
+{
+	for (int y = 0; y < map_max_y; y++) {//(yが14)
+		for (int x = 0; x < map_max_x; x++) {//(xが25)
+
+			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == block)
+			{
+				//blockObj[y][x] = Object3d::Create();
+				//blockObj[y][x]->SetModel(blockModel);
+				//位置と大きさの変更(今は大きさは変更しないで)
+				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE, 0, ((float)y - ((float)map_max_y / 2)) * LAND_SCALE });
+			}
+		}
+	}
+}
+
+void GameScene::MapUpdate(int mapNumber)
+{
+	for (int y = 0; y < map_max_y; y++)
+	{
+		for (int x = 0; x < map_max_x; x++)
+		{
+			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == block)
+			{
+				blockObj[y][x]->Update();
+			}
+		}
+	}
+}
+
+void GameScene::MapDraw(int mapNumber)
+{
+	//マップチップの描画
+	for (int y = 0; y < map_max_y; y++)
+	{
+		for (int x = 0; x < map_max_x; x++)
+		{
+			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == block)
+			{
+				blockObj[y][x]->Draw();
+			}
+		}
+	}
+}
+
+bool GameScene::MapCollide(XMFLOAT3& pos, float radiusX, float radiusY, int mapNumber, const XMFLOAT3 oldPos)
+{
+	//マップチップ
+	//X, Y
+	float mapX = 0;
+	float mapY = 0;
+	//Radius
+	float mapRadiusX = 0;
+	float mapRadiusY = 0;
+
+	//フラグ
+	bool hitFlag = false;
+
+	//判定
+	int mapMaxX = static_cast<int>((pos.x + radiusX + LAND_SCALE / 2) / LAND_SCALE);
+	int mapMinX = static_cast<int>((pos.x - radiusX + LAND_SCALE / 2) / LAND_SCALE);
+	int mapMaxY = -static_cast<int>((pos.y - radiusY + LAND_SCALE / 2) / LAND_SCALE - 1);
+	int mapMinY = -static_cast<int>((pos.y + radiusY + LAND_SCALE / 2) / LAND_SCALE - 1);
+
+	for (int h = mapMinY; h <= mapMaxY; h++)
+	{
+		if (h < 0)
+		{
+			continue;
+		}
+		for (int w = mapMinX; w <= mapMaxX; w++)
+		{
+			if (w < 0)
+			{
+				continue;
+			}
+			if (Mapchip::GetChipNum(w, h, map[mapNumber]) == block)
+			{
+				mapX = blockObj[h][w]->GetPosition().x;
+				mapY = blockObj[h][w]->GetPosition().y;
+				mapRadiusX = 2.0f * blockObj[h][w]->GetScale().x;
+				mapRadiusY = 2.0f * blockObj[h][w]->GetScale().y;
+
+				if (pos.x <= mapX + mapRadiusX && mapX - mapRadiusX <= pos.x)
+				{
+					if (mapY + mapRadiusY + radiusY > pos.y && mapY < oldPos.y)
+					{
+						pos.y = mapY + mapRadiusY + radiusY;
+						hitFlag = true;
+						height = h;
+						width = w;
+					}
+					else if (mapY - mapRadiusY - radiusY < pos.y && mapY > oldPos.y)
+					{
+						pos.y = mapY - mapRadiusY - radiusY;
+						hitFlag = true;
+						height = h;
+						width = w;
+					}
+				}
+				if (pos.y <= mapY + mapRadiusY && mapY - mapRadiusY <= pos.y)
+				{
+					if (mapX + mapRadiusX + radiusX > pos.x && mapX < oldPos.x)
+					{
+						pos.x = mapX + mapRadiusX + radiusX;
+						hitFlag = true;
+						height = h;
+						width = w;
+					}
+					else if (mapX - mapRadiusX - radiusX < pos.x && mapX > oldPos.x)
+					{
+						pos.x = mapX - mapRadiusX - radiusX;
+						hitFlag = true;
+						height = h;
+						width = w;
+					}
+				}
+			}
+		}
+	}
+
+	return hitFlag;
+}
+
+int GameScene::GetLeftMapChip(XMFLOAT3 position)
+{
+	int chip = Mapchip::GetChipNum(static_cast<int>((position.x + LAND_SCALE / 2) / LAND_SCALE - 1), -static_cast<int>((position.y - LAND_SCALE / 2) / LAND_SCALE), map[0]);
+	return chip;
+}
+
+int GameScene::GetRightMapChip(XMFLOAT3 position)
+{
+	int chip = Mapchip::GetChipNum(static_cast<int>((position.x + LAND_SCALE / 2) / LAND_SCALE + 1), -static_cast<int>((position.y - LAND_SCALE / 2) / LAND_SCALE), map[0]);
+	return chip;
+}
+
+int GameScene::GetUpMapChip(XMFLOAT3 position)
+{
+	int chip = Mapchip::GetChipNum(static_cast<int>((position.x + LAND_SCALE / 2) / LAND_SCALE), -static_cast<int>((position.y - LAND_SCALE / 2) / LAND_SCALE + 1), map[0]);
+	return chip;
 }

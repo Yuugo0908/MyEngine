@@ -22,6 +22,7 @@
 #include "Collision.h"
 #include "Light.h"
 #include "Easing.h"
+#include "Mapchip.h"
 
 #include <SafeDelete.h>
 #include <stdlib.h>
@@ -55,6 +56,20 @@ public: // メンバ関数
 	// 当たり判定
 	void CollisionUpdate();
 
+	// マップチップ用
+	// マップチップ生成
+	void MapCreate(int mapNumber);
+	// マップチップ更新
+	void MapUpdate(int mapNumber);
+	// マップチップ描画
+	void MapDraw(int mapNumber);
+	// マップチップ当たり判定
+	bool MapCollide(XMFLOAT3& pos, float radiusX, float radiusY, int mapNumber, const XMFLOAT3 oldPos);
+	// 位置取得
+	int GetLeftMapChip(XMFLOAT3 position);
+	int GetRightMapChip(XMFLOAT3 position);
+	int GetUpMapChip(XMFLOAT3 position);
+
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
 		XMFLOAT3 len = { posA.x - posB.x, posA.y - posB.y, posA.z - posB.z };
@@ -71,6 +86,7 @@ private: // メンバ変数
 	Collision* collision = nullptr;
 	Light* light = nullptr;
 	Easing* easing = nullptr;
+	Mapchip* mapchip = nullptr;
 
 	Rope* rope = nullptr;
 	Player* player = nullptr;
@@ -85,6 +101,25 @@ private: // メンバ変数
 	Model* stageModel = nullptr;
 	std::unique_ptr<Object3d> stage = nullptr;
 
+	// マップ
+	//マップチップ1つの大きさ
+	const float LAND_SCALE = 5.0f;
+	//マップチップの番号
+	enum MapNumber
+	{
+		None, block
+	};
+	// モデル
+	Model* blockModel = nullptr;
+	//mapchipオブジェクト
+	std::vector<std::vector<int>> map; //マップチップ
+	std::unique_ptr<Object3d> blockObj[map_max_y][map_max_x]; // ステージブロック
+	// 管理フラグ
+	bool hitFlag = false;
+	// マップ番号
+	int height;
+	int width;
+
 	// 画像
 	Image2d* title = nullptr;
 	Image2d* result = nullptr;
@@ -97,6 +132,9 @@ private: // メンバ変数
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
+	XMFLOAT3 pPosOld = {};
+	float pRadiusX = 0.0f;
+	float pRadiusY = 0.0f;
 	bool jumpFlag = false;//自由落下のフラグ
 	bool moveFlag = false;//移動管理フラグ
 	float playerHp = 360;

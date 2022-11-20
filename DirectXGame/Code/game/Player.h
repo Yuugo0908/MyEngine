@@ -32,6 +32,8 @@ public: // メンバ関数
 	const XMFLOAT3& GetPos() { return pPos; }
 	void SetPos(XMFLOAT3 pPos) { this->pPos = pPos; }
 
+	const XMFLOAT3& GetScale() { return pScale; }
+
 private: // メンバ変数
 
 	Keyboard* keyboard = nullptr;
@@ -46,6 +48,7 @@ private: // メンバ変数
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
+	XMFLOAT3 pScale = {};
 	float pSpeed = 0.35f;
 	bool jumpFlag = false;//自由落下のフラグ
 	bool moveFlag = false;//移動管理フラグ

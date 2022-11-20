@@ -192,6 +192,9 @@
     <ClCompile Include="Code\game\Item.cpp">
       <Filter>ソースファイル\game</Filter>
     </ClCompile>
+    <ClCompile Include="Code\3d\Mapchip.cpp">
+      <Filter>ソースファイル\3d</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h">
@@ -313,6 +316,9 @@
     </ClInclude>
     <ClInclude Include="Code\game\Item.h">
       <Filter>ヘッダーファイル\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\3d\Mapchip.h">
+      <Filter>ヘッダーファイル\3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

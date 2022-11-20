@@ -24,7 +24,7 @@ void Bullet::Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos)
 		attackCount++;
 	}
 
-	if (GetLength(oldePos, bPos) >= 30.0f)
+	if (GetLength(oldePos, bPos) >= 45.0f)
 	{
 		attackFlag = false;
 		bPos = ePos;
