@@ -118,8 +118,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 
 	// 各オブジェクトの位置や大きさを初期化
 	stage->SetPosition({ 0.0f, -1.0f, 0.0f });
-	stage->SetScale({ 1.0f, 1.0f, 1.0f });
-	skydome->SetPosition({ 0.0f, 12.0f, 0.0f });
+	stage->SetScale({ 60.0f, 1.0f, 60.0f });
+	skydome->SetPosition({ 0.0f, -30.0f, 0.0f });
 	skydome->SetScale({ 5.0f, 5.0f, 5.0f });
 
 	// オブジェクト生成
@@ -404,7 +404,7 @@ void GameScene::CollisionUpdate()
 
 void GameScene::MapCreate(int mapNumber)
 {
-	for (int y = 0; y < map_max_y; y++) {//(yが14)
+	for (int y = 0; y < map_max_y; y++) {//(yが25)
 		for (int x = 0; x < map_max_x; x++) {//(xが25)
 
 			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == block)
@@ -412,7 +412,7 @@ void GameScene::MapCreate(int mapNumber)
 				//blockObj[y][x] = Object3d::Create();
 				//blockObj[y][x]->SetModel(blockModel);
 				//位置と大きさの変更(今は大きさは変更しないで)
-				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE, 0, ((float)y - ((float)map_max_y / 2)) * LAND_SCALE });
+				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE, (float)mapNumber , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE });
 			}
 		}
 	}
