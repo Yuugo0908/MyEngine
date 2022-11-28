@@ -1,6 +1,8 @@
 #include "WinApp.h"
 #include <imgui_impl_win32.h>
 
+#pragma comment(lib, "winmm.lib")
+
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 const wchar_t WinApp::windowClassName[] = L"DirectXGame";
@@ -23,6 +25,9 @@ LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 void WinApp::CreateGameWindow()
 {
+	// システムタイマーの分解能を上げる
+	timeBeginPeriod(1);
+
 	// ウィンドウクラスの設定
 	wndClass.cbSize = sizeof(WNDCLASSEX);
 	wndClass.lpfnWndProc = (WNDPROC)WindowProc; // ウィンドウプロシージャ

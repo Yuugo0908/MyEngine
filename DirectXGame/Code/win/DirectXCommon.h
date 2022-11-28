@@ -6,6 +6,8 @@
 #include <wrl.h>
 #include <d3dx12.h>
 #include <cstdlib>
+#include <chrono>
+#include <thread>
 
 #include "WinApp.h"
 
@@ -26,6 +28,7 @@ public: // メンバ関数
 	void ClearRenderTarget();
 	// 深度バッファのクリア
 	void ClearDepthBuffer();
+
 	// デバイスの取得
 	ID3D12Device* GetDevice() { return device.Get(); }
 	// 描画コマンドリストの取得
@@ -52,6 +55,10 @@ private: // メンバ変数
 	//imgui関連
 	ComPtr<ID3D12DescriptorHeap> imguiHeap; // ヒープ保持用
 
+	// FPS固定用変数
+	// 記録時間(FPS固定用)
+	std::chrono::steady_clock::time_point reference;
+
 private: // メンバ関数
 	// DXGIデバイス初期化
 	bool InitializeDXGIDevice();
@@ -67,4 +74,8 @@ private: // メンバ関数
 	bool CreateFence();
 	// imguiの初期化
 	bool InitImgui();
+	// FPS固定初期化
+	void InitializeFixFPS();
+	// FPS固定更新
+	void UpdateFixFPS();
 };
