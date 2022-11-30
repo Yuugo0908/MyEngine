@@ -13,7 +13,8 @@ bool Bullet::Initialize()
 
 void Bullet::Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos)
 {
-	//bPos = bulletObj->GetPosition();
+	this->pPos = pPos;
+	this->ePos = ePos;
 	if (shakeFlag)
 	{
 		Camera::GetInstance()->CameraShake(shakeFlag);
@@ -24,25 +25,24 @@ void Bullet::Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos)
 		attackCount++;
 	}
 
-	if (GetLength(oldePos, bPos) >= 45.0f)
+	//Search();
+
+	//if (GetLength(pPos, bPos) >= 10.0f)
+	//{
+	//	Search();
+	//}
+
+	if (GetLength(ePosOld, bPos) >= 20.0f)
 	{
 		attackFlag = false;
-		bPos = ePos;
+		Search();
 		attackCount = 0;
 	}
 
 	if (!attackFlag)
 	{
 		bPos = ePos;
-		oldePos = ePos;
-
-		XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
-		XMVECTOR bulletPos = { ePos.x, ePos.y, ePos.z, 1 };
-
-		XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, bulletPos);
-		XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
-
-		bSpeed = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
+		Search();
 	}
 
 	bulletObj->SetPosition(bPos);
@@ -51,12 +51,34 @@ void Bullet::Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos)
 
 void Bullet::Attack()
 {
-	if (attackCount >= 30)
+	if (attackCount >= 20)
 	{
+		XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
+		XMVECTOR bulletPos = { ePos.x, ePos.y, ePos.z, 1 };
+
+		XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, bulletPos);
+		XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
+
+		bSpeed = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
+
 		bPos.x += bSpeed.x / 2;
-		bPos.y += bSpeed.y / 3;
+		bPos.y += bSpeed.y / 2;
 		bPos.z += bSpeed.z / 2;
 	}
+}
+
+void Bullet::Search()
+{
+	//bPos = ePos;
+	ePosOld = ePos;
+
+	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
+	XMVECTOR bulletPos = { ePos.x, ePos.y, ePos.z, 1 };
+
+	XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, bulletPos);
+	XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
+
+	bSpeed = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
 }
 
 void Bullet::Finalize()
@@ -73,5 +95,6 @@ void Bullet::Collision()
 {
 	shakeFlag = true;
 	attackFlag = false;
+	Search();
 	attackCount = 0;
 }

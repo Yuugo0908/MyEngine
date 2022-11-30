@@ -124,12 +124,25 @@ void Camera::Update()
 	Mouse::MouseMove mouseMove = mouse->GetMouseMove();
 
 	// マウスの左ボタンが押されていたらカメラを回転させる
-	float dy = mouseMove.MouseX * scaleY;
-	//float dx = mouseMove.MouseY * scaleX;
 
-	//angleX = -dx * XM_PI;
-	angleY = -dy * XM_PI * speed;
-	dirty = true;
+	if (moveCount <= 30)
+	{
+		moveCount++;
+	}
+	if (mouse->TriggerMouseLeft())
+	{
+		moveCount = 0;
+	}
+
+	if (moveCount >= 30)
+	{
+		float dy = mouseMove.MouseX * scaleY;
+		//float dx = mouseMove.MouseY * scaleX;
+
+		//angleX = -dx * XM_PI;
+		angleY = -dy * XM_PI * speed;
+		dirty = true;
+	}
 
 	// ホイール入力で距離を変更
 	if (mouseMove.MouseZ != 0) {
@@ -281,4 +294,16 @@ XMFLOAT3 Camera::CameraTrack(XMFLOAT3 pPos)
 	XMFLOAT3 cameraTrack = { cameraLength.m128_f32[0], cameraLength.m128_f32[1], cameraLength.m128_f32[2] };
 
 	return cameraTrack;
+}
+
+float Camera::CameraRot(XMFLOAT3 pPos)
+{
+	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 0 };
+	XMVECTOR cameraPos = { eye.x, eye.y, eye.z, 0 };
+
+	XMVECTOR subCameraPlayer = XMVectorSubtract(playerPos, cameraPos);
+
+	float angle = (float)atan2(subCameraPlayer.m128_f32[0], subCameraPlayer.m128_f32[2]);
+
+	return angle;
 }

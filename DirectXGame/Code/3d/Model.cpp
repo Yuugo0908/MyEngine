@@ -148,9 +148,8 @@ void Model::CreateModel(const std::string& text)
 {
 	// ファイルストリーム
 	std::ifstream file;
-	//.odjファイルを開く
-	//file.open("Resources/triangle/triangle_tex.obj");
 
+	//.odjファイルを開く
 	const string modelname = text;
 	const string filename = modelname + ".obj";
 	const string directoryPath = "Resources/" + modelname + "/";

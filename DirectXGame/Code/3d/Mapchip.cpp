@@ -34,7 +34,7 @@ int Mapchip::GetChipNum(int x, int y, std::vector<int> map)
 	}
 
 	//Ç±Ç±ÇÃåxçêÇÕãCÇ…ÇµÇ»Ç¢Ç≈OK
-	return map[Y * map_max_x + X];
+	return map[static_cast<std::vector<int, std::allocator<int>>::size_type>(Y) * map_max_x + X];
 }
 
 void Mapchip::ChangeChipNum(int x, int y, std::vector<int>& map)
@@ -42,8 +42,8 @@ void Mapchip::ChangeChipNum(int x, int y, std::vector<int>& map)
 	const int X = x / map_size;
 	const int Y = y / map_size;
 
-	if (map[Y * map_max_x + X] == 1)
+	if (map[static_cast<std::vector<int, std::allocator<int>>::size_type>(Y) * map_max_x + X] != 1)
 	{
-		map[Y * map_max_x + X] = 0;
+		map[static_cast<std::vector<int, std::allocator<int>>::size_type>(Y) * map_max_x + X] = 0;
 	}
 }

@@ -14,6 +14,8 @@ public: // メンバ関数
 
 	void Attack();
 
+	void Search();
+
 	void Finalize();
 
 	void Draw();
@@ -45,7 +47,11 @@ private: // メンバ変数
 	bool shakeFlag = false; // カメラのシェイク
 	int attackCount = 0;
 
+	// プレイヤー
+	XMFLOAT3 pPos = {};
+
 	// エネミー
-	XMFLOAT3 oldePos = {};
+	XMFLOAT3 ePos = {};
+	XMFLOAT3 ePosOld = {};
 };
 

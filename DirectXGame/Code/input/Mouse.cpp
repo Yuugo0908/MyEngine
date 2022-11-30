@@ -64,14 +64,13 @@ void Mouse::Update()
 
 		// ƒ}ƒEƒX‚Ì“ü—Í
 		result = devMouse->GetDeviceState(sizeof(mouseState), &mouseState);
-		ShowCursor(false);
 		hwnd = winApp->GetHwnd();
 		GetClientRect(hwnd, &rcClient);
 
-		ptClientUL.x = rcClient.left;
-		ptClientUL.y = rcClient.top;
-		ptClientLR.x = rcClient.right + 1;
-		ptClientLR.y = rcClient.bottom + 1;
+		ptClientUL.x = rcClient.left + 100;
+		ptClientUL.y = rcClient.top + 100;
+		ptClientLR.x = rcClient.right - 100;
+		ptClientLR.y = rcClient.bottom - 100;
 		ClientToScreen(hwnd, &ptClientUL);
 		ClientToScreen(hwnd, &ptClientLR);
 

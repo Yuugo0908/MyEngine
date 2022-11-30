@@ -23,7 +23,7 @@ public: // ÉÅÉìÉoä÷êî
 
 	void Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d>& object);
 
-	void Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScale, const std::unique_ptr<Object3d>& object);
+	void Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d>& object);
 
 	void Collision();
 

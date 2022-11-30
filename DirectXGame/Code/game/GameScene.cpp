@@ -10,6 +10,17 @@ GameScene::~GameScene() {
 
 }
 
+// 静的メンバ変数の実体
+Model* GameScene::blockModel;
+std::vector<std::vector<int>> GameScene::map;
+std::unique_ptr<Object3d> GameScene::blockObj[map_max_y][map_max_x];
+Collision::Sphere GameScene::sphere[map_max_y][map_max_x];
+
+bool GameScene::hitFlag = false;
+int GameScene::height = 0;
+int GameScene::width = 0;
+const float GameScene::LAND_SCALE = 5.0f;
+
 
 void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mouse* mouse, Audio* audio) {
 	// nullptrチェック
@@ -104,23 +115,20 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	bullet->Initialize();
 	enemy->Initialize(player, bullet);
 
-	// .objの名前を指定してモデルを読み込む
-	skydomeModel = skydomeModel->CreateFromObject("skydome");
-	stageModel = stageModel->CreateFromObject("stage");
 
 	// 3Dオブジェクト生成
-	skydome = Object3d::Create();
-	stage = Object3d::Create();
+	//skydome = Object3d::Create();
+	//stage = Object3d::Create();
 
 	// 3Dオブジェクトにモデルを割り当てる
-	skydome->SetModel(skydomeModel);
-	stage->SetModel(stageModel);
+	//skydome->SetModel(skydomeModel);
+	//stage->SetModel(stageModel);
 
 	// 各オブジェクトの位置や大きさを初期化
-	stage->SetPosition({ 0.0f, -1.0f, 0.0f });
-	stage->SetScale({ 60.0f, 1.0f, 60.0f });
-	skydome->SetPosition({ 0.0f, -30.0f, 0.0f });
-	skydome->SetScale({ 5.0f, 5.0f, 5.0f });
+	//stage->SetPosition({ 0.0f, -1.0f, 0.0f });
+	//stage->SetScale({ 60.0f, 1.0f, 60.0f });
+	//skydome->SetPosition({ 0.0f, -30.0f, 0.0f });
+	//skydome->SetScale({ 5.0f, 5.0f, 5.0f });
 
 	// オブジェクト生成
 	blockModel = blockModel->CreateFromObject("block");
@@ -141,6 +149,53 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 				blockObj[y][x]->SetPosition({ 1000.0f,1000.0f,0.0f });
 			}
 		}
+	}
+
+	// レベルデータの読み込み
+	levelData = LevelLoader::LoadFile("test");
+
+	// .objの名前を指定してモデルを読み込む
+	cubeModel = cubeModel->CreateFromObject("cube");
+	sphereModel = sphereModel->CreateFromObject("sphere");
+	stageModel = stageModel->CreateFromObject("stage");
+	skydomeModel = skydomeModel->CreateFromObject("skydome");
+	models.insert(std::make_pair("cube", cubeModel));
+	models.insert(std::make_pair("sphere", sphereModel));
+	models.insert(std::make_pair("stage", stageModel));
+	models.insert(std::make_pair("skydome", skydomeModel));
+	models.insert(std::make_pair("block", blockModel));
+
+	// レベルデータからオブジェクトを生成、配置
+	for (LevelData::ObjectData& objectData : levelData->objects) 
+	{
+		// 3Dオブジェクトを生成
+		Object3d* newObject = Object3d::arrayCreate();
+		// ファイル名から登録済みモデルを検索
+		Model* model = nullptr;
+		decltype(models)::iterator it = models.find(objectData.fileName);
+		if (it != models.end()) {
+			model = it->second;
+		}
+
+		newObject->SetModel(model);
+
+		// 座標
+		DirectX::XMFLOAT3 pos;
+		DirectX::XMStoreFloat3(&pos, objectData.trans);
+		newObject->SetPosition(pos);
+
+		// 回転角
+		DirectX::XMFLOAT3 rot;
+		DirectX::XMStoreFloat3(&rot, objectData.rot);
+		newObject->SetRotation(rot);
+
+		// 座標
+		DirectX::XMFLOAT3 scale;
+		DirectX::XMStoreFloat3(&scale, objectData.scale);
+		newObject->SetScale(scale);
+
+		// 配列に登録
+		objects.push_back(newObject);
 	}
 
 	// カメラの設定
@@ -167,6 +222,7 @@ void GameScene::Update() {
 
 	if (nowScene == 0)
 	{
+		MapCreate(0);
 		if (keyboard->TriggerKey(DIK_SPACE))
 		{
 			nowScene = 1;
@@ -181,24 +237,25 @@ void GameScene::Update() {
 
 		rFlag = rope->GetrFlag();
 		moveFlag = rope->GetmoveFlag();
+		avoidFlag = player->GetAvoidFlag();
 		eAlive = enemy->GetAlive();
 		attackFlag = bullet->GetAttackFlag();
 
-		//bullet->Update(pPos, ePos);
 		player->Update(rFlag, moveFlag);
 		enemy->Update();
 
 		pPos = player->GetPos();
 		pPosOld = pPos;
-		pRadiusX = 0.5f * player->GetScale().x;
-		pRadiusY = 0.5f * player->GetScale().y;
-		MapCreate(0);
+		pRadius = player->GetScale();
 		MapUpdate(0);
-		// マップチップ当たり判定
-		if (MapCollide(pPos, pRadiusX, pRadiusY, 0, pPosOld))
+		if (MapCollide(pPos, pRadius, 0, pPosOld))
 		{
-			Mapchip::ChangeChipNum(width, height, map[0]);
-			DebugText::GetInstance()->Print(50, 30 * 3, 2, "ObjectHit");
+			DebugText::GetInstance()->Print(50, 30 * 10, 2, "ObjectHit");
+		}
+
+		for (auto& object : objects)
+		{
+			object->Update();
 		}
 
 		ePos = enemy->GetPos();
@@ -211,10 +268,6 @@ void GameScene::Update() {
 
 		player->SetPos(pPos);
 		enemy->SetPos(ePos);
-		//bullet->SetPos(bPos);
-
-		skydome->Update();
-		stage->Update();
 		mouse->Update();
 
 		if (enemyHp == 0)
@@ -235,7 +288,7 @@ void GameScene::reset()
 
 void GameScene::Draw() {
 
-	//SetImgui();
+	SetImgui();
 
 #pragma region 背景画像描画
 	// // 背景画像描画前処理
@@ -263,11 +316,14 @@ void GameScene::Draw() {
 	{
 		bullet->Draw();
 	}
-	skydome->Draw();
-	stage->Draw();
 	rope->Draw();
 	//item->Draw();
 	MapDraw(0);
+
+	for (auto& object : objects)
+	{
+		object->Draw();
+	}
 
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
@@ -364,12 +420,10 @@ void GameScene::CollisionUpdate()
 {
 	if (Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
 	{
-		bPos = {0, 100, 0};
 		shakeFlag = true;
 		eAlive = false;
 		moveFlag = true;
 		attackFlag = false;
-		bullet->SetPos(bPos);
 		bullet->SetAttackFlag(attackFlag);
 		rope->SetmoveFlag(moveFlag);
 		enemy->SetAlive(eAlive);
@@ -396,10 +450,8 @@ void GameScene::CollisionUpdate()
 		}
 	}
 
-	//if (Collision::CollisionObject(player->GetObj(), item->GetObj()))
-	//{
-	//	shakeFlag = true;
-	//}
+	player->SetPos(pPos);
+	camera->SetTarget(pPos);
 }
 
 void GameScene::MapCreate(int mapNumber)
@@ -409,10 +461,10 @@ void GameScene::MapCreate(int mapNumber)
 
 			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == block)
 			{
-				//blockObj[y][x] = Object3d::Create();
-				//blockObj[y][x]->SetModel(blockModel);
 				//位置と大きさの変更(今は大きさは変更しないで)
-				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE, (float)mapNumber , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE });
+				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE, (float)mapNumber * LAND_SCALE , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE });
+				sphere[y][x].center = XMVectorSet(((float)x - ((float)map_max_x / 2)) * LAND_SCALE, (float)mapNumber * LAND_SCALE, ((float)y - ((float)map_max_y / 2)) * LAND_SCALE, 0.0f);
+				sphere[y][x].radius = blockObj[y][x]->GetScale().x;
 			}
 		}
 	}
@@ -447,82 +499,89 @@ void GameScene::MapDraw(int mapNumber)
 	}
 }
 
-bool GameScene::MapCollide(XMFLOAT3& pos, float radiusX, float radiusY, int mapNumber, const XMFLOAT3 oldPos)
+bool GameScene::MapCollide(XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const XMFLOAT3 oldPos)
 {
 	//マップチップ
 	//X, Y
-	float mapX = 0;
-	float mapY = 0;
+	XMFLOAT3 mapPos = {};
 	//Radius
-	float mapRadiusX = 0;
-	float mapRadiusY = 0;
+	XMFLOAT3 mapRadius = {};
 
 	//フラグ
 	bool hitFlag = false;
 
-	//判定
-	int mapMaxX = static_cast<int>((pos.x + radiusX + LAND_SCALE / 2) / LAND_SCALE);
-	int mapMinX = static_cast<int>((pos.x - radiusX + LAND_SCALE / 2) / LAND_SCALE);
-	int mapMaxY = -static_cast<int>((pos.y - radiusY + LAND_SCALE / 2) / LAND_SCALE - 1);
-	int mapMinY = -static_cast<int>((pos.y + radiusY + LAND_SCALE / 2) / LAND_SCALE - 1);
-
-	for (int h = mapMinY; h <= mapMaxY; h++)
+	for (int y = 0; y < map_max_y; y++)
 	{
-		if (h < 0)
+		for (int x = 0; x < map_max_x; x++)
 		{
-			continue;
-		}
-		for (int w = mapMinX; w <= mapMaxX; w++)
-		{
-			if (w < 0)
+			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == block)
 			{
-				continue;
-			}
-			if (Mapchip::GetChipNum(w, h, map[mapNumber]) == block)
-			{
-				mapX = blockObj[h][w]->GetPosition().x;
-				mapY = blockObj[h][w]->GetPosition().y;
-				mapRadiusX = 2.0f * blockObj[h][w]->GetScale().x;
-				mapRadiusY = 2.0f * blockObj[h][w]->GetScale().y;
+				mapPos = blockObj[y][x]->GetPosition();
+				mapRadius = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);
 
-				if (pos.x <= mapX + mapRadiusX && mapX - mapRadiusX <= pos.x)
+				// 判定
+				float maxMapX = mapPos.x + mapRadius.x;
+				float minMapX = mapPos.x - mapRadius.x;
+				float maxMapY = mapPos.y + mapRadius.y;
+				float minMapY = mapPos.y - mapRadius.y;
+				float maxMapZ = mapPos.z + mapRadius.z;
+				float minMapZ = mapPos.z - mapRadius.z;
+
+				//オブジェクト同士の距離
+				float l_x = sqrtf(powf(mapPos.x - pos.x, 2));
+				float l_y = sqrtf(powf(mapPos.y - pos.y, 2));
+				float l_z = sqrtf(powf(mapPos.z - pos.z, 2));
+				// オブジェクト同士の半径
+				float r_x = sqrtf(powf(radius.x + mapRadius.x, 2));
+				float r_y = sqrtf(powf(radius.y + mapRadius.y, 2));
+				float r_z = sqrtf(powf(radius.z + mapRadius.z, 2));
+
+				if (pos.x <= maxMapX && pos.x >= minMapX)
 				{
-					if (mapY + mapRadiusY + radiusY > pos.y && mapY < oldPos.y)
+					if (maxMapZ + radius.z > pos.z && mapPos.z < oldPos.z)
 					{
-						pos.y = mapY + mapRadiusY + radiusY;
+						pos.z = maxMapZ + radius.z;
 						hitFlag = true;
-						height = h;
-						width = w;
+						avoidFlag = false;
+						player->SetAvoidFlag(avoidFlag);
+						height = y;
+						width = x;
 					}
-					else if (mapY - mapRadiusY - radiusY < pos.y && mapY > oldPos.y)
+					else if (minMapZ - radius.z < pos.z && mapPos.z > oldPos.z)
 					{
-						pos.y = mapY - mapRadiusY - radiusY;
+						pos.z = minMapZ - radius.z;
 						hitFlag = true;
-						height = h;
-						width = w;
+						avoidFlag = false;
+						player->SetAvoidFlag(avoidFlag);
+						height = y;
+						width = x;
 					}
 				}
-				if (pos.y <= mapY + mapRadiusY && mapY - mapRadiusY <= pos.y)
+
+				if (pos.z <= maxMapZ && pos.z >= minMapZ)
 				{
-					if (mapX + mapRadiusX + radiusX > pos.x && mapX < oldPos.x)
+					if (maxMapX + radius.x > pos.x && mapPos.x < oldPos.x)
 					{
-						pos.x = mapX + mapRadiusX + radiusX;
+						pos.x = maxMapX + radius.x;
 						hitFlag = true;
-						height = h;
-						width = w;
+						avoidFlag = false;
+						player->SetAvoidFlag(avoidFlag);
+						height = y;
+						width = x;
 					}
-					else if (mapX - mapRadiusX - radiusX < pos.x && mapX > oldPos.x)
+					else if (minMapX - radius.x < pos.x && mapPos.x > oldPos.x)
 					{
-						pos.x = mapX - mapRadiusX - radiusX;
+						pos.x = minMapX - radius.x;
 						hitFlag = true;
-						height = h;
-						width = w;
+						avoidFlag = false;
+						player->SetAvoidFlag(avoidFlag);
+						height = y;
+						width = x;
 					}
 				}
 			}
 		}
 	}
-
 	return hitFlag;
 }
 

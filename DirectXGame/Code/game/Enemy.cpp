@@ -66,19 +66,19 @@ void Enemy::Update()
 		ePos.y = 0.0f;
 		eVal = 0.0f;
 
-		if (!attackFlag && lengthOld > 50.0f)
+		if (!attackFlag && lengthOld > 50.0f || PElength > 50.0f)
 		{
 			phase = Enemy::Phase::stay;
 		}
-		else if (PElength <= 30.0f)
+		else if (!attackFlag && PElength > 20.0f && PElength <= 50.0f)
+		{
+			phase = Enemy::Phase::move;
+		}
+		else if (PElength <= 20.0f)
 		{
 			phase = Enemy::Phase::attack;
 			attackFlag = true;
 			bullet->SetAttackFlag(attackFlag);
-		}
-		else if (!attackFlag && PElength > 30.0f && PElength <= 50.0f)
-		{
-			phase = Enemy::Phase::move;
 		}
 
 		switch (phase)

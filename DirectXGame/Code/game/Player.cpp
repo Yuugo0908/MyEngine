@@ -8,7 +8,6 @@ bool Player::Initialize(Keyboard* keyboard, Mouse* mouse)
 	this->mouse = mouse;
 
 	rope = new Rope;
-	easing = new Easing;
 
 	// モデルの生成
 	playerModel = playerModel->CreateFromObject("cube");
@@ -16,7 +15,7 @@ bool Player::Initialize(Keyboard* keyboard, Mouse* mouse)
 	playerObj->SetModel(playerModel);
 
 	// 位置を変数に格納
-	playerObj->SetPosition({ 0.0f, 5.0f, -5.0f });
+	playerObj->SetPosition({ 0.0f, 0.0f, -5.0f });
 	playerObj->SetScale({ 0.8f,0.8f,0.8f });
 	pPos = playerObj->GetPosition();
 	pScale = playerObj->GetScale();
@@ -28,9 +27,13 @@ bool Player::Initialize(Keyboard* keyboard, Mouse* mouse)
 void Player::Update(bool rFlag, bool moveFlag)
 {
 	cameraTrack = camera->CameraTrack(pPos);
+	cameraRot = camera->CameraRot(pPos);
 	cameraTrack = cameraTrack * pSpeed;
+
 	playerObj->SetPosition(pPos);
 	playerObj->SetScale(pScale);
+	playerObj->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
+
 	if (moveFlag)
 	{
 		Jump();
@@ -47,8 +50,7 @@ void Player::Update(bool rFlag, bool moveFlag)
 			}
 		}
 
-		pMove = pAcc * rate;
-		cameraTrack = cameraTrack * rate;
+		cameraTrack = cameraTrack * pAcc * rate;
 
 		if (keyboard->PushKey(DIK_D))
 		{
@@ -78,65 +80,53 @@ void Player::Update(bool rFlag, bool moveFlag)
 
 void Player::Rush(bool rFlag)
 {
-	if (rushCount <= 30)
+	if (avoidFlag)
 	{
-		rushCount++;
+		pAcc -= pGra;
 	}
-
 	// 自機の突進
-
-	if (!rFlag && mouse->TriggerMouseRight() && rushCount >= 30)
+	else if (!rFlag && mouse->TriggerMouseRight())
 	{
-		easeFlag = true;
-		startPos = pPos;
-		endPos = pPos;
-		if (keyboard->PushKey(DIK_D))
-		{
-			endPos.x += cameraTrack.z * avoidMove;
-			endPos.z -= cameraTrack.x * avoidMove;
-		}
-		else if (keyboard->PushKey(DIK_A))
-		{
-			endPos.x -= cameraTrack.z * avoidMove;
-			endPos.z += cameraTrack.x * avoidMove;
-		}
-		if (keyboard->PushKey(DIK_W))
-		{
-			endPos.x += cameraTrack.x * avoidMove;
-			endPos.z += cameraTrack.z * avoidMove;
-		}
-		else if (keyboard->PushKey(DIK_S))
-		{
-			endPos.x -= cameraTrack.x * avoidMove;
-			endPos.z -= cameraTrack.z * avoidMove;
-		}
+		avoidFlag = true;
+		pAcc = 2.2f;
 	}
-	easing->EaseInUpdate(startPos, endPos, pPos, easeFlag, avoidTime);
+
+	if (!avoidFlag)
+	{
+		pAcc = 1.0f;
+	}
+	else if (pAcc <= 1.0f)
+	{
+		avoidFlag = false;
+	}
 }
 
 void Player::Jump()
 {
-	if (pPos.y > 0.0f)
-	{
-		jumpFlag = true;
-	}
-	else
-	{
-		pPos.y = 0.0f;
-		pVal = 0.0f;
-		jumpFlag = false;
-	}
-
 	// ジャンプ
-	if (keyboard->TriggerKey(DIK_SPACE) && !jumpFlag)
+	if (jumpFlag)
+	{
+		pVal -= pGra;
+		pPos.y += pVal;
+	}
+	else if (keyboard->TriggerKey(DIK_SPACE))
 	{
 		jumpFlag = true;
 		// 上昇率の更新
 		pVal = 1.25f;
 	}
-	if (jumpFlag && !easeFlag)
+
+	if (!jumpFlag)
 	{
-		pVal -= pGra;
-		pPos.y += pVal;
+		pVal = 0.0f;
+	}
+	else if (pVal <= 0.0f)
+	{
+		// オブジェクト同士の当たり判定を実装するならここのif文を変更
+		if (pPos.y <= 0.0f)
+		{
+			pPos.y = 0.0f;
+			jumpFlag = false;
+		}
 	}
 }

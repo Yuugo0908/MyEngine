@@ -12,7 +12,7 @@ struct PSOutput
 float4 main(VSOutput input) : SV_TARGET
 {
 	//テクスチャマッピング
-	float4 texcolor = tex.Sample(smp, input.uv);
+	float4 texcolor = tex.Sample(smp, input.uv) * color;
 
 	//シェーディングによる色
 	float4 shadecolor;
@@ -32,7 +32,7 @@ float4 main(VSOutput input) : SV_TARGET
 	//鏡面反射光
 	float3 specular = pow(saturate(dot(reflect, eyedir)), shininess) * m_specular;
 	//全て加算する
-	shadecolor.rgb = (ambient + diffuse + specular) * color * lightColor;
+	shadecolor.rgb = (ambient + diffuse + specular) * lightColor;
 	shadecolor.a = m_alpha;
 
 	return shadecolor * texcolor;

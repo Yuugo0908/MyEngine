@@ -46,17 +46,18 @@ void Rope::Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d
 
 		if (!rThrowFlag && !rBackFlag && mouse->TriggerMouseLeft())
 		{
+			rPos = pPos;
 			moveFlag = false;
 			rThrowFlag = true;
 			avoidTime = 0.0f;
-			if (objLength <= maxRope)
+			if (objLength <= 10.0f)
 			{
 				rRotFlag = true;
 			}
 		}
 		if (throwCount == 30)
 		{
-			Throw(pPos, ePos, rPos, rScale, object);
+			Throw(pPos, ePos, object);
 		}
 
 		if (Collision::CollisionObject(object, ropeObj))
@@ -103,7 +104,7 @@ void Rope::Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d
 	}
 }
 
-void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScale, const std::unique_ptr<Object3d>& object)
+void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d>& object)
 {
 	// フラグがtrueじゃない場合は初期化してリターンする
 	if (!rThrowFlag && !rBackFlag)
@@ -122,6 +123,9 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 
 	XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
 
+	XMFLOAT3 cSpeed = Camera::GetInstance()->CameraTrack(pPos);
+	float cRot = Camera::GetInstance()->CameraRot(pPos);
+
 	if (rThrowFlag)
 	{
 		if (rRotFlag)
@@ -139,8 +143,9 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 		}
 		else
 		{
-			ropeObj->SetRotation({ 0, 0, 0 });
-			manageRopePos.z += 0.6f;
+			ropeObj->SetRotation({ 0, XMConvertToDegrees(cRot), 0});
+			manageRopePos.x += cSpeed.x;
+			manageRopePos.z += cSpeed.z;
 			rRotFlag = false;
 		}
 		ray.start = XMVectorSet(manageRopePos.x, manageRopePos.y, manageRopePos.z, 1);
@@ -177,7 +182,8 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, XMFLOAT3& rPos, XMFLOAT3& rScal
 		}
 		else
 		{
-			manageRopePos.z -= 0.6f;
+			manageRopePos.x -= cSpeed.x;
+			manageRopePos.z -= cSpeed.z;
 		}
 		ray.start = XMVectorSet(manageRopePos.x, manageRopePos.y, manageRopePos.z, 1);
 

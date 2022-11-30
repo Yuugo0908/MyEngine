@@ -64,6 +64,7 @@ public: // 静的メンバ関数
 	void CameraShake(bool& flag);
 	// カメラの追尾
 	XMFLOAT3 CameraTrack(XMFLOAT3 pPos);
+	float CameraRot(XMFLOAT3 pPos);
 
 
 private: // メンバ変数
@@ -100,4 +101,6 @@ private: // メンバ変数
 	XMFLOAT3 shake = {};
 	// シェイク管理カウンター
 	int shakeCount = 0;
+	// カメラの動作管理用カウンター
+	int moveCount = 30;
 };

@@ -1,0 +1,126 @@
+{
+    "name": "scene",
+    "objects": [
+        {
+            "type": "LIGHT",
+            "name": "Light",
+            "transform": {
+                "translation": [
+                    1.0054539442062378,
+                    5.903861999511719,
+                    -4.076245307922363
+                ],
+                "rotation": [
+                    -3.1637072563171387,
+                    -106.93630981445312,
+                    37.261043548583984
+                ],
+                "scaling": [
+                    0.9999999403953552,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "CAMERA",
+            "name": "Camera",
+            "transform": {
+                "translation": [
+                    -6.925790786743164,
+                    4.958309173583984,
+                    -7.358891487121582
+                ],
+                "rotation": [
+                    2.664711473698844e-06,
+                    -46.69194793701172,
+                    63.559303283691406
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "平面",
+            "transform": {
+                "translation": [
+                    0.0,
+                    -1.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    60.0,
+                    1.0,
+                    60.0
+                ]
+            },
+            "file_name": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "skydome",
+            "transform": {
+                "translation": [
+                    0.0,
+                    -30.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    5.0,
+                    5.0,
+                    5.0
+                ]
+            },
+            "file_name": "skydome"
+        },
+        {
+            "type": "MESH",
+            "name": "球",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "sphere",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    2.0,
+                    2.0,
+                    2.0
+                ]
+            }
+        }
+    ]
+}

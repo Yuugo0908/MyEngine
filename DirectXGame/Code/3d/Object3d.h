@@ -34,6 +34,9 @@ public: // 静的メンバ関数
 	static void PostDraw();
 	// 3Dオブジェクト生成
 	static std::unique_ptr<Object3d> Create();
+	// 配列用のオブジェクト生成関数
+	// ユニークポインターを使用した場合エラーが発生するためにそれの回避用
+	static Object3d* arrayCreate();
 	// グラフィックパイプライン生成
 	static bool CreateGraphicsPipeline();
 	// ライトのセット

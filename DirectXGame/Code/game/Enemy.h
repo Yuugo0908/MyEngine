@@ -55,7 +55,9 @@ private:
 
 	Model* enemyModel = nullptr;
 	std::unique_ptr<Object3d> enemyObj = nullptr;
-	std::list<Enemy> enemy;
+
+	// 弾複数生成用
+	std::list<std::unique_ptr<Bullet>> bullets;
 
 	// エネミー
 	XMFLOAT3 ePos = {};

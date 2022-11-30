@@ -23,6 +23,7 @@
 #include "Light.h"
 #include "Easing.h"
 #include "Mapchip.h"
+#include "LevelLoader.h"
 
 #include <SafeDelete.h>
 #include <stdlib.h>
@@ -58,13 +59,13 @@ public: // メンバ関数
 
 	// マップチップ用
 	// マップチップ生成
-	void MapCreate(int mapNumber);
+	static void MapCreate(int mapNumber);
 	// マップチップ更新
-	void MapUpdate(int mapNumber);
+	static void MapUpdate(int mapNumber);
 	// マップチップ描画
-	void MapDraw(int mapNumber);
+	static void MapDraw(int mapNumber);
 	// マップチップ当たり判定
-	bool MapCollide(XMFLOAT3& pos, float radiusX, float radiusY, int mapNumber, const XMFLOAT3 oldPos);
+	bool MapCollide(XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const XMFLOAT3 oldPos);
 	// 位置取得
 	int GetLeftMapChip(XMFLOAT3 position);
 	int GetRightMapChip(XMFLOAT3 position);
@@ -93,32 +94,40 @@ private: // メンバ変数
 	Enemy* enemy = nullptr;
 	Bullet* bullet = nullptr;
 	Item* item = Item::GetInstance();
+	LevelData* levelData = nullptr;
 
 	// ゲームシーン用
 	// 3dモデル
-	Model* skydomeModel = nullptr;
-	std::unique_ptr<Object3d> skydome = nullptr;
-	Model* stageModel = nullptr;
-	std::unique_ptr<Object3d> stage = nullptr;
+	//std::unique_ptr<Object3d> skydome = nullptr;
+	//std::unique_ptr<Object3d> stage = nullptr;
 
 	// マップ
 	//マップチップ1つの大きさ
-	const float LAND_SCALE = 5.0f;
+	static const float LAND_SCALE;
 	//マップチップの番号
 	enum MapNumber
 	{
 		None, block
 	};
-	// モデル
-	Model* blockModel = nullptr;
+
 	//mapchipオブジェクト
-	std::vector<std::vector<int>> map; //マップチップ
-	std::unique_ptr<Object3d> blockObj[map_max_y][map_max_x]; // ステージブロック
+	static Model* blockModel;
+	static std::vector<std::vector<int>> map; //マップチップ
+	static std::unique_ptr<Object3d> blockObj[map_max_y][map_max_x]; // ステージブロック
+	static Collision::Sphere sphere[map_max_y][map_max_x];
+	// jsonオブジェクト
+	Model* cubeModel = nullptr;
+	Model* sphereModel = nullptr;
+	Model* stageModel = nullptr;
+	Model* skydomeModel = nullptr;
+	std::map<std::string, Model*> models;
+	std::vector<Object3d*> objects;
+
 	// 管理フラグ
-	bool hitFlag = false;
+	static bool hitFlag;
 	// マップ番号
-	int height;
-	int width;
+	static int height;
+	static int width;
 
 	// 画像
 	Image2d* title = nullptr;
@@ -133,10 +142,10 @@ private: // メンバ変数
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
 	XMFLOAT3 pPosOld = {};
-	float pRadiusX = 0.0f;
-	float pRadiusY = 0.0f;
+	XMFLOAT3 pRadius = {};
 	bool jumpFlag = false;//自由落下のフラグ
 	bool moveFlag = false;//移動管理フラグ
+	bool avoidFlag = false;//回避管理フラグ
 	float playerHp = 360;
 
 	// エネミー
