@@ -163,6 +163,13 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 		objects.push_back(std::move(newObject));
 	}
 
+	pPos = player->GetPos();
+	ePos = enemy->GetPos();
+	pPosOld = pPos;
+	ePosOld = ePos;
+	pRadius = player->GetScale();
+	eRadius = enemy->GetObj()->GetScale();
+
 	// カメラの設定
 	camera->SetTarget(pPos);
 
@@ -236,7 +243,7 @@ void GameScene::Update() {
 		{
 			for (int x = 0; x < map_max_x; x++)
 			{
-				if (Mapchip::GetChipNum(x, y, map[0]) == blocks_)
+				if (Mapchip::GetChipNum(x, y, map[0]) == blocks_ || Mapchip::GetChipNum(x, y, map[0]) == walls_)
 				{
 					XMFLOAT3 boxPos = blockObj[y][x]->GetPosition();
 					XMFLOAT3 boxRadius = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);
@@ -289,7 +296,7 @@ void GameScene::reset()
 
 void GameScene::Draw() {
 
-	//SetImgui();
+	SetImgui();
 
 #pragma region 背景画像描画
 	// // 背景画像描画前処理
@@ -488,8 +495,17 @@ void GameScene::MapCreate(int mapNumber)
 				blockObj[y][x] = Object3d::Create();
 				blockObj[y][x]->SetModel(blockModel);
 				//位置と大きさの変更(今は大きさは変更しないで)
-				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE, (float)mapNumber * LAND_SCALE , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE });
+				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE, 2.5f , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE });
 				blockObj[y][x]->SetScale({ 1.0f,1.0f,1.0f });
+			}
+
+			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == walls_)
+			{
+				blockObj[y][x] = Object3d::Create();
+				blockObj[y][x]->SetModel(blockModel);
+				//位置と大きさの変更(今は大きさは変更しないで)
+				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE, 2.5f , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE });
+				blockObj[y][x]->SetScale({ 1.0f,5.0f,1.0f });
 			}
 
 		}
@@ -502,7 +518,7 @@ void GameScene::MapUpdate(int mapNumber)
 	{
 		for (int x = 0; x < map_max_x; x++)
 		{
-			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == blocks_)
+			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == blocks_ || Mapchip::GetChipNum(x, y, map[mapNumber]) == walls_)
 			{
 				blockObj[y][x]->Update();
 			}
@@ -540,7 +556,7 @@ bool GameScene::MapCollide(XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const 
 	{
 		for (int x = 0; x < map_max_x; x++)
 		{
-			if (Mapchip::GetChipNum(x, y, map[0]) == blocks_)
+			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == blocks_ || Mapchip::GetChipNum(x, y, map[mapNumber]) == walls_)
 			{
 				mapPos = blockObj[y][x]->GetPosition();
 				mapRadius = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);

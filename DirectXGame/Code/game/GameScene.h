@@ -106,7 +106,7 @@ private: // メンバ変数
 	//マップチップの番号
 	enum MapNumber
 	{
-		None, blocks_, enemys_
+		None, blocks_, walls_
 	};
 
 	//mapchipオブジェクト

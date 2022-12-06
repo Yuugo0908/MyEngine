@@ -15,7 +15,9 @@ bool Player::Initialize(Keyboard* keyboard, Mouse* mouse)
 	playerObj->SetModel(playerModel);
 
 	// ˆÊ’u‚ð•Ï”‚ÉŠi”[
-	playerObj->SetPosition({ 50.0f, 0.0f, 50.0f });
+	pPos = { 0.0f, 10.0f, 0.0f };
+
+	playerObj->SetPosition(pPos);
 	playerObj->SetScale({ 0.8f,0.8f,0.8f });
 	pPos = playerObj->GetPosition();
 	pScale = playerObj->GetScale();

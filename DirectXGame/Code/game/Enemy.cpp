@@ -85,7 +85,7 @@ void Enemy::Update()
 	}
 
 
-	if (!attackFlag && (PElength > 10.0f && PElength <= 40.0f))
+	if (!attackFlag && (PElength > 10.0f && PElength <= 30.0f))
 	{
 		phase = Enemy::Phase::move;
 	}
