@@ -15,7 +15,7 @@ bool Player::Initialize(Keyboard* keyboard, Mouse* mouse)
 	playerObj->SetModel(playerModel);
 
 	// 位置を変数に格納
-	playerObj->SetPosition({ 0.0f, 0.0f, -5.0f });
+	playerObj->SetPosition({ 50.0f, 0.0f, 50.0f });
 	playerObj->SetScale({ 0.8f,0.8f,0.8f });
 	pPos = playerObj->GetPosition();
 	pScale = playerObj->GetScale();
@@ -88,6 +88,7 @@ void Player::Rush(bool rFlag)
 	else if (!rFlag && mouse->TriggerMouseRight())
 	{
 		avoidFlag = true;
+		// 加速力の更新
 		pAcc = 2.2f;
 	}
 
@@ -103,30 +104,33 @@ void Player::Rush(bool rFlag)
 
 void Player::Jump()
 {
-	// ジャンプ
-	if (jumpFlag)
+	if (!jumpFlag && keyboard->TriggerKey(DIK_SPACE))
 	{
-		pVal -= pGra;
-		pPos.y += pVal;
-	}
-	else if (keyboard->TriggerKey(DIK_SPACE))
-	{
+		onGround = false;
 		jumpFlag = true;
 		// 上昇率の更新
 		pVal = 1.25f;
 	}
 
-	if (!jumpFlag)
+	// ジャンプ
+	if (jumpFlag)
 	{
-		pVal = 0.0f;
-	}
-	else if (pVal <= 0.0f)
-	{
-		// オブジェクト同士の当たり判定を実装するならここのif文を変更
-		if (pPos.y <= 0.0f)
+		pVal -= pGra;
+		pPos.y += pVal;
+		if (onGround)
 		{
-			pPos.y = 0.0f;
 			jumpFlag = false;
+			pVal = 0.0f;
+		}
+	}
+	// 重力
+	else
+	{
+		pDown -= 0.5f;
+		pPos.y += pDown;
+		if (onGround)
+		{
+			pDown = 0.0f;
 		}
 	}
 }

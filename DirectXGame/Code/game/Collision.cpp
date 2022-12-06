@@ -112,3 +112,72 @@ bool Collision::CollisionRaySphere(const Ray& ray, const Sphere& sphere, float* 
 {
 	return false;
 }
+
+bool Collision::CollisionBoxPoint(const XMFLOAT3 boxPos, const XMFLOAT3 boxRadius, XMFLOAT3& pPos, const XMFLOAT3 pRadius, XMFLOAT3 pOldPos)
+{
+	//マップチップ
+	//X, Y
+	XMFLOAT3 mapPos = {};
+	//Radius
+	XMFLOAT3 mapRadius = {};
+
+	//フラグ
+	bool hitFlag = false;
+
+	mapPos = boxPos;
+	mapRadius = boxRadius;
+
+	// 判定
+	float maxMapX = mapPos.x + mapRadius.x;
+	float minMapX = mapPos.x - mapRadius.x;
+	float maxMapY = mapPos.y + mapRadius.y;
+	float minMapY = mapPos.y - mapRadius.y;
+	float maxMapZ = mapPos.z + mapRadius.z;
+	float minMapZ = mapPos.z - mapRadius.z;
+
+	if ((pPos.x <= maxMapX && pPos.x >= minMapX) &&
+		(pPos.y <= maxMapY && pPos.y >= minMapY))
+	{
+		if (maxMapZ + pRadius.z > pPos.z && mapPos.z < pOldPos.z)
+		{
+			pPos.z = maxMapZ + pRadius.z;
+			hitFlag = true;
+		}
+		else if (minMapZ - pRadius.z < pPos.z && mapPos.z > pOldPos.z)
+		{
+			pPos.z = minMapZ - pRadius.z;
+			hitFlag = true;
+		}
+	}
+
+	if ((pPos.z <= maxMapZ && pPos.z >= minMapZ) &&
+		(pPos.y <= maxMapY && pPos.y >= minMapY))
+	{
+		if (maxMapX + pRadius.x > pPos.x && mapPos.x < pOldPos.x)
+		{
+			pPos.x = maxMapX + pRadius.x;
+			hitFlag = true;
+		}
+		else if (minMapX - pRadius.x < pPos.x && mapPos.x > pOldPos.x)
+		{
+			pPos.x = minMapX - pRadius.x;
+			hitFlag = true;
+		}
+	}
+
+	if ((pPos.x <= maxMapX && pPos.x >= minMapX) &&
+		(pPos.z <= maxMapZ && pPos.z >= minMapZ))
+	{
+		if (maxMapY + pRadius.y > pPos.y && mapPos.y < pOldPos.y)
+		{
+			pPos.y = maxMapY + pRadius.y;
+			hitFlag = true;
+		}
+		else if (minMapY - pRadius.y < pPos.y && mapPos.y > pOldPos.y)
+		{
+			pPos.y = minMapY - pRadius.y;
+			hitFlag = true;
+		}
+	}
+	return hitFlag;
+}

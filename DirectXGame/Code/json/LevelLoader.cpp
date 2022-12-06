@@ -6,8 +6,6 @@ using namespace std;
 const std::string LevelLoader::baseDirectory = "Resources/level/";
 const std::string LevelLoader::Extension = ".json";
 
-Collision::Sphere LevelLoader::sphere;
-
 LevelData* LevelLoader::LoadFile(const std::string& fileName)
 {
 	// ファイルストリーム
@@ -42,63 +40,73 @@ LevelData* LevelLoader::LoadFile(const std::string& fileName)
 	// "objects"の全オブジェクトを走査
 	for (nlohmann::json& object : deserialized["objects"])
 	{
-		assert(object.contains("type"));
-
-		// 種別を取得
-		std::string type = object["type"].get<std::string>();
-
-		// MESH
-		if (type.compare("MESH") == 0) {
-			// 要素追加
-			levelData->objects.emplace_back(LevelData::ObjectData{});
-			// 今追加した要素の参照を得る
-			LevelData::ObjectData& objectData = levelData->objects.back();
-
-			if (object.contains("file_name")) {
-				// ファイル名
-				objectData.fileName = object["file_name"];
-			}
-
-			// トランスフォームのパラメータ読み込み
-			nlohmann::json& transform = object["transform"];
-			// 平行移動
-			objectData.trans.m128_f32[0] = (float)transform["translation"][0];
-			objectData.trans.m128_f32[1] = (float)transform["translation"][1];
-			objectData.trans.m128_f32[2] = (float)transform["translation"][2];
-			objectData.trans.m128_f32[3] = 1.0f;
-			// 回転角
-			objectData.rot.m128_f32[0] = (float)transform["rotation"][0];
-			objectData.rot.m128_f32[1] = (float)transform["rotation"][1];
-			objectData.rot.m128_f32[2] = (float)transform["rotation"][2];
-			objectData.rot.m128_f32[3] = 0.0f;
-			// スケーリング
-			objectData.scale.m128_f32[0] = (float)transform["scaling"][0];
-			objectData.scale.m128_f32[1] = (float)transform["scaling"][1];
-			objectData.scale.m128_f32[2] = (float)transform["scaling"][2];
-			objectData.scale.m128_f32[3] = 0.0f;
-
-			// コライダーのパラメータ読み込み
-			if (object.contains("collider"))
-			{
-				nlohmann::json& collider = object["collider"];
-				// コライダーの中心点
-				objectData.center.m128_f32[0] = (float)collider["center"][0];
-				objectData.center.m128_f32[1] = (float)collider["center"][1];
-				objectData.center.m128_f32[2] = (float)collider["center"][2];
-				objectData.center.m128_f32[3] = 0.0f;
-				sphere.center = objectData.center;
-				// コライダーの大きさ
-				objectData.size.m128_f32[0] = (float)collider["size"][0];
-				objectData.size.m128_f32[1] = (float)collider["size"][1];
-				objectData.size.m128_f32[2] = (float)collider["size"][2];
-				objectData.size.m128_f32[3] = 0.0f;
-			}
-		}
+		Recursive(object, levelData);
 
 		//if (object.contains("children"))
 		//{
-
+		//	Recursive(object, levelData);
 		//}
 	}
+
+	levelData->stageModel = levelData->stageModel->CreateFromObject("stage");
+	levelData->skydomeModel = levelData->skydomeModel->CreateFromObject("skydome");
+	levelData->models.insert(std::make_pair("stage", levelData->stageModel));
+	levelData->models.insert(std::make_pair("skydome", levelData->skydomeModel));
+
 	return levelData;
+}
+
+void LevelLoader::Recursive(nlohmann::json& object, LevelData* levelData)
+{
+	assert(object.contains("type"));
+
+	// 種別を取得
+	std::string type = object["type"].get<std::string>();
+
+	// MESH
+	if (type.compare("MESH") == 0) {
+		// 要素追加
+		levelData->objects.emplace_back(LevelData::ObjectData{});
+		// 今追加した要素の参照を得る
+		LevelData::ObjectData& objectData = levelData->objects.back();
+
+		if (object.contains("file_name")) {
+			// ファイル名
+			objectData.fileName = object["file_name"];
+		}
+
+		// トランスフォームのパラメータ読み込み
+		nlohmann::json& transform = object["transform"];
+		// 平行移動
+		objectData.trans.m128_f32[0] = (float)transform["translation"][0];
+		objectData.trans.m128_f32[1] = (float)transform["translation"][1];
+		objectData.trans.m128_f32[2] = (float)transform["translation"][2];
+		objectData.trans.m128_f32[3] = 1.0f;
+		// 回転角
+		objectData.rot.m128_f32[0] = (float)transform["rotation"][0];
+		objectData.rot.m128_f32[1] = (float)transform["rotation"][1];
+		objectData.rot.m128_f32[2] = (float)transform["rotation"][2];
+		objectData.rot.m128_f32[3] = 0.0f;
+		// スケーリング
+		objectData.scale.m128_f32[0] = (float)transform["scaling"][0];
+		objectData.scale.m128_f32[1] = (float)transform["scaling"][1];
+		objectData.scale.m128_f32[2] = (float)transform["scaling"][2];
+		objectData.scale.m128_f32[3] = 0.0f;
+
+		// コライダーのパラメータ読み込み
+		if (object.contains("collider"))
+		{
+			nlohmann::json& collider = object["collider"];
+			// コライダーの中心点
+			objectData.center.m128_f32[0] = (float)collider["center"][0];
+			objectData.center.m128_f32[1] = (float)collider["center"][1];
+			objectData.center.m128_f32[2] = (float)collider["center"][2];
+			objectData.center.m128_f32[3] = 0.0f;
+			// コライダーの大きさ
+			objectData.size.m128_f32[0] = (float)collider["size"][0];
+			objectData.size.m128_f32[1] = (float)collider["size"][1];
+			objectData.size.m128_f32[2] = (float)collider["size"][2];
+			objectData.size.m128_f32[3] = 0.0f;
+		}
+	}
 }

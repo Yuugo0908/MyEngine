@@ -56,6 +56,8 @@ public: // メンバ関数
 	void CameraUpdate();
 	// 当たり判定
 	void CollisionUpdate();
+	// ステージの当たり判定
+	bool CollisionStage(XMFLOAT3& pos, const XMFLOAT3 radius, const XMFLOAT3 oldPos);
 
 	// マップチップ用
 	// マップチップ生成
@@ -66,10 +68,6 @@ public: // メンバ関数
 	static void MapDraw(int mapNumber);
 	// マップチップ当たり判定
 	bool MapCollide(XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const XMFLOAT3 oldPos);
-	// 位置取得
-	int GetLeftMapChip(XMFLOAT3 position);
-	int GetRightMapChip(XMFLOAT3 position);
-	int GetUpMapChip(XMFLOAT3 position);
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
@@ -114,17 +112,11 @@ private: // メンバ変数
 	static Model* blockModel;
 	static std::vector<std::vector<int>> map; //マップチップ
 	static std::unique_ptr<Object3d> blockObj[map_max_y][map_max_x]; // ステージブロック
-	static Collision::Sphere sphere[map_max_y][map_max_x];
 	// jsonオブジェクト
-	Model* cubeModel = nullptr;
-	Model* sphereModel = nullptr;
-	Model* stageModel = nullptr;
-	Model* skydomeModel = nullptr;
-	std::map<std::string, Model*> models;
-	std::vector<Object3d*> objects;
+	std::vector<std::unique_ptr<Object3d>> objects{};
+	XMFLOAT3 stagePos = {};
+	XMFLOAT3 stageScale = {};
 
-	// 管理フラグ
-	static bool hitFlag;
 	// マップ番号
 	static int height;
 	static int width;
@@ -143,13 +135,15 @@ private: // メンバ変数
 	XMFLOAT3 pPos = {};//座標
 	XMFLOAT3 pPosOld = {};
 	XMFLOAT3 pRadius = {};
-	bool jumpFlag = false;//自由落下のフラグ
+	bool onGround = false;//自由落下のフラグ
 	bool moveFlag = false;//移動管理フラグ
 	bool avoidFlag = false;//回避管理フラグ
 	float playerHp = 360;
 
 	// エネミー
 	XMFLOAT3 ePos = {};
+	XMFLOAT3 ePosOld = {};
+	XMFLOAT3 eRadius = {};
 	bool eFlag = false; // 自由落下のフラグ
 	bool eAlive = false;// 生きているかのフラグ
 	float enemyHp = 360;

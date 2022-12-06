@@ -8,7 +8,7 @@ class Bullet
 {
 public: // メンバ関数
 
-	bool Initialize();
+	bool Initialize(Model* bulletModel);
 
 	void Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos);
 
@@ -37,7 +37,6 @@ public: // メンバ関数
 	}
 
 private: // メンバ変数
-	Model* bulletModel = nullptr;
 	std::unique_ptr<Object3d> bulletObj = nullptr;
 
 	// バレット

@@ -28,6 +28,9 @@ public: // メンバ関数
 	// 突進
 	const bool& GetAvoidFlag() { return avoidFlag; }
 	void SetAvoidFlag(bool avoidFlag) { this->avoidFlag = avoidFlag; }
+	// ジャンプ
+	const bool& GetOnGround() { return onGround; }
+	void SetOnGround(bool onGround) { this->onGround = onGround; }
 
 	// 位置
 	const XMFLOAT3& GetPos() { return pPos; }
@@ -56,19 +59,17 @@ private: // メンバ変数
 	XMFLOAT3 pRot = {};//回転
 
 	float pSpeed = 0.35f;
-	bool jumpFlag = false;//自由落下のフラグ
+	bool onGround = false;//自由落下のフラグ
+	bool jumpFlag = false;
 	bool moveFlag = false;//移動管理フラグ
 	float pMove = 0.0f;//移動量
 	float pAcc = 0.2f;//加速
 	float pVal = 0.2f;//速度
-	const float pGra = 0.1f;//重力
+	float pDown = 0.0f;
+	float pGra = 0.1f;//重力
 	float rate = 1.0f; // 斜め移動時の制限
 
 	// 突進用
-	XMFLOAT3 startPos = {}; // 開始位置
-	XMFLOAT3 endPos = {}; // 終点位置
-	float avoidMove = 20.0f; // 距離
-	float avoidTime = 0.0f; // 経過時間
 	bool avoidFlag = false; // 回避開始フラグ
 	int avoidCount = 0;
 

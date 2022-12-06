@@ -24,6 +24,11 @@ struct LevelData
 	};
 	// オブジェクト配列
 	std::vector<ObjectData> objects;
+
+	// モデルリスト
+	Model* stageModel = nullptr;
+	Model* skydomeModel = nullptr; 
+	std::map<std::string, Model*> models;
 };
 
 class LevelLoader
@@ -33,9 +38,11 @@ public:
 	static const std::string baseDirectory;
 	// 拡張子
 	static const std::string Extension;
-
-	static Collision::Sphere sphere;
 public:
 	// ファイル読み込み
 	static LevelData* LoadFile(const std::string& fileName);
+
+	static void Recursive(nlohmann::json& object, LevelData* levelData);
+
+	static void SetCollision();
 };

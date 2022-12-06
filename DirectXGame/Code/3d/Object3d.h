@@ -34,9 +34,6 @@ public: // 静的メンバ関数
 	static void PostDraw();
 	// 3Dオブジェクト生成
 	static std::unique_ptr<Object3d> Create();
-	// 配列用のオブジェクト生成関数
-	// ユニークポインターを使用した場合エラーが発生するためにそれの回避用
-	static Object3d* arrayCreate();
 	// グラフィックパイプライン生成
 	static bool CreateGraphicsPipeline();
 	// ライトのセット
@@ -88,7 +85,7 @@ public: // メンバ関数
 	// 座標の設定
 	void SetPosition(XMFLOAT3 position) { this->position = position; }
 	// モデルの設定
-	void SetModel(Model* model) { this->model = model; };
+	void SetModel(Model* model) { this->model = model; }
 	// 色の設定
 	void SetColor(XMFLOAT4 color) { this->color = color; }
 private: // メンバ変数

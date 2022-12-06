@@ -19,9 +19,9 @@ public:
 		stay,
 	};
 
-	bool Initialize(Player* player, Bullet* bullet);
+	bool Initialize(Player* player);
 
-	bool Create();
+	bool BulletCreate();
 
 	void Update();
 
@@ -34,6 +34,10 @@ public:
 	void Stay();
 
 	void Spawn();
+
+	bool EnemyCollision();
+
+	bool BulletCollision();
 
 	const std::unique_ptr<Object3d>& GetObj() { return enemyObj; }
 
@@ -51,12 +55,13 @@ public:
 
 private:
 	Player* player = nullptr;
-	Bullet* bullet = nullptr;
 
 	Model* enemyModel = nullptr;
 	std::unique_ptr<Object3d> enemyObj = nullptr;
 
 	// 弾複数生成用
+	bool LoadFlag = false;
+	static Model* bulletModel;
 	std::list<std::unique_ptr<Bullet>> bullets;
 
 	// エネミー
