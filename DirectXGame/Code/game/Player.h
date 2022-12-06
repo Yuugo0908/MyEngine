@@ -23,12 +23,15 @@ public: // メンバ関数
 
 	void Jump();
 
+	// マップチップ当たり判定
+	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const XMFLOAT3 oldPos);
+
 	// オブジェクト
 	const std::unique_ptr<Object3d>& GetObj() { return playerObj; }
 	// 突進
 	const bool& GetAvoidFlag() { return avoidFlag; }
 	void SetAvoidFlag(bool avoidFlag) { this->avoidFlag = avoidFlag; }
-	// ジャンプ
+	// 着地
 	const bool& GetOnGround() { return onGround; }
 	void SetOnGround(bool onGround) { this->onGround = onGround; }
 

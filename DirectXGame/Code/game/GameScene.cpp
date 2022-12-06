@@ -118,22 +118,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	blockModel = blockModel->CreateFromObject("block");
 	//マップチップ用のCSV読み込み
 	//(map, "Resource/scv/なんたら.csv")で追加可能
-	Mapchip::CsvToVector(map, "Resources/csv/tutorial.csv");//mapNum=0
-
-	//マップチップ用のオブジェクトの初期化
-	for (int y = 0; y < map_max_y; y++)
-	{
-		for (int x = 0; x < map_max_x; x++)
-		{
-			if (Mapchip::GetChipNum(x, y, map[0]) == block)
-			{
-				blockObj[y][x] = Object3d::Create();
-				blockObj[y][x]->SetModel(blockModel);
-				blockObj[y][x]->SetScale({ 1.0f,1.0f,1.0f });
-				blockObj[y][x]->SetPosition({ 1000.0f,1000.0f,0.0f });
-			}
-		}
-	}
+	Mapchip::CsvToVector(map, "Resources/csv/stage1.csv");//mapNum=0
 
 	// レベルデータの読み込み
 	levelData = LevelLoader::LoadFile("gameScene");
@@ -201,9 +186,12 @@ void GameScene::Update() {
 
 	if (nowScene == 0)
 	{
-		MapCreate(0);
 		if (keyboard->TriggerKey(DIK_SPACE))
 		{
+			//マップチップ用のCSV読み込み
+			//(map, "Resource/scv/なんたら.csv")で追加可能
+			Mapchip::CsvToVector(map, "Resources/csv/stage1.csv");//mapNum=0
+			MapCreate(0);
 			nowScene = 1;
 		}
 	}
@@ -232,16 +220,40 @@ void GameScene::Update() {
 		eRadius = enemy->GetObj()->GetScale();
 
 		MapUpdate(0);
-		if (MapCollide(pPos, pRadius, 0, pPosOld))
-		{
-			onGround = true;
-			player->SetOnGround(onGround);
-			avoidFlag = false;
-			player->SetAvoidFlag(avoidFlag);
-		}
-		MapCollide(ePos, eRadius, 0, ePosOld);
+		//if (MapCollide(pPos, pRadius, 0, pPosOld))
+		//{
+		//	onGround = true;
+		//	player->SetOnGround(onGround);
+		//	avoidFlag = false;
+		//	player->SetAvoidFlag(avoidFlag);
+		//}
+		//if (MapCollide(ePos, eRadius, 0, ePosOld))
+		//{
+		//	enemy->SetOnGround(true);
+		//}
 
-		CollisionStage(pPos, pRadius, pPosOld);
+		for (int y = 0; y < map_max_y; y++)
+		{
+			for (int x = 0; x < map_max_x; x++)
+			{
+				if (Mapchip::GetChipNum(x, y, map[0]) == blocks_)
+				{
+					XMFLOAT3 boxPos = blockObj[y][x]->GetPosition();
+					XMFLOAT3 boxRadius = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);
+					player->MapCollide(boxPos, boxRadius, pPos, pRadius, 0, pPosOld);
+					enemy->MapCollide(boxPos, boxRadius, ePos, eRadius, 0, ePosOld);
+				}
+			}
+		}
+
+		if (CollisionStage(pPos, pRadius, pPosOld))
+		{
+			player->SetOnGround(true);
+		}
+		if (CollisionStage(ePos, eRadius, ePosOld))
+		{
+			enemy->SetOnGround(true);
+		}
 
 		for (auto& object : objects)
 		{
@@ -295,19 +307,22 @@ void GameScene::Draw() {
 	Object3d::PreDraw(dxCommon->GetCommandList());
 
 	// 3Dオブクジェクトの描画
-	player->Draw();
-
-	if (eAlive)
+	if (nowScene == 1)
 	{
-		enemy->Draw();
-	}
-	rope->Draw();
-	//item->Draw();
-	MapDraw(0);
+		player->Draw();
 
-	for (auto& object : objects)
-	{
-		object->Draw();
+		if (eAlive)
+		{
+			enemy->Draw();
+		}
+		rope->Draw();
+		//item->Draw();
+		MapDraw(0);
+
+		for (auto& object : objects)
+		{
+			object->Draw();
+		}
 	}
 
 	// 3Dオブジェクト描画後処理
@@ -445,22 +460,18 @@ bool GameScene::CollisionStage(XMFLOAT3& pos, const XMFLOAT3 radius, const XMFLO
 
 	bool hitFlag = false;
 
-	if ((pPos.x <= maxX && pPos.x >= minX) &&
-		(pPos.z <= maxZ && pPos.z >= minZ))
+	if ((pos.x <= maxX && pos.x >= minX) &&
+		(pos.z <= maxZ && pos.z >= minZ))
 	{
-		if (maxY + pRadius.y > pPos.y && stagePos.y < oldPos.y)
+		if (maxY + radius.y > pos.y && stagePos.y < oldPos.y)
 		{
-			pPos.y = maxY + pRadius.y;
+			pos.y = maxY + radius.y;
 			hitFlag = true;
-			onGround = true;
-			player->SetOnGround(onGround);
 		}
-		else if (minY - pRadius.y < pPos.y && stagePos.y > oldPos.y)
+		else if (minY - radius.y < pos.y && stagePos.y > oldPos.y)
 		{
-			pPos.y = minY - pRadius.y;
+			pos.y = minY - radius.y;
 			hitFlag = true;
-			onGround = true;
-			player->SetOnGround(onGround);
 		}
 	}
 
@@ -472,11 +483,15 @@ void GameScene::MapCreate(int mapNumber)
 	for (int y = 0; y < map_max_y; y++) {//(yが25)
 		for (int x = 0; x < map_max_x; x++) {//(xが25)
 
-			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == block)
+			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == blocks_)
 			{
+				blockObj[y][x] = Object3d::Create();
+				blockObj[y][x]->SetModel(blockModel);
 				//位置と大きさの変更(今は大きさは変更しないで)
 				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE, (float)mapNumber * LAND_SCALE , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE });
+				blockObj[y][x]->SetScale({ 1.0f,1.0f,1.0f });
 			}
+
 		}
 	}
 }
@@ -487,7 +502,7 @@ void GameScene::MapUpdate(int mapNumber)
 	{
 		for (int x = 0; x < map_max_x; x++)
 		{
-			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == block)
+			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == blocks_)
 			{
 				blockObj[y][x]->Update();
 			}
@@ -502,7 +517,7 @@ void GameScene::MapDraw(int mapNumber)
 	{
 		for (int x = 0; x < map_max_x; x++)
 		{
-			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == block)
+			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == blocks_)
 			{
 				blockObj[y][x]->Draw();
 			}
@@ -525,7 +540,7 @@ bool GameScene::MapCollide(XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const 
 	{
 		for (int x = 0; x < map_max_x; x++)
 		{
-			if (Mapchip::GetChipNum(x, y, map[0]) == block)
+			if (Mapchip::GetChipNum(x, y, map[0]) == blocks_)
 			{
 				mapPos = blockObj[y][x]->GetPosition();
 				mapRadius = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);

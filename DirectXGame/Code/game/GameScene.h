@@ -34,6 +34,7 @@ private: // 静的メンバ変数
 	static const int debugTextTexNumber = 0;
 
 public: // メンバ関数
+
 	// コンストクラタ
 	GameScene();
 	// デストラクタ
@@ -105,7 +106,7 @@ private: // メンバ変数
 	//マップチップの番号
 	enum MapNumber
 	{
-		None, block
+		None, blocks_, enemys_
 	};
 
 	//mapchipオブジェクト

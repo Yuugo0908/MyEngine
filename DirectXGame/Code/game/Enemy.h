@@ -39,6 +39,9 @@ public:
 
 	bool BulletCollision();
 
+	// マップチップ当たり判定
+	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const XMFLOAT3 oldPos);
+
 	const std::unique_ptr<Object3d>& GetObj() { return enemyObj; }
 
 	const XMFLOAT3& GetPos() { return ePos; }
@@ -46,6 +49,10 @@ public:
 
 	const bool& GetAlive() { return eAlive; }
 	void SetAlive(bool eAlive) { this->eAlive = eAlive; }
+
+	// 着地
+	const bool& GetOnGround() { return onGround; }
+	void SetOnGround(bool onGround) { this->onGround = onGround; }
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
@@ -67,18 +74,25 @@ private:
 	// エネミー
 	XMFLOAT3 ePos = {};
 	XMFLOAT3 oldePos = {};
+	XMFLOAT3 randPos = {}; // ランダムなスポーン位置
+
+	Phase phase = Enemy::Phase::move;
+
+	float eUp = 0.0f; // 上昇
+	float eDown = 0.0f;// 下降
+	float eGra = 0.1f; // 重力
 	float PElength = 0.0f;
 	float lengthOld = 0.0f;
-	bool eFlag = false; // 自由落下のフラグ
-	float eVal = 0.2f; // 速度
-	float eGra = 0.1f; // 重力
-	bool eAlive = false;// 生きているかのフラグ
+
 	int eAliveCount = 0;
 	int enemyCount = 0; // 倒した数
-	bool attackFlag = false;
-	Phase phase = Enemy::Phase::move;
-	XMFLOAT3 randPos = {}; // ランダムなスポーン位置
 	int attackCount = 0;
+
+	bool eFlag = false; // 自由落下のフラグ
+	bool eAlive = false;// 生きているかのフラグ
+	bool attackFlag = false;
+	bool jumpFlag = false;
+	bool onGround = false;
 
 	// バレット
 	XMFLOAT3 bPos = {};

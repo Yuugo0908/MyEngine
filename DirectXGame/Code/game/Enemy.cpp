@@ -43,6 +43,8 @@ void Enemy::Update()
 			pPos = player->GetPos();
 			Spawn();
 			eAlive = true;
+			onGround = false;
+			attackFlag = false;
 			eAliveCount = 0;
 		}
 
@@ -61,26 +63,39 @@ void Enemy::Update()
 	PElength = GetLength(pPos, ePos);
 	lengthOld = GetLength(ePos, oldePos);
 
-	if (ePos.y > 0.0f)
+	// ジャンプ
+	if (jumpFlag)
 	{
-		eVal -= eGra;
-		ePos.y += eVal;
+		eUp -= eGra;
+		ePos.y += eUp;
+		if (onGround)
+		{
+			jumpFlag = false;
+			eUp = 0.0f;
+		}
+	}
+	else
+	{
+		eDown -= 0.2f;
+		ePos.y += eDown;
+		if (onGround)
+		{
+			eDown = 0.0f;
+		}
 	}
 
-	else if (ePos.y <= 0.0f)
+
+	if (!attackFlag && (PElength > 10.0f && PElength <= 40.0f))
 	{
-		ePos.y = 0.0f;
-		eVal = 0.0f;
+		phase = Enemy::Phase::move;
+	}
+	else if(!attackFlag)
+	{
+		phase = Enemy::Phase::stay;
+	}
 
-		if (!attackFlag && (PElength > 10.0f && PElength <= 40.0f))
-		{
-			phase = Enemy::Phase::move;
-		}
-		else if(!attackFlag)
-		{
-			phase = Enemy::Phase::stay;
-		}
-
+	if (onGround)
+	{
 		if (PElength <= 15.0f)
 		{
 			phase = Enemy::Phase::attack;
@@ -90,23 +105,26 @@ void Enemy::Update()
 				bullet->SetAttackFlag(attackFlag);
 			}
 		}
+	}
 
-		switch (phase)
+	switch (phase)
+	{
+	default:
+	case Enemy::Phase::attack:
+		for (std::unique_ptr<Bullet>& bullet : bullets)
 		{
-		default:
-		case Enemy::Phase::attack:
-			for (std::unique_ptr<Bullet>& bullet : bullets)
+			if (attackFlag)
 			{
 				bullet->Attack();
 			}
-			break;
-		case Enemy::Phase::move:
-			Move();
-			break;
-		case Enemy::Phase::stay:
-			Stay();
-			break;
 		}
+		break;
+	case Enemy::Phase::move:
+		Move();
+		break;
+	case Enemy::Phase::stay:
+		Stay();
+		break;
 	}
 
 	enemyObj->SetPosition(ePos);
@@ -156,7 +174,7 @@ void Enemy::Spawn()
 	randPos.z = (float)(-40 + rand() % 80);
 
 	phase = Enemy::Phase::move;
-	enemyObj->SetPosition({ randPos.x, 5.0f, randPos.z });
+	enemyObj->SetPosition({ randPos.x, 8.0f, randPos.z });
 	enemyObj->SetScale({ 1.0f, 1.0f, 1.0f });
 	enemyObj->SetColor({ 0.0f, 0.8f, 0.0f, 1.0f });
 	ePos = enemyObj->GetPosition();
@@ -165,9 +183,10 @@ void Enemy::Spawn()
 
 bool Enemy::EnemyCollision()
 {
+	eAlive = false;
+	LoadFlag = false;
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
-		eAlive = false;
 		bullets.remove(bullet);
 		break;
 	}
@@ -189,6 +208,97 @@ bool Enemy::BulletCollision()
 		}
 	}
 	return false;
+}
+
+bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const XMFLOAT3 oldPos)
+{
+	//フラグ
+	bool hitFlag = false;
+
+	// 判定
+	float maxBoxX = boxPos.x + boxRadius.x;
+	float minBoxX = boxPos.x - boxRadius.x;
+	float maxBoxY = boxPos.y + boxRadius.y;
+	float minBoxY = boxPos.y - boxRadius.y;
+	float maxBoxZ = boxPos.z + boxRadius.z;
+	float minBoxZ = boxPos.z - boxRadius.z;
+
+	if ((pos.x <= maxBoxX && pos.x >= minBoxX) &&
+		(pos.z <= maxBoxZ && pos.z >= minBoxZ))
+	{
+		if (maxBoxY + radius.y > pos.y && boxPos.y < oldPos.y)
+		{
+			pos.y = maxBoxY + radius.y;
+			hitFlag = true;
+			onGround = true;
+		}
+		else if (minBoxY - radius.y < pos.y && boxPos.y > oldPos.y)
+		{
+			pos.y = minBoxY - radius.y;
+			hitFlag = true;
+			onGround = true;
+		}
+	}
+
+	if ((pos.x <= maxBoxX && pos.x >= minBoxX) &&
+		(pos.y <= maxBoxY && pos.y >= minBoxY))
+	{
+		if (maxBoxZ + radius.z > pos.z && boxPos.z < oldPos.z)
+		{
+			pos.z = maxBoxZ + radius.z;
+			hitFlag = true;
+			if (!jumpFlag)
+			{
+				onGround = false;
+				jumpFlag = true;
+				// 上昇率の更新
+				eUp = 1.25f;
+			}
+		}
+		else if (minBoxZ - radius.z < pos.z && boxPos.z > oldPos.z)
+		{
+			pos.z = minBoxZ - radius.z;
+			hitFlag = true;
+			if (!jumpFlag)
+			{
+				onGround = false;
+				jumpFlag = true;
+				// 上昇率の更新
+				eUp = 1.25f;
+			}
+		}
+	}
+
+	if ((pos.z <= maxBoxZ && pos.z >= minBoxZ) &&
+		(pos.y <= maxBoxY && pos.y >= minBoxY))
+	{
+		if (maxBoxX + radius.x > pos.x && boxPos.x < oldPos.x)
+		{
+			pos.x = maxBoxX + radius.x;
+			hitFlag = true;
+			if (!jumpFlag)
+			{
+				onGround = false;
+				jumpFlag = true;
+				// 上昇率の更新
+				eUp = 1.25f;
+			}
+		}
+		else if (minBoxX - radius.x < pos.x && boxPos.x > oldPos.x)
+		{
+			pos.x = minBoxX - radius.x;
+			hitFlag = true;
+			if (!jumpFlag)
+			{
+				onGround = false;
+				jumpFlag = true;
+				// 上昇率の更新
+				eUp = 1.25f;
+			}
+		}
+	}
+
+	return hitFlag;
 }
 
 void Enemy::Draw()

@@ -126,11 +126,78 @@ void Player::Jump()
 	// èdóÕ
 	else
 	{
-		pDown -= 0.5f;
+		pDown -= 0.3f;
 		pPos.y += pDown;
 		if (onGround)
 		{
 			pDown = 0.0f;
 		}
 	}
+}
+
+bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const XMFLOAT3 oldPos)
+{
+	//ÉtÉâÉO
+	bool hitFlag = false;
+
+	// îªíË
+	float maxBoxX = boxPos.x + boxRadius.x;
+	float minBoxX = boxPos.x - boxRadius.x;
+	float maxBoxY = boxPos.y + boxRadius.y;
+	float minBoxY = boxPos.y - boxRadius.y;
+	float maxBoxZ = boxPos.z + boxRadius.z;
+	float minBoxZ = boxPos.z - boxRadius.z;
+
+	if ((pos.x <= maxBoxX && pos.x >= minBoxX) &&
+		(pos.z <= maxBoxZ && pos.z >= minBoxZ))
+	{
+		if (maxBoxY + radius.y > pos.y && boxPos.y < oldPos.y)
+		{
+			pos.y = maxBoxY + radius.y;
+			hitFlag = true;
+			onGround = true;
+		}
+		else if (minBoxY - radius.y < pos.y && boxPos.y > oldPos.y)
+		{
+			pos.y = minBoxY - radius.y;
+			hitFlag = true;
+			onGround = true;
+		}
+	}
+
+	if ((pos.x <= maxBoxX && pos.x >= minBoxX) &&
+		(pos.y <= maxBoxY && pos.y >= minBoxY))
+	{
+		if (maxBoxZ + radius.z > pos.z && boxPos.z < oldPos.z)
+		{
+			pos.z = maxBoxZ + radius.z;
+			hitFlag = true;
+			avoidFlag = false;
+		}
+		else if (minBoxZ - radius.z < pos.z && boxPos.z > oldPos.z)
+		{
+			pos.z = minBoxZ - radius.z;
+			hitFlag = true;
+			avoidFlag = false;
+		}
+	}
+
+	if ((pos.z <= maxBoxZ && pos.z >= minBoxZ) &&
+		(pos.y <= maxBoxY && pos.y >= minBoxY))
+	{
+		if (maxBoxX + radius.x > pos.x && boxPos.x < oldPos.x)
+		{
+			pos.x = maxBoxX + radius.x;
+			hitFlag = true;
+			avoidFlag = false;
+		}
+		else if (minBoxX - radius.x < pos.x && boxPos.x > oldPos.x)
+		{
+			pos.x = minBoxX - radius.x;
+			hitFlag = true;
+			avoidFlag = false;
+		}
+	}
+
+	return hitFlag;
 }
