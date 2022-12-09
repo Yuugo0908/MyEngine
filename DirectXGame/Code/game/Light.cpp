@@ -15,7 +15,7 @@ Light* Light::Create()
 	return instance;
 }
 
-void Light::StaticInitialize(ID3D12Device* device)
+bool Light::StaticInitialize(ID3D12Device* device)
 {
 	// 再初期化チェック
 	assert(!Light::device);
@@ -23,6 +23,8 @@ void Light::StaticInitialize(ID3D12Device* device)
 	assert(device);
 	// 静的メンバ変数のセット
 	Light::device = device;
+
+	return true;
 }
 
 void Light::Initialize()

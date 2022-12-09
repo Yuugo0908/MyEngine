@@ -16,11 +16,7 @@ public: // ƒƒ“ƒoŠÖ”
 
 	void Search();
 
-	void Finalize();
-
 	void Draw();
-
-	void Collision();
 
 	const std::unique_ptr<Object3d>& GetObj() { return bulletObj; }
 

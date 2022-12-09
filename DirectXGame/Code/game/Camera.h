@@ -1,6 +1,7 @@
 #pragma once
 #include "Mouse.h"
 #include "Operator.h"
+#include "DebugText.h"
 class Camera
 {
 private:
@@ -103,4 +104,7 @@ private: // メンバ変数
 	int shakeCount = 0;
 	// カメラの動作管理用カウンター
 	int moveCount = 30;
+	// 注視点から視点へのベクトルと、上方向ベクトル
+	XMVECTOR vTargetEye = {};
+	XMVECTOR vUp = {};
 };

@@ -2,17 +2,20 @@
 
 bool Rope::Initialize(Keyboard* keyboard, Mouse* mouse)
 {
-	assert(keyboard);
-	assert(mouse);
-	this->keyboard = keyboard;
-	this->mouse = mouse;
+	if (ropeModel == NULL)
+	{
+		assert(keyboard);
+		assert(mouse);
+		this->keyboard = keyboard;
+		this->mouse = mouse;
 
-	easing = new Easing;
+		easing = new Easing;
 
-	// モデルの生成
-	ropeModel = ropeModel->CreateFromObject("rope");
-	ropeObj = Object3d::Create();
-	ropeObj->SetModel(ropeModel);
+		// モデルの生成
+		ropeModel = ropeModel->CreateFromObject("rope");
+		ropeObj = Object3d::Create();
+		ropeObj->SetModel(ropeModel);
+	}
 
 	// 位置、スケールを変数に格納
 	ropeObj->SetScale({ 0.0f, 0.0f, 0.0f });

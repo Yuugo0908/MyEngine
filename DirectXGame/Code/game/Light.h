@@ -27,7 +27,7 @@ public: // 静的メンバ関数
 	/// 静的初期化
 	/// </summary>
 	/// <param name="device">デバイス</param>
-	static void StaticInitialize(ID3D12Device* device);
+	static bool StaticInitialize(ID3D12Device* device);
 	/// <summary>
 	/// インスタンス生成
 	/// </summary>

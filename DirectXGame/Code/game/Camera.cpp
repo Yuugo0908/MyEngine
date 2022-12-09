@@ -123,8 +123,7 @@ void Camera::Update()
 	// マウスの入力を取得
 	Mouse::MouseMove mouseMove = mouse->GetMouseMove();
 
-	// マウスの左ボタンが押されていたらカメラを回転させる
-
+	// マウスの左ボタンが押されていたらカメラを回転させない
 	if (moveCount <= 30)
 	{
 		moveCount++;
@@ -137,19 +136,24 @@ void Camera::Update()
 	if (moveCount >= 30)
 	{
 		float dy = mouseMove.MouseX * scaleY;
-		//float dx = mouseMove.MouseY * scaleX;
-
-		//angleX = -dx * XM_PI;
 		angleY = -dy * XM_PI * speed;
 		dirty = true;
 	}
 
+	DebugText::GetInstance()->Print(100, 30 * 10, 2, "%f", (float)mouseMove.MouseX);
+	DebugText::GetInstance()->Print(100, 30 * 11, 2, "%f", (float)mouseMove.MouseY);
+	DebugText::GetInstance()->Print(100, 30 * 12, 2, "%f", vTargetEye.m128_f32[0]);
+	DebugText::GetInstance()->Print(100, 30 * 13, 2, "%f", vTargetEye.m128_f32[1]);
+
 	// ホイール入力で距離を変更
 	if (mouseMove.MouseZ != 0) {
-		distance -= mouseMove.MouseZ / 100.0f;
-		distance = max(distance, 1.0f);
+		distance -= mouseMove.MouseZ / 120.0f;
+		distance = max(distance, 10.0f);
+		distance = min(distance, 20.0f);
 		dirty = true;
 	}
+
+	DebugText::GetInstance()->Print(100, 30 * 14, 2, "%f", distance);
 
 	if (dirty || viewDirty) {
 		// 追加回転分の回転行列を生成
@@ -160,16 +164,16 @@ void Camera::Update()
 		matRot = matRotNew * matRot;
 
 		// 注視点から視点へのベクトルと、上方向ベクトル
-		XMVECTOR vTargetEye = { 0.0f, 0.0f, -distance, 1.0f };
-		XMVECTOR vUp = { 0.0f, 1.0f, 0.0f, 0.0f };
+		vTargetEye = { 0.0f, 0.0f, -distance, 1.0f };
+		vUp = { 0.0f, 1.0f, 0.0f, 0.0f };
 
 		// ベクトルを回転
 		vTargetEye = XMVector3Transform(vTargetEye, matRot);
-		vUp = XMVector3Transform(vUp, matRot);
+		//vUp = XMVector3Transform(vUp, matRot);
 
 		// 注視点からずらした位置に視点座標を決定
 		const XMFLOAT3& target = GetTarget();
-		SetEye({ target.x + vTargetEye.m128_f32[0], target.y + vTargetEye.m128_f32[1] + 10.0f, target.z + vTargetEye.m128_f32[2] });
+		SetEye({ target.x + vTargetEye.m128_f32[0], target.y + vTargetEye.m128_f32[1] + distance - 5.0f, target.z + vTargetEye.m128_f32[2] });
 		SetUp({ vUp.m128_f32[0], vUp.m128_f32[1], vUp.m128_f32[2] });
 	}
 

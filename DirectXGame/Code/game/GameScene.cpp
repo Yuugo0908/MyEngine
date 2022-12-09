@@ -37,7 +37,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	rope = new Rope;
 	player = new Player;
 	enemy = new Enemy;
-	//bullet = new Bullet;
 	mapchip = new Mapchip;
 
 	// デバイスのセット
@@ -108,17 +107,12 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	GameOver = Image2d::Create(7, { 0.0f,0.0f });
 	GameOver->SetSize({ 1280.0f,720.0f });
 
-
-	//item->Initialize();
 	rope->Initialize(keyboard, mouse);
 	player->Initialize(keyboard, mouse);
 	enemy->Initialize(player);
 
 	// オブジェクト生成
 	blockModel = blockModel->CreateFromObject("block");
-	//マップチップ用のCSV読み込み
-	//(map, "Resource/scv/なんたら.csv")で追加可能
-	Mapchip::CsvToVector(map, "Resources/csv/stage1.csv");//mapNum=0
 
 	// レベルデータの読み込み
 	levelData = LevelLoader::LoadFile("gameScene");
@@ -214,30 +208,18 @@ void GameScene::Update() {
 		avoidFlag = player->GetAvoidFlag();
 		onGround = player->GetOnGround();
 		eAlive = enemy->GetAlive();
-		//attackFlag = bullet->GetAttackFlag();
 
 		player->Update(rFlag, moveFlag);
 		enemy->Update();
 
-		pPos = player->GetPos();
-		ePos = enemy->GetPos();
 		pPosOld = pPos;
 		ePosOld = ePos;
-		pRadius = player->GetScale();
+		pPos = player->GetPos();
+		ePos = enemy->GetPos();
+		pRadius = player->GetObj()->GetScale();
 		eRadius = enemy->GetObj()->GetScale();
 
 		MapUpdate(0);
-		//if (MapCollide(pPos, pRadius, 0, pPosOld))
-		//{
-		//	onGround = true;
-		//	player->SetOnGround(onGround);
-		//	avoidFlag = false;
-		//	player->SetAvoidFlag(avoidFlag);
-		//}
-		//if (MapCollide(ePos, eRadius, 0, ePosOld))
-		//{
-		//	enemy->SetOnGround(true);
-		//}
 
 		for (int y = 0; y < map_max_y; y++)
 		{
@@ -267,12 +249,10 @@ void GameScene::Update() {
 			object->Update();
 		}
 
-		//bPos = bullet->GetPos();
 
 		length = GetLength(pPos, ePos);
 
 		rope->Update(pPos, ePos, enemy->GetObj());
-		//item->Update();
 
 		player->SetPos(pPos);
 		enemy->SetPos(ePos);
@@ -288,6 +268,17 @@ void GameScene::Update() {
 			nowScene = 3;
 		}
 	}
+
+	//if (nowScene == 2 || nowScene == 3)
+	//{
+	//	playerHp = 360;
+	//	enemyHp = 360;
+	//	eAlive = false;
+	//	if (keyboard->TriggerKey(DIK_SPACE))
+	//	{
+	//		nowScene = 0;
+	//	}
+	//}
 }
 
 void GameScene::reset()
@@ -386,9 +377,9 @@ void GameScene::SetImgui()
 	ImGui::Text("playerPosZ : %6.2f", pPos.z);
 
 	ImGui::Separator();
-	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[0]);
-	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[1]);
-	ImGui::Text("cameraLength : %6.2f", cameraLength.m128_f32[2]);
+	ImGui::Text("cameraLength : %6.2f", cPos.x);
+	ImGui::Text("cameraLength : %6.2f", cPos.y);
+	ImGui::Text("cameraLength : %6.2f", cPos.z);
 
 	ImGui::Separator();
 	ImGui::Text("length : %6.2f", length);
@@ -427,6 +418,7 @@ void GameScene::CollisionUpdate()
 {
 	if (Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
 	{
+		enemy->EnemyCollision();
 		shakeFlag = true;
 		moveFlag = true;
 		rope->SetmoveFlag(moveFlag);
@@ -442,10 +434,9 @@ void GameScene::CollisionUpdate()
 
 		rFlag = false;
 		rope->SetrFlag(rFlag);
-		enemy->EnemyCollision();
 	}
 
-	if (enemy->BulletCollision())
+	if (!rFlag && enemy->BulletCollision())
 	{
 		shakeFlag = true;
 		playerHp -= 72;
@@ -467,19 +458,26 @@ bool GameScene::CollisionStage(XMFLOAT3& pos, const XMFLOAT3 radius, const XMFLO
 
 	bool hitFlag = false;
 
-	if ((pos.x <= maxX && pos.x >= minX) &&
-		(pos.z <= maxZ && pos.z >= minZ))
+	if ((pos.x < maxX && pos.x > minX) &&
+		(pos.z < maxZ && pos.z > minZ))
 	{
 		if (maxY + radius.y > pos.y && stagePos.y < oldPos.y)
 		{
-			pos.y = maxY + radius.y;
+			if (stagePos.y + radius.y >= pos.y)
+			{
+				pos.y = oldPos.y;
+			}
 			hitFlag = true;
 		}
-		else if (minY - radius.y < pos.y && stagePos.y > oldPos.y)
-		{
-			pos.y = minY - radius.y;
-			hitFlag = true;
-		}
+		//else if (minY - radius.y < pos.y && stagePos.y > oldPos.y)
+		//{
+		//	pos.y = stagePos.y - radius.y;
+		//	if (stagePos.y + radius.y <= pos.y)
+		//	{
+		//		pos.y = oldPos.y;
+		//	}
+		//	hitFlag = true;
+		//}
 	}
 
 	return hitFlag;
@@ -504,8 +502,8 @@ void GameScene::MapCreate(int mapNumber)
 				blockObj[y][x] = Object3d::Create();
 				blockObj[y][x]->SetModel(blockModel);
 				//位置と大きさの変更(今は大きさは変更しないで)
-				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE, 2.5f , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE });
-				blockObj[y][x]->SetScale({ 1.0f,5.0f,1.0f });
+				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE, 5.0f , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE });
+				blockObj[y][x]->SetScale({ 1.0f,2.0f,1.0f });
 			}
 
 		}
@@ -533,7 +531,7 @@ void GameScene::MapDraw(int mapNumber)
 	{
 		for (int x = 0; x < map_max_x; x++)
 		{
-			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == blocks_)
+			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == blocks_ || Mapchip::GetChipNum(x, y, map[mapNumber]) == walls_)
 			{
 				blockObj[y][x]->Draw();
 			}

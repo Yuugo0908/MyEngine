@@ -25,8 +25,6 @@ bool Enemy::BulletCreate()
 	std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>();
 	newBullet->Initialize(bulletModel);
 	newBullet->SetPos(ePos);
-	attackFlag = false;
-	newBullet->SetAttackFlag(attackFlag);
 	bullets.push_back(std::move(newBullet));
 	return true;
 }
@@ -44,19 +42,29 @@ void Enemy::Update()
 			Spawn();
 			eAlive = true;
 			onGround = false;
-			attackFlag = false;
 			eAliveCount = 0;
 		}
 
 		ePos = enemyObj->GetPosition();
 		enemyObj->Update();
-		if (!LoadFlag)
-		{
-			BulletCreate();
-			LoadFlag = true;
-		}
+
 		//LoadFlag = false;
 		return;
+	}
+
+	for (std::unique_ptr<Bullet>& bullet : bullets)
+	{
+		bullet->Attack();
+		if (GetLength(ePos, bullet->GetPos()) >= 20.0f)
+		{
+			bullets.remove(bullet);
+			break;
+		}
+	}
+
+	if (attackCount <= 30)
+	{
+		attackCount++;
 	}
 
 	pPos = player->GetPos();
@@ -85,11 +93,11 @@ void Enemy::Update()
 	}
 
 
-	if (!attackFlag && (PElength > 10.0f && PElength <= 30.0f))
+	if (PElength > 10.0f && PElength <= 30.0f)
 	{
 		phase = Enemy::Phase::move;
 	}
-	else if(!attackFlag)
+	else
 	{
 		phase = Enemy::Phase::stay;
 	}
@@ -99,11 +107,6 @@ void Enemy::Update()
 		if (PElength <= 15.0f)
 		{
 			phase = Enemy::Phase::attack;
-			for (std::unique_ptr<Bullet>& bullet : bullets)
-			{
-				attackFlag = true;
-				bullet->SetAttackFlag(attackFlag);
-			}
 		}
 	}
 
@@ -111,12 +114,16 @@ void Enemy::Update()
 	{
 	default:
 	case Enemy::Phase::attack:
+		if (attackCount >= 10)
+		{
+			BulletCreate();
+			attackCount = 0;
+		}
+
 		for (std::unique_ptr<Bullet>& bullet : bullets)
 		{
-			if (attackFlag)
-			{
-				bullet->Attack();
-			}
+			bullet->SetAttackFlag(true);
+			bullet->Search();
 		}
 		break;
 	case Enemy::Phase::move:
@@ -142,7 +149,6 @@ void Enemy::Move()
 	XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
 
 	ePos.x += subPE.x / 5;
-	//ePos.y += subPE.y / 3;
 	ePos.z += subPE.z / 5;
 }
 
@@ -163,7 +169,6 @@ void Enemy::Stay()
 	else
 	{
 		ePos.x += subPE.x / 5;
-		//ePos.y += subPE.y / 5;
 		ePos.z += subPE.z / 5;
 	}
 }
@@ -184,7 +189,7 @@ void Enemy::Spawn()
 bool Enemy::EnemyCollision()
 {
 	eAlive = false;
-	LoadFlag = false;
+	//LoadFlag = false;
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
 		bullets.remove(bullet);
@@ -197,13 +202,10 @@ bool Enemy::BulletCollision()
 {
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
-		attackFlag = bullet->GetAttackFlag();
 		bullet->Update(pPos, ePos);
 		if (Collision::CollisionObject(bullet->GetObj(), player->GetObj()))
 		{
-			bPos = ePos;
-			bullet->SetPos(bPos);
-			bullet->Collision();
+			bullets.remove(bullet);
 			return true;
 		}
 	}
@@ -228,15 +230,23 @@ bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLO
 	{
 		if (maxBoxY + radius.y > pos.y && boxPos.y < oldPos.y)
 		{
-			pos.y = maxBoxY + radius.y;
+			//pos.y = maxBoxY + radius.y;
 			hitFlag = true;
+			if (maxBoxY + radius.y >= pos.y)
+			{
+				pos.y = oldPos.y;
+			}
 			onGround = true;
 		}
 		else if (minBoxY - radius.y < pos.y && boxPos.y > oldPos.y)
 		{
-			pos.y = minBoxY - radius.y;
+			//pos.y = minBoxY - radius.y;
 			hitFlag = true;
-			onGround = true;
+			if (maxBoxY + radius.y <= pos.y)
+			{
+				pos.y = oldPos.y;
+			}
+			//onGround = true;
 		}
 	}
 
@@ -247,7 +257,7 @@ bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLO
 		{
 			pos.z = maxBoxZ + radius.z;
 			hitFlag = true;
-			if (!jumpFlag)
+			if (!jumpFlag && onGround)
 			{
 				onGround = false;
 				jumpFlag = true;
@@ -259,7 +269,7 @@ bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLO
 		{
 			pos.z = minBoxZ - radius.z;
 			hitFlag = true;
-			if (!jumpFlag)
+			if (!jumpFlag && onGround)
 			{
 				onGround = false;
 				jumpFlag = true;
@@ -276,7 +286,7 @@ bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLO
 		{
 			pos.x = maxBoxX + radius.x;
 			hitFlag = true;
-			if (!jumpFlag)
+			if (!jumpFlag && onGround)
 			{
 				onGround = false;
 				jumpFlag = true;
@@ -288,7 +298,7 @@ bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLO
 		{
 			pos.x = minBoxX - radius.x;
 			hitFlag = true;
-			if (!jumpFlag)
+			if (!jumpFlag && onGround)
 			{
 				onGround = false;
 				jumpFlag = true;
@@ -307,10 +317,7 @@ void Enemy::Draw()
 
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
-		if (bullet->GetAttackFlag())
-		{
-			bullet->Draw();
-		}
+		bullet->Draw();
 	}
 }
 

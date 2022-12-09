@@ -68,7 +68,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		return 1;
 	}
 	// ライト静的初期化
-	Light::StaticInitialize(dxCommon->GetDevice());
+	if (!Light::StaticInitialize(dxCommon->GetDevice()))
+	{
+		assert(0);
+		return 1;
+	}
 
 #pragma endregion 汎用機能初期化
 
@@ -85,14 +89,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 
 #pragma region DirectX毎フレーム処理
-
-		// 入力関連の毎フレーム処理
-		keyboard->Update();
-		controller->Update();
-		mouse->Update();
-
 		if (GetActiveWindow())
 		{
+			// 入力関連の毎フレーム処理
+			keyboard->Update();
+			controller->Update();
+			mouse->Update();
 			// ゲームシーンの毎フレーム処理
 			gameScene->Update();
 		}
@@ -130,6 +132,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	safe_delete(gameScene);
 	safe_delete(audio);
 	safe_delete(image2d);
+	safe_delete(light);
 	safe_delete(dxCommon);
 	FbxLoader::GetInstance()->Finalize();
 

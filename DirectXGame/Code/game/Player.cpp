@@ -76,7 +76,6 @@ void Player::Update(bool rFlag, bool moveFlag)
 		}
 	}
 
-	//pPos = playerObj->GetPosition();
 	playerObj->Update();
 }
 
@@ -128,7 +127,7 @@ void Player::Jump()
 	// d—Í
 	else
 	{
-		pDown -= 0.3f;
+		pDown = -0.75f;
 		pPos.y += pDown;
 		if (onGround)
 		{
@@ -155,15 +154,22 @@ bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFL
 	{
 		if (maxBoxY + radius.y > pos.y && boxPos.y < oldPos.y)
 		{
-			pos.y = maxBoxY + radius.y;
+			//pos.y = maxBoxY + radius.y;
 			hitFlag = true;
+			if (maxBoxY + radius.y >= pos.y)
+			{
+				pos.y = oldPos.y;
+			}
 			onGround = true;
 		}
 		else if (minBoxY - radius.y < pos.y && boxPos.y > oldPos.y)
 		{
 			pos.y = minBoxY - radius.y;
 			hitFlag = true;
-			onGround = true;
+			if (minBoxY - radius.y <= pos.y)
+			{
+				pos.y = oldPos.y;
+			}
 		}
 	}
 
