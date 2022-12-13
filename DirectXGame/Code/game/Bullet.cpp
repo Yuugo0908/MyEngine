@@ -15,6 +15,8 @@ void Bullet::Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos)
 	this->pPos = pPos;
 	this->ePos = ePos;
 
+	Attack();
+
 	bulletObj->SetPosition(bPos);
 	bulletObj->Update();
 }

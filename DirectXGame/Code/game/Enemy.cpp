@@ -1,14 +1,27 @@
 #include "Enemy.h"
 
 Model* Enemy::bulletModel = nullptr;
+Model* Enemy::enemyModel = nullptr;
+
+bool Enemy::StaticInit()
+{
+	bulletModel = bulletModel->CreateFromObject("sphere");
+	enemyModel = enemyModel->CreateFromObject("sphere");
+
+	if (bulletModel == nullptr || enemyModel == nullptr)
+	{
+		assert(NULL);
+		return false;
+	}
+
+	return true;
+}
 
 bool Enemy::Initialize(Player* player)
 {
 	assert(player);
 	this->player = player;
 
-	bulletModel = bulletModel->CreateFromObject("sphere");
-	enemyModel = enemyModel->CreateFromObject("sphere");
 	enemyObj = Object3d::Create();
 	enemyObj->SetModel(enemyModel);
 
@@ -16,6 +29,7 @@ bool Enemy::Initialize(Player* player)
 	enemyObj->SetScale({ 1.0f, 1.0f, 1.0f });
 	enemyObj->SetColor({ 0.0f, 0.8f, 0.0f, 1.0f});
 	ePos = enemyObj->GetPosition();
+	eRadius = enemyObj->GetScale();
 
 	return true;
 }
@@ -42,34 +56,26 @@ void Enemy::Update()
 			Spawn();
 			eAlive = true;
 			onGround = false;
+			attackFlag = true;
 			eAliveCount = 0;
 		}
 
 		ePos = enemyObj->GetPosition();
+		eOldPos = ePos;
 		enemyObj->Update();
 
-		//LoadFlag = false;
 		return;
 	}
 
-	for (std::unique_ptr<Bullet>& bullet : bullets)
-	{
-		bullet->Attack();
-		if (GetLength(ePos, bullet->GetPos()) >= 20.0f)
-		{
-			bullets.remove(bullet);
-			break;
-		}
-	}
-
-	if (attackCount <= 30)
+	eOldPos = ePos;
+	if (attackCount <= 60)
 	{
 		attackCount++;
 	}
 
 	pPos = player->GetPos();
 	PElength = GetLength(pPos, ePos);
-	lengthOld = GetLength(ePos, oldePos);
+	lengthOld = GetLength(ePos, spawnPos);
 
 	// ジャンプ
 	if (jumpFlag)
@@ -93,49 +99,52 @@ void Enemy::Update()
 	}
 
 
-	if (PElength > 10.0f && PElength <= 30.0f)
+	if (PElength <= 30.0f)
 	{
-		phase = Enemy::Phase::move;
+		phase = move;
 	}
 	else
 	{
-		phase = Enemy::Phase::stay;
+		phase = stay;
 	}
 
 	if (onGround)
 	{
 		if (PElength <= 15.0f)
 		{
-			phase = Enemy::Phase::attack;
+			phase = attack;
 		}
 	}
 
 	switch (phase)
 	{
-	default:
-	case Enemy::Phase::attack:
-		if (attackCount >= 10)
-		{
-			BulletCreate();
-			attackCount = 0;
-		}
-
-		for (std::unique_ptr<Bullet>& bullet : bullets)
-		{
-			bullet->SetAttackFlag(true);
-			bullet->Search();
-		}
+	case attack:
+		Attack();
 		break;
-	case Enemy::Phase::move:
+	case move:
 		Move();
 		break;
-	case Enemy::Phase::stay:
+	case stay:
+	default:
 		Stay();
-		break;
 	}
 
 	enemyObj->SetPosition(ePos);
 	enemyObj->Update();
+}
+
+void Enemy::Attack()
+{
+	if (attackFlag && attackCount >= 60)
+	{
+		BulletCreate();
+		attackCount = 0;
+	}
+
+	for (std::unique_ptr<Bullet>& bullet : bullets)
+	{
+		bullet->Search();
+	}
 }
 
 void Enemy::Move()
@@ -154,7 +163,7 @@ void Enemy::Move()
 
 void Enemy::Stay()
 {
-	XMVECTOR oldEnemyPos = { oldePos.x, oldePos.y, oldePos.z, 1 };
+	XMVECTOR oldEnemyPos = { spawnPos.x, spawnPos.y, spawnPos.z, 1 };
 	XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
 
 	XMVECTOR subOldEnemy = XMVectorSubtract(oldEnemyPos, enemyPos);
@@ -162,9 +171,9 @@ void Enemy::Stay()
 
 	XMFLOAT3 subPE = { NsubOldEnemy.m128_f32[0], NsubOldEnemy.m128_f32[1], NsubOldEnemy.m128_f32[2] };
 
-	if (lengthOld <= 0.3f)
+	if (lengthOld <= 0.0f)
 	{
-		ePos = oldePos;
+		ePos = spawnPos;
 	}
 	else
 	{
@@ -178,18 +187,17 @@ void Enemy::Spawn()
 	randPos.x = (float)(-40 + rand() % 80);
 	randPos.z = (float)(-40 + rand() % 80);
 
-	phase = Enemy::Phase::move;
+	phase = move;
 	enemyObj->SetPosition({ randPos.x, 8.0f, randPos.z });
 	enemyObj->SetScale({ 1.0f, 1.0f, 1.0f });
 	enemyObj->SetColor({ 0.0f, 0.8f, 0.0f, 1.0f });
 	ePos = enemyObj->GetPosition();
-	oldePos = { ePos.x, 0.0f, ePos.z };
+	spawnPos = { ePos.x, 0.0f, ePos.z };
 }
 
 bool Enemy::EnemyCollision()
 {
 	eAlive = false;
-	//LoadFlag = false;
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
 		bullets.remove(bullet);
@@ -208,11 +216,17 @@ bool Enemy::BulletCollision()
 			bullets.remove(bullet);
 			return true;
 		}
+
+		else if (GetLength(ePos, bullet->GetPos()) >= 20.0f)
+		{
+			bullets.remove(bullet);
+			return false;
+		}
 	}
 	return false;
 }
 
-bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const XMFLOAT3 oldPos)
+bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius)
 {
 	//フラグ
 	bool hitFlag = false;
@@ -225,66 +239,36 @@ bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLO
 	float maxBoxZ = boxPos.z + boxRadius.z;
 	float minBoxZ = boxPos.z - boxRadius.z;
 
-	if ((pos.x <= maxBoxX && pos.x >= minBoxX) &&
-		(pos.z <= maxBoxZ && pos.z >= minBoxZ))
+	if ((ePos.x <= maxBoxX && ePos.x >= minBoxX) &&
+		(ePos.z <= maxBoxZ && ePos.z >= minBoxZ))
 	{
-		if (maxBoxY + radius.y > pos.y && boxPos.y < oldPos.y)
+		if (maxBoxY + eRadius.y > ePos.y && boxPos.y < eOldPos.y)
 		{
-			//pos.y = maxBoxY + radius.y;
+			//ePos.y = maxBoxY + eRadius.y;
 			hitFlag = true;
-			if (maxBoxY + radius.y >= pos.y)
+			if (maxBoxY + eRadius.y >= ePos.y)
 			{
-				pos.y = oldPos.y;
+				ePos.y = eOldPos.y;
 			}
 			onGround = true;
 		}
-		else if (minBoxY - radius.y < pos.y && boxPos.y > oldPos.y)
+		else if (minBoxY - eRadius.y < ePos.y && boxPos.y > eOldPos.y)
 		{
-			//pos.y = minBoxY - radius.y;
+			//ePos.y = minBoxY - eRadius.y;
 			hitFlag = true;
-			if (maxBoxY + radius.y <= pos.y)
+			if (maxBoxY + eRadius.y <= ePos.y)
 			{
-				pos.y = oldPos.y;
-			}
-			//onGround = true;
-		}
-	}
-
-	if ((pos.x <= maxBoxX && pos.x >= minBoxX) &&
-		(pos.y <= maxBoxY && pos.y >= minBoxY))
-	{
-		if (maxBoxZ + radius.z > pos.z && boxPos.z < oldPos.z)
-		{
-			pos.z = maxBoxZ + radius.z;
-			hitFlag = true;
-			if (!jumpFlag && onGround)
-			{
-				onGround = false;
-				jumpFlag = true;
-				// 上昇率の更新
-				eUp = 1.25f;
-			}
-		}
-		else if (minBoxZ - radius.z < pos.z && boxPos.z > oldPos.z)
-		{
-			pos.z = minBoxZ - radius.z;
-			hitFlag = true;
-			if (!jumpFlag && onGround)
-			{
-				onGround = false;
-				jumpFlag = true;
-				// 上昇率の更新
-				eUp = 1.25f;
+				ePos.y = eOldPos.y;
 			}
 		}
 	}
 
-	if ((pos.z <= maxBoxZ && pos.z >= minBoxZ) &&
-		(pos.y <= maxBoxY && pos.y >= minBoxY))
+	if ((ePos.x <= maxBoxX && ePos.x >= minBoxX) &&
+		(ePos.y <= maxBoxY && ePos.y >= minBoxY))
 	{
-		if (maxBoxX + radius.x > pos.x && boxPos.x < oldPos.x)
+		if (maxBoxZ + eRadius.z > ePos.z && boxPos.z < eOldPos.z)
 		{
-			pos.x = maxBoxX + radius.x;
+			ePos.z = maxBoxZ + eRadius.z;
 			hitFlag = true;
 			if (!jumpFlag && onGround)
 			{
@@ -294,9 +278,38 @@ bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLO
 				eUp = 1.25f;
 			}
 		}
-		else if (minBoxX - radius.x < pos.x && boxPos.x > oldPos.x)
+		else if (minBoxZ - eRadius.z < ePos.z && boxPos.z > eOldPos.z)
 		{
-			pos.x = minBoxX - radius.x;
+			ePos.z = minBoxZ - eRadius.z;
+			hitFlag = true;
+			if (!jumpFlag && onGround)
+			{
+				onGround = false;
+				jumpFlag = true;
+				// 上昇率の更新
+				eUp = 1.25f;
+			}
+		}
+	}
+
+	if ((ePos.z <= maxBoxZ && ePos.z >= minBoxZ) &&
+		(ePos.y <= maxBoxY && ePos.y >= minBoxY))
+	{
+		if (maxBoxX + eRadius.x > ePos.x && boxPos.x < eOldPos.x)
+		{
+			ePos.x = maxBoxX + eRadius.x;
+			hitFlag = true;
+			if (!jumpFlag && onGround)
+			{
+				onGround = false;
+				jumpFlag = true;
+				// 上昇率の更新
+				eUp = 1.25f;
+			}
+		}
+		else if (minBoxX - eRadius.x < ePos.x && boxPos.x > eOldPos.x)
+		{
+			ePos.x = minBoxX - eRadius.x;
 			hitFlag = true;
 			if (!jumpFlag && onGround)
 			{
@@ -311,9 +324,103 @@ bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLO
 	return hitFlag;
 }
 
+bool Enemy::StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale)
+{
+	//ePos = enemyObj->GetPosition();
+	//eRadius = enemyObj->GetScale();
+
+	// 判定
+	float maxX = stagePos.x + stageScale.x;
+	float maxY = stagePos.y + stageScale.y;
+	float maxZ = stagePos.z + stageScale.z;
+	float minX = stagePos.x - stageScale.x;
+	float minY = stagePos.y - stageScale.y;
+	float minZ = stagePos.z - stageScale.z;
+
+	bool hitFlag = false;
+
+	if ((ePos.x < maxX && ePos.x > minX) &&
+		(ePos.z < maxZ && ePos.z > minZ))
+	{
+		if (maxY + eRadius.y > ePos.y && stagePos.y < eOldPos.y)
+		{
+			if (stagePos.y + eRadius.y >= ePos.y)
+			{
+				ePos.y = eOldPos.y;
+			}
+			hitFlag = true;
+		}
+	}
+	enemyObj->SetPosition(ePos);
+	enemyObj->Update();
+
+	return hitFlag;
+}
+
+bool Enemy::RopeCollide(XMFLOAT3 rPos, XMFLOAT3 rRadius)
+{
+	//フラグ
+	bool hitFlag = false;
+
+	// 判定
+	float maxBoxX = rPos.x + rRadius.x;
+	float minBoxX = rPos.x - rRadius.x;
+	float maxBoxY = rPos.y + rRadius.y;
+	float minBoxY = rPos.y - rRadius.y;
+	float maxBoxZ = rPos.z + rRadius.z;
+	float minBoxZ = rPos.z - rRadius.z;
+
+	if ((ePos.x <= maxBoxX && ePos.x >= minBoxX) &&
+		(ePos.z <= maxBoxZ && ePos.z >= minBoxZ))
+	{
+		if (maxBoxY + eRadius.y > ePos.y && rPos.y < eOldPos.y)
+		{
+			hitFlag = true;
+		}
+		else if (minBoxY - eRadius.y < ePos.y && rPos.y > eOldPos.y)
+		{
+			hitFlag = true;
+		}
+	}
+
+	if ((ePos.x <= maxBoxX && ePos.x >= minBoxX) &&
+		(ePos.y <= maxBoxY && ePos.y >= minBoxY))
+	{
+		if (maxBoxZ + eRadius.z > ePos.z && rPos.z < eOldPos.z)
+		{
+			hitFlag = true;
+		}
+		else if (minBoxZ - eRadius.z < ePos.z && rPos.z > eOldPos.z)
+		{
+			hitFlag = true;
+		}
+	}
+
+	if ((ePos.z <= maxBoxZ && ePos.z >= minBoxZ) &&
+		(ePos.y <= maxBoxY && ePos.y >= minBoxY))
+	{
+		if (maxBoxX + eRadius.x > ePos.x && rPos.x < eOldPos.x)
+		{
+			hitFlag = true;
+		}
+		else if (minBoxX - eRadius.x < ePos.x && rPos.x > eOldPos.x)
+		{
+			hitFlag = true;
+		}
+	}
+	enemyObj->SetPosition(ePos);
+	enemyObj->SetScale(eRadius);
+	enemyObj->Update();
+
+	return hitFlag;
+}
+
 void Enemy::Draw()
 {
-	enemyObj->Draw();
+	if (eAlive)
+	{
+		enemyObj->Draw();
+	}
 
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{

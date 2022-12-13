@@ -23,9 +23,6 @@ public: // ƒƒ“ƒoŠÖ”
 	const XMFLOAT3& GetPos() { return bPos; }
 	void SetPos(XMFLOAT3 bPos) { this->bPos = bPos; }
 
-	const bool& GetAttackFlag() { return attackFlag; }
-	void SetAttackFlag(bool attackFlag) { this->attackFlag = attackFlag; }
-
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
 		XMFLOAT3 len = { posA.x - posB.x, posA.y - posB.y, posA.z - posB.z };

@@ -12,12 +12,14 @@ class Enemy
 {
 public:
 	// 行動フェーズ
-	enum class Phase
+	typedef enum
 	{
 		attack,
 		move,
 		stay,
-	};
+	} Phase;
+
+	static bool StaticInit();
 
 	bool Initialize(Player* player);
 
@@ -28,6 +30,8 @@ public:
 	void Finalize();
 
 	void Draw();
+
+	void Attack();
 
 	void Move();
 
@@ -40,7 +44,9 @@ public:
 	bool BulletCollision();
 
 	// マップチップ当たり判定
-	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const XMFLOAT3 oldPos);
+	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius);
+	bool StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale);
+	bool RopeCollide(XMFLOAT3 rPos, XMFLOAT3 rRadius);
 
 	const std::unique_ptr<Object3d>& GetObj() { return enemyObj; }
 
@@ -49,6 +55,8 @@ public:
 
 	const bool& GetAlive() { return eAlive; }
 	void SetAlive(bool eAlive) { this->eAlive = eAlive; }
+
+	void SetAttackFlag(bool attackFlag) { this->attackFlag = attackFlag; }
 
 	// 着地
 	const bool& GetOnGround() { return onGround; }
@@ -63,20 +71,21 @@ public:
 private:
 	Player* player = nullptr;
 
-	Model* enemyModel = nullptr;
+	static Model* enemyModel;
 	std::unique_ptr<Object3d> enemyObj = nullptr;
 
 	// 弾複数生成用
-	bool LoadFlag = false;
 	static Model* bulletModel;
 	std::list<std::unique_ptr<Bullet>> bullets;
 
 	// エネミー
 	XMFLOAT3 ePos = {};
-	XMFLOAT3 oldePos = {};
+	XMFLOAT3 eOldPos = {};
+	XMFLOAT3 eRadius = {};
+	XMFLOAT3 spawnPos = {};
 	XMFLOAT3 randPos = {}; // ランダムなスポーン位置
 
-	Phase phase = Enemy::Phase::move;
+	Phase phase = move;
 
 	float eUp = 0.0f; // 上昇
 	float eDown = 0.0f;// 下降

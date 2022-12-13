@@ -21,11 +21,11 @@ public: // メンバ関数
 		ropeObj->Draw();
 	}
 
-	void Update(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d>& object);
+	void Update(XMFLOAT3& pPos);
 
-	void Throw(XMFLOAT3& pPos, XMFLOAT3& ePos, const std::unique_ptr<Object3d>& object);
+	void Throw(XMFLOAT3& pPos);
 
-	void Collision();
+	void Collision(XMFLOAT3& startPos, XMFLOAT3& endPos);
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
@@ -43,6 +43,9 @@ public: // メンバ関数
 	const bool& GetrFlag() { return rFlag; }
 	void SetrFlag(bool rFlag) { this->rFlag = rFlag; }
 
+	
+	const std::unique_ptr<Object3d>& GetObj() { return ropeObj; }
+
 private: // メンバ変数
 
 	Keyboard* keyboard = nullptr;
@@ -57,7 +60,7 @@ private: // メンバ変数
 
 	// 変数
 	XMFLOAT3 rPos = {};
-	XMFLOAT3 rScale = {};
+	XMFLOAT3 rRadius = {};
 	float angleX = 0.0f; // X軸
 	float angleY = 0.0f; // Y軸
 	float vecXZ = 0.0f; // XZ平面上のベクトル

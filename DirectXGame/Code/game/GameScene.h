@@ -91,14 +91,11 @@ private: // メンバ変数
 	Rope* rope = nullptr;
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
+	// 複数生成用リスト
+	std::list<std::unique_ptr<Enemy>> enemys;
 	Bullet* bullet = nullptr;
 	Item* item = Item::GetInstance();
 	LevelData* levelData = nullptr;
-
-	// ゲームシーン用
-	// 3dモデル
-	//std::unique_ptr<Object3d> skydome = nullptr;
-	//std::unique_ptr<Object3d> stage = nullptr;
 
 	// マップ
 	//マップチップ1つの大きさ
@@ -142,19 +139,15 @@ private: // メンバ変数
 	float playerHp = 360;
 
 	// エネミー
+	int enemyCount = 4;
+	float enemyHp = 360;
 	XMFLOAT3 ePos = {};
 	XMFLOAT3 ePosOld = {};
 	XMFLOAT3 eRadius = {};
-	bool eFlag = false; // 自由落下のフラグ
-	bool eAlive = false;// 生きているかのフラグ
-	float enemyHp = 360;
-
-	// バレット
-	XMFLOAT3 bPos = {};
-	bool attackFlag = false;
 
 	// ロープ
 	XMFLOAT3 rPos = {};
+	XMFLOAT3 rRadius = {};
 	bool rFlag = false;
 
 	// カメラ

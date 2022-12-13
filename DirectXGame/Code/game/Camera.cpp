@@ -140,10 +140,10 @@ void Camera::Update()
 		dirty = true;
 	}
 
-	DebugText::GetInstance()->Print(100, 30 * 10, 2, "%f", (float)mouseMove.MouseX);
-	DebugText::GetInstance()->Print(100, 30 * 11, 2, "%f", (float)mouseMove.MouseY);
-	DebugText::GetInstance()->Print(100, 30 * 12, 2, "%f", vTargetEye.m128_f32[0]);
-	DebugText::GetInstance()->Print(100, 30 * 13, 2, "%f", vTargetEye.m128_f32[1]);
+	//DebugText::GetInstance()->Print(100, 30 * 10, 2, "%f", (float)mouseMove.MouseX);
+	//DebugText::GetInstance()->Print(100, 30 * 11, 2, "%f", (float)mouseMove.MouseY);
+	//DebugText::GetInstance()->Print(100, 30 * 12, 2, "%f", vTargetEye.m128_f32[0]);
+	//DebugText::GetInstance()->Print(100, 30 * 13, 2, "%f", vTargetEye.m128_f32[1]);
 
 	// ホイール入力で距離を変更
 	if (mouseMove.MouseZ != 0) {
@@ -153,7 +153,7 @@ void Camera::Update()
 		dirty = true;
 	}
 
-	DebugText::GetInstance()->Print(100, 30 * 14, 2, "%f", distance);
+	//DebugText::GetInstance()->Print(100, 30 * 14, 2, "%f", distance);
 
 	if (dirty || viewDirty) {
 		// 追加回転分の回転行列を生成

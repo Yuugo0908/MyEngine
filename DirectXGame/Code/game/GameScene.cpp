@@ -15,7 +15,6 @@ Model* GameScene::blockModel;
 std::vector<std::vector<int>> GameScene::map;
 std::unique_ptr<Object3d> GameScene::blockObj[map_max_y][map_max_x];
 
-
 int GameScene::height = 0;
 int GameScene::width = 0;
 const float GameScene::LAND_SCALE = 5.0f;
@@ -107,18 +106,11 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	GameOver = Image2d::Create(7, { 0.0f,0.0f });
 	GameOver->SetSize({ 1280.0f,720.0f });
 
-	rope->Initialize(keyboard, mouse);
-	player->Initialize(keyboard, mouse);
-	enemy->Initialize(player);
-
-	// オブジェクト生成
-	blockModel = blockModel->CreateFromObject("block");
-
 	// レベルデータの読み込み
 	levelData = LevelLoader::LoadFile("gameScene");
 
 	// レベルデータからオブジェクトを生成、配置
-	for (LevelData::ObjectData& objectData : levelData->objects) 
+	for (LevelData::ObjectData& objectData : levelData->objects)
 	{
 		// 3Dオブジェクトを生成
 		std::unique_ptr<Object3d> newObject = Object3d::Create();
@@ -157,12 +149,23 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 		objects.push_back(std::move(newObject));
 	}
 
+	Enemy::StaticInit();
+
+	rope->Initialize(keyboard, mouse);
+	player->Initialize(keyboard, mouse);
 	pPos = player->GetPos();
-	ePos = enemy->GetPos();
 	pPosOld = pPos;
-	ePosOld = ePos;
 	pRadius = player->GetScale();
-	eRadius = enemy->GetObj()->GetScale();
+
+	for (int i = 0; i < enemyCount; i++)
+	{
+		std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
+		newEnemy->Initialize(player);
+		enemys.push_back(std::move(newEnemy));
+	}
+
+	// オブジェクト生成
+	blockModel = blockModel->CreateFromObject("block");
 
 	// カメラの設定
 	camera->SetTarget(pPos);
@@ -179,7 +182,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 void GameScene::Finalize()
 {
 	player->Finalize();
-	enemy->Finalize();
+	//enemy->Finalize();
 	rope->Finalize();
 }
 
@@ -191,6 +194,7 @@ void GameScene::Update() {
 		{
 			//マップチップ用のCSV読み込み
 			//(map, "Resource/scv/なんたら.csv")で追加可能
+			//Mapchip::CsvToVector(map, "Resources/csv/tutorial.csv");//mapNum=0
 			Mapchip::CsvToVector(map, "Resources/csv/stage1.csv");//mapNum=0
 			MapCreate(0);
 			nowScene = 1;
@@ -207,17 +211,28 @@ void GameScene::Update() {
 		moveFlag = rope->GetmoveFlag();
 		avoidFlag = player->GetAvoidFlag();
 		onGround = player->GetOnGround();
-		eAlive = enemy->GetAlive();
+		//eAlive = enemy->GetAlive();
 
 		player->Update(rFlag, moveFlag);
-		enemy->Update();
-
 		pPosOld = pPos;
-		ePosOld = ePos;
 		pPos = player->GetPos();
-		ePos = enemy->GetPos();
 		pRadius = player->GetObj()->GetScale();
-		eRadius = enemy->GetObj()->GetScale();
+		if (CollisionStage(pPos, pRadius, pPosOld))
+		{
+			player->SetOnGround(true);
+		}
+		for (std::unique_ptr<Enemy>& enemy : enemys)
+		{
+			enemy->Update();
+		}
+
+		for (std::unique_ptr<Enemy>& enemy : enemys)
+		{
+			if (enemy->StageCollide(stagePos, stageScale))
+			{
+				enemy->SetOnGround(true);
+			}
+		}
 
 		MapUpdate(0);
 
@@ -230,18 +245,12 @@ void GameScene::Update() {
 					XMFLOAT3 boxPos = blockObj[y][x]->GetPosition();
 					XMFLOAT3 boxRadius = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);
 					player->MapCollide(boxPos, boxRadius, pPos, pRadius, 0, pPosOld);
-					enemy->MapCollide(boxPos, boxRadius, ePos, eRadius, 0, ePosOld);
+					for (std::unique_ptr<Enemy>& enemy : enemys)
+					{
+						enemy->MapCollide(boxPos, boxRadius);
+					}
 				}
 			}
-		}
-
-		if (CollisionStage(pPos, pRadius, pPosOld))
-		{
-			player->SetOnGround(true);
-		}
-		if (CollisionStage(ePos, eRadius, ePosOld))
-		{
-			enemy->SetOnGround(true);
 		}
 
 		for (auto& object : objects)
@@ -249,13 +258,11 @@ void GameScene::Update() {
 			object->Update();
 		}
 
-
-		length = GetLength(pPos, ePos);
-
-		rope->Update(pPos, ePos, enemy->GetObj());
+		rope->Update(pPos);
+		rPos = rope->GetObj()->GetPosition();
+		rRadius = rope->GetObj()->GetScale();
 
 		player->SetPos(pPos);
-		enemy->SetPos(ePos);
 		mouse->Update();
 
 		if (enemyHp == 0)
@@ -287,7 +294,7 @@ void GameScene::reset()
 
 void GameScene::Draw() {
 
-	SetImgui();
+	//SetImgui();
 
 #pragma region 背景画像描画
 	// // 背景画像描画前処理
@@ -309,12 +316,11 @@ void GameScene::Draw() {
 	{
 		player->Draw();
 
-		if (eAlive)
+		for (std::unique_ptr<Enemy>& enemy : enemys)
 		{
 			enemy->Draw();
 		}
 		rope->Draw();
-		//item->Draw();
 		MapDraw(0);
 
 		for (auto& object : objects)
@@ -416,30 +422,34 @@ void GameScene::CameraUpdate()
 
 void GameScene::CollisionUpdate()
 {
-	if (Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
+	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
-		enemy->EnemyCollision();
-		shakeFlag = true;
-		moveFlag = true;
-		rope->SetmoveFlag(moveFlag);
-
-		if (rFlag)
+		rPos = rope->GetObj()->GetPosition();
+		rRadius = rope->GetObj()->GetScale();
+		if (!rFlag && enemy->RopeCollide(rPos, rRadius * 2.0f))
 		{
+			ePos = enemy->GetObj()->GetPosition();
+			rope->Collision(pPos, ePos);
+			enemy->SetAttackFlag(false);
+		}
+
+		if (rFlag && Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
+		{
+			shakeFlag = true;
+			moveFlag = true;
+			rope->SetmoveFlag(moveFlag);
+
 			enemyHp -= 72;
+
+			rope->SetrFlag(false);
+			enemy->EnemyCollision();
 		}
-		else
+
+		if (!rFlag && enemy->BulletCollision())
 		{
-			playerHp -= 72;
+			shakeFlag = true;
+			playerHp -= 18;
 		}
-
-		rFlag = false;
-		rope->SetrFlag(rFlag);
-	}
-
-	if (!rFlag && enemy->BulletCollision())
-	{
-		shakeFlag = true;
-		playerHp -= 72;
 	}
 
 	player->SetPos(pPos);
@@ -469,15 +479,6 @@ bool GameScene::CollisionStage(XMFLOAT3& pos, const XMFLOAT3 radius, const XMFLO
 			}
 			hitFlag = true;
 		}
-		//else if (minY - radius.y < pos.y && stagePos.y > oldPos.y)
-		//{
-		//	pos.y = stagePos.y - radius.y;
-		//	if (stagePos.y + radius.y <= pos.y)
-		//	{
-		//		pos.y = oldPos.y;
-		//	}
-		//	hitFlag = true;
-		//}
 	}
 
 	return hitFlag;

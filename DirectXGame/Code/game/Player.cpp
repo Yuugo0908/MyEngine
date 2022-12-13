@@ -48,7 +48,7 @@ void Player::Update(bool rFlag, bool moveFlag)
 		{
 			if (keyboard->PushKey(DIK_W) || keyboard->PushKey(DIK_S))
 			{
-				rate = 0.7f;
+				rate = sqrtf(1.0f / 2.0f);
 			}
 		}
 

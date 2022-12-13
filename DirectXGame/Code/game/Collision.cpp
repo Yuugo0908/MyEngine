@@ -113,7 +113,7 @@ bool Collision::CollisionRaySphere(const Ray& ray, const Sphere& sphere, float* 
 	return false;
 }
 
-bool Collision::CollisionBoxPoint(const XMFLOAT3 boxPos, const XMFLOAT3 boxRadius, XMFLOAT3& pPos, const XMFLOAT3 pRadius, XMFLOAT3 pOldPos)
+bool Collision::CollisionBoxPoint(const XMFLOAT3 boxPos, const XMFLOAT3 boxRadius, XMFLOAT3& pos, const XMFLOAT3 radius, XMFLOAT3 oldPos)
 {
 	//マップチップ
 	//X, Y
@@ -135,49 +135,79 @@ bool Collision::CollisionBoxPoint(const XMFLOAT3 boxPos, const XMFLOAT3 boxRadiu
 	float maxMapZ = mapPos.z + mapRadius.z;
 	float minMapZ = mapPos.z - mapRadius.z;
 
-	if ((pPos.x <= maxMapX && pPos.x >= minMapX) &&
-		(pPos.y <= maxMapY && pPos.y >= minMapY))
+	if ((pos.x <= maxMapX && pos.x >= minMapX) &&
+		(pos.y <= maxMapY && pos.y >= minMapY))
 	{
-		if (maxMapZ + pRadius.z > pPos.z && mapPos.z < pOldPos.z)
+		if (maxMapZ + radius.z > pos.z && mapPos.z < oldPos.z)
 		{
-			pPos.z = maxMapZ + pRadius.z;
+			pos.z = maxMapZ + radius.z;
 			hitFlag = true;
 		}
-		else if (minMapZ - pRadius.z < pPos.z && mapPos.z > pOldPos.z)
+		else if (minMapZ - radius.z < pos.z && mapPos.z > oldPos.z)
 		{
-			pPos.z = minMapZ - pRadius.z;
+			pos.z = minMapZ - radius.z;
 			hitFlag = true;
 		}
 	}
 
-	if ((pPos.z <= maxMapZ && pPos.z >= minMapZ) &&
-		(pPos.y <= maxMapY && pPos.y >= minMapY))
+	if ((pos.z <= maxMapZ && pos.z >= minMapZ) &&
+		(pos.y <= maxMapY && pos.y >= minMapY))
 	{
-		if (maxMapX + pRadius.x > pPos.x && mapPos.x < pOldPos.x)
+		if (maxMapX + radius.x > pos.x && mapPos.x < oldPos.x)
 		{
-			pPos.x = maxMapX + pRadius.x;
+			pos.x = maxMapX + radius.x;
 			hitFlag = true;
 		}
-		else if (minMapX - pRadius.x < pPos.x && mapPos.x > pOldPos.x)
+		else if (minMapX - radius.x < pos.x && mapPos.x > oldPos.x)
 		{
-			pPos.x = minMapX - pRadius.x;
+			pos.x = minMapX - radius.x;
 			hitFlag = true;
 		}
 	}
 
-	if ((pPos.x <= maxMapX && pPos.x >= minMapX) &&
-		(pPos.z <= maxMapZ && pPos.z >= minMapZ))
+	if ((pos.x <= maxMapX && pos.x >= minMapX) &&
+		(pos.z <= maxMapZ && pos.z >= minMapZ))
 	{
-		if (maxMapY + pRadius.y > pPos.y && mapPos.y < pOldPos.y)
+		if (maxMapY + radius.y > pos.y && mapPos.y < oldPos.y)
 		{
-			pPos.y = maxMapY + pRadius.y;
+			pos.y = maxMapY + radius.y;
 			hitFlag = true;
 		}
-		else if (minMapY - pRadius.y < pPos.y && mapPos.y > pOldPos.y)
+		else if (minMapY - radius.y < pos.y && mapPos.y > oldPos.y)
 		{
-			pPos.y = minMapY - pRadius.y;
+			pos.y = minMapY - radius.y;
 			hitFlag = true;
 		}
 	}
 	return hitFlag;
 }
+
+bool Collision::CollisionStage(const XMFLOAT3 stagePos, const XMFLOAT3 stageRadius, XMFLOAT3& pos, const XMFLOAT3 radius, XMFLOAT3 oldPos)
+{
+	// 判定
+	float maxX = stagePos.x + stageRadius.x;
+	float maxY = stagePos.y + stageRadius.y;
+	float maxZ = stagePos.z + stageRadius.z;
+	float minX = stagePos.x - stageRadius.x;
+	float minY = stagePos.y - stageRadius.y;
+	float minZ = stagePos.z - stageRadius.z;
+
+	bool hitFlag = false;
+
+	if ((pos.x < maxX && pos.x > minX) &&
+		(pos.z < maxZ && pos.z > minZ))
+	{
+		if (maxY + radius.y > pos.y && stagePos.y < oldPos.y)
+		{
+			if (stagePos.y + radius.y >= pos.y)
+			{
+				pos.y = oldPos.y;
+			}
+			hitFlag = true;
+		}
+	}
+
+	return hitFlag;
+}
+
+
