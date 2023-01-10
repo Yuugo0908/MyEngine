@@ -23,9 +23,9 @@ void Bullet::Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos)
 
 void Bullet::Attack()
 {
-	bPos.x += bSpeed.x / 2;
-	bPos.y += bSpeed.y / 2;
-	bPos.z += bSpeed.z / 2;
+	bPos.x += bSpeed.x / 3;
+	bPos.y += bSpeed.y / 3;
+	bPos.z += bSpeed.z / 3;
 }
 
 void Bullet::Search()

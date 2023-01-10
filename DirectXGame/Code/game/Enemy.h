@@ -12,12 +12,12 @@ class Enemy
 {
 public:
 	// 行動フェーズ
-	typedef enum
+	enum class Phase
 	{
 		attack,
 		move,
 		stay,
-	} Phase;
+	};
 
 	static bool StaticInit();
 
@@ -38,6 +38,8 @@ public:
 	void Stay();
 
 	void Spawn();
+
+	void Reset();
 
 	bool EnemyCollision();
 
@@ -85,7 +87,7 @@ private:
 	XMFLOAT3 spawnPos = {};
 	XMFLOAT3 randPos = {}; // ランダムなスポーン位置
 
-	Phase phase = move;
+	Phase phase = Enemy::Phase::move;
 
 	float eUp = 0.0f; // 上昇
 	float eDown = 0.0f;// 下降
@@ -94,7 +96,6 @@ private:
 	float lengthOld = 0.0f;
 
 	int eAliveCount = 0;
-	int enemyCount = 0; // 倒した数
 	int attackCount = 0;
 
 	bool eFlag = false; // 自由落下のフラグ
@@ -102,9 +103,6 @@ private:
 	bool attackFlag = false;
 	bool jumpFlag = false;
 	bool onGround = false;
-
-	// バレット
-	XMFLOAT3 bPos = {};
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};

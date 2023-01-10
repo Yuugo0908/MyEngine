@@ -23,6 +23,8 @@ public: // メンバ関数
 
 	void Jump();
 
+	void Reset();
+
 	// マップチップ当たり判定
 	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const XMFLOAT3 oldPos);
 

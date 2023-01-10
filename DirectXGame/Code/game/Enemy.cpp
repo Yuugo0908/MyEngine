@@ -25,7 +25,7 @@ bool Enemy::Initialize(Player* player)
 	enemyObj = Object3d::Create();
 	enemyObj->SetModel(enemyModel);
 
-	enemyObj->SetPosition({ 0.0f, 100.0f, 0.0f });
+	enemyObj->SetPosition({ 0.0f, 0.0f, 0.0f });
 	enemyObj->SetScale({ 1.0f, 1.0f, 1.0f });
 	enemyObj->SetColor({ 0.0f, 0.8f, 0.0f, 1.0f});
 	ePos = enemyObj->GetPosition();
@@ -48,7 +48,6 @@ void Enemy::Update()
 	if (!eAlive)
 	{
 		eAliveCount++;
-		enemyObj->SetPosition({ 0.0f, 100.0f, 0.0f });
 
 		if (eAliveCount == 60)
 		{
@@ -101,30 +100,30 @@ void Enemy::Update()
 
 	if (PElength <= 30.0f)
 	{
-		phase = move;
+		phase = Enemy::Phase::move;
 	}
 	else
 	{
-		phase = stay;
+		phase = Enemy::Phase::stay;
 	}
 
 	if (onGround)
 	{
 		if (PElength <= 15.0f)
 		{
-			phase = attack;
+			phase = Enemy::Phase::attack;
 		}
 	}
 
 	switch (phase)
 	{
-	case attack:
+	case Enemy::Phase::attack:
 		Attack();
 		break;
-	case move:
+	case Enemy::Phase::move:
 		Move();
 		break;
-	case stay:
+	case Enemy::Phase::stay:
 	default:
 		Stay();
 	}
@@ -187,7 +186,7 @@ void Enemy::Spawn()
 	randPos.x = (float)(-40 + rand() % 80);
 	randPos.z = (float)(-40 + rand() % 80);
 
-	phase = move;
+	phase = Enemy::Phase::move;
 	enemyObj->SetPosition({ randPos.x, 8.0f, randPos.z });
 	enemyObj->SetScale({ 1.0f, 1.0f, 1.0f });
 	enemyObj->SetColor({ 0.0f, 0.8f, 0.0f, 1.0f });
@@ -195,9 +194,20 @@ void Enemy::Spawn()
 	spawnPos = { ePos.x, 0.0f, ePos.z };
 }
 
+void Enemy::Reset()
+{
+	eAlive = false;
+	for (std::unique_ptr<Bullet>& bullet : bullets)
+	{
+		bullets.remove(bullet);
+		break;
+	}
+}
+
 bool Enemy::EnemyCollision()
 {
 	eAlive = false;
+	eAliveCount = 0;
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
 		bullets.remove(bullet);
@@ -217,7 +227,7 @@ bool Enemy::BulletCollision()
 			return true;
 		}
 
-		else if (GetLength(ePos, bullet->GetPos()) >= 20.0f)
+		if (GetLength(ePos, bullet->GetPos()) >= 20.0f)
 		{
 			bullets.remove(bullet);
 			return false;
@@ -351,7 +361,7 @@ bool Enemy::StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale)
 			hitFlag = true;
 		}
 	}
-	enemyObj->SetPosition(ePos);
+	//enemyObj->SetPosition(ePos);
 	enemyObj->Update();
 
 	return hitFlag;
@@ -363,53 +373,66 @@ bool Enemy::RopeCollide(XMFLOAT3 rPos, XMFLOAT3 rRadius)
 	bool hitFlag = false;
 
 	// ”»’è
-	float maxBoxX = rPos.x + rRadius.x;
-	float minBoxX = rPos.x - rRadius.x;
-	float maxBoxY = rPos.y + rRadius.y;
-	float minBoxY = rPos.y - rRadius.y;
-	float maxBoxZ = rPos.z + rRadius.z;
-	float minBoxZ = rPos.z - rRadius.z;
+	float maxRopeX = rPos.x + rRadius.x;
+	float maxRopeY = rPos.y + rRadius.y;
+	float maxRopeZ = rPos.z + rRadius.z;
+	float minRopeX = rPos.x - rRadius.x;
+	float minRopeY = rPos.y - rRadius.y;
+	float minRopeZ = rPos.z - rRadius.z;
 
-	if ((ePos.x <= maxBoxX && ePos.x >= minBoxX) &&
-		(ePos.z <= maxBoxZ && ePos.z >= minBoxZ))
+	float maxEnemyX = ePos.x + eRadius.x;
+	float maxEnemyY = ePos.y + eRadius.y;
+	float maxEnemyZ = ePos.z + eRadius.z;
+	float minEnemyX = ePos.x - eRadius.x;
+	float minEnemyY = ePos.y - eRadius.y;
+	float minEnemyZ = ePos.z - eRadius.z;
+
+	if ((minRopeX < maxEnemyX && maxRopeX > minEnemyX) &&
+		(minRopeY < maxEnemyY && maxRopeY > minEnemyY) &&
+		(minRopeZ < maxEnemyZ && maxRopeZ > minEnemyZ))
 	{
-		if (maxBoxY + eRadius.y > ePos.y && rPos.y < eOldPos.y)
-		{
-			hitFlag = true;
-		}
-		else if (minBoxY - eRadius.y < ePos.y && rPos.y > eOldPos.y)
-		{
-			hitFlag = true;
-		}
+		hitFlag = true;
 	}
 
-	if ((ePos.x <= maxBoxX && ePos.x >= minBoxX) &&
-		(ePos.y <= maxBoxY && ePos.y >= minBoxY))
-	{
-		if (maxBoxZ + eRadius.z > ePos.z && rPos.z < eOldPos.z)
-		{
-			hitFlag = true;
-		}
-		else if (minBoxZ - eRadius.z < ePos.z && rPos.z > eOldPos.z)
-		{
-			hitFlag = true;
-		}
-	}
+	//if ((ePos.x < maxRopeX && ePos.x > minRopeX) &&
+	//	(ePos.z < maxRopeZ && ePos.z > minRopeZ))
+	//{
+	//	if (maxRopeY> ePos.y)
+	//	{
+	//		hitFlag = true;
+	//	}
+	//	else if (minRopeY < ePos.y)
+	//	{
+	//		hitFlag = true;
+	//	}
+	//}
 
-	if ((ePos.z <= maxBoxZ && ePos.z >= minBoxZ) &&
-		(ePos.y <= maxBoxY && ePos.y >= minBoxY))
-	{
-		if (maxBoxX + eRadius.x > ePos.x && rPos.x < eOldPos.x)
-		{
-			hitFlag = true;
-		}
-		else if (minBoxX - eRadius.x < ePos.x && rPos.x > eOldPos.x)
-		{
-			hitFlag = true;
-		}
-	}
-	enemyObj->SetPosition(ePos);
-	enemyObj->SetScale(eRadius);
+	//if ((ePos.x < maxRopeX && ePos.x > minRopeX) &&
+	//	(ePos.y < maxRopeY && ePos.y > minRopeY))
+	//{
+	//	if (maxRopeZ > ePos.z)
+	//	{
+	//		hitFlag = true;
+	//	}
+	//	else if (minRopeZ < ePos.z)
+	//	{
+	//		hitFlag = true;
+	//	}
+	//}
+
+	//if ((ePos.z < maxRopeZ && ePos.z > minRopeZ) &&
+	//	(ePos.y < maxRopeY && ePos.y > minRopeY))
+	//{
+	//	if (maxRopeX > ePos.x)
+	//	{
+	//		hitFlag = true;
+	//	}
+	//	else if (minRopeX < ePos.x)
+	//	{
+	//		hitFlag = true;
+	//	}
+	//}
+
 	enemyObj->Update();
 
 	return hitFlag;

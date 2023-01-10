@@ -55,17 +55,19 @@ public: // 静的メンバ関数
 	void CameraMoveVector(const XMVECTOR& move);
 	void CameraMoveEyeVector(const XMVECTOR& move);
 
-	/// 毎フレーム更新
+	// 毎フレーム更新
 	void Update();
-	/// ビュー行列を更新
+	// ビュー行列を更新
 	void UpdateViewMatrix();
-	/// 射影行列を更新
+	// 射影行列を更新
 	void UpdateProjectionMatrix();
 	// カメラのシェイクを実行
 	void CameraShake(bool& flag);
 	// カメラの追尾
 	XMFLOAT3 CameraTrack(XMFLOAT3 pPos);
 	float CameraRot(XMFLOAT3 pPos);
+
+	void Reset();
 
 
 private: // メンバ変数
@@ -107,4 +109,12 @@ private: // メンバ変数
 	// 注視点から視点へのベクトルと、上方向ベクトル
 	XMVECTOR vTargetEye = {};
 	XMVECTOR vUp = {};
+
+	Mouse::MouseMove mouseMove;
+
+	bool dirty = false;
+	float dy = 0.0f;
+	float angleX = 0;
+	float angleY = 0;
+	float speed = 0.75f;
 };

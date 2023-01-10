@@ -453,6 +453,11 @@ void Image2d::SetSize(XMFLOAT2 size)
 	TransferVertices();
 }
 
+void Image2d::SetColor(XMFLOAT4 color)
+{
+	this->color = color;
+}
+
 void Image2d::SetAnchorPoint(XMFLOAT2 anchorpoint)
 {
 	this->anchorpoint = anchorpoint;

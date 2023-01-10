@@ -106,6 +106,14 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	GameOver = Image2d::Create(7, { 0.0f,0.0f });
 	GameOver->SetSize({ 1280.0f,720.0f });
 
+	if (!Image2d::LoadTexture(8, L"Resources/black_backGround.png"))
+	{
+		assert(0);
+	}
+	backGround = Image2d::Create(8, { 0.0f,0.0f });
+	backGround->SetSize({ 1280.0f,720.0f });
+	backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.0f });
+
 	// レベルデータの読み込み
 	levelData = LevelLoader::LoadFile("gameScene");
 
@@ -194,102 +202,210 @@ void GameScene::Update() {
 		{
 			//マップチップ用のCSV読み込み
 			//(map, "Resource/scv/なんたら.csv")で追加可能
-			//Mapchip::CsvToVector(map, "Resources/csv/tutorial.csv");//mapNum=0
-			Mapchip::CsvToVector(map, "Resources/csv/stage1.csv");//mapNum=0
-			MapCreate(0);
-			nowScene = 1;
+			if (!mapLoadFlag)
+			{
+				//Mapchip::CsvToVector(map, "Resources/csv/tutorial.csv");//mapNum=0
+				Mapchip::CsvToVector(map, "Resources/csv/stage1.csv");//mapNum=0
+				MapCreate(0);
+				mapLoadFlag = true;
+			}
+			if (!fadeIn)
+			{
+				fadeIn = true;
+			}
+		}
+
+		if(fadeIn)
+		{
+			alpha += 0.01f;
+			backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
+			if (alpha >= 1.0f)
+			{
+				nowScene = 1;
+				fadeIn = false;
+				fadeOut = true;
+			}
 		}
 	}
 
 	if (nowScene == 1)
 	{
-		CollisionUpdate();
-		LightUpdate();
-		CameraUpdate();
-
-		rFlag = rope->GetrFlag();
-		moveFlag = rope->GetmoveFlag();
-		avoidFlag = player->GetAvoidFlag();
-		onGround = player->GetOnGround();
-		//eAlive = enemy->GetAlive();
-
-		player->Update(rFlag, moveFlag);
-		pPosOld = pPos;
-		pPos = player->GetPos();
-		pRadius = player->GetObj()->GetScale();
-		if (CollisionStage(pPos, pRadius, pPosOld))
+		// タイトルから移行後の更新
 		{
-			player->SetOnGround(true);
-		}
-		for (std::unique_ptr<Enemy>& enemy : enemys)
-		{
-			enemy->Update();
-		}
-
-		for (std::unique_ptr<Enemy>& enemy : enemys)
-		{
-			if (enemy->StageCollide(stagePos, stageScale))
+			CollisionUpdate();
+			LightUpdate();
+			CameraUpdate();
+			// jsonファイルから読み込んだオブジェクトの更新
+			for (auto& object : objects)
 			{
-				enemy->SetOnGround(true);
+				object->Update();
 			}
-		}
+			// マップオブジェクトの更新
+			MapUpdate(0);
 
-		MapUpdate(0);
+			player->SetPos(pPos);
+			//	プレイヤーの座標、半径の設定
+			player->Update(rFlag, moveFlag);
+			pPosOld = pPos;
+			pPos = player->GetPos();
+			pRadius = player->GetObj()->GetScale();
 
-		for (int y = 0; y < map_max_y; y++)
-		{
-			for (int x = 0; x < map_max_x; x++)
+			rPos = rope->GetObj()->GetPosition();
+			rRadius = rope->GetObj()->GetScale();
+
+			// フェードアウトが終わるまではここでリターン
+			if (fadeOut)
 			{
-				if (Mapchip::GetChipNum(x, y, map[0]) == blocks_ || Mapchip::GetChipNum(x, y, map[0]) == walls_)
+				alpha -= 0.01f;
+				backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });			
+				if (alpha <= 0.0f)
 				{
-					XMFLOAT3 boxPos = blockObj[y][x]->GetPosition();
-					XMFLOAT3 boxRadius = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);
-					player->MapCollide(boxPos, boxRadius, pPos, pRadius, 0, pPosOld);
-					for (std::unique_ptr<Enemy>& enemy : enemys)
-					{
-						enemy->MapCollide(boxPos, boxRadius);
-					}
+					fadeOut = false;
 				}
 			}
 		}
 
-		for (auto& object : objects)
+		if (!fadeIn && !fadeOut)
 		{
-			object->Update();
+			// フラグの取得
+			rFlag = rope->GetrFlag();
+			moveFlag = rope->GetmoveFlag();
+			avoidFlag = player->GetAvoidFlag();
+			onGround = player->GetOnGround();
+
+			if (throwCount < 30)
+			{
+				throwCount++;
+			}
+
+			rope->Update(pPos);
+
+			for (std::unique_ptr<Enemy>& enemy : enemys)
+			{
+				ePos = enemy->GetPos();
+				PElength = GetLength(pPos, ePos);
+
+				if (PElength < minLength && ePos.y > 0.0f)
+				{
+					ePosSave = ePos;
+				}
+			}
+
+			if (throwCount == 30)
+			{
+				rope->Throw(pPos, ePosSave, PElength);
+			}
+
+			for (std::unique_ptr<Enemy>& enemy : enemys)
+			{
+				enemy->Update();
+			}
+
+			rPos = rope->GetObj()->GetPosition();
+			rRadius = rope->GetObj()->GetScale();
+
+			player->SetPos(pPos);
+			mouse->Update();
 		}
 
-		rope->Update(pPos);
-		rPos = rope->GetObj()->GetPosition();
-		rRadius = rope->GetObj()->GetScale();
-
-		player->SetPos(pPos);
-		mouse->Update();
-
-		if (enemyHp == 0)
+		if (enemyHp <= 0)
 		{
-			nowScene = 2;
+			fadeIn = true;
+			if (fadeIn)
+			{
+				alpha += 0.01f;
+				backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
+				if (alpha >= 1.0)
+				{
+					nowScene = 2;
+					fadeIn = false;
+					fadeOut = true;
+				}
+			}
 		}
 
-		if (playerHp == 0)
+		if (playerHp <= 0)
 		{
-			nowScene = 3;
+			fadeIn = true;
+			if (fadeIn)
+			{
+				alpha += 0.01f;
+				backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
+				if (alpha >= 1.0f)
+				{
+					nowScene = 3;
+					fadeIn = false;
+					fadeOut = true;
+				}
+			}
 		}
 	}
 
-	//if (nowScene == 2 || nowScene == 3)
-	//{
-	//	playerHp = 360;
-	//	enemyHp = 360;
-	//	eAlive = false;
-	//	if (keyboard->TriggerKey(DIK_SPACE))
-	//	{
-	//		nowScene = 0;
-	//	}
-	//}
+	if (nowScene == 2 || nowScene == 3)
+	{
+		if (fadeOut)
+		{
+			alpha -= 0.01f;
+			backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
+			if (alpha <= 0.0f)
+			{
+				fadeOut = false;
+			}
+		}
+
+		if (alpha <= 0.0f && keyboard->TriggerKey(DIK_SPACE))
+		{
+			player->Reset();
+			for (std::unique_ptr<Enemy>& enemy : enemys)
+			{
+				enemy->Reset();
+			}
+			rope->Reset();
+			camera->Reset();
+			reset();
+			nowScene = 0;
+		}
+	}
 }
 
 void GameScene::reset()
 {
+	// プレイヤー
+	pPos = { 0.0f, 10.0f, 0.0f };//座標
+	player->GetObj()->SetPosition(pPos);
+	pPosOld = { 0.0f, 10.0f, 0.0f };
+	pRadius = {};
+	onGround = false;//自由落下のフラグ
+	moveFlag = false;//移動管理フラグ
+	avoidFlag = false;//回避管理フラグ
+	playerHp = 360;
+
+	// エネミー
+	enemyCount = 4;
+	enemyHp = 360;
+	ePos = {};
+	ePosOld = {};
+	eRadius = {};
+
+	// ロープ
+	rPos = {};
+	rRadius = {};
+	rFlag = false;
+
+	// カメラ
+	cPos = {};
+	cTarget = {};
+	cameraLength = {};
+
+	// 突進用
+	startPos = {}; // 開始位置
+	endPos = {}; // 終点位置
+	avoidMove = 5.0f; // 距離
+	avoidTime = 0.0f; // 経過時間
+	easeFlag = false; // イージング開始フラグ
+
+	// シェイク用
+	shakeFlag = false;
 }
 
 void GameScene::Draw() {
@@ -297,14 +413,14 @@ void GameScene::Draw() {
 	//SetImgui();
 
 #pragma region 背景画像描画
-	// // 背景画像描画前処理
-	//Image2d::PreDraw(dxCommon->GetCommandList());
-	// // 背景画像描画
-	//backGround->Draw();
-	// // 画像描画後処理
-	//Image2d::PostDraw();
-	// // 深度バッファクリア
-	//dxCommon->ClearDepthBuffer();
+	// 背景画像描画前処理
+	Image2d::PreDraw(dxCommon->GetCommandList());
+
+
+	// 画像描画後処理
+	Image2d::PostDraw();
+	// 深度バッファクリア
+	dxCommon->ClearDepthBuffer();
 #pragma endregion 背景画像描画
 
 #pragma region 3Dオブジェクト描画
@@ -338,10 +454,12 @@ void GameScene::Draw() {
 	Image2d::PreDraw(dxCommon->GetCommandList());
 
 	// 前景画像の描画
+
 	if (nowScene == 0)
 	{
 		title->Draw();
 	}
+
 	if (nowScene == 1)
 	{
 		HPText->Draw();
@@ -354,14 +472,18 @@ void GameScene::Draw() {
 		EnemyHPGauge->SetSize({ enemyHp,60 });
 		EnemyHPGauge->Draw();
 	}
+
 	if (nowScene == 2)
 	{
 		result->Draw();
 	}
+
 	if (nowScene == 3)
 	{
 		GameOver->Draw();
 	}
+
+	backGround->Draw();
 
 	// デバッグテキストの描画
 	DebugText::GetInstance()->DrawAll(dxCommon->GetCommandList());
@@ -386,9 +508,6 @@ void GameScene::SetImgui()
 	ImGui::Text("cameraLength : %6.2f", cPos.x);
 	ImGui::Text("cameraLength : %6.2f", cPos.y);
 	ImGui::Text("cameraLength : %6.2f", cPos.z);
-
-	ImGui::Separator();
-	ImGui::Text("length : %6.2f", length);
 
 	ImGui::End();
 }
@@ -422,24 +541,64 @@ void GameScene::CameraUpdate()
 
 void GameScene::CollisionUpdate()
 {
+	if (CollisionStage(pPos, pRadius, pPosOld))
+	{
+		player->SetOnGround(true);
+	}
+
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
-		rPos = rope->GetObj()->GetPosition();
-		rRadius = rope->GetObj()->GetScale();
-		if (!rFlag && enemy->RopeCollide(rPos, rRadius * 2.0f))
+		if (enemy->StageCollide(stagePos, stageScale))
 		{
-			ePos = enemy->GetObj()->GetPosition();
+			enemy->SetOnGround(true);
+		}
+	}
+
+	for (int y = 0; y < map_max_y; y++)
+	{
+		for (int x = 0; x < map_max_x; x++)
+		{
+			if (Mapchip::GetChipNum(x, y, map[0]) == blocks_ || Mapchip::GetChipNum(x, y, map[0]) == walls_)
+			{
+				XMFLOAT3 boxPos = blockObj[y][x]->GetPosition();
+				XMFLOAT3 boxRadius = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);
+				player->MapCollide(boxPos, boxRadius, pPos, pRadius, 0, pPosOld);
+				for (std::unique_ptr<Enemy>& enemy : enemys)
+				{
+					enemy->MapCollide(boxPos, boxRadius);
+				}
+			}
+		}
+	}
+
+	for (std::unique_ptr<Enemy>& enemy : enemys)
+	{
+		//rPos = rope->GetObj()->GetPosition();
+		//rRadius = rope->GetObj()->GetScale();
+		eAlive = enemy->GetAlive();
+		if (eAlive && !rFlag && enemy->RopeCollide(rPos, rRadius))
+		{
+			ePos = enemy->GetPos();
 			rope->Collision(pPos, ePos);
 			enemy->SetAttackFlag(false);
 		}
 
-		if (rFlag && Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
+		if (eAlive && Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
 		{
 			shakeFlag = true;
 			moveFlag = true;
 			rope->SetmoveFlag(moveFlag);
 
-			enemyHp -= 72;
+			if (rFlag)
+			{
+				enemyHp -= 72;
+				minLength = 15.0f;
+				ePosSave = { 0.0f, 0.0f, 0.0f };
+			}
+			else
+			{
+				playerHp -= 18;
+			}
 
 			rope->SetrFlag(false);
 			enemy->EnemyCollision();
@@ -452,7 +611,6 @@ void GameScene::CollisionUpdate()
 		}
 	}
 
-	player->SetPos(pPos);
 	camera->SetTarget(pPos);
 }
 

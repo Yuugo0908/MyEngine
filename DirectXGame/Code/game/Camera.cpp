@@ -115,13 +115,9 @@ void Camera::CameraMoveEyeVector(const XMVECTOR& move)
 
 void Camera::Update()
 {
-	bool dirty = false;
-	float angleX = 0;
-	float angleY = 0;
-	float speed = 0.75f;
 
 	// マウスの入力を取得
-	Mouse::MouseMove mouseMove = mouse->GetMouseMove();
+	mouseMove = mouse->GetMouseMove();
 
 	// マウスの左ボタンが押されていたらカメラを回転させない
 	if (moveCount <= 30)
@@ -131,11 +127,12 @@ void Camera::Update()
 	if (mouse->TriggerMouseLeft())
 	{
 		moveCount = 0;
+		angleY = 0.0f;
 	}
 
 	if (moveCount >= 30)
 	{
-		float dy = mouseMove.MouseX * scaleY;
+		dy = mouseMove.MouseX * scaleY;
 		angleY = -dy * XM_PI * speed;
 		dirty = true;
 	}
@@ -310,4 +307,27 @@ float Camera::CameraRot(XMFLOAT3 pPos)
 	float angle = (float)atan2(subCameraPlayer.m128_f32[0], subCameraPlayer.m128_f32[2]);
 
 	return angle;
+}
+
+void Camera::Reset()
+{
+	distance = 15.0f;
+	eye = { 0, 0, distance };
+	target = { 0, 0, 0 };
+	up = { 0, 1, 0 };
+	cameraLength = {};
+	shake = {};
+	vTargetEye = {};
+	vUp = {};
+	viewDirty = false;
+	projectionDirty = false;
+	shakeCount = 0;
+	moveCount = 30;
+	mouseMove = {0, 0, 0};
+
+	dirty = false;
+	angleX = 0;
+	angleY = 0;
+	speed = 0.75f;
+	dy = 0.0f;
 }

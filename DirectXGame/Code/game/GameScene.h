@@ -110,6 +110,7 @@ private: // メンバ変数
 	static Model* blockModel;
 	static std::vector<std::vector<int>> map; //マップチップ
 	static std::unique_ptr<Object3d> blockObj[map_max_y][map_max_x]; // ステージブロック
+	bool mapLoadFlag = false;
 	// jsonオブジェクト
 	std::vector<std::unique_ptr<Object3d>> objects{};
 	XMFLOAT3 stagePos = {};
@@ -128,6 +129,8 @@ private: // メンバ変数
 	Image2d* PlayerHPGauge = nullptr;
 	Image2d* EnemyHPBar = nullptr;
 	Image2d* EnemyHPGauge = nullptr;
+	Image2d* backGround = nullptr;
+	float alpha = 0.0f;
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
@@ -139,16 +142,21 @@ private: // メンバ変数
 	float playerHp = 360;
 
 	// エネミー
-	int enemyCount = 4;
+	int enemyCount = 5;
 	float enemyHp = 360;
+	bool eAlive = false;
 	XMFLOAT3 ePos = {};
 	XMFLOAT3 ePosOld = {};
 	XMFLOAT3 eRadius = {};
+	XMFLOAT3 ePosSave = {};
+	float minLength = 15.0f;
 
 	// ロープ
 	XMFLOAT3 rPos = {};
 	XMFLOAT3 rRadius = {};
 	bool rFlag = false;
+	int throwCount = 0;
+	float PElength = 0.0f;
 
 	// カメラ
 	XMFLOAT3 cPos = {};
@@ -162,19 +170,11 @@ private: // メンバ変数
 	float avoidTime = 0.0f; // 経過時間
 	bool easeFlag = false; // イージング開始フラグ
 
-	// 当たり判定
-	int cCount = 0;
-	bool cFlag = false;
-
 	// シーン管理用
 	int nowScene = 0;
+	bool fadeIn = false;
+	bool fadeOut = false;
 
 	// シェイク用
 	bool shakeFlag = false;
-	XMFLOAT2 shakeXY = {};
-	int shakeTime = 0;
-
-	float length = 0.0f;
-
-	bool poseFlag = false;
 };

@@ -136,6 +136,39 @@ void Player::Jump()
 	}
 }
 
+void Player::Reset()
+{
+	pPos = { 0.0f, 10.0f, 0.0f };//座標
+	pRot = { 0.0f, 0.0f, 0.0f };//回転
+
+	playerObj->SetPosition(pPos);
+	playerObj->SetScale({ 0.8f,0.8f,0.8f });
+	playerObj->SetRotation(pRot);
+	playerObj->Update();
+
+	pSpeed = 0.35f;
+	onGround = false;//自由落下のフラグ
+	jumpFlag = false;
+	moveFlag = false;//移動管理フラグ
+	pMove = 0.0f;//移動量
+	pAcc = 0.2f;//加速
+	pVal = 0.2f;//速度
+	pDown = 0.0f;
+	pGra = 0.1f;//重力
+	rate = 1.0f; // 斜め移動時の制限
+
+	// 突進用
+	avoidFlag = false; // 回避開始フラグ
+	avoidCount = 0;
+
+	// ロープ管理用
+	rFlag = false;
+
+	// カメラ距離取得用
+	cameraTrack = {};
+	cameraRot = 0.0f;
+}
+
 bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const XMFLOAT3 oldPos)
 {
 	//フラグ
