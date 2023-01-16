@@ -57,8 +57,6 @@ public: // メンバ関数
 	void CameraUpdate();
 	// 当たり判定
 	void CollisionUpdate();
-	// ステージの当たり判定
-	bool CollisionStage(XMFLOAT3& pos, const XMFLOAT3 radius, const XMFLOAT3 oldPos);
 
 	// マップチップ用
 	// マップチップ生成
@@ -67,8 +65,6 @@ public: // メンバ関数
 	static void MapUpdate(int mapNumber);
 	// マップチップ描画
 	static void MapDraw(int mapNumber);
-	// マップチップ当たり判定
-	bool MapCollide(XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const XMFLOAT3 oldPos);
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
@@ -131,6 +127,7 @@ private: // メンバ変数
 	Image2d* EnemyHPGauge = nullptr;
 	Image2d* backGround = nullptr;
 	float alpha = 0.0f;
+	Image2d* explanation = nullptr;
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
@@ -142,18 +139,16 @@ private: // メンバ変数
 	float playerHp = 360;
 
 	// エネミー
-	int enemyCount = 5;
+	static const int enemyCount = 5;
 	float enemyHp = 360;
 	bool eAlive = false;
 	XMFLOAT3 ePos = {};
 	XMFLOAT3 ePosOld = {};
 	XMFLOAT3 eRadius = {};
 	XMFLOAT3 ePosSave = {};
-	float minLength = 15.0f;
+	float minLength = 10.0f;
 
 	// ロープ
-	XMFLOAT3 rPos = {};
-	XMFLOAT3 rRadius = {};
 	bool rFlag = false;
 	int throwCount = 0;
 	float PElength = 0.0f;
@@ -163,17 +158,11 @@ private: // メンバ変数
 	XMFLOAT3 cTarget = {};
 	XMVECTOR cameraLength = {};
 
-	// 突進用
-	XMFLOAT3 startPos = {}; // 開始位置
-	XMFLOAT3 endPos = {}; // 終点位置
-	float avoidMove = 5.0f; // 距離
-	float avoidTime = 0.0f; // 経過時間
-	bool easeFlag = false; // イージング開始フラグ
-
 	// シーン管理用
 	int nowScene = 0;
 	bool fadeIn = false;
 	bool fadeOut = false;
+	bool expFlag = false;
 
 	// シェイク用
 	bool shakeFlag = false;

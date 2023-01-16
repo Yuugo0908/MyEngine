@@ -16,11 +16,11 @@ bool Player::Initialize(Keyboard* keyboard, Mouse* mouse)
 
 	// ˆÊ’u‚ð•Ï”‚ÉŠi”[
 	pPos = { 0.0f, 10.0f, 0.0f };
+	pPosOld = { 0.0f, 10.0f, 0.0f };
+	pScale = { 0.8f,0.8f,0.8f };
 
 	playerObj->SetPosition(pPos);
-	playerObj->SetScale({ 0.8f,0.8f,0.8f });
-	pPos = playerObj->GetPosition();
-	pScale = playerObj->GetScale();
+	playerObj->SetScale(pScale);
 	playerObj->Update();
 
 	return true;
@@ -32,6 +32,7 @@ void Player::Update(bool rFlag, bool moveFlag)
 	cameraRot = camera->CameraRot(pPos);
 	cameraTrack = cameraTrack * pSpeed;
 
+	pPosOld = playerObj->GetPosition();
 	playerObj->SetPosition(pPos);
 	playerObj->SetScale(pScale);
 	playerObj->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
@@ -75,6 +76,10 @@ void Player::Update(bool rFlag, bool moveFlag)
 			pPos.z -= cameraTrack.z;
 		}
 	}
+
+	DebugText::GetInstance()->Print(100, 30 * 10, 2, "%f", pPos.x);
+	DebugText::GetInstance()->Print(100, 30 * 11, 2, "%f", pPos.y);
+	DebugText::GetInstance()->Print(100, 30 * 12, 2, "%f", pPos.z);
 
 	playerObj->Update();
 }
@@ -139,6 +144,7 @@ void Player::Jump()
 void Player::Reset()
 {
 	pPos = { 0.0f, 10.0f, 0.0f };//À•W
+	pPosOld = { 0.0f, 10.0f, 0.0f };
 	pRot = { 0.0f, 0.0f, 0.0f };//‰ñ“]
 
 	playerObj->SetPosition(pPos);
@@ -169,7 +175,7 @@ void Player::Reset()
 	cameraRot = 0.0f;
 }
 
-bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const XMFLOAT3 oldPos)
+bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, int mapNumber)
 {
 	//ƒtƒ‰ƒO
 	bool hitFlag = false;
@@ -182,63 +188,97 @@ bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFL
 	float maxBoxZ = boxPos.z + boxRadius.z;
 	float minBoxZ = boxPos.z - boxRadius.z;
 
-	if ((pos.x <= maxBoxX && pos.x >= minBoxX) &&
-		(pos.z <= maxBoxZ && pos.z >= minBoxZ))
+	if ((pPos.x <= maxBoxX && pPos.x >= minBoxX) &&
+		(pPos.z <= maxBoxZ && pPos.z >= minBoxZ))
 	{
-		if (maxBoxY + radius.y > pos.y && boxPos.y < oldPos.y)
+		if (maxBoxY + pScale.y > pPos.y && boxPos.y < pPosOld.y)
 		{
-			//pos.y = maxBoxY + radius.y;
+			//pPos.y = maxBoxY + pScale.y;
 			hitFlag = true;
-			if (maxBoxY + radius.y >= pos.y)
+			if (maxBoxY + pScale.y >= pPos.y)
 			{
-				pos.y = oldPos.y;
+				pPos.y = pPosOld.y;
 			}
 			onGround = true;
 		}
-		else if (minBoxY - radius.y < pos.y && boxPos.y > oldPos.y)
+		else if (minBoxY - pScale.y < pPos.y && boxPos.y > pPosOld.y)
 		{
-			pos.y = minBoxY - radius.y;
+			//pPos.y = minBoxY - pScale.y;
 			hitFlag = true;
-			if (minBoxY - radius.y <= pos.y)
+			if (minBoxY - pScale.y <= pPos.y)
 			{
-				pos.y = oldPos.y;
+				pPos.y = pPosOld.y;
 			}
 		}
 	}
 
-	if ((pos.x <= maxBoxX && pos.x >= minBoxX) &&
-		(pos.y <= maxBoxY && pos.y >= minBoxY))
+	if ((pPos.x <= maxBoxX && pPos.x >= minBoxX) &&
+		(pPos.y <= maxBoxY && pPos.y >= minBoxY))
 	{
-		if (maxBoxZ + radius.z > pos.z && boxPos.z < oldPos.z)
+		if (maxBoxZ + pScale.z > pPos.z && boxPos.z < pPosOld.z)
 		{
-			pos.z = maxBoxZ + radius.z;
+			pPos.z = maxBoxZ + pScale.z;
 			hitFlag = true;
 			avoidFlag = false;
 		}
-		else if (minBoxZ - radius.z < pos.z && boxPos.z > oldPos.z)
+		else if (minBoxZ - pScale.z < pPos.z && boxPos.z > pPosOld.z)
 		{
-			pos.z = minBoxZ - radius.z;
+			pPos.z = minBoxZ - pScale.z;
 			hitFlag = true;
 			avoidFlag = false;
 		}
 	}
 
-	if ((pos.z <= maxBoxZ && pos.z >= minBoxZ) &&
-		(pos.y <= maxBoxY && pos.y >= minBoxY))
+	if ((pPos.z <= maxBoxZ && pPos.z >= minBoxZ) &&
+		(pPos.y <= maxBoxY && pPos.y >= minBoxY))
 	{
-		if (maxBoxX + radius.x > pos.x && boxPos.x < oldPos.x)
+		if (maxBoxX + pScale.x > pPos.x && boxPos.x < pPosOld.x)
 		{
-			pos.x = maxBoxX + radius.x;
+			pPos.x = maxBoxX + pScale.x;
 			hitFlag = true;
 			avoidFlag = false;
 		}
-		else if (minBoxX - radius.x < pos.x && boxPos.x > oldPos.x)
+		else if (minBoxX - pScale.x < pPos.x && boxPos.x > pPosOld.x)
 		{
-			pos.x = minBoxX - radius.x;
+			pPos.x = minBoxX - pScale.x;
 			hitFlag = true;
 			avoidFlag = false;
 		}
 	}
+
+	playerObj->SetPosition(pPos);
+	playerObj->Update();
+
+	return hitFlag;
+}
+
+bool Player::StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale)
+{
+	// ”»’è
+	float maxX = stagePos.x + stageScale.x;
+	float maxY = stagePos.y + stageScale.y;
+	float maxZ = stagePos.z + stageScale.z;
+	float minX = stagePos.x - stageScale.x;
+	float minY = stagePos.y - stageScale.y;
+	float minZ = stagePos.z - stageScale.z;
+
+	bool hitFlag = false;
+
+	if ((pPos.x < maxX && pPos.x > minX) &&
+		(pPos.z < maxZ && pPos.z > minZ))
+	{
+		if (maxY + pScale.y > pPos.y && stagePos.y < pPosOld.y)
+		{
+			if (stagePos.y + pScale.y >= pPos.y)
+			{
+				pPos.y = pPosOld.y;
+			}
+			hitFlag = true;
+		}
+	}
+
+	playerObj->SetPosition(pPos);
+	playerObj->Update();
 
 	return hitFlag;
 }

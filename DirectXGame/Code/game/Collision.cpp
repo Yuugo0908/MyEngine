@@ -41,6 +41,22 @@ bool Collision::CollisionObject(const std::unique_ptr<Object3d>& object_a, const
 	return false;
 }
 
+bool Collision::CollisionSphere(const Sphere& sphere1, const Sphere& sphere2)
+{
+	float x = sphere2.center.m128_f32[0] - sphere1.center.m128_f32[0];
+	float y = sphere2.center.m128_f32[1] - sphere1.center.m128_f32[1];
+	float z = sphere2.center.m128_f32[2] - sphere1.center.m128_f32[2];
+
+	float r = sphere1.radius + sphere2.radius;
+
+	if ((x * x) + (y * y) + (z * z) <= (r * r))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool Collision::CollisionSpherePlane(const Sphere& sphere, const Plane& plane, XMVECTOR* inter)
 {
 	// 座標系の原点から球の中心座標への距離
@@ -108,9 +124,32 @@ bool Collision::CollisionRayTriangle(const Ray& ray, const Triangle& triangle, f
 	return false;
 }
 
-bool Collision::CollisionRaySphere(const Ray& ray, const Sphere& sphere, float* distance, XMVECTOR* inter)
+bool Collision::CollisionRaySphere(const Ray& ray, const Sphere& sphere)
 {
-	return false;
+	XMVECTOR m = ray.start - sphere.center;
+	float b = XMVector3Dot(m, ray.dir).m128_f32[1];
+	float c = XMVector3Dot(m, m).m128_f32[1] - sphere.radius * sphere.radius;
+
+	if (c > 0.0f && b > 0.0f)
+	{
+		return false;
+	}
+
+	float discr = b * b - c;
+
+	if (discr < 0.0f)
+	{
+		return false;
+	}
+
+	float t = -b - sqrtf(discr);
+
+	if (t < 0)
+	{
+		t = 0.0f;
+	}
+
+	return true;
 }
 
 bool Collision::CollisionBoxPoint(const XMFLOAT3 boxPos, const XMFLOAT3 boxRadius, XMFLOAT3& pos, const XMFLOAT3 radius, XMFLOAT3 oldPos)

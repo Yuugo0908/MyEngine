@@ -27,14 +27,13 @@ bool Rope::Initialize(Keyboard* keyboard, Mouse* mouse)
 	rScale = ropeObj->GetScale();
 	ropeObj->Update();
 
-	ray.start = XMVectorSet(rPos.x, rPos.y, rPos.z, 1);
-	ray.dir = XMVectorSet(0, 0, 1, 0);
-
 	return true;
 }
 
 void Rope::Update(XMFLOAT3& pPos)
 {
+	startPos = pPos;
+
 	if (throwCount < 30)
 	{
 		throwCount++;
@@ -42,7 +41,7 @@ void Rope::Update(XMFLOAT3& pPos)
 
 	if (!rFlag)
 	{
-		rPos = pPos + manageRopePos;
+		rPos = startPos + manageRopePos;
 		rScale = manageRopeScale;
 		ropeObj->SetPosition(rPos);
 		ropeObj->SetScale(rScale);
@@ -51,7 +50,7 @@ void Rope::Update(XMFLOAT3& pPos)
 
 		if (!rThrowFlag && !rBackFlag && mouse->TriggerMouseLeft())
 		{
-			rPos = pPos;
+			rPos = startPos;
 			moveFlag = false;
 			rThrowFlag = true;
 			avoidTime = 0.0f;
@@ -61,15 +60,15 @@ void Rope::Update(XMFLOAT3& pPos)
 		return;
 	}
 
-	objLength = GetLength(pPos, endPos);
+	objLength = GetLength(startPos, endPos);
 	{
-		XMFLOAT3 length = { pPos.x - endPos.x, pPos.y - endPos.y, pPos.z - endPos.z };
+		XMFLOAT3 length = { startPos.x - endPos.x, startPos.y - endPos.y, startPos.z - endPos.z };
 
-		angleY = (float)atan2(pPos.x - endPos.x, pPos.z - endPos.z);
-		vecXZ = sqrtf((pPos.x - endPos.x) * (pPos.x - endPos.x) + (pPos.z - endPos.z) * (pPos.z - endPos.z));
-		angleX = (float)atan2(endPos.y - pPos.y, vecXZ);
+		angleY = (float)atan2(startPos.x - endPos.x, startPos.z - endPos.z);
+		vecXZ = sqrtf((startPos.x - endPos.x) * (startPos.x - endPos.x) + (startPos.z - endPos.z) * (startPos.z - endPos.z));
+		angleX = (float)atan2(endPos.y - startPos.y, vecXZ);
 
-		rPos = { (pPos.x + endPos.x) / 2, (pPos.y + endPos.y) / 2, (pPos.z + endPos.z) / 2 };
+		rPos = { (startPos.x + endPos.x) / 2, (startPos.y + endPos.y) / 2, (startPos.z + endPos.z) / 2 };
 		rScale = { 0.2f, 0.2f , objLength / 2.0f };
 		ropeObj->SetPosition(rPos);
 		ropeObj->SetScale(rScale);
@@ -80,15 +79,11 @@ void Rope::Update(XMFLOAT3& pPos)
 
 	if (pEaseFlag)
 	{
-		easing->EaseInUpdate(pPos, endPos, pPos, pEaseFlag, avoidTime);
+		easing->EaseInUpdate(startPos, endPos, startPos, pEaseFlag, avoidTime);
 	}
-	//else if (eEaseFlag)
-	//{
-	//	easing->EaseInUpdate(ePos, pPos, ePos, eEaseFlag, avoidTime);
-	//}
 }
 
-void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3 ePos, float length)
+void Rope::Throw(XMFLOAT3 pPos, XMFLOAT3& ePos, float& length)
 {
 	// フラグがtrueじゃない場合は初期化してリターンする
 	if (!rThrowFlag && !rBackFlag)
@@ -99,7 +94,7 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3 ePos, float length)
 		return;
 	}
 
-	if (length < maxRope)
+	if (length < 10.0f)
 	{
 		rRotFlag = true;
 	}
@@ -112,8 +107,8 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3 ePos, float length)
 
 	XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
 
-	XMFLOAT3 cSpeed = Camera::GetInstance()->CameraTrack(pPos);
-	float cRot = Camera::GetInstance()->CameraRot(pPos);
+	cSpeed = Camera::GetInstance()->CameraTrack(pPos);
+	cRot = Camera::GetInstance()->CameraRot(pPos);
 
 	if (rThrowFlag)
 	{
@@ -124,15 +119,16 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3 ePos, float length)
 			vecXZ = sqrtf((pPos.x - ePos.x) * (pPos.x - ePos.x) + (pPos.z - ePos.z) * (pPos.z - ePos.z));
 			// X軸周りの角度
 			angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
-			ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
-			ray.dir = XMVectorSet(XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0, 0);
+			rRot = { XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 };
+			ropeObj->SetRotation(rRot);
 			manageRopePos.x += subPE.x;
 			manageRopePos.y += subPE.y;
 			manageRopePos.z += subPE.z;
 		}
 		else
 		{
-			ropeObj->SetRotation({ 0, XMConvertToDegrees(cRot), 0 });
+			rRot = { 0, XMConvertToDegrees(cRot), 0 };
+			ropeObj->SetRotation(rRot);
 			manageRopePos.x += cSpeed.x;
 			manageRopePos.z += cSpeed.z;
 			rRotFlag = false;
@@ -162,7 +158,6 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3 ePos, float length)
 			// X軸周りの角度
 			angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
 			ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
-			ray.dir = XMVectorSet(XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0, 0);
 			manageRopePos.x -= subPE.x;
 			manageRopePos.y -= subPE.y;
 			manageRopePos.z -= subPE.z;
@@ -190,23 +185,78 @@ void Rope::Throw(XMFLOAT3& pPos, XMFLOAT3 ePos, float length)
 			throwCount = 0;
 			manageRopePos = {};
 			manageRopeScale = {};
+			cSpeed = {};
+			cRot = 0.0f;
+
+			ePos = { 0.0f, -1000.0f, 0.0f };
+			length = 10.0f;
 		}
 	}
 }
 
-void Rope::Collision(XMFLOAT3& startPos, XMFLOAT3& endPos)
+bool Rope::Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos)
 {
-	manageRopePos = {};
-	manageRopeScale = {};
-	avoidTime = 0.0f;
-	rThrowFlag = false;
-	rBackFlag = false;
-	rRotFlag = false;
-	this->startPos = startPos;
-	this->endPos = endPos;
-	rFlag = true;
-	pEaseFlag = true;
-	throwCount = 0;
+	if (!rThrowFlag && !rBackFlag)
+	{
+		return false;
+	}
+
+	XMFLOAT3 pos = object->GetPosition();
+	XMFLOAT3 scale = object->GetScale();
+
+	XMFLOAT3 lay = pPos;
+	XMFLOAT3 vec = manageRopePos;
+	XMFLOAT3 center = pos;
+	float radius = scale.x;
+	XMFLOAT3 q1 = {};
+	XMFLOAT3 q2 = {};
+
+	center = center - lay;
+
+	float A = vec.x * vec.x + vec.y * vec.y + vec.z * vec.z;
+	float B = vec.x * center.x + vec.y * center.y + vec.z * center.z;
+	float C = center.x * center.x + center.y * center.y + center.z * center.z - radius * radius;
+
+	if (A == 0.0f)
+	{
+		return false;
+	}
+
+	float s = B * B - A * C;
+	if (s < 0.0f)
+	{
+		return false;
+	}
+
+	s = sqrtf(s);
+	float a1 = (B - s) / A;
+	float a2 = (B + s) / A;
+
+	if (a1 < 0.0f || a2 < 0.0f)
+	{
+		return false;
+	}
+
+	//長さ
+	float l_x = rPos.x - pos.x;
+	float l_y = rPos.y - pos.y;
+	float l_z = rPos.z - pos.z;
+
+	float r = (scale.z + manageRopeScale.z);
+
+	if ((l_x * l_x) + (l_y * l_y) + (l_z * l_z) <= (r * r))
+	{
+		endPos = pos;
+		manageRopePos = {};
+		manageRopeScale = {};
+		avoidTime = 0.0f;
+		rThrowFlag = false;
+		rBackFlag = false;
+		rRotFlag = false;
+		rFlag = true;
+		throwCount = 0;
+		return true;
+	}
 }
 
 void Rope::Reset()
@@ -218,6 +268,7 @@ void Rope::Reset()
 	// 変数
 	rPos = {};
 	rScale = {};
+	rRot = {};
 	manageRopePos = {}; // ロープ位置管理用
 	manageRopeScale = { 0.0f, 0.0f, 0.0f }; // ロープスケール管理用
 	angleX = 0.0f; // X軸

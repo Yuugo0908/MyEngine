@@ -23,9 +23,9 @@ public: // メンバ関数
 
 	void Update(XMFLOAT3& pPos);
 
-	void Throw(XMFLOAT3& pPos, XMFLOAT3 ePos, float length);
+	void Throw(XMFLOAT3 pPos, XMFLOAT3& ePos, float& length);
 
-	void Collision(XMFLOAT3& startPos, XMFLOAT3& endPos);
+	bool Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos);
 
 	void Reset();
 
@@ -58,8 +58,6 @@ private: // メンバ変数
 	Mouse* mouse = nullptr;
 	Easing* easing = nullptr;
 
-	Collision::Ray ray;
-
 	//ロープモデル
 	Model* ropeModel = nullptr;
 	std::unique_ptr<Object3d> ropeObj = nullptr;
@@ -67,6 +65,7 @@ private: // メンバ変数
 	// 変数
 	XMFLOAT3 rPos = {};
 	XMFLOAT3 rScale = {};
+	XMFLOAT3 rRot = {};
 	XMFLOAT3 manageRopePos = {}; // ロープ位置管理用
 	XMFLOAT3 manageRopeScale = { 0.0f, 0.0f, 0.0f }; // ロープスケール管理用
 	const float maxRope = 15.0f; // ロープの最大
@@ -79,6 +78,9 @@ private: // メンバ変数
 	bool rBackFlag = false; // ロープを戻す
 	bool rRotFlag = false;
 	int throwCount = 0;
+
+	XMFLOAT3 cSpeed = {};
+	float cRot = 0.0f;
 
 	// 突進用
 	XMFLOAT3 startPos = {}; // 開始位置

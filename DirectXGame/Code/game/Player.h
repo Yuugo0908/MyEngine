@@ -26,7 +26,9 @@ public: // メンバ関数
 	void Reset();
 
 	// マップチップ当たり判定
-	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, XMFLOAT3& pos, XMFLOAT3 radius, int mapNumber, const XMFLOAT3 oldPos);
+	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, int mapNumber);
+
+	bool StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale);
 
 	// オブジェクト
 	const std::unique_ptr<Object3d>& GetObj() { return playerObj; }
@@ -37,15 +39,15 @@ public: // メンバ関数
 	const bool& GetOnGround() { return onGround; }
 	void SetOnGround(bool onGround) { this->onGround = onGround; }
 
-	// 位置
-	const XMFLOAT3& GetPos() { return pPos; }
-	void SetPos(XMFLOAT3 pPos) { this->pPos = pPos; }
+	//// 位置
+	//const XMFLOAT3& GetPos() { return pPos; }
+	//void SetPos(XMFLOAT3 pPos) { this->pPos = pPos; }
 
-	const XMFLOAT3& GetRot() { return pRot; }
-	void SetRot(XMFLOAT3 pRot) { this->pRot = pRot; }
+	//const XMFLOAT3& GetRot() { return pRot; }
+	//void SetRot(XMFLOAT3 pRot) { this->pRot = pRot; }
 
-	const XMFLOAT3& GetScale() { return pScale; }
-	void SetScale(XMFLOAT3 pScale) { this->pScale = pScale; }
+	//const XMFLOAT3& GetScale() { return pScale; }
+	//void SetScale(XMFLOAT3 pScale) { this->pScale = pScale; }
 
 private: // メンバ変数
 
@@ -60,6 +62,7 @@ private: // メンバ変数
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
+	XMFLOAT3 pPosOld = {};
 	XMFLOAT3 pScale = {};//大きさ
 	XMFLOAT3 pRot = {};//回転
 

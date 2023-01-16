@@ -48,12 +48,8 @@ public:
 	// マップチップ当たり判定
 	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius);
 	bool StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale);
-	bool RopeCollide(XMFLOAT3 rPos, XMFLOAT3 rRadius);
 
 	const std::unique_ptr<Object3d>& GetObj() { return enemyObj; }
-
-	const XMFLOAT3& GetPos() { return ePos; }
-	void SetPos(XMFLOAT3 ePos) { this->ePos = ePos; }
 
 	const bool& GetAlive() { return eAlive; }
 	void SetAlive(bool eAlive) { this->eAlive = eAlive; }
@@ -83,7 +79,7 @@ private:
 	// エネミー
 	XMFLOAT3 ePos = {};
 	XMFLOAT3 eOldPos = {};
-	XMFLOAT3 eRadius = {};
+	XMFLOAT3 eScale = {};
 	XMFLOAT3 spawnPos = {};
 	XMFLOAT3 randPos = {}; // ランダムなスポーン位置
 

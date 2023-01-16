@@ -25,6 +25,8 @@ bool Camera::Initialize(const int window_width, const int window_height, Mouse* 
 	scaleY = 1.0f / (float)window_height;
 	aspectRatio = (float)window_width / window_height;
 
+	matRot *= XMMatrixRotationY(XMConvertToRadians(-40.0f));
+
 	//ビュー行列の計算
 	UpdateViewMatrix();
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "Object3d.h"
 #include "Operator.h"
+#include <vector>
 class Collision
 {
 public: // サブクラス
@@ -40,6 +41,8 @@ public: // 静的メンバ関数
 	static Collision* GetInstance();
 	//オブジェクト同士の当たり判定
 	static bool CollisionObject(const std::unique_ptr<Object3d>& object_a, const std::unique_ptr<Object3d>& object_b);
+	// 球と球の当たり判定
+	static bool CollisionSphere(const Sphere& sphere1, const Sphere& sphere2);
 	// 球と平面の当たり判定
 	static bool CollisionSpherePlane(const Sphere& sphere, const Plane& plane, XMVECTOR* inter);
 	// 球と三角形の当たり判定
@@ -50,7 +53,7 @@ public: // 静的メンバ関数
 	// レイと法線付き三角形の当たり判定
 	static bool CollisionRayTriangle(const Ray& ray, const Triangle& triangle, float* distance = nullptr, XMVECTOR* inter = nullptr);
 	// レイと球の当たり判定
-	static bool CollisionRaySphere(const Ray& ray, const Sphere& sphere, float* distance = nullptr, XMVECTOR* inter = nullptr);
+	static bool CollisionRaySphere(const Ray& ray, const Sphere& sphere);
 
 	// BOXと点の当たり判定
 	static bool CollisionBoxPoint(const XMFLOAT3 boxPos, const XMFLOAT3 boxRadius, XMFLOAT3& pos, const XMFLOAT3 radius, XMFLOAT3 oldPos);
