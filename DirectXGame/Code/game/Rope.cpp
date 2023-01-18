@@ -79,7 +79,7 @@ void Rope::Update(XMFLOAT3& pPos)
 
 	if (pEaseFlag)
 	{
-		easing->EaseInUpdate(startPos, endPos, startPos, pEaseFlag, avoidTime);
+		easing->EaseInUpdate(startPos, endPos, pPos, pEaseFlag, avoidTime);
 	}
 }
 
@@ -196,11 +196,13 @@ void Rope::Throw(XMFLOAT3 pPos, XMFLOAT3& ePos, float& length)
 
 bool Rope::Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos)
 {
+	//ロープを飛ばしていなかった場合は即リターンする
 	if (!rThrowFlag && !rBackFlag)
 	{
 		return false;
 	}
 
+	// レイの当たり判定(直線上に敵がいればtrueそれ以外はfalse)
 	XMFLOAT3 pos = object->GetPosition();
 	XMFLOAT3 scale = object->GetScale();
 
@@ -208,8 +210,6 @@ bool Rope::Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos)
 	XMFLOAT3 vec = manageRopePos;
 	XMFLOAT3 center = pos;
 	float radius = scale.x;
-	XMFLOAT3 q1 = {};
-	XMFLOAT3 q2 = {};
 
 	center = center - lay;
 
@@ -237,6 +237,7 @@ bool Rope::Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos)
 		return false;
 	}
 
+	// 球の当たり判定
 	//長さ
 	float l_x = rPos.x - pos.x;
 	float l_y = rPos.y - pos.y;
@@ -254,9 +255,12 @@ bool Rope::Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos)
 		rBackFlag = false;
 		rRotFlag = false;
 		rFlag = true;
+		pEaseFlag = true;
 		throwCount = 0;
 		return true;
 	}
+
+	return false;
 }
 
 void Rope::Reset()

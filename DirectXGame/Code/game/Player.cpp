@@ -77,10 +77,6 @@ void Player::Update(bool rFlag, bool moveFlag)
 		}
 	}
 
-	DebugText::GetInstance()->Print(100, 30 * 10, 2, "%f", pPos.x);
-	DebugText::GetInstance()->Print(100, 30 * 11, 2, "%f", pPos.y);
-	DebugText::GetInstance()->Print(100, 30 * 12, 2, "%f", pPos.z);
-
 	playerObj->Update();
 }
 

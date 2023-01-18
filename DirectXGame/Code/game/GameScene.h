@@ -57,6 +57,8 @@ public: // メンバ関数
 	void CameraUpdate();
 	// 当たり判定
 	void CollisionUpdate();
+	// 遮蔽物があるかの判別
+	bool RayCollision();
 
 	// マップチップ用
 	// マップチップ生成
@@ -102,11 +104,19 @@ private: // メンバ変数
 		None, blocks_, walls_
 	};
 
+	enum Scene
+	{
+		title_, tutorial_, game_, clear_, failure_
+	};
+
 	//mapchipオブジェクト
 	static Model* blockModel;
 	static std::vector<std::vector<int>> map; //マップチップ
 	static std::unique_ptr<Object3d> blockObj[map_max_y][map_max_x]; // ステージブロック
 	bool mapLoadFlag = false;
+	XMFLOAT3 boxPos = {};
+	XMFLOAT3 boxScale = {};
+
 	// jsonオブジェクト
 	std::vector<std::unique_ptr<Object3d>> objects{};
 	XMFLOAT3 stagePos = {};
@@ -132,19 +142,19 @@ private: // メンバ変数
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
 	XMFLOAT3 pPosOld = {};
-	XMFLOAT3 pRadius = {};
+	XMFLOAT3 pScale = {};
 	bool onGround = false;//自由落下のフラグ
 	bool moveFlag = false;//移動管理フラグ
 	bool avoidFlag = false;//回避管理フラグ
 	float playerHp = 360;
 
 	// エネミー
-	static const int enemyCount = 5;
+	static const int enemyCount = 1;
 	float enemyHp = 360;
 	bool eAlive = false;
 	XMFLOAT3 ePos = {};
 	XMFLOAT3 ePosOld = {};
-	XMFLOAT3 eRadius = {};
+	XMFLOAT3 eScale = {};
 	XMFLOAT3 ePosSave = {};
 	float minLength = 10.0f;
 
@@ -159,11 +169,14 @@ private: // メンバ変数
 	XMVECTOR cameraLength = {};
 
 	// シーン管理用
-	int nowScene = 0;
+	int nowScene = title_;
 	bool fadeIn = false;
 	bool fadeOut = false;
 	bool expFlag = false;
 
 	// シェイク用
 	bool shakeFlag = false;
+
+	// 確認用
+	int check = 0;
 };

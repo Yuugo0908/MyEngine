@@ -69,6 +69,11 @@ void Enemy::Update()
 	float lengthY = ((pPos.y - ePos.y) * (pPos.y - ePos.y));
 	lengthOld = GetLength(ePos, spawnPos);
 
+	for (std::unique_ptr<Bullet>& bullet : bullets)
+	{
+		bullet->Update(pPos, ePos);
+	}
+
 	// ƒWƒƒƒ“ƒv
 	if (jumpFlag)
 	{
@@ -82,7 +87,7 @@ void Enemy::Update()
 	}
 	else
 	{
-		eDown -= 0.2f;
+		eDown -= 0.75f;
 		ePos.y += eDown;
 		if (onGround)
 		{
@@ -91,7 +96,7 @@ void Enemy::Update()
 	}
 
 
-	if (PElength <= 30.0f)
+	if (PElength <= 20.0f && attackFlag)
 	{
 		phase = Enemy::Phase::move;
 	}
@@ -100,7 +105,7 @@ void Enemy::Update()
 		phase = Enemy::Phase::stay;
 	}
 
-	if (onGround)
+	if (onGround && attackFlag)
 	{
 		if (PElength <= 15.0f)
 		{
@@ -111,7 +116,7 @@ void Enemy::Update()
 	switch (phase)
 	{
 	case Enemy::Phase::attack:
-		//Attack();
+		Attack();
 		break;
 	case Enemy::Phase::move:
 		Move();
@@ -126,7 +131,7 @@ void Enemy::Update()
 
 void Enemy::Attack()
 {
-	if (attackCount >= 60)
+	if (attackCount >= 60 && !catchFlag)
 	{
 		BulletCreate();
 		attackCount = 0;
@@ -214,7 +219,6 @@ bool Enemy::BulletCollision()
 {
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
-		bullet->Update(pPos, ePos);
 		if (Collision::CollisionObject(bullet->GetObj(), player->GetObj()))
 		{
 			bullets.remove(bullet);

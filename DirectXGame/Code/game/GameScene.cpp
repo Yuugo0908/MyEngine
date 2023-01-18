@@ -201,7 +201,7 @@ void GameScene::Finalize()
 
 void GameScene::Update() {
 
-	if (nowScene == 0)
+	if (nowScene == title_)
 	{
 		if (!fadeIn && keyboard->TriggerKey(DIK_SPACE))
 		{
@@ -232,7 +232,7 @@ void GameScene::Update() {
 			backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
 			if (alpha >= 1.0f)
 			{
-				nowScene = 1;
+				nowScene = game_;
 				fadeIn = false;
 				fadeOut = true; 
 				explanation->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.0f });
@@ -240,7 +240,7 @@ void GameScene::Update() {
 		}
 	}
 
-	if (nowScene == 1)
+	if (nowScene == game_)
 	{
 		// タイトルから移行後の更新
 		{
@@ -258,6 +258,7 @@ void GameScene::Update() {
 			//	プレイヤーの座標、半径の設定
 			player->Update(rFlag, moveFlag);
 			pPos = player->GetObj()->GetPosition();
+			pScale = player->GetObj()->GetScale();
 
 			// フェードアウトが終わるまではここでリターン
 			if (fadeOut)
@@ -290,12 +291,30 @@ void GameScene::Update() {
 			{
 				pPos = player->GetObj()->GetPosition();
 				ePos = enemy->GetObj()->GetPosition();
+				eScale = enemy->GetObj()->GetScale();
 				PElength = GetLength(pPos, ePos);
+
+				if (PElength < minLength)
+				{
+					minLength = PElength;
+					ePosSave = ePos;
+				}
+
+				if (RayCollision())
+				{
+					enemy->SetAttackFlag(false);
+				}
+				else
+				{
+					enemy->SetAttackFlag(true);
+				}
 			}
 
 			if (throwCount == 30)
 			{
-				rope->Throw(pPos, ePos, PElength);
+				rope->Throw(pPos, ePosSave, minLength);
+				ePosSave = {};
+				minLength = 10.0f;
 			}
 
 			for (std::unique_ptr<Enemy>& enemy : enemys)
@@ -316,7 +335,7 @@ void GameScene::Update() {
 				backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
 				if (alpha >= 1.0)
 				{
-					nowScene = 2;
+					nowScene = clear_;
 					fadeIn = false;
 					fadeOut = true;
 				}
@@ -332,7 +351,7 @@ void GameScene::Update() {
 				backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
 				if (alpha >= 1.0f)
 				{
-					nowScene = 3;
+					nowScene = failure_;
 					fadeIn = false;
 					fadeOut = true;
 				}
@@ -340,7 +359,7 @@ void GameScene::Update() {
 		}
 	}
 
-	if (nowScene == 2 || nowScene == 3)
+	if (nowScene == clear_ || nowScene == failure_)
 	{
 		if (fadeOut)
 		{
@@ -362,7 +381,7 @@ void GameScene::Update() {
 			rope->Reset();
 			camera->Reset();
 			reset();
-			nowScene = 0;
+			nowScene = title_;
 		}
 	}
 }
@@ -372,7 +391,7 @@ void GameScene::reset()
 	// プレイヤー
 	pPos = { 0.0f, 10.0f, 0.0f };//座標
 	pPosOld = { 0.0f, 10.0f, 0.0f };
-	pRadius = {};
+	pScale = {};
 	onGround = false;//自由落下のフラグ
 	moveFlag = false;//移動管理フラグ
 	avoidFlag = false;//回避管理フラグ
@@ -382,7 +401,7 @@ void GameScene::reset()
 	enemyHp = 360;
 	ePos = {};
 	ePosOld = {};
-	eRadius = {};
+	eScale = {};
 
 	// ロープ
 	rFlag = false;
@@ -416,7 +435,7 @@ void GameScene::Draw() {
 	Object3d::PreDraw(dxCommon->GetCommandList());
 
 	// 3Dオブクジェクトの描画
-	if (nowScene == 1)
+	if (nowScene == game_)
 	{
 		player->GetObj()->Draw();
 
@@ -443,12 +462,12 @@ void GameScene::Draw() {
 
 	// 前景画像の描画
 
-	if (nowScene == 0)
+	if (nowScene == title_)
 	{
 		title->Draw();
 	}
 
-	if (nowScene == 1)
+	if (nowScene == game_)
 	{
 		HPText->Draw();
 		PlayerHPBar->Draw();
@@ -461,12 +480,12 @@ void GameScene::Draw() {
 		EnemyHPGauge->Draw();
 	}
 
-	if (nowScene == 2)
+	if (nowScene == clear_)
 	{
 		result->Draw();
 	}
 
-	if (nowScene == 3)
+	if (nowScene == failure_)
 	{
 		GameOver->Draw();
 	}
@@ -497,6 +516,9 @@ void GameScene::SetImgui()
 	ImGui::Text("cameraLength : %6.2f", ePos.x);
 	ImGui::Text("cameraLength : %6.2f", ePos.y);
 	ImGui::Text("cameraLength : %6.2f", ePos.z);
+
+	ImGui::Separator();
+	ImGui::Text("check : %d", check);
 
 	ImGui::End();
 }
@@ -549,12 +571,12 @@ void GameScene::CollisionUpdate()
 		{
 			if (Mapchip::GetChipNum(x, y, map[0]) == blocks_ || Mapchip::GetChipNum(x, y, map[0]) == walls_)
 			{
-				XMFLOAT3 boxPos = blockObj[y][x]->GetPosition();
-				XMFLOAT3 boxRadius = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);
-				player->MapCollide(boxPos, boxRadius, 0);
+				boxPos = blockObj[y][x]->GetPosition();
+				boxScale = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);
+				player->MapCollide(boxPos, boxScale, 0);
 				for (std::unique_ptr<Enemy>& enemy : enemys)
 				{
-					enemy->MapCollide(boxPos, boxRadius);
+					enemy->MapCollide(boxPos, boxScale);
 				}
 			}
 		}
@@ -567,7 +589,14 @@ void GameScene::CollisionUpdate()
 		if (eAlive && !rFlag)
 		{
 			pPos = player->GetObj()->GetPosition();
-			rope->Collision(enemy->GetObj(), pPos);
+			if (rope->Collision(enemy->GetObj(), pPos))
+			{
+				enemy->SetCatchFlag(true);
+			}
+			else
+			{
+				enemy->SetCatchFlag(false);
+			}
 		}
 
 		if (eAlive && Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
@@ -581,7 +610,6 @@ void GameScene::CollisionUpdate()
 			{
 				rope->SetrFlag(false);
 				enemyHp -= 72;
-				//enemys.remove(enemy);
 				break;
 			}
 			else
@@ -600,6 +628,75 @@ void GameScene::CollisionUpdate()
 	camera->SetTarget(pPos);
 }
 
+bool GameScene::RayCollision()
+{
+	for (int y = 0; y < map_max_y; y++)
+	{
+		for (int x = 0; x < map_max_x; x++)
+		{
+			if (Mapchip::GetChipNum(x, y, map[0]) == blocks_)
+			{
+				boxPos = blockObj[y][x]->GetPosition();
+				boxScale = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);
+				// エネミーからプレイヤーへのレイ
+				XMFLOAT3 layStart = ePos;
+
+				XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
+				XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
+				XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, enemyPos);
+				XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
+				XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
+
+				XMFLOAT3 layVec = subPE;
+
+				if(GetLength(pPos, ePos) >= GetLength(boxPos, ePos))
+				{
+					// マップオブジェクトの座標と大きさ
+					XMFLOAT3 bCenter = boxPos;
+					XMFLOAT3 bRadius = boxScale;
+
+					bCenter = bCenter - layStart;
+
+					float bA = layVec.x * layVec.x + layVec.y * layVec.y + layVec.z * layVec.z;
+					if (bA == 0.0f)
+					{
+						check = 0;
+						continue;
+					}
+
+					float bB = layVec.x * bCenter.x + layVec.y * bCenter.y + layVec.z * bCenter.z;
+					float bC1 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bRadius.x * bRadius.x;
+
+					float s1 = bB * bB - bA * bC1;
+					if (s1 < 0.0f)
+					{
+						check = 0;
+						continue;
+					}
+
+					s1 = sqrtf(s1);
+					float a1 = (bB - s1) / bA;
+					float a2 = (bB + s1) / bA;
+
+					if (a1 < 0.0f || a2 < 0.0f)
+					{
+						check = 0;
+						continue;
+					}
+
+					check = 1;
+					return true;
+				}
+				else
+				{
+					continue;
+				}
+			}
+		}
+	}
+	return false;
+}
+
 void GameScene::MapCreate(int mapNumber)
 {
 	for (int y = 0; y < map_max_y; y++) {//(yが25)
@@ -609,7 +706,7 @@ void GameScene::MapCreate(int mapNumber)
 			{
 				blockObj[y][x] = Object3d::Create();
 				blockObj[y][x]->SetModel(blockModel);
-				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE, 2.5f , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE });
+				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE + 2.5f, 2.5f , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE + 2.5f });
 				blockObj[y][x]->SetScale({ 1.0f,1.0f,1.0f });
 			}
 
@@ -617,10 +714,9 @@ void GameScene::MapCreate(int mapNumber)
 			{
 				blockObj[y][x] = Object3d::Create();
 				blockObj[y][x]->SetModel(blockModel);
-				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE, 5.0f , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE });
+				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE + 2.5f, 5.0f , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE + 2.5f });
 				blockObj[y][x]->SetScale({ 1.0f,2.0f,1.0f });
 			}
-
 		}
 	}
 }

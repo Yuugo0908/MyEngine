@@ -55,6 +55,7 @@ public:
 	void SetAlive(bool eAlive) { this->eAlive = eAlive; }
 
 	void SetAttackFlag(bool attackFlag) { this->attackFlag = attackFlag; }
+	void SetCatchFlag(bool catchFlag) { this->catchFlag = catchFlag; }
 
 	// 着地
 	const bool& GetOnGround() { return onGround; }
@@ -96,9 +97,11 @@ private:
 
 	bool eFlag = false; // 自由落下のフラグ
 	bool eAlive = false;// 生きているかのフラグ
-	bool attackFlag = false;
+	bool attackFlag = false;// 攻撃がプレイヤーに当たるかのフラグ
+	bool catchFlag = false;// ロープで捕まっているかの判定
 	bool jumpFlag = false;
 	bool onGround = false;
+	bool hitFlag = false;
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};

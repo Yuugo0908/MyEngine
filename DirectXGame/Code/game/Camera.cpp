@@ -25,7 +25,8 @@ bool Camera::Initialize(const int window_width, const int window_height, Mouse* 
 	scaleY = 1.0f / (float)window_height;
 	aspectRatio = (float)window_width / window_height;
 
-	matRot *= XMMatrixRotationY(XMConvertToRadians(-40.0f));
+	// カメラの最初の向きを変更するならここで変更
+	matRot *= XMMatrixRotationY(XMConvertToRadians(0.0f));
 
 	//ビュー行列の計算
 	UpdateViewMatrix();
@@ -139,11 +140,6 @@ void Camera::Update()
 		dirty = true;
 	}
 
-	//DebugText::GetInstance()->Print(100, 30 * 10, 2, "%f", (float)mouseMove.MouseX);
-	//DebugText::GetInstance()->Print(100, 30 * 11, 2, "%f", (float)mouseMove.MouseY);
-	//DebugText::GetInstance()->Print(100, 30 * 12, 2, "%f", vTargetEye.m128_f32[0]);
-	//DebugText::GetInstance()->Print(100, 30 * 13, 2, "%f", vTargetEye.m128_f32[1]);
-
 	// ホイール入力で距離を変更
 	if (mouseMove.MouseZ != 0) {
 		distance -= mouseMove.MouseZ / 120.0f;
@@ -151,8 +147,6 @@ void Camera::Update()
 		distance = min(distance, 20.0f);
 		dirty = true;
 	}
-
-	//DebugText::GetInstance()->Print(100, 30 * 14, 2, "%f", distance);
 
 	if (dirty || viewDirty) {
 		// 追加回転分の回転行列を生成
@@ -332,4 +326,13 @@ void Camera::Reset()
 	angleY = 0;
 	speed = 0.75f;
 	dy = 0.0f;
+
+	// カメラの方向をリセットして再計算
+	matRot *= XMMatrixRotationX(XMConvertToRadians(0.0f));
+	matRot *= XMMatrixRotationY(XMConvertToRadians(0.0f));
+
+	//ビュー行列の計算
+	UpdateViewMatrix();
+	// 射影行列の計算
+	UpdateProjectionMatrix();
 }
