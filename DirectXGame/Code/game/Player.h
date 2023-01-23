@@ -19,6 +19,8 @@ public: // メンバ関数
 
 	void Draw() { playerObj->Draw(); }
 
+	void Attack(XMFLOAT3 targetPos, bool& flag, float& avoidTime);
+
 	void Rush(bool rFlag);
 
 	void Jump();
@@ -32,22 +34,12 @@ public: // メンバ関数
 
 	// オブジェクト
 	const std::unique_ptr<Object3d>& GetObj() { return playerObj; }
-	// 突進
+	// 回避
 	const bool& GetAvoidFlag() { return avoidFlag; }
 	void SetAvoidFlag(bool avoidFlag) { this->avoidFlag = avoidFlag; }
 	// 着地
 	const bool& GetOnGround() { return onGround; }
 	void SetOnGround(bool onGround) { this->onGround = onGround; }
-
-	//// 位置
-	//const XMFLOAT3& GetPos() { return pPos; }
-	//void SetPos(XMFLOAT3 pPos) { this->pPos = pPos; }
-
-	//const XMFLOAT3& GetRot() { return pRot; }
-	//void SetRot(XMFLOAT3 pRot) { this->pRot = pRot; }
-
-	//const XMFLOAT3& GetScale() { return pScale; }
-	//void SetScale(XMFLOAT3 pScale) { this->pScale = pScale; }
 
 private: // メンバ変数
 

@@ -77,10 +77,10 @@ void Rope::Update(XMFLOAT3& pPos)
 	}
 
 
-	if (pEaseFlag)
-	{
-		easing->EaseInUpdate(startPos, endPos, pPos, pEaseFlag, avoidTime);
-	}
+	//if (pEaseFlag)
+	//{
+	//	easing->EaseInUpdate(startPos, endPos, pPos, pEaseFlag, avoidTime);
+	//}
 }
 
 void Rope::Throw(XMFLOAT3 pPos, XMFLOAT3& ePos, float& length)
@@ -255,7 +255,6 @@ bool Rope::Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos)
 		rBackFlag = false;
 		rRotFlag = false;
 		rFlag = true;
-		pEaseFlag = true;
 		throwCount = 0;
 		return true;
 	}

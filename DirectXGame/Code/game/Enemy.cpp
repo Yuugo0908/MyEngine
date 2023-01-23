@@ -36,18 +36,13 @@ bool Enemy::BulletCreate()
 {
 	std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>();
 	newBullet->Initialize(bulletModel);
-	newBullet->SetPos(ePos);
+	newBullet->SetPos(enemyObj->GetPosition());
 	bullets.push_back(std::move(newBullet));
 	return true;
 }
 
 void Enemy::Update()
 {
-	if (eAliveCount <= 60)
-	{
-		eAliveCount++;
-	}
-
 	if (!eAlive)
 	{
 		Spawn();
@@ -58,7 +53,37 @@ void Enemy::Update()
 	eOldPos = enemyObj->GetPosition();
 	enemyObj->SetPosition(ePos);
 
-	if (attackCount <= 60)
+	if (PElength <= 20.0f && attackFlag)
+	{
+		phase = Enemy::Phase::move;
+	}
+	else
+	{
+		phase = Enemy::Phase::stay;
+	}
+
+	if (onGround && attackFlag)
+	{
+		if (PElength <= 15.0f)
+		{
+			phase = Enemy::Phase::attack;
+		}
+	}
+
+	switch (phase)
+	{
+	case Enemy::Phase::attack:
+		Attack();
+		break;
+	case Enemy::Phase::move:
+		Move();
+		break;
+	case Enemy::Phase::stay:
+	default:
+		Stay();
+	}
+
+	if (attackCount <= 30)
 	{
 		attackCount++;
 	}
@@ -95,35 +120,14 @@ void Enemy::Update()
 		}
 	}
 
-
-	if (PElength <= 20.0f && attackFlag)
+	// bullets‚Ìíœ
+	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
-		phase = Enemy::Phase::move;
-	}
-	else
-	{
-		phase = Enemy::Phase::stay;
-	}
-
-	if (onGround && attackFlag)
-	{
-		if (PElength <= 15.0f)
+		if (phase == Enemy::Phase::move || phase == Enemy::Phase::stay)
 		{
-			phase = Enemy::Phase::attack;
+			bullets.remove(bullet);
+			break;
 		}
-	}
-
-	switch (phase)
-	{
-	case Enemy::Phase::attack:
-		Attack();
-		break;
-	case Enemy::Phase::move:
-		Move();
-		break;
-	case Enemy::Phase::stay:
-	default:
-		Stay();
 	}
 
 	enemyObj->Update();
@@ -131,15 +135,14 @@ void Enemy::Update()
 
 void Enemy::Attack()
 {
-	if (attackCount >= 60 && !catchFlag)
+	if (attackCount >= 30 && attackFlag && !catchFlag)
 	{
 		BulletCreate();
+		for (std::unique_ptr<Bullet>& bullet : bullets)
+		{
+			bullet->Search();
+		}
 		attackCount = 0;
-	}
-
-	for (std::unique_ptr<Bullet>& bullet : bullets)
-	{
-		bullet->Search();
 	}
 }
 
@@ -219,16 +222,15 @@ bool Enemy::BulletCollision()
 {
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
-		if (Collision::CollisionObject(bullet->GetObj(), player->GetObj()))
-		{
-			bullets.remove(bullet);
-			return true;
-		}
-
 		if (GetLength(ePos, bullet->GetPos()) >= 20.0f)
 		{
 			bullets.remove(bullet);
 			return false;
+		}
+		if (Collision::CollisionObject(bullet->GetObj(), player->GetObj()))
+		{
+			bullets.remove(bullet);
+			return true;
 		}
 	}
 	return false;
@@ -236,6 +238,15 @@ bool Enemy::BulletCollision()
 
 bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 {
+	for (std::unique_ptr<Bullet>& bullet : bullets)
+	{
+		if (bullet->MapCollide(boxPos, boxScale))
+		{
+			bullets.remove(bullet);
+			break;
+		}
+	}
+
 	//ƒtƒ‰ƒO
 	bool hitFlag = false;
 

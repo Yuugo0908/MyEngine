@@ -209,6 +209,7 @@ void GameScene::Update() {
 			//(map, "Resource/scv/なんたら.csv")で追加可能
 			if (!mapLoadFlag)
 			{
+				//Mapchip::CsvToVector(map, "Resources/csv/tutorial.csv");
 				Mapchip::CsvToVector(map, "Resources/csv/stage1.csv");
 				MapCreate(0);
 				mapLoadFlag = true;
@@ -244,9 +245,11 @@ void GameScene::Update() {
 	{
 		// タイトルから移行後の更新
 		{
-			CollisionUpdate();
-			LightUpdate();
-			CameraUpdate();
+			//	プレイヤーの座標、半径の設定
+			player->Update(rFlag, moveFlag);
+			pPos = player->GetObj()->GetPosition();
+			pScale = player->GetObj()->GetScale();
+
 			// jsonファイルから読み込んだオブジェクトの更新
 			for (auto& object : objects)
 			{
@@ -255,10 +258,9 @@ void GameScene::Update() {
 			// マップオブジェクトの更新
 			MapUpdate(0);
 
-			//	プレイヤーの座標、半径の設定
-			player->Update(rFlag, moveFlag);
-			pPos = player->GetObj()->GetPosition();
-			pScale = player->GetObj()->GetScale();
+			CollisionUpdate();
+			LightUpdate();
+			CameraUpdate();
 
 			// フェードアウトが終わるまではここでリターン
 			if (fadeOut)
@@ -565,38 +567,27 @@ void GameScene::CollisionUpdate()
 		}
 	}
 
-	for (int y = 0; y < map_max_y; y++)
-	{
-		for (int x = 0; x < map_max_x; x++)
-		{
-			if (Mapchip::GetChipNum(x, y, map[0]) == blocks_ || Mapchip::GetChipNum(x, y, map[0]) == walls_)
-			{
-				boxPos = blockObj[y][x]->GetPosition();
-				boxScale = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);
-				player->MapCollide(boxPos, boxScale, 0);
-				for (std::unique_ptr<Enemy>& enemy : enemys)
-				{
-					enemy->MapCollide(boxPos, boxScale);
-				}
-			}
-		}
-	}
-
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
 		eAlive = enemy->GetAlive();
 
-		if (eAlive && !rFlag)
+		if (eAlive)
 		{
 			pPos = player->GetObj()->GetPosition();
 			if (rope->Collision(enemy->GetObj(), pPos))
 			{
+				attackFlag = true;
 				enemy->SetCatchFlag(true);
 			}
 			else
 			{
 				enemy->SetCatchFlag(false);
 			}
+		}
+		
+		if(attackFlag)
+		{
+			player->Attack(enemy->GetObj()->GetPosition(), attackFlag, avoidTime);
 		}
 
 		if (eAlive && Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
@@ -609,6 +600,8 @@ void GameScene::CollisionUpdate()
 			if (rFlag)
 			{
 				rope->SetrFlag(false);
+				attackFlag = false;
+				avoidTime = 0.0f;
 				enemyHp -= 72;
 				break;
 			}
@@ -616,12 +609,6 @@ void GameScene::CollisionUpdate()
 			{
 				playerHp -= 18;
 			}
-		}
-
-		if (!rFlag && enemy->BulletCollision())
-		{
-			shakeFlag = true;
-			playerHp -= 18;
 		}
 	}
 
@@ -634,7 +621,7 @@ bool GameScene::RayCollision()
 	{
 		for (int x = 0; x < map_max_x; x++)
 		{
-			if (Mapchip::GetChipNum(x, y, map[0]) == blocks_)
+			if (Mapchip::GetChipNum(x, y, map[0]) == blocks_ || Mapchip::GetChipNum(x, y, map[0]) == walls_)
 			{
 				boxPos = blockObj[y][x]->GetPosition();
 				boxScale = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);
@@ -653,32 +640,43 @@ bool GameScene::RayCollision()
 				{
 					// マップオブジェクトの座標と大きさ
 					XMFLOAT3 bCenter = boxPos;
-					XMFLOAT3 bRadius = boxScale;
+					XMFLOAT3 bRadius = { boxScale.x * 2.0f, boxScale.y, boxScale.z * 2.0f };
 
 					bCenter = bCenter - layStart;
 
-					float bA = layVec.x * layVec.x + layVec.y * layVec.y + layVec.z * layVec.z;
-					if (bA == 0.0f)
+					float bA1 = layVec.x * layVec.x + layVec.y * layVec.y + layVec.z * layVec.z;
+					if (bA1 == 0.0f)
 					{
 						check = 0;
 						continue;
 					}
 
-					float bB = layVec.x * bCenter.x + layVec.y * bCenter.y + layVec.z * bCenter.z;
+					float bB1 = layVec.x * bCenter.x + layVec.y * bCenter.y + layVec.z * bCenter.z;
+					
 					float bC1 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bRadius.x * bRadius.x;
+					float bC2 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bRadius.y * bRadius.y;
+					float bC3 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bRadius.z * bRadius.z;
 
-					float s1 = bB * bB - bA * bC1;
-					if (s1 < 0.0f)
+					float s1 = bB1 * bB1 - bA1 * bC1;
+					float s2 = bB1 * bB1 - bA1 * bC2;
+					float s3 = bB1 * bB1 - bA1 * bC3;
+					if (s1 < 0.0f || s2 < 0.0f || s3 < 0.0f)
 					{
 						check = 0;
 						continue;
 					}
 
 					s1 = sqrtf(s1);
-					float a1 = (bB - s1) / bA;
-					float a2 = (bB + s1) / bA;
+					s2 = sqrtf(s2);
+					s3 = sqrtf(s3);
+					float a1 = (bB1 - s1) / bA1;
+					float a2 = (bB1 + s1) / bA1;
+					float a3 = (bB1 - s2) / bA1;
+					float a4 = (bB1 + s2) / bA1;
+					float a5 = (bB1 - s3) / bA1;
+					float a6 = (bB1 + s3) / bA1;
 
-					if (a1 < 0.0f || a2 < 0.0f)
+					if (a1 < 0.0f || a2 < 0.0f || a3 < 0.0f || a4 < 0.0f || a5 < 0.0f || a6 < 0.0f)
 					{
 						check = 0;
 						continue;
@@ -708,14 +706,16 @@ void GameScene::MapCreate(int mapNumber)
 				blockObj[y][x]->SetModel(blockModel);
 				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE + 2.5f, 2.5f , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE + 2.5f });
 				blockObj[y][x]->SetScale({ 1.0f,1.0f,1.0f });
+				blockObj[y][x]->Update();
 			}
 
-			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == walls_)
+			else if (Mapchip::GetChipNum(x, y, map[mapNumber]) == walls_)
 			{
 				blockObj[y][x] = Object3d::Create();
 				blockObj[y][x]->SetModel(blockModel);
 				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE + 2.5f, 5.0f , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE + 2.5f });
 				blockObj[y][x]->SetScale({ 1.0f,2.0f,1.0f });
+				blockObj[y][x]->Update();
 			}
 		}
 	}
@@ -727,8 +727,23 @@ void GameScene::MapUpdate(int mapNumber)
 	{
 		for (int x = 0; x < map_max_x; x++)
 		{
-			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == blocks_ || Mapchip::GetChipNum(x, y, map[mapNumber]) == walls_)
+			if (Mapchip::GetChipNum(x, y, map[0]) == blocks_ || Mapchip::GetChipNum(x, y, map[0]) == walls_)
 			{
+				boxPos = blockObj[y][x]->GetPosition();
+				boxScale = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);
+				player->MapCollide(boxPos, boxScale, 0);
+				for (std::unique_ptr<Enemy>& enemy : enemys)
+				{
+					enemy->MapCollide(boxPos, boxScale);
+					if (enemy->BulletCollision())
+					{
+						if (!rFlag)
+						{
+							shakeFlag = true;
+							playerHp -= 18;
+						}
+					}
+				}
 				blockObj[y][x]->Update();
 			}
 		}
@@ -742,7 +757,7 @@ void GameScene::MapDraw(int mapNumber)
 	{
 		for (int x = 0; x < map_max_x; x++)
 		{
-			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == blocks_ || Mapchip::GetChipNum(x, y, map[mapNumber]) == walls_)
+			if (Mapchip::GetChipNum(x, y, map[0]) == blocks_ || Mapchip::GetChipNum(x, y, map[0]) == walls_)
 			{
 				blockObj[y][x]->Draw();
 			}

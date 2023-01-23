@@ -80,6 +80,24 @@ void Player::Update(bool rFlag, bool moveFlag)
 	playerObj->Update();
 }
 
+void Player::Attack(XMFLOAT3 targetPos, bool& flag, float& avoidTime)
+{
+	// フラグがtrueじゃない場合はリターンする
+	if (!flag)
+	{
+		avoidTime = 0.0f;
+		return;
+	}
+
+	if (avoidTime < 1.0f)
+	{
+		avoidTime += 0.1f;
+	}
+
+	pPos = Easing::easeIn(pPos, targetPos, avoidTime);
+	playerObj->Update();
+}
+
 void Player::Rush(bool rFlag)
 {
 	if (avoidFlag)

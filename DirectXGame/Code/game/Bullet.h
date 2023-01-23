@@ -18,6 +18,8 @@ public: // メンバ関数
 
 	void Draw();
 
+	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale);
+
 	const std::unique_ptr<Object3d>& GetObj() { return bulletObj; }
 
 	const XMFLOAT3& GetPos() { return bPos; }
@@ -34,6 +36,8 @@ private: // メンバ変数
 
 	// バレット
 	XMFLOAT3 bPos = {};
+	XMFLOAT3 bOldPos = {};
+	XMFLOAT3 bScale = {};
 	XMFLOAT3 bSpeed = {};
 	bool attackFlag = false;
 	bool shakeFlag = false; // カメラのシェイク

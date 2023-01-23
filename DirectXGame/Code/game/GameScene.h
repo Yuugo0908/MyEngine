@@ -64,7 +64,7 @@ public: // メンバ関数
 	// マップチップ生成
 	static void MapCreate(int mapNumber);
 	// マップチップ更新
-	static void MapUpdate(int mapNumber);
+	void MapUpdate(int mapNumber);
 	// マップチップ描画
 	static void MapDraw(int mapNumber);
 
@@ -179,4 +179,7 @@ private: // メンバ変数
 
 	// 確認用
 	int check = 0;
+
+	bool attackFlag = false; // 突進開始フラグ
+	float avoidTime = 0.0f;
 };
