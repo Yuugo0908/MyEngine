@@ -2,9 +2,9 @@
 #include "Object3d.h"
 #include "Keyboard.h"
 #include "Collision.h"
+#include "Easing.h"
 #include "Operator.h"
 #include "Camera.h"
-#include "Rope.h"
 #include "Mapchip.h"
 
 class Player
@@ -28,7 +28,7 @@ public: // メンバ関数
 	void Reset();
 
 	// マップチップ当たり判定
-	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, int mapNumber);
+	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale);
 
 	bool StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale);
 
@@ -45,7 +45,6 @@ private: // メンバ変数
 
 	Keyboard* keyboard = nullptr;
 	Mouse* mouse = nullptr;
-	Rope* rope = nullptr;
 	Camera* camera = Camera::GetInstance();
 
 	// モデル
@@ -72,9 +71,6 @@ private: // メンバ変数
 	// 突進用
 	bool avoidFlag = false; // 回避開始フラグ
 	int avoidCount = 0;
-
-	// ロープ管理用
-	bool rFlag = false;
 
 	// カメラ距離取得用
 	XMFLOAT3 cameraTrack = {};

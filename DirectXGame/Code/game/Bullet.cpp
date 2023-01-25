@@ -21,17 +21,17 @@ void Bullet::Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos)
 
 	bOldPos = bPos;
 
-	Attack();
+	if (!searchFlag)
+	{
+		Search();
+	}
 
-	bulletObj->SetPosition(bPos);
-	bulletObj->Update();
-}
-
-void Bullet::Attack()
-{
 	bPos.x += bSpeed.x / 3;
 	bPos.y += bSpeed.y / 3;
 	bPos.z += bSpeed.z / 3;
+
+	bulletObj->SetPosition(bPos);
+	bulletObj->Update();
 }
 
 void Bullet::Search()

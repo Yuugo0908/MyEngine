@@ -75,11 +75,6 @@ bool Collision::CollisionSpherePlane(const Sphere& sphere, const Plane& plane, X
 	return true;
 }
 
-bool Collision::CollisionSphereTriangle(const Sphere& sphere, const Triangle& triangle, XMVECTOR* closest)
-{
-	return false;
-}
-
 bool Collision::CollisionRayPlane(const Ray& ray, const Plane& plane, float* distance, XMVECTOR* inter)
 {
 	const float epsilon = 1.0e-5f; // åÎç∑ãzé˚ópÇÃî˜è¨Ç»íl
@@ -117,11 +112,6 @@ bool Collision::CollisionRayPlane(const Ray& ray, const Plane& plane, float* dis
 	}
 
 	return true;
-}
-
-bool Collision::CollisionRayTriangle(const Ray& ray, const Triangle& triangle, float* distance, XMVECTOR* inter)
-{
-	return false;
 }
 
 bool Collision::CollisionRaySphere(const Ray& ray, const Sphere& sphere)

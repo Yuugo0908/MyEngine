@@ -7,8 +7,6 @@ bool Player::Initialize(Keyboard* keyboard, Mouse* mouse)
 	this->keyboard = keyboard;
 	this->mouse = mouse;
 
-	rope = new Rope;
-
 	// モデルの生成
 	playerModel = playerModel->CreateFromObject("cube");
 	playerObj = Object3d::Create();
@@ -91,10 +89,10 @@ void Player::Attack(XMFLOAT3 targetPos, bool& flag, float& avoidTime)
 
 	if (avoidTime < 1.0f)
 	{
-		avoidTime += 0.1f;
+		avoidTime += 0.08f;
 	}
 
-	pPos = Easing::easeIn(pPos, targetPos, avoidTime);
+	pPos = Easing::GetInstance()->easeIn(pPos, targetPos, avoidTime);
 	playerObj->Update();
 }
 
@@ -181,33 +179,29 @@ void Player::Reset()
 	avoidFlag = false; // 回避開始フラグ
 	avoidCount = 0;
 
-	// ロープ管理用
-	rFlag = false;
-
 	// カメラ距離取得用
 	cameraTrack = {};
 	cameraRot = 0.0f;
 }
 
-bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, int mapNumber)
+bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 {
 	//フラグ
 	bool hitFlag = false;
 
 	// 判定
-	float maxBoxX = boxPos.x + boxRadius.x;
-	float minBoxX = boxPos.x - boxRadius.x;
-	float maxBoxY = boxPos.y + boxRadius.y;
-	float minBoxY = boxPos.y - boxRadius.y;
-	float maxBoxZ = boxPos.z + boxRadius.z;
-	float minBoxZ = boxPos.z - boxRadius.z;
+	float maxBoxX = boxPos.x + boxScale.x;
+	float minBoxX = boxPos.x - boxScale.x;
+	float maxBoxY = boxPos.y + boxScale.y;
+	float minBoxY = boxPos.y - boxScale.y;
+	float maxBoxZ = boxPos.z + boxScale.z;
+	float minBoxZ = boxPos.z - boxScale.z;
 
 	if ((pPos.x <= maxBoxX && pPos.x >= minBoxX) &&
 		(pPos.z <= maxBoxZ && pPos.z >= minBoxZ))
 	{
 		if (maxBoxY + pScale.y > pPos.y && boxPos.y < pPosOld.y)
 		{
-			//pPos.y = maxBoxY + pScale.y;
 			hitFlag = true;
 			if (maxBoxY + pScale.y >= pPos.y)
 			{
@@ -217,7 +211,6 @@ bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxRadius, int mapNumber)
 		}
 		else if (minBoxY - pScale.y < pPos.y && boxPos.y > pPosOld.y)
 		{
-			//pPos.y = minBoxY - pScale.y;
 			hitFlag = true;
 			if (minBoxY - pScale.y <= pPos.y)
 			{

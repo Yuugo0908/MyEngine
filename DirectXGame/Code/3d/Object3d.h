@@ -25,6 +25,7 @@ public: // サブクラス
 		float a;
 		XMFLOAT4 color;
 	};
+
 public: // 静的メンバ関数
 	// 静的初期化
 	static bool StaticInitialize(ID3D12Device* device, Camera* camera = nullptr);
@@ -88,6 +89,11 @@ public: // メンバ関数
 	void SetModel(Model* model) { this->model = model; }
 	// 色の設定
 	void SetColor(XMFLOAT4 color) { this->color = color; }
+	// オブジェクトのタイプ設定
+	void SetType(int type) { this->type = type; }
+	// オブジェクトタイプの取得
+	const int& GetType() { return type; }
+
 private: // メンバ変数
 	ComPtr<ID3D12Resource> constBufferB0; // 定数バッファ
 	// 色
@@ -103,4 +109,6 @@ private: // メンバ変数
 	// 親オブジェクト
 	Object3d* parent = nullptr;
 	Model* model = nullptr;
+	// オブジェクトタイプ
+	int type = 0;
 };

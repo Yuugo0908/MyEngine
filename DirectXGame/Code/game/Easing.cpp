@@ -1,6 +1,13 @@
 #include "Easing.h"
 #include <cmath>
 
+Easing* Easing::GetInstance()
+{
+	static Easing instance;
+
+	return &instance;
+}
+
 XMFLOAT3 Easing::lerp(const XMFLOAT3& start, const XMFLOAT3& end, const float time)
 {
 	return start * (1.0f - time) + end * time;

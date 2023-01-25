@@ -10,14 +10,8 @@ GameScene::~GameScene() {
 
 }
 
-// 静的メンバ変数の実体
-Model* GameScene::blockModel;
-std::vector<std::vector<int>> GameScene::map;
-std::unique_ptr<Object3d> GameScene::blockObj[map_max_y][map_max_x];
-
 int GameScene::height = 0;
 int GameScene::width = 0;
-const float GameScene::LAND_SCALE = 5.0f;
 
 
 void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mouse* mouse, Audio* audio) {
@@ -123,7 +117,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	explanation->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.0f });
 
 	// レベルデータの読み込み
-	levelData = LevelLoader::LoadFile("gameScene");
+	levelData = LevelLoader::LoadFile("gameScene2");
 
 	// レベルデータからオブジェクトを生成、配置
 	for (LevelData::ObjectData& objectData : levelData->objects)
@@ -157,12 +151,16 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 
 		if (objectData.fileName == "stage")
 		{
-			stagePos = pos;
-			stageScale = scale;
+			newObject->SetType(stage_);
+		}
+
+		if (objectData.fileName == "cube")
+		{
+			newObject->SetType(box_);
 		}
 
 		// 配列に登録
-		objects.push_back(std::move(newObject));
+		jsonObject.push_back(std::move(newObject));
 	}
 
 	Enemy::StaticInit();
@@ -177,9 +175,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 		newEnemy->Initialize(player);
 		enemys.push_back(std::move(newEnemy));
 	}
-
-	// オブジェクト生成
-	blockModel = blockModel->CreateFromObject("block");
 
 	// カメラの設定
 	camera->SetTarget(pPos);
@@ -207,13 +202,13 @@ void GameScene::Update() {
 		{
 			//マップチップ用のCSV読み込み
 			//(map, "Resource/scv/なんたら.csv")で追加可能
-			if (!mapLoadFlag)
-			{
-				//Mapchip::CsvToVector(map, "Resources/csv/tutorial.csv");
-				Mapchip::CsvToVector(map, "Resources/csv/stage1.csv");
-				MapCreate(0);
-				mapLoadFlag = true;
-			}
+			//if (!mapLoadFlag)
+			//{
+			//	//Mapchip::CsvToVector(map, "Resources/csv/tutorial.csv");
+			//	Mapchip::CsvToVector(map, "Resources/csv/stage1.csv");
+			//	MapCreate(0);
+			//	mapLoadFlag = true;
+			//}
 
 			if (!expFlag)
 			{
@@ -241,38 +236,72 @@ void GameScene::Update() {
 		}
 	}
 
+	// タイトルから移行後の更新
 	if (nowScene == game_)
 	{
-		// タイトルから移行後の更新
+		//	プレイヤーの座標、半径の設定
+		rope->Update(pPos);
+		player->Update(rFlag, moveFlag);
+		pPos = player->GetObj()->GetPosition();
+		pScale = player->GetObj()->GetScale();
+		if (attackFlag)
 		{
-			//	プレイヤーの座標、半径の設定
-			player->Update(rFlag, moveFlag);
-			pPos = player->GetObj()->GetPosition();
-			pScale = player->GetObj()->GetScale();
+			player->Attack(catchPos, attackFlag, avoidTime);
+		}
 
-			// jsonファイルから読み込んだオブジェクトの更新
-			for (auto& object : objects)
+		// jsonファイルから読み込んだオブジェクトの更新
+		for (auto& object : jsonObject)
+		{
+			object->Update();
+
+			if (object->GetType() == box_)
 			{
-				object->Update();
-			}
-			// マップオブジェクトの更新
-			MapUpdate(0);
+				XMFLOAT3 boxPos = object->GetPosition();
+				XMFLOAT3 boxScale = object->GetScale();
+				player->MapCollide(boxPos, boxScale);
 
-			CollisionUpdate();
-			LightUpdate();
-			CameraUpdate();
-
-			// フェードアウトが終わるまではここでリターン
-			if (fadeOut)
-			{
-				alpha -= 0.02f;
-				backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });			
-				if (alpha <= 0.0f)
+				for (std::unique_ptr<Enemy>& enemy : enemys)
 				{
-					fadeOut = false;
+					enemy->MapCollide(boxPos, boxScale);
+				}
+			}
+			else if (object->GetType() == stage_)
+			{
+				XMFLOAT3 stagePos = object->GetPosition();
+				XMFLOAT3 stageScale = object->GetScale();
+
+				if (player->StageCollide(stagePos, stageScale))
+				{
+					player->SetOnGround(true);
+				}
+
+				for (std::unique_ptr<Enemy>& enemy : enemys)
+				{
+					eAlive = enemy->GetAlive();
+
+					if (eAlive && enemy->StageCollide(stagePos, stageScale))
+					{
+						enemy->SetOnGround(true);
+					}
 				}
 			}
 		}
+
+		CollisionUpdate();
+		LightUpdate();
+		CameraUpdate();
+
+		// フェードアウトが終わるまではここでリターン
+		if (fadeOut)
+		{
+			alpha -= 0.02f;
+			backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });			
+			if (alpha <= 0.0f)
+			{
+				fadeOut = false;
+			}
+		}
+		
 
 		if (!fadeIn && !fadeOut)
 		{
@@ -286,8 +315,6 @@ void GameScene::Update() {
 			{
 				throwCount++;
 			}
-
-			rope->Update(pPos);
 
 			for (std::unique_ptr<Enemy>& enemy : enemys)
 			{
@@ -310,18 +337,15 @@ void GameScene::Update() {
 				{
 					enemy->SetAttackFlag(true);
 				}
+				enemy->Update();
 			}
+
 
 			if (throwCount == 30)
 			{
 				rope->Throw(pPos, ePosSave, minLength);
 				ePosSave = {};
-				minLength = 10.0f;
-			}
-
-			for (std::unique_ptr<Enemy>& enemy : enemys)
-			{
-				enemy->Update();
+				minLength = 15.0f;
 			}
 
 			player->GetObj()->SetPosition(pPos);
@@ -446,9 +470,9 @@ void GameScene::Draw() {
 			enemy->Draw();
 		}
 		rope->Draw();
-		MapDraw(0);
+		//MapDraw(0);
 
-		for (auto& object : objects)
+		for (auto& object : jsonObject)
 		{
 			object->Draw();
 		}
@@ -519,9 +543,6 @@ void GameScene::SetImgui()
 	ImGui::Text("cameraLength : %6.2f", ePos.y);
 	ImGui::Text("cameraLength : %6.2f", ePos.z);
 
-	ImGui::Separator();
-	ImGui::Text("check : %d", check);
-
 	ImGui::End();
 }
 
@@ -549,34 +570,57 @@ void GameScene::CameraUpdate()
 
 	cPos = camera->GetEye();
 	cTarget = camera->GetTarget();
+	//DebugText::GetInstance()->Print(30, 30 * 15, 2, "%f", cPos.x);
+	//DebugText::GetInstance()->Print(30, 30 * 16, 2, "%f", cPos.y);
+	//DebugText::GetInstance()->Print(30, 30 * 17, 2, "%f", cPos.z);
 	camera->Update();
 }
 
 void GameScene::CollisionUpdate()
 {
-	if (player->StageCollide(stagePos, stageScale))
-	{
-		player->SetOnGround(true);
-	}
+	//for (XMFLOAT3& pos : stagePos)
+	//{
+	//	for (XMFLOAT3& scale : stageScale)
+	//	{
+	//		if (player->StageCollide(pos, scale))
+	//		{
+	//			player->SetOnGround(true);
+	//		}
+	//		for (std::unique_ptr<Enemy>& enemy : enemys)
+	//		{
+	//			if (enemy->StageCollide(pos, scale))
+	//			{
+	//				enemy->SetOnGround(true);
+	//			}
+	//		}
+	//	}
+	//}
 
-	for (std::unique_ptr<Enemy>& enemy : enemys)
-	{
-		if (enemy->StageCollide(stagePos, stageScale))
-		{
-			enemy->SetOnGround(true);
-		}
-	}
+	//if (player->StageCollide(stagePos, stageScale))
+	//{
+	//	player->SetOnGround(true);
+	//}
+
+	//for (std::unique_ptr<Enemy>& enemy : enemys)
+	//{
+	//	eAlive = enemy->GetAlive();
+
+	//	if (eAlive && enemy->StageCollide(stagePos, stageScale))
+	//	{
+	//		enemy->SetOnGround(true);
+	//	}
+	//}
 
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
 		eAlive = enemy->GetAlive();
-
 		if (eAlive)
 		{
 			pPos = player->GetObj()->GetPosition();
 			if (rope->Collision(enemy->GetObj(), pPos))
 			{
 				attackFlag = true;
+				catchPos = enemy->GetObj()->GetPosition();
 				enemy->SetCatchFlag(true);
 			}
 			else
@@ -584,15 +628,13 @@ void GameScene::CollisionUpdate()
 				enemy->SetCatchFlag(false);
 			}
 		}
-		
-		if(attackFlag)
-		{
-			player->Attack(enemy->GetObj()->GetPosition(), attackFlag, avoidTime);
-		}
+	}
 
-		if (eAlive && Collision::CollisionObject(player->GetObj(), enemy->GetObj()))
+	for (std::unique_ptr<Enemy>& enemy : enemys)
+	{
+		eAlive = enemy->GetAlive();
+		if (eAlive && enemy->EnemyCollision(player->GetObj()))
 		{
-			enemy->EnemyCollision();
 			shakeFlag = true;
 			moveFlag = true;
 			rope->SetmoveFlag(moveFlag);
@@ -612,155 +654,91 @@ void GameScene::CollisionUpdate()
 		}
 	}
 
+	for (std::unique_ptr<Enemy>& enemy : enemys)
+	{
+		eAlive = enemy->GetAlive();
+		if (eAlive && enemy->BulletCollision())
+		{
+			if (!rFlag)
+			{
+				shakeFlag = true;
+				playerHp -= 18;
+			}
+		}
+	}
+
 	camera->SetTarget(pPos);
 }
 
 bool GameScene::RayCollision()
 {
-	for (int y = 0; y < map_max_y; y++)
+	for (auto& object : jsonObject)
 	{
-		for (int x = 0; x < map_max_x; x++)
+		if (object->GetType() == box_)
 		{
-			if (Mapchip::GetChipNum(x, y, map[0]) == blocks_ || Mapchip::GetChipNum(x, y, map[0]) == walls_)
+			XMFLOAT3 boxPos =object->GetPosition();
+			XMFLOAT3 boxScale = object->GetScale();
+			// エネミーからプレイヤーへのレイ
+			XMFLOAT3 layStart = ePos;
+
+			XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
+			XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
+			XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, enemyPos);
+			XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
+			XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
+
+			XMFLOAT3 layVec = subPE;
+
+			if(GetLength(pPos, ePos) >= GetLength(boxPos, ePos))
 			{
-				boxPos = blockObj[y][x]->GetPosition();
-				boxScale = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);
-				// エネミーからプレイヤーへのレイ
-				XMFLOAT3 layStart = ePos;
+				// マップオブジェクトの座標と大きさ
+				XMFLOAT3 bCenter = boxPos;
+				XMFLOAT3 bRadius = { boxScale.x * 2.0f, boxScale.y, boxScale.z * 2.0f };
 
-				XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
-				XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
-				XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, enemyPos);
-				XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
-				XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
+				bCenter = bCenter - layStart;
 
-				XMFLOAT3 layVec = subPE;
-
-				if(GetLength(pPos, ePos) >= GetLength(boxPos, ePos))
-				{
-					// マップオブジェクトの座標と大きさ
-					XMFLOAT3 bCenter = boxPos;
-					XMFLOAT3 bRadius = { boxScale.x * 2.0f, boxScale.y, boxScale.z * 2.0f };
-
-					bCenter = bCenter - layStart;
-
-					float bA1 = layVec.x * layVec.x + layVec.y * layVec.y + layVec.z * layVec.z;
-					if (bA1 == 0.0f)
-					{
-						check = 0;
-						continue;
-					}
-
-					float bB1 = layVec.x * bCenter.x + layVec.y * bCenter.y + layVec.z * bCenter.z;
-					
-					float bC1 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bRadius.x * bRadius.x;
-					float bC2 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bRadius.y * bRadius.y;
-					float bC3 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bRadius.z * bRadius.z;
-
-					float s1 = bB1 * bB1 - bA1 * bC1;
-					float s2 = bB1 * bB1 - bA1 * bC2;
-					float s3 = bB1 * bB1 - bA1 * bC3;
-					if (s1 < 0.0f || s2 < 0.0f || s3 < 0.0f)
-					{
-						check = 0;
-						continue;
-					}
-
-					s1 = sqrtf(s1);
-					s2 = sqrtf(s2);
-					s3 = sqrtf(s3);
-					float a1 = (bB1 - s1) / bA1;
-					float a2 = (bB1 + s1) / bA1;
-					float a3 = (bB1 - s2) / bA1;
-					float a4 = (bB1 + s2) / bA1;
-					float a5 = (bB1 - s3) / bA1;
-					float a6 = (bB1 + s3) / bA1;
-
-					if (a1 < 0.0f || a2 < 0.0f || a3 < 0.0f || a4 < 0.0f || a5 < 0.0f || a6 < 0.0f)
-					{
-						check = 0;
-						continue;
-					}
-
-					check = 1;
-					return true;
-				}
-				else
+				float bA1 = layVec.x * layVec.x + layVec.y * layVec.y + layVec.z * layVec.z;
+				if (bA1 == 0.0f)
 				{
 					continue;
 				}
+
+				float bB1 = layVec.x * bCenter.x + layVec.y * bCenter.y + layVec.z * bCenter.z;
+				
+				float bC1 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bRadius.x * bRadius.x;
+				float bC2 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bRadius.y * bRadius.y;
+				float bC3 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bRadius.z * bRadius.z;
+
+				float s1 = bB1 * bB1 - bA1 * bC1;
+				float s2 = bB1 * bB1 - bA1 * bC2;
+				float s3 = bB1 * bB1 - bA1 * bC3;
+				if (s1 < 0.0f || s2 < 0.0f || s3 < 0.0f)
+				{
+					continue;
+				}
+
+				s1 = sqrtf(s1);
+				s2 = sqrtf(s2);
+				s3 = sqrtf(s3);
+				float a1 = (bB1 - s1) / bA1;
+				float a2 = (bB1 + s1) / bA1;
+				float a3 = (bB1 - s2) / bA1;
+				float a4 = (bB1 + s2) / bA1;
+				float a5 = (bB1 - s3) / bA1;
+				float a6 = (bB1 + s3) / bA1;
+
+				if (a1 < 0.0f || a2 < 0.0f || a3 < 0.0f || a4 < 0.0f || a5 < 0.0f || a6 < 0.0f)
+				{
+					continue;
+				}
+
+				return true;
+			}
+			else
+			{
+				continue;
 			}
 		}
 	}
 	return false;
-}
-
-void GameScene::MapCreate(int mapNumber)
-{
-	for (int y = 0; y < map_max_y; y++) {//(yが25)
-		for (int x = 0; x < map_max_x; x++) {//(xが25)
-
-			if (Mapchip::GetChipNum(x, y, map[mapNumber]) == blocks_)
-			{
-				blockObj[y][x] = Object3d::Create();
-				blockObj[y][x]->SetModel(blockModel);
-				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE + 2.5f, 2.5f , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE + 2.5f });
-				blockObj[y][x]->SetScale({ 1.0f,1.0f,1.0f });
-				blockObj[y][x]->Update();
-			}
-
-			else if (Mapchip::GetChipNum(x, y, map[mapNumber]) == walls_)
-			{
-				blockObj[y][x] = Object3d::Create();
-				blockObj[y][x]->SetModel(blockModel);
-				blockObj[y][x]->SetPosition({ ((float)x - ((float)map_max_x / 2)) * LAND_SCALE + 2.5f, 5.0f , ((float)y - ((float)map_max_y / 2)) * LAND_SCALE + 2.5f });
-				blockObj[y][x]->SetScale({ 1.0f,2.0f,1.0f });
-				blockObj[y][x]->Update();
-			}
-		}
-	}
-}
-
-void GameScene::MapUpdate(int mapNumber)
-{
-	for (int y = 0; y < map_max_y; y++)
-	{
-		for (int x = 0; x < map_max_x; x++)
-		{
-			if (Mapchip::GetChipNum(x, y, map[0]) == blocks_ || Mapchip::GetChipNum(x, y, map[0]) == walls_)
-			{
-				boxPos = blockObj[y][x]->GetPosition();
-				boxScale = blockObj[y][x]->GetScale() * (LAND_SCALE / 2);
-				player->MapCollide(boxPos, boxScale, 0);
-				for (std::unique_ptr<Enemy>& enemy : enemys)
-				{
-					enemy->MapCollide(boxPos, boxScale);
-					if (enemy->BulletCollision())
-					{
-						if (!rFlag)
-						{
-							shakeFlag = true;
-							playerHp -= 18;
-						}
-					}
-				}
-				blockObj[y][x]->Update();
-			}
-		}
-	}
-}
-
-void GameScene::MapDraw(int mapNumber)
-{
-	//マップチップの描画
-	for (int y = 0; y < map_max_y; y++)
-	{
-		for (int x = 0; x < map_max_x; x++)
-		{
-			if (Mapchip::GetChipNum(x, y, map[0]) == blocks_ || Mapchip::GetChipNum(x, y, map[0]) == walls_)
-			{
-				blockObj[y][x]->Draw();
-			}
-		}
-	}
 }

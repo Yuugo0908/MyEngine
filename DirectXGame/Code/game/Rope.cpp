@@ -61,26 +61,18 @@ void Rope::Update(XMFLOAT3& pPos)
 	}
 
 	objLength = GetLength(startPos, endPos);
-	{
-		XMFLOAT3 length = { startPos.x - endPos.x, startPos.y - endPos.y, startPos.z - endPos.z };
+	XMFLOAT3 length = { startPos.x - endPos.x, startPos.y - endPos.y, startPos.z - endPos.z };
 
-		angleY = (float)atan2(startPos.x - endPos.x, startPos.z - endPos.z);
-		vecXZ = sqrtf((startPos.x - endPos.x) * (startPos.x - endPos.x) + (startPos.z - endPos.z) * (startPos.z - endPos.z));
-		angleX = (float)atan2(endPos.y - startPos.y, vecXZ);
+	angleY = (float)atan2(startPos.x - endPos.x, startPos.z - endPos.z);
+	vecXZ = sqrtf((startPos.x - endPos.x) * (startPos.x - endPos.x) + (startPos.z - endPos.z) * (startPos.z - endPos.z));
+	angleX = (float)atan2(endPos.y - startPos.y, vecXZ);
 
-		rPos = { (startPos.x + endPos.x) / 2, (startPos.y + endPos.y) / 2, (startPos.z + endPos.z) / 2 };
-		rScale = { 0.2f, 0.2f , objLength / 2.0f };
-		ropeObj->SetPosition(rPos);
-		ropeObj->SetScale(rScale);
-		ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
-		ropeObj->Update();
-	}
-
-
-	//if (pEaseFlag)
-	//{
-	//	easing->EaseInUpdate(startPos, endPos, pPos, pEaseFlag, avoidTime);
-	//}
+	rPos = { (startPos.x + endPos.x) / 2, (startPos.y + endPos.y) / 2, (startPos.z + endPos.z) / 2 };
+	rScale = { 0.2f, 0.2f , objLength / 2.0f };
+	ropeObj->SetPosition(rPos);
+	ropeObj->SetScale(rScale);
+	ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
+	ropeObj->Update();
 }
 
 void Rope::Throw(XMFLOAT3 pPos, XMFLOAT3& ePos, float& length)
@@ -94,7 +86,7 @@ void Rope::Throw(XMFLOAT3 pPos, XMFLOAT3& ePos, float& length)
 		return;
 	}
 
-	if (length < 10.0f)
+	if (length < 15.0f)
 	{
 		rRotFlag = true;
 	}
@@ -136,7 +128,7 @@ void Rope::Throw(XMFLOAT3 pPos, XMFLOAT3& ePos, float& length)
 
 		manageRopeScale.x += 0.02f;
 		manageRopeScale.y += 0.02f;
-		manageRopeScale.z += 0.7f;
+		manageRopeScale.z += 0.6f;
 
 		avoidTime += 0.1f;
 
@@ -170,7 +162,7 @@ void Rope::Throw(XMFLOAT3 pPos, XMFLOAT3& ePos, float& length)
 
 		manageRopeScale.x -= 0.02f;
 		manageRopeScale.y -= 0.02f;
-		manageRopeScale.z -= 0.7f;
+		manageRopeScale.z -= 0.6f;
 
 
 		avoidTime += 0.1f;

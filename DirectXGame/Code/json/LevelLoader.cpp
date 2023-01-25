@@ -41,17 +41,14 @@ LevelData* LevelLoader::LoadFile(const std::string& fileName)
 	for (nlohmann::json& object : deserialized["objects"])
 	{
 		Recursive(object, levelData);
-
-		//if (object.contains("children"))
-		//{
-		//	Recursive(object, levelData);
-		//}
 	}
 
 	levelData->stageModel = levelData->stageModel->CreateFromObject("stage");
 	levelData->skydomeModel = levelData->skydomeModel->CreateFromObject("skydome");
+	levelData->cubeModel = levelData->cubeModel->CreateFromObject("cube");
 	levelData->models.insert(std::make_pair("stage", levelData->stageModel));
 	levelData->models.insert(std::make_pair("skydome", levelData->skydomeModel));
+	levelData->models.insert(std::make_pair("cube", levelData->cubeModel));
 
 	return levelData;
 }
@@ -73,6 +70,10 @@ void LevelLoader::Recursive(nlohmann::json& object, LevelData* levelData)
 		if (object.contains("file_name")) {
 			// ファイル名
 			objectData.fileName = object["file_name"];
+		}
+		else
+		{
+			assert(0);
 		}
 
 		// トランスフォームのパラメータ読み込み

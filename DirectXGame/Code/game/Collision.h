@@ -45,13 +45,9 @@ public: // 静的メンバ関数
 	static bool CollisionSphere(const Sphere& sphere1, const Sphere& sphere2);
 	// 球と平面の当たり判定
 	static bool CollisionSpherePlane(const Sphere& sphere, const Plane& plane, XMVECTOR* inter);
-	// 球と三角形の当たり判定
-	static bool CollisionSphereTriangle(const Sphere& sphere, const Triangle& triangle, XMVECTOR* closest);
 
 	// レイと平面の当たり判定
 	static bool CollisionRayPlane(const Ray& ray, const Plane& plane, float* distance = nullptr, XMVECTOR* inter = nullptr);
-	// レイと法線付き三角形の当たり判定
-	static bool CollisionRayTriangle(const Ray& ray, const Triangle& triangle, float* distance = nullptr, XMVECTOR* inter = nullptr);
 	// レイと球の当たり判定
 	static bool CollisionRaySphere(const Ray& ray, const Sphere& sphere);
 
@@ -64,9 +60,5 @@ public: // メンバ関数
 
 	// オブジェクト同士の距離を取得
 	float GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b);
-
-private: // メンバ変数
-
-	Operator* ope = nullptr;
 };
 

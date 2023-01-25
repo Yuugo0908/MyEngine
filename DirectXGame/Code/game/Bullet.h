@@ -12,8 +12,6 @@ public: // メンバ関数
 
 	void Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos);
 
-	void Attack();
-
 	void Search();
 
 	void Draw();
@@ -40,6 +38,7 @@ private: // メンバ変数
 	XMFLOAT3 bScale = {};
 	XMFLOAT3 bSpeed = {};
 	bool attackFlag = false;
+	bool searchFlag = false;
 	bool shakeFlag = false; // カメラのシェイク
 	int attackCount = 0;
 

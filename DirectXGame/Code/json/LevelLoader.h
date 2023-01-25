@@ -28,6 +28,7 @@ struct LevelData
 	// ƒ‚ƒfƒ‹ƒŠƒXƒg
 	Model* stageModel = nullptr;
 	Model* skydomeModel = nullptr; 
+	Model* cubeModel = nullptr;
 	std::map<std::string, Model*> models;
 };
 
@@ -43,6 +44,4 @@ public:
 	static LevelData* LoadFile(const std::string& fileName);
 
 	static void Recursive(nlohmann::json& object, LevelData* levelData);
-
-	static void SetCollision();
 };

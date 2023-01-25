@@ -22,7 +22,6 @@
 #include "Collision.h"
 #include "Light.h"
 #include "Easing.h"
-#include "Mapchip.h"
 #include "LevelLoader.h"
 
 #include <SafeDelete.h>
@@ -60,14 +59,6 @@ public: // メンバ関数
 	// 遮蔽物があるかの判別
 	bool RayCollision();
 
-	// マップチップ用
-	// マップチップ生成
-	static void MapCreate(int mapNumber);
-	// マップチップ更新
-	void MapUpdate(int mapNumber);
-	// マップチップ描画
-	static void MapDraw(int mapNumber);
-
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
 		XMFLOAT3 len = { posA.x - posB.x, posA.y - posB.y, posA.z - posB.z };
@@ -95,32 +86,19 @@ private: // メンバ変数
 	Item* item = Item::GetInstance();
 	LevelData* levelData = nullptr;
 
-	// マップ
-	//マップチップ1つの大きさ
-	static const float LAND_SCALE;
-	//マップチップの番号
-	enum MapNumber
-	{
-		None, blocks_, walls_
-	};
-
 	enum Scene
 	{
 		title_, tutorial_, game_, clear_, failure_
 	};
 
-	//mapchipオブジェクト
-	static Model* blockModel;
-	static std::vector<std::vector<int>> map; //マップチップ
-	static std::unique_ptr<Object3d> blockObj[map_max_y][map_max_x]; // ステージブロック
-	bool mapLoadFlag = false;
-	XMFLOAT3 boxPos = {};
-	XMFLOAT3 boxScale = {};
+	enum ObjectType
+	{
+		sphere_, box_, stage_
+	};
 
 	// jsonオブジェクト
-	std::vector<std::unique_ptr<Object3d>> objects{};
-	XMFLOAT3 stagePos = {};
-	XMFLOAT3 stageScale = {};
+	std::vector<std::unique_ptr<Object3d>> jsonObject{};
+	int objectType = 0;
 
 	// マップ番号
 	static int height;
@@ -149,7 +127,7 @@ private: // メンバ変数
 	float playerHp = 360;
 
 	// エネミー
-	static const int enemyCount = 1;
+	static const int enemyCount = 3;
 	float enemyHp = 360;
 	bool eAlive = false;
 	XMFLOAT3 ePos = {};
@@ -162,6 +140,7 @@ private: // メンバ変数
 	bool rFlag = false;
 	int throwCount = 0;
 	float PElength = 0.0f;
+	XMFLOAT3 catchPos = {};
 
 	// カメラ
 	XMFLOAT3 cPos = {};
@@ -176,9 +155,6 @@ private: // メンバ変数
 
 	// シェイク用
 	bool shakeFlag = false;
-
-	// 確認用
-	int check = 0;
 
 	bool attackFlag = false; // 突進開始フラグ
 	float avoidTime = 0.0f;

@@ -37,17 +37,17 @@ public:
 
 	void Stay();
 
+	void Jump();
+
 	void Spawn();
 
 	void Reset();
 
-	bool EnemyCollision();
+	bool EnemyCollision(const std::unique_ptr<Object3d>& object);
 
 	bool BulletCollision();
 
-	void BulletRemove();
-
-	// マップチップ当たり判定
+	// マップ当たり判定
 	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale);
 	bool StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale);
 
@@ -58,9 +58,7 @@ public:
 
 	void SetAttackFlag(bool attackFlag) { this->attackFlag = attackFlag; }
 	void SetCatchFlag(bool catchFlag) { this->catchFlag = catchFlag; }
-
 	// 着地
-	const bool& GetOnGround() { return onGround; }
 	void SetOnGround(bool onGround) { this->onGround = onGround; }
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
@@ -94,6 +92,7 @@ private:
 	float PElength = 0.0f;
 	float lengthOld = 0.0f;
 
+	int eAliveCount = 0;
 	int attackCount = 0;
 
 	bool eFlag = false; // 自由落下のフラグ

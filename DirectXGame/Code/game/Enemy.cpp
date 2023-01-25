@@ -25,9 +25,19 @@ bool Enemy::Initialize(Player* player)
 	enemyObj = Object3d::Create();
 	enemyObj->SetModel(enemyModel);
 
-	enemyObj->SetPosition({ 0.0f, 0.0f, 0.0f });
-	enemyObj->SetScale({ 1.0f, 1.0f, 1.0f });
-	enemyObj->SetColor({ 0.0f, 0.8f, 0.0f, 1.0f});
+	randPos.x = (float)(-40 + rand() % 80);
+	randPos.z = (float)(-40 + rand() % 80);
+
+	phase = Enemy::Phase::stay;
+	ePos = { randPos.x, 15.0f, randPos.z };
+	eScale = { 1.0f, 1.0f, 1.0f };
+
+	enemyObj->SetPosition(ePos);
+	enemyObj->SetScale(eScale);
+	enemyObj->SetColor({ 0.0f, 0.8f, 0.0f, 1.0f });
+	enemyObj->Update();
+	spawnPos = { ePos.x, 0.0f, ePos.z };
+	eAlive = true;
 
 	return true;
 }
@@ -45,13 +55,36 @@ void Enemy::Update()
 {
 	if (!eAlive)
 	{
-		Spawn();
-		eAlive = true;
-		//return;
+		if (eAliveCount <= 60)
+		{
+			eAliveCount++;
+		}
+		else
+		{
+			Spawn();
+			eAlive = true;
+			phase = Enemy::Phase::stay;
+			return;
+		}
+	}
+
+	if (attackCount <= 30)
+	{
+		attackCount++;
 	}
 
 	eOldPos = enemyObj->GetPosition();
 	enemyObj->SetPosition(ePos);
+
+	pPos = player->GetObj()->GetPosition();
+	PElength = GetLength(pPos, ePos);
+	lengthOld = GetLength(ePos, spawnPos);
+
+	for (std::unique_ptr<Bullet>& bullet : bullets)
+	{
+		bullet->Update(pPos, ePos);
+	}
+	Jump();
 
 	if (PElength <= 20.0f && attackFlag)
 	{
@@ -83,65 +116,14 @@ void Enemy::Update()
 		Stay();
 	}
 
-	if (attackCount <= 30)
-	{
-		attackCount++;
-	}
-
-
-	pPos = player->GetObj()->GetPosition();
-	PElength = GetLength(pPos, ePos);
-	float lengthY = ((pPos.y - ePos.y) * (pPos.y - ePos.y));
-	lengthOld = GetLength(ePos, spawnPos);
-
-	for (std::unique_ptr<Bullet>& bullet : bullets)
-	{
-		bullet->Update(pPos, ePos);
-	}
-
-	// ジャンプ
-	if (jumpFlag)
-	{
-		eUp -= eGra;
-		ePos.y += eUp;
-		if (onGround)
-		{
-			jumpFlag = false;
-			eUp = 0.0f;
-		}
-	}
-	else
-	{
-		eDown -= 0.75f;
-		ePos.y += eDown;
-		if (onGround)
-		{
-			eDown = 0.0f;
-		}
-	}
-
-	// bulletsの削除
-	for (std::unique_ptr<Bullet>& bullet : bullets)
-	{
-		if (phase == Enemy::Phase::move || phase == Enemy::Phase::stay)
-		{
-			bullets.remove(bullet);
-			break;
-		}
-	}
-
 	enemyObj->Update();
 }
 
 void Enemy::Attack()
 {
-	if (attackCount >= 30 && attackFlag && !catchFlag)
+	if (eAlive && attackCount >= 30)
 	{
 		BulletCreate();
-		for (std::unique_ptr<Bullet>& bullet : bullets)
-		{
-			bullet->Search();
-		}
 		attackCount = 0;
 	}
 }
@@ -181,12 +163,36 @@ void Enemy::Stay()
 	}
 }
 
+void Enemy::Jump()
+{
+	// ジャンプ
+	if (jumpFlag)
+	{
+		eUp -= eGra;
+		ePos.y += eUp;
+		if (onGround)
+		{
+			jumpFlag = false;
+			eUp = 0.0f;
+		}
+	}
+	else
+	{
+		eDown -= 0.75f;
+		ePos.y += eDown;
+		if (onGround)
+		{
+			eDown = 0.0f;
+		}
+	}
+}
+
 void Enemy::Spawn()
 {
 	randPos.x = (float)(-40 + rand() % 80);
 	randPos.z = (float)(-40 + rand() % 80);
 
-	phase = Enemy::Phase::move;
+	phase = Enemy::Phase::stay;
 	ePos = { randPos.x, 15.0f, randPos.z };
 	eScale = { 1.0f, 1.0f, 1.0f };
 
@@ -200,22 +206,24 @@ void Enemy::Spawn()
 void Enemy::Reset()
 {
 	eAlive = false;
-	for (std::unique_ptr<Bullet>& bullet : bullets)
-	{
-		bullets.remove(bullet);
-		break;
-	}
+	bullets.erase(bullets.begin(), bullets.end());
 }
 
-bool Enemy::EnemyCollision()
+bool Enemy::EnemyCollision(const std::unique_ptr<Object3d>& object)
 {
-	eAlive = false;
-	for (std::unique_ptr<Bullet>& bullet : bullets)
+	if (!Collision::CollisionObject(object, enemyObj))
 	{
-		bullets.remove(bullet);
-		break;
+		return false;
 	}
-	return true;
+	else
+	{
+		eAlive = false;
+		eAliveCount = 0;
+		attackFlag = false;
+		catchFlag = false;
+		bullets.erase(bullets.begin(), bullets.end());
+		return true;
+	}
 }
 
 bool Enemy::BulletCollision()
