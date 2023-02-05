@@ -8,17 +8,18 @@ bool Player::Initialize(Keyboard* keyboard, Mouse* mouse)
 	this->mouse = mouse;
 
 	// ƒ‚ƒfƒ‹‚Ì¶¬
-	playerModel = playerModel->CreateFromObject("cube");
+	playerModel = playerModel->CreateFromObject("sphere");
 	playerObj = Object3d::Create();
 	playerObj->SetModel(playerModel);
 
 	// ˆÊ’u‚ğ•Ï”‚ÉŠi”[
-	pPos = { 0.0f, 10.0f, 0.0f };
-	pPosOld = { 0.0f, 10.0f, 0.0f };
+	pPos = { 0.0f, 10.0f, -10.0f };
+	pPosOld = pPos;
 	pScale = { 0.8f,0.8f,0.8f };
 
 	playerObj->SetPosition(pPos);
 	playerObj->SetScale(pScale);
+	playerObj->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
 	playerObj->Update();
 
 	return true;

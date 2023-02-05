@@ -54,6 +54,8 @@ public: // メンバ関数
 	void LightUpdate();
 	// カメラの更新
 	void CameraUpdate();
+	// jsonオブジェクトの更新
+	void jsonObjectUpdate();
 	// 当たり判定
 	void CollisionUpdate();
 	// 遮蔽物があるかの判別
@@ -75,7 +77,6 @@ private: // メンバ変数
 	Collision* collision = nullptr;
 	Light* light = nullptr;
 	Easing* easing = nullptr;
-	Mapchip* mapchip = nullptr;
 
 	Rope* rope = nullptr;
 	Player* player = nullptr;
@@ -93,12 +94,13 @@ private: // メンバ変数
 
 	enum ObjectType
 	{
-		sphere_, box_, stage_
+		sphere_, box_, stage_, wall_
 	};
 
 	// jsonオブジェクト
 	std::vector<std::unique_ptr<Object3d>> jsonObject{};
 	int objectType = 0;
+	bool layHit = false;
 
 	// マップ番号
 	static int height;
@@ -127,7 +129,7 @@ private: // メンバ変数
 	float playerHp = 360;
 
 	// エネミー
-	static const int enemyCount = 3;
+	static const int enemyCount = 2;
 	float enemyHp = 360;
 	bool eAlive = false;
 	XMFLOAT3 ePos = {};
@@ -158,4 +160,6 @@ private: // メンバ変数
 
 	bool attackFlag = false; // 突進開始フラグ
 	float avoidTime = 0.0f;
+
+	int check = 0;
 };

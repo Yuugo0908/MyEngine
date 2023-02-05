@@ -86,6 +86,204 @@
                 ]
             },
             "file_name": "skydome"
+        },
+        {
+            "type": "MESH",
+            "name": "cube.003",
+            "transform": {
+                "translation": [
+                    -75.0,
+                    4.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    4.0,
+                    75.0
+                ]
+            },
+            "file_name": "cube"
+        },
+        {
+            "type": "MESH",
+            "name": "cube.002",
+            "transform": {
+                "translation": [
+                    0.0,
+                    4.0,
+                    -75.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    75.0,
+                    4.0,
+                    1.0
+                ]
+            },
+            "file_name": "cube"
+        },
+        {
+            "type": "MESH",
+            "name": "cube",
+            "transform": {
+                "translation": [
+                    75.0,
+                    4.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    4.0,
+                    75.0
+                ]
+            },
+            "file_name": "cube"
+        },
+        {
+            "type": "MESH",
+            "name": "cube.001",
+            "transform": {
+                "translation": [
+                    0.0,
+                    4.0,
+                    75.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    75.0,
+                    4.0,
+                    1.0
+                ]
+            },
+            "file_name": "cube"
+        },
+        {
+            "type": "MESH",
+            "name": "立方体.004",
+            "transform": {
+                "translation": [
+                    0.0,
+                    3.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    7.0,
+                    3.0,
+                    7.0
+                ]
+            },
+            "file_name": "cube"
+        },
+        {
+            "type": "MESH",
+            "name": "立方体.006",
+            "transform": {
+                "translation": [
+                    50.0,
+                    2.0,
+                    50.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    15.0,
+                    2.0,
+                    15.0
+                ]
+            },
+            "file_name": "cube"
+        },
+        {
+            "type": "MESH",
+            "name": "立方体.007",
+            "transform": {
+                "translation": [
+                    -50.0,
+                    2.0,
+                    50.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    15.0,
+                    2.0,
+                    15.0
+                ]
+            },
+            "file_name": "cube"
+        },
+        {
+            "type": "MESH",
+            "name": "立方体.008",
+            "transform": {
+                "translation": [
+                    -50.0,
+                    2.0,
+                    -50.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    15.0,
+                    2.0,
+                    15.0
+                ]
+            },
+            "file_name": "cube"
+        },
+        {
+            "type": "MESH",
+            "name": "立方体.009",
+            "transform": {
+                "translation": [
+                    50.0,
+                    2.0,
+                    -50.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    15.0,
+                    2.0,
+                    15.0
+                ]
+            },
+            "file_name": "cube"
         }
     ]
 }

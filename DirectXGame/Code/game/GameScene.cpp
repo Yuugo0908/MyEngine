@@ -30,7 +30,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	rope = new Rope;
 	player = new Player;
 	enemy = new Enemy;
-	mapchip = new Mapchip;
 
 	// デバイスのセット
 	FbxObject3d::SetDevice(dxCommon->GetDevice());
@@ -117,7 +116,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	explanation->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.0f });
 
 	// レベルデータの読み込み
-	levelData = LevelLoader::LoadFile("gameScene2");
+	levelData = LevelLoader::LoadFile("gameScene");
 
 	// レベルデータからオブジェクトを生成、配置
 	for (LevelData::ObjectData& objectData : levelData->objects)
@@ -157,6 +156,11 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 		if (objectData.fileName == "cube")
 		{
 			newObject->SetType(box_);
+		}
+
+		if (objectData.fileName == "wall")
+		{
+			newObject->SetType(wall_);
 		}
 
 		// 配列に登録
@@ -250,42 +254,7 @@ void GameScene::Update() {
 		}
 
 		// jsonファイルから読み込んだオブジェクトの更新
-		for (auto& object : jsonObject)
-		{
-			object->Update();
-
-			if (object->GetType() == box_)
-			{
-				XMFLOAT3 boxPos = object->GetPosition();
-				XMFLOAT3 boxScale = object->GetScale();
-				player->MapCollide(boxPos, boxScale);
-
-				for (std::unique_ptr<Enemy>& enemy : enemys)
-				{
-					enemy->MapCollide(boxPos, boxScale);
-				}
-			}
-			else if (object->GetType() == stage_)
-			{
-				XMFLOAT3 stagePos = object->GetPosition();
-				XMFLOAT3 stageScale = object->GetScale();
-
-				if (player->StageCollide(stagePos, stageScale))
-				{
-					player->SetOnGround(true);
-				}
-
-				for (std::unique_ptr<Enemy>& enemy : enemys)
-				{
-					eAlive = enemy->GetAlive();
-
-					if (eAlive && enemy->StageCollide(stagePos, stageScale))
-					{
-						enemy->SetOnGround(true);
-					}
-				}
-			}
-		}
+		jsonObjectUpdate();
 
 		CollisionUpdate();
 		LightUpdate();
@@ -329,14 +298,18 @@ void GameScene::Update() {
 					ePosSave = ePos;
 				}
 
-				if (RayCollision())
+				if (PElength <= 15.0f)
 				{
-					enemy->SetAttackFlag(false);
+					if (RayCollision())
+					{
+						enemy->SetAttackFlag(false);
+					}
+					else
+					{
+						enemy->SetAttackFlag(true);
+					}
 				}
-				else
-				{
-					enemy->SetAttackFlag(true);
-				}
+
 				enemy->Update();
 			}
 
@@ -539,9 +512,7 @@ void GameScene::SetImgui()
 	ImGui::Text("playerPosZ : %6.2f", pPos.z);
 
 	ImGui::Separator();
-	ImGui::Text("cameraLength : %6.2f", ePos.x);
-	ImGui::Text("cameraLength : %6.2f", ePos.y);
-	ImGui::Text("cameraLength : %6.2f", ePos.z);
+	ImGui::Text("check : %d", check);
 
 	ImGui::End();
 }
@@ -569,48 +540,55 @@ void GameScene::CameraUpdate()
 	}
 
 	cPos = camera->GetEye();
-	cTarget = camera->GetTarget();
 	//DebugText::GetInstance()->Print(30, 30 * 15, 2, "%f", cPos.x);
+	cTarget = camera->GetTarget();
 	//DebugText::GetInstance()->Print(30, 30 * 16, 2, "%f", cPos.y);
 	//DebugText::GetInstance()->Print(30, 30 * 17, 2, "%f", cPos.z);
 	camera->Update();
 }
 
+void GameScene::jsonObjectUpdate()
+{
+	for (auto& object : jsonObject)
+	{
+		object->Update();
+
+		if (object->GetType() == box_)
+		{
+			XMFLOAT3 boxPos = object->GetPosition();
+			XMFLOAT3 boxScale = object->GetScale();
+			player->MapCollide(boxPos, boxScale);
+
+			for (std::unique_ptr<Enemy>& enemy : enemys)
+			{
+				enemy->MapCollide(boxPos, boxScale);
+			}
+		}
+		else if (object->GetType() == stage_)
+		{
+			XMFLOAT3 stagePos = object->GetPosition();
+			XMFLOAT3 stageScale = object->GetScale();
+
+			if (player->StageCollide(stagePos, stageScale))
+			{
+				player->SetOnGround(true);
+			}
+
+			for (std::unique_ptr<Enemy>& enemy : enemys)
+			{
+				eAlive = enemy->GetAlive();
+
+				if (eAlive && enemy->StageCollide(stagePos, stageScale))
+				{
+					enemy->SetOnGround(true);
+				}
+			}
+		}
+	}
+}
+
 void GameScene::CollisionUpdate()
 {
-	//for (XMFLOAT3& pos : stagePos)
-	//{
-	//	for (XMFLOAT3& scale : stageScale)
-	//	{
-	//		if (player->StageCollide(pos, scale))
-	//		{
-	//			player->SetOnGround(true);
-	//		}
-	//		for (std::unique_ptr<Enemy>& enemy : enemys)
-	//		{
-	//			if (enemy->StageCollide(pos, scale))
-	//			{
-	//				enemy->SetOnGround(true);
-	//			}
-	//		}
-	//	}
-	//}
-
-	//if (player->StageCollide(stagePos, stageScale))
-	//{
-	//	player->SetOnGround(true);
-	//}
-
-	//for (std::unique_ptr<Enemy>& enemy : enemys)
-	//{
-	//	eAlive = enemy->GetAlive();
-
-	//	if (eAlive && enemy->StageCollide(stagePos, stageScale))
-	//	{
-	//		enemy->SetOnGround(true);
-	//	}
-	//}
-
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
 		eAlive = enemy->GetAlive();
@@ -676,67 +654,107 @@ bool GameScene::RayCollision()
 	{
 		if (object->GetType() == box_)
 		{
-			XMFLOAT3 boxPos =object->GetPosition();
-			XMFLOAT3 boxScale = object->GetScale();
-			// エネミーからプレイヤーへのレイ
+			// ワールド空間での光線の基点
 			XMFLOAT3 layStart = ePos;
-
+			// ワールド空間での光線の方向
 			XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
 			XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
 			XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, enemyPos);
 			XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
 			XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
-
 			XMFLOAT3 layVec = subPE;
+			//境界BOX(ローカル)
+			XMFLOAT3 boxPos = object->GetPosition();
+			XMFLOAT3 boxScale = object->GetScale();
 
-			if(GetLength(pPos, ePos) >= GetLength(boxPos, ePos))
+			float t_min = -FLT_MAX;
+			float t_max = FLT_MAX;
+			float max[3] = { boxPos.x + boxScale.x, boxPos.y + boxScale.y, boxPos.z + boxScale.z };
+			float min[3] = { boxPos.x - boxScale.x, boxPos.y - boxScale.y, boxPos.z - boxScale.z };
+			float p[3] = { layStart.x, layStart.y, layStart.z };
+			float d[3] = { layVec.x, layVec.y, layVec.z };
+
+			// マップオブジェクトの座標と大きさ
+			XMFLOAT3 boxMax = boxPos + boxScale;
+			XMFLOAT3 bCenter = boxPos;
+			float bScale = GetLength(boxPos, boxMax);
+			bCenter = bCenter - layStart;
+			float bA1 = layVec.x * layVec.x + layVec.y * layVec.y + layVec.z * layVec.z;
+			if (bA1 == 0.0f)// レイの長さが0
 			{
-				// マップオブジェクトの座標と大きさ
-				XMFLOAT3 bCenter = boxPos;
-				XMFLOAT3 bRadius = { boxScale.x * 2.0f, boxScale.y, boxScale.z * 2.0f };
+				check = 0;
+				continue;
+			}
+			float bB1 = layVec.x * bCenter.x + layVec.y * bCenter.y + layVec.z * bCenter.z;
+			float bC1 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bScale * bScale;
+			float s1 = bB1 * bB1 - bA1 * bC1;
+			s1 = sqrtf(s1);
+			float a1 = (bB1 - s1) / bA1;
+			float a2 = (bB1 + s1) / bA1;
+			if (a1 < 0.0f || a2 < 0.0f)
+			{
+				check = 0;
+				continue;
+			}
 
-				bCenter = bCenter - layStart;
-
-				float bA1 = layVec.x * layVec.x + layVec.y * layVec.y + layVec.z * layVec.z;
-				if (bA1 == 0.0f)
+			for (int i = 0; i < 3; ++i)
+			{
+				if (abs(d[i]) < FLT_EPSILON)
 				{
-					continue;
+					if (p[i] < min[i] || p[i] > max[i])
+					{
+						check = 0; // 交差していない
+						break;
+					}
+					else
+					{
+						check = 1;
+					}
 				}
-
-				float bB1 = layVec.x * bCenter.x + layVec.y * bCenter.y + layVec.z * bCenter.z;
-				
-				float bC1 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bRadius.x * bRadius.x;
-				float bC2 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bRadius.y * bRadius.y;
-				float bC3 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bRadius.z * bRadius.z;
-
-				float s1 = bB1 * bB1 - bA1 * bC1;
-				float s2 = bB1 * bB1 - bA1 * bC2;
-				float s3 = bB1 * bB1 - bA1 * bC3;
-				if (s1 < 0.0f || s2 < 0.0f || s3 < 0.0f)
+				else
 				{
-					continue;
+					// スラブとの距離を算出
+					// t1が近スラブ、t2が遠スラブとの距離
+					float odd = 1.0f / d[i];
+					float t1 = (min[i] - p[i]) * odd;
+					float t2 = (max[i] - p[i]) * odd;
+
+					if (t1 > t2)
+					{
+						float tmp = t1;
+						t1 = t2;
+						t2 = tmp;
+					}
+
+					if (t1 > t_min) t_min = t1;
+					if (t2 < t_max) t_max = t2;
+
+					// スラブ交差チェック
+					if (t_min >= t_max)
+					{
+						check = 0;
+						break;
+					}
+					else
+					{
+						check = 1;
+					}
 				}
+			}
 
-				s1 = sqrtf(s1);
-				s2 = sqrtf(s2);
-				s3 = sqrtf(s3);
-				float a1 = (bB1 - s1) / bA1;
-				float a2 = (bB1 + s1) / bA1;
-				float a3 = (bB1 - s2) / bA1;
-				float a4 = (bB1 + s2) / bA1;
-				float a5 = (bB1 - s3) / bA1;
-				float a6 = (bB1 + s3) / bA1;
-
-				if (a1 < 0.0f || a2 < 0.0f || a3 < 0.0f || a4 < 0.0f || a5 < 0.0f || a6 < 0.0f)
-				{
-					continue;
-				}
-
-				return true;
+			if (check == 0)
+			{
+				continue;
 			}
 			else
 			{
-				continue;
+				XMFLOAT3 colPosMax = layStart + (layVec * t_max);
+				XMFLOAT3 colPosMin = layStart + (layVec * t_min);
+
+				if (GetLength(ePos, pPos) >= GetLength(ePos, colPosMax) || GetLength(ePos, pPos) >= GetLength(ePos, colPosMin))
+				{
+					return true;
+				}
 			}
 		}
 	}

@@ -5,7 +5,6 @@
 #include "Easing.h"
 #include "Operator.h"
 #include "Camera.h"
-#include "Mapchip.h"
 
 class Player
 {

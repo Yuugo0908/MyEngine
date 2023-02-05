@@ -8,9 +8,9 @@ class Bullet
 {
 public: // ÉÅÉìÉoä÷êî
 
-	bool Initialize(Model* bulletModel);
+	bool Initialize(Model* bulletModel, const XMFLOAT3& pPos, const XMFLOAT3& ePos);
 
-	void Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos);
+	void Update();
 
 	void Search();
 

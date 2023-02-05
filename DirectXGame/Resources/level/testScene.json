@@ -45,7 +45,7 @@
         },
         {
             "type": "MESH",
-            "name": "stage",
+            "name": "平面",
             "transform": {
                 "translation": [
                     0.0,
@@ -59,7 +59,7 @@
                 ],
                 "scaling": [
                     75.0,
-                    1.0,
+                    0.10000000149011612,
                     75.0
                 ]
             },
@@ -72,7 +72,7 @@
                 "translation": [
                     0.0,
                     -30.0,
-                    -5.0
+                    -0.0
                 ],
                 "rotation": [
                     0.0,
@@ -89,76 +89,10 @@
         },
         {
             "type": "MESH",
-            "name": "cube.003",
-            "transform": {
-                "translation": [
-                    -75.0,
-                    1.0,
-                    -0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    1.0,
-                    1.0,
-                    75.0
-                ]
-            },
-            "file_name": "cube"
-        },
-        {
-            "type": "MESH",
-            "name": "cube.002",
+            "name": "立方体.001",
             "transform": {
                 "translation": [
                     0.0,
-                    1.0,
-                    -75.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    75.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "file_name": "cube"
-        },
-        {
-            "type": "MESH",
-            "name": "cube",
-            "transform": {
-                "translation": [
-                    75.0,
-                    1.0,
-                    -0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    1.0,
-                    1.0,
-                    75.0
-                ]
-            },
-            "file_name": "cube"
-        },
-        {
-            "type": "MESH",
-            "name": "立方体",
-            "transform": {
-                "translation": [
-                    21.06594467163086,
                     5.0,
                     -0.0
                 ],
@@ -168,31 +102,9 @@
                     0.0
                 ],
                 "scaling": [
-                    10.0,
+                    8.0,
                     5.0,
-                    1.0
-                ]
-            },
-            "file_name": "cube"
-        },
-        {
-            "type": "MESH",
-            "name": "cube.001",
-            "transform": {
-                "translation": [
-                    0.0,
-                    1.0,
-                    75.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    75.0,
-                    1.0,
-                    1.0
+                    3.0
                 ]
             },
             "file_name": "cube"

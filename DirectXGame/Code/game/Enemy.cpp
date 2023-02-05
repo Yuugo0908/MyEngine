@@ -29,7 +29,9 @@ bool Enemy::Initialize(Player* player)
 	randPos.z = (float)(-40 + rand() % 80);
 
 	phase = Enemy::Phase::stay;
+	pPos = player->GetObj()->GetPosition();
 	ePos = { randPos.x, 15.0f, randPos.z };
+	//ePos = { 0.0f, 15.0f, 20.0f };
 	eScale = { 1.0f, 1.0f, 1.0f };
 
 	enemyObj->SetPosition(ePos);
@@ -45,7 +47,7 @@ bool Enemy::Initialize(Player* player)
 bool Enemy::BulletCreate()
 {
 	std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>();
-	newBullet->Initialize(bulletModel);
+	newBullet->Initialize(bulletModel, pPos, ePos);
 	newBullet->SetPos(enemyObj->GetPosition());
 	bullets.push_back(std::move(newBullet));
 	return true;
@@ -82,26 +84,34 @@ void Enemy::Update()
 
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
-		bullet->Update(pPos, ePos);
+		bullet->Update();
 	}
 	Jump();
 
-	if (PElength <= 20.0f && attackFlag)
+	if (attackFlag)
 	{
-		phase = Enemy::Phase::move;
+		if (PElength <= 20.0f)
+		{
+			phase = Enemy::Phase::move;
+		}
+		else
+		{
+			phase = Enemy::Phase::stay;
+		}
+
+		if (onGround)
+		{
+			if (PElength <= 15.0f)
+			{
+				phase = Enemy::Phase::attack;
+			}
+		}
 	}
 	else
 	{
 		phase = Enemy::Phase::stay;
 	}
 
-	if (onGround && attackFlag)
-	{
-		if (PElength <= 15.0f)
-		{
-			phase = Enemy::Phase::attack;
-		}
-	}
 
 	switch (phase)
 	{
@@ -219,7 +229,6 @@ bool Enemy::EnemyCollision(const std::unique_ptr<Object3d>& object)
 	{
 		eAlive = false;
 		eAliveCount = 0;
-		attackFlag = false;
 		catchFlag = false;
 		bullets.erase(bullets.begin(), bullets.end());
 		return true;
@@ -230,7 +239,7 @@ bool Enemy::BulletCollision()
 {
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
-		if (GetLength(ePos, bullet->GetPos()) >= 20.0f)
+		if (GetLength(ePos, bullet->GetPos()) >= 30.0f)
 		{
 			bullets.remove(bullet);
 			return false;

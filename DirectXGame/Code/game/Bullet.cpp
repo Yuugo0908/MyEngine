@@ -1,30 +1,26 @@
 #include "Bullet.h"
 
-bool Bullet::Initialize(Model* bulletModel)
+bool Bullet::Initialize(Model* bulletModel, const XMFLOAT3& pPos, const XMFLOAT3& ePos)
 {
-	bPos = { 0.0f, 100.0f, 0.0f };
+	this->pPos = pPos;
+	this->ePos = ePos;
+	bPos = ePos;
 	bScale = { 0.5, 0.5, 0.5 };
 	bOldPos = bPos;
+
+	Search();
 
 	bulletObj = Object3d::Create();
 	bulletObj->SetModel(bulletModel);
 	bulletObj->SetPosition(bPos);
 	bulletObj->SetScale(bScale);
-	bulletObj->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+	bulletObj->SetColor({ 0.0f, 0.0f, 1.0f, 1.0f });
 	return true;
 }
 
-void Bullet::Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos)
+void Bullet::Update()
 {
-	this->pPos = pPos;
-	this->ePos = ePos;
-
 	bOldPos = bPos;
-
-	if (!searchFlag)
-	{
-		Search();
-	}
 
 	bPos.x += bSpeed.x / 3;
 	bPos.y += bSpeed.y / 3;
@@ -36,8 +32,6 @@ void Bullet::Update(const XMFLOAT3& pPos, const XMFLOAT3& ePos)
 
 void Bullet::Search()
 {
-	ePosOld = ePos;
-
 	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
 	XMVECTOR bulletPos = { ePos.x, ePos.y, ePos.z, 1 };
 
