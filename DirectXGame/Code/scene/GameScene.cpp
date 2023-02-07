@@ -66,13 +66,15 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	result = Image2d::Create(2, { 0.0f,0.0f });
 	result->SetSize({ 1280.0f,720.0f });
 
-	if (!Image2d::LoadTexture(3, L"Resources/HPText.png")) {
+	if (!Image2d::LoadTexture(3, L"Resources/HPText.png"))
+	{
 		assert(0);
 	}
 	HPText = Image2d::Create(3, { 0.0f,0.0f });
 	HPText->SetSize({ 1280.0f,720.0f });
 
-	if (!Image2d::LoadTexture(4, L"Resources/HPBar.png")) {
+	if (!Image2d::LoadTexture(4, L"Resources/HPBar.png"))
+	{
 		assert(0);
 	}
 	PlayerHPBar = Image2d::Create(4, { 0.0f,45.0f });
@@ -80,20 +82,23 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	EnemyHPBar = Image2d::Create(4, { 0.0f,160.0f });
 	EnemyHPBar->SetSize({ 360.0f,60.0f });
 
-	if (!Image2d::LoadTexture(5, L"Resources/PlayerHPGauge.png")) {
+	if (!Image2d::LoadTexture(5, L"Resources/PlayerHPGauge.png"))
+	{
 		assert(0);
 	}
 	PlayerHPGauge = Image2d::Create(5, { 0.0f,45.0f });
 	PlayerHPGauge->SetSize({ 30.0f,60.0f });
 
 
-	if (!Image2d::LoadTexture(6, L"Resources/EnemyHPGauge.png")) {
+	if (!Image2d::LoadTexture(6, L"Resources/EnemyHPGauge.png"))
+	{
 		assert(0);
 	}
 	EnemyHPGauge = Image2d::Create(6, { 0.0f,160.0f });
 	EnemyHPGauge->SetSize({ 30.0f,60.0f });
 
-	if (!Image2d::LoadTexture(7, L"Resources/GameOver.png")) {
+	if (!Image2d::LoadTexture(7, L"Resources/GameOver.png"))
+	{
 		assert(0);
 	}
 	GameOver = Image2d::Create(7, { 0.0f,0.0f });
@@ -443,7 +448,6 @@ void GameScene::Draw() {
 			enemy->Draw();
 		}
 		rope->Draw();
-		//MapDraw(0);
 
 		for (auto& object : jsonObject)
 		{
@@ -680,17 +684,21 @@ bool GameScene::RayCollision()
 			float bScale = GetLength(boxPos, boxMax);
 			bCenter = bCenter - layStart;
 			float bA1 = layVec.x * layVec.x + layVec.y * layVec.y + layVec.z * layVec.z;
+
 			if (bA1 == 0.0f)// レイの長さが0
 			{
 				check = 0;
 				continue;
 			}
+
 			float bB1 = layVec.x * bCenter.x + layVec.y * bCenter.y + layVec.z * bCenter.z;
 			float bC1 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bScale * bScale;
 			float s1 = bB1 * bB1 - bA1 * bC1;
+
 			s1 = sqrtf(s1);
 			float a1 = (bB1 - s1) / bA1;
 			float a2 = (bB1 + s1) / bA1;
+
 			if (a1 < 0.0f || a2 < 0.0f)
 			{
 				check = 0;
@@ -751,10 +759,10 @@ bool GameScene::RayCollision()
 				XMFLOAT3 colPosMax = layStart + (layVec * t_max);
 				XMFLOAT3 colPosMin = layStart + (layVec * t_min);
 
-				if (GetLength(ePos, pPos) >= GetLength(ePos, colPosMax) || GetLength(ePos, pPos) >= GetLength(ePos, colPosMin))
-				{
+				//if (GetLength(ePos, pPos) >= GetLength(ePos, colPosMax) || GetLength(ePos, pPos) >= GetLength(ePos, colPosMin))
+				//{
 					return true;
-				}
+				//}
 			}
 		}
 	}

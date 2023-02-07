@@ -31,7 +31,7 @@ bool Enemy::Initialize(Player* player)
 	phase = Enemy::Phase::stay;
 	pPos = player->GetObj()->GetPosition();
 	ePos = { randPos.x, 15.0f, randPos.z };
-	//ePos = { 0.0f, 15.0f, 20.0f };
+	//ePos = { 0.0f, 15.0f, 10.0f };
 	eScale = { 1.0f, 1.0f, 1.0f };
 
 	enemyObj->SetPosition(ePos);

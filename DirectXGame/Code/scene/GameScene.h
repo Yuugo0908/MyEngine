@@ -129,7 +129,7 @@ private: // メンバ変数
 	float playerHp = 360;
 
 	// エネミー
-	static const int enemyCount = 2;
+	static const int enemyCount = 5;
 	float enemyHp = 360;
 	bool eAlive = false;
 	XMFLOAT3 ePos = {};

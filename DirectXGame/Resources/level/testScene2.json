@@ -92,8 +92,8 @@
             "name": "立方体.001",
             "transform": {
                 "translation": [
-                    20.0,
-                    5.0,
+                    0.0,
+                    4.0,
                     -0.0
                 ],
                 "rotation": [
@@ -102,53 +102,9 @@
                     0.0
                 ],
                 "scaling": [
-                    1.0,
                     5.0,
-                    10.0
-                ]
-            },
-            "file_name": "cube"
-        },
-        {
-            "type": "MESH",
-            "name": "立方体.002",
-            "transform": {
-                "translation": [
-                    -20.0,
-                    5.0,
-                    -0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    1.0,
-                    5.0,
-                    10.0
-                ]
-            },
-            "file_name": "cube"
-        },
-        {
-            "type": "MESH",
-            "name": "立方体.003",
-            "transform": {
-                "translation": [
-                    0.0,
-                    5.0,
-                    -0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    10.0,
-                    5.0,
-                    1.0
+                    4.0,
+                    3.0
                 ]
             },
             "file_name": "cube"
