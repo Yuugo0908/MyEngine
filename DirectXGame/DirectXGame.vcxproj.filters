@@ -79,6 +79,12 @@
     <Filter Include="ヘッダーファイル\json">
       <UniqueIdentifier>{cbabccf8-ca0a-4ac2-9f8d-01996c29363f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソースファイル\scene">
+      <UniqueIdentifier>{8c08e103-d7b5-424e-9fe7-52b4401cccab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダーファイル\scene">
+      <UniqueIdentifier>{3733f71d-46d5-442b-8f09-d84ced7c9531}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="imgui\imgui.cpp">
@@ -127,9 +133,6 @@
       <Filter>ソースファイル\game</Filter>
     </ClCompile>
     <ClCompile Include="Code\game\Enemy.cpp">
-      <Filter>ソースファイル\game</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\game\GameScene.cpp">
       <Filter>ソースファイル\game</Filter>
     </ClCompile>
     <ClCompile Include="Code\game\Light.cpp">
@@ -183,12 +186,6 @@
     <ClCompile Include="Code\win\WinApp.cpp">
       <Filter>ソースファイル\win</Filter>
     </ClCompile>
-    <ClCompile Include="TitleScene.cpp">
-      <Filter>ソースファイル\game</Filter>
-    </ClCompile>
-    <ClCompile Include="EndScene.cpp">
-      <Filter>ソースファイル\game</Filter>
-    </ClCompile>
     <ClCompile Include="Code\game\Rope.cpp">
       <Filter>ソースファイル\game</Filter>
     </ClCompile>
@@ -200,6 +197,15 @@
     </ClCompile>
     <ClCompile Include="Code\json\LevelLoader.cpp">
       <Filter>ソースファイル\json</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\scene\TitleScene.cpp">
+      <Filter>ソースファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\scene\EndScene.cpp">
+      <Filter>ソースファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\scene\GameScene.cpp">
+      <Filter>ソースファイル\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -275,9 +281,6 @@
     <ClInclude Include="Code\fbx\FbxObject3d.h">
       <Filter>ヘッダーファイル\game</Filter>
     </ClInclude>
-    <ClInclude Include="Code\game\GameScene.h">
-      <Filter>ヘッダーファイル\game</Filter>
-    </ClInclude>
     <ClInclude Include="Code\game\Light.h">
       <Filter>ヘッダーファイル\game</Filter>
     </ClInclude>
@@ -308,12 +311,6 @@
     <ClInclude Include="Code\win\WinApp.h">
       <Filter>ヘッダーファイル\win</Filter>
     </ClInclude>
-    <ClInclude Include="TitleScene.h">
-      <Filter>ヘッダーファイル\game</Filter>
-    </ClInclude>
-    <ClInclude Include="EndScene.h">
-      <Filter>ヘッダーファイル\game</Filter>
-    </ClInclude>
     <ClInclude Include="Code\game\Rope.h">
       <Filter>ヘッダーファイル\game</Filter>
     </ClInclude>
@@ -325,6 +322,15 @@
     </ClInclude>
     <ClInclude Include="Code\json\LevelLoader.h">
       <Filter>ヘッダーファイル\json</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\scene\EndScene.h">
+      <Filter>ヘッダーファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\scene\TitleScene.h">
+      <Filter>ヘッダーファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\scene\GameScene.h">
+      <Filter>ヘッダーファイル\scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

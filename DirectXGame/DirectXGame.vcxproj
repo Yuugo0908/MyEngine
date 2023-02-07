@@ -104,7 +104,6 @@
     <ClCompile Include="Code\game\Collision.cpp" />
     <ClCompile Include="Code\game\Easing.cpp" />
     <ClCompile Include="Code\game\Enemy.cpp" />
-    <ClCompile Include="Code\game\GameScene.cpp" />
     <ClCompile Include="Code\game\Item.cpp" />
     <ClCompile Include="Code\game\Light.cpp" />
     <ClCompile Include="Code\game\Player.cpp" />
@@ -117,10 +116,12 @@
     <ClCompile Include="Code\postEffect\MultiRT.cpp" />
     <ClCompile Include="Code\postEffect\MultiTex.cpp" />
     <ClCompile Include="Code\postEffect\PostEffect.cpp" />
+    <ClCompile Include="Code\scene\EndScene.cpp" />
+    <ClCompile Include="Code\scene\GameScene.cpp" />
+    <ClCompile Include="Code\scene\TitleScene.cpp" />
     <ClCompile Include="Code\win\DirectXCommon.cpp" />
     <ClCompile Include="Code\win\main.cpp" />
     <ClCompile Include="Code\win\WinApp.cpp" />
-    <ClCompile Include="EndScene.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -128,7 +129,6 @@
     <ClCompile Include="imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
-    <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\2d\DebugText.h" />
@@ -146,7 +146,6 @@
     <ClInclude Include="Code\game\Collision.h" />
     <ClInclude Include="Code\game\Easing.h" />
     <ClInclude Include="Code\game\Enemy.h" />
-    <ClInclude Include="Code\game\GameScene.h" />
     <ClInclude Include="Code\game\Item.h" />
     <ClInclude Include="Code\game\Light.h" />
     <ClInclude Include="Code\game\Player.h" />
@@ -159,10 +158,12 @@
     <ClInclude Include="Code\postEffect\MultiRT.h" />
     <ClInclude Include="Code\postEffect\MultiTex.h" />
     <ClInclude Include="Code\postEffect\PostEffect.h" />
+    <ClInclude Include="Code\scene\EndScene.h" />
+    <ClInclude Include="Code\scene\GameScene.h" />
+    <ClInclude Include="Code\scene\TitleScene.h" />
     <ClInclude Include="Code\win\DirectXCommon.h" />
     <ClInclude Include="Code\win\SafeDelete.h" />
     <ClInclude Include="Code\win\WinApp.h" />
-    <ClInclude Include="EndScene.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx12.h" />
@@ -171,7 +172,6 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
-    <ClInclude Include="TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli" />
