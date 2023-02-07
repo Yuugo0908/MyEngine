@@ -49,6 +49,11 @@ public: // 静的メンバ関数
 		return matViewProjection;
 	}
 
+	// ビルボード行列の取得
+	const XMMATRIX& GetMatBillboard() {
+		return matBillboard;
+	}
+
 	// ベクトルによる移動
 	void CameraMoveVector(XMFLOAT3 move);
 	void CameraMoveEyeVector(XMFLOAT3 move);
@@ -75,6 +80,10 @@ private: // メンバ変数
 	Mouse* mouse;
 	// ビュー行列
 	XMMATRIX matView = DirectX::XMMatrixIdentity();
+	// ビルボード行列
+	XMMATRIX matBillboard = DirectX::XMMatrixIdentity();
+	// Y軸回りビルボード行列
+	XMMATRIX matBillboardY = DirectX::XMMatrixIdentity();
 	// 射影行列
 	XMMATRIX matProjection = DirectX::XMMatrixIdentity();
 	// ビュー射影行列

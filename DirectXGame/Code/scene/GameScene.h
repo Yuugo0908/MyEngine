@@ -23,6 +23,7 @@
 #include "Light.h"
 #include "Easing.h"
 #include "LevelLoader.h"
+#include "Particle.h"
 
 #include <SafeDelete.h>
 #include <stdlib.h>
@@ -60,6 +61,8 @@ public: // メンバ関数
 	void CollisionUpdate();
 	// 遮蔽物があるかの判別
 	bool RayCollision();
+
+	void GameScene::CreateParticles(XMFLOAT3 pos);
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
@@ -118,6 +121,9 @@ private: // メンバ変数
 	Image2d* backGround = nullptr;
 	float alpha = 0.0f;
 	Image2d* explanation = nullptr;
+
+
+	Particle* particle = nullptr;
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標

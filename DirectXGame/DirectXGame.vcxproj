@@ -59,7 +59,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(ProjectDir)Code\2d;$(ProjectDir)Code\3d;$(ProjectDir)Code\win;$(ProjectDir)Code\audio;$(ProjectDir)Code\operator;$(ProjectDir)Code\postEffect;$(ProjectDir)Code\game;$(ProjectDir)Code\input;$(ProjectDir)Code\fbx;$(ProjectDir)Code\json</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(ProjectDir)Code\2d;$(ProjectDir)Code\3d;$(ProjectDir)Code\win;$(ProjectDir)Code\audio;$(ProjectDir)Code\operator;$(ProjectDir)Code\postEffect;$(ProjectDir)Code\game;$(ProjectDir)Code\input;$(ProjectDir)Code\fbx;$(ProjectDir)Code\json;$(ProjectDir)Code\scene</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -95,6 +95,7 @@
     <ClCompile Include="Code\3d\Mesh.cpp" />
     <ClCompile Include="Code\3d\Model.cpp" />
     <ClCompile Include="Code\3d\Object3d.cpp" />
+    <ClCompile Include="Code\3d\Particle.cpp" />
     <ClCompile Include="Code\audio\Audio.cpp" />
     <ClCompile Include="Code\fbx\FbxLoader.cpp" />
     <ClCompile Include="Code\fbx\FbxModel.cpp" />
@@ -137,6 +138,7 @@
     <ClInclude Include="Code\3d\Mesh.h" />
     <ClInclude Include="Code\3d\Model.h" />
     <ClInclude Include="Code\3d\Object3d.h" />
+    <ClInclude Include="Code\3d\Particle.h" />
     <ClInclude Include="Code\audio\Audio.h" />
     <ClInclude Include="Code\fbx\FbxLoader.h" />
     <ClInclude Include="Code\fbx\FbxModel.h" />

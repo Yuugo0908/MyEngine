@@ -207,6 +207,9 @@
     <ClCompile Include="Code\scene\GameScene.cpp">
       <Filter>ソースファイル\scene</Filter>
     </ClCompile>
+    <ClCompile Include="Code\3d\Particle.cpp">
+      <Filter>ソースファイル\3d</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h">
@@ -331,6 +334,9 @@
     </ClInclude>
     <ClInclude Include="Code\scene\GameScene.h">
       <Filter>ヘッダーファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\3d\Particle.h">
+      <Filter>ヘッダーファイル\3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

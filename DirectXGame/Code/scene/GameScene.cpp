@@ -120,6 +120,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	explanation->SetSize({ 1280.0f,720.0f });
 	explanation->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.0f });
 
+
+	// パーティクルマネージャ生成
+	particle = Particle::Create(dxCommon->GetDevice(), camera);
+
 	// レベルデータの読み込み
 	levelData = LevelLoader::LoadFile("gameScene");
 
@@ -209,16 +213,6 @@ void GameScene::Update() {
 	{
 		if (!fadeIn && keyboard->TriggerKey(DIK_SPACE))
 		{
-			//マップチップ用のCSV読み込み
-			//(map, "Resource/scv/なんたら.csv")で追加可能
-			//if (!mapLoadFlag)
-			//{
-			//	//Mapchip::CsvToVector(map, "Resources/csv/tutorial.csv");
-			//	Mapchip::CsvToVector(map, "Resources/csv/stage1.csv");
-			//	MapCreate(0);
-			//	mapLoadFlag = true;
-			//}
-
 			if (!expFlag)
 			{
 				expFlag = true;
@@ -264,6 +258,7 @@ void GameScene::Update() {
 		CollisionUpdate();
 		LightUpdate();
 		CameraUpdate();
+		particle->Update();
 
 		// フェードアウトが終わるまではここでリターン
 		if (fadeOut)
@@ -453,6 +448,9 @@ void GameScene::Draw() {
 		{
 			object->Draw();
 		}
+
+		// パーティクルの描画
+		particle->Draw(dxCommon->GetCommandList());
 	}
 
 	// 3Dオブジェクト描画後処理
@@ -519,6 +517,30 @@ void GameScene::SetImgui()
 	ImGui::Text("check : %d", check);
 
 	ImGui::End();
+}
+
+void GameScene::CreateParticles(XMFLOAT3 setPos)
+{
+	for (int i = 0; i < 20; i++) {
+		// X,Y,Z全て[-5.0f,+5.0f]でランダムに分布
+		XMFLOAT3 pos{};
+		pos.x = setPos.x;
+		pos.y = setPos.y;
+		pos.z = setPos.z;
+
+		const float rnd_vel = 0.1f;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+
+		XMFLOAT3 acc{};
+		const float rnd_acc = 0.001f;
+		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
+
+		// 追加
+		particle->Add(60, pos, vel, acc, 5.0f, 0.0f);
+	}
 }
 
 void GameScene::LightUpdate()
@@ -621,8 +643,11 @@ void GameScene::CollisionUpdate()
 			moveFlag = true;
 			rope->SetmoveFlag(moveFlag);
 
+
 			if (rFlag)
 			{
+				// パーティクル生成
+				CreateParticles(enemy->GetObj()->GetPosition());
 				rope->SetrFlag(false);
 				attackFlag = false;
 				avoidTime = 0.0f;

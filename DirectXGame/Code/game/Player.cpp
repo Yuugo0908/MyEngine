@@ -90,7 +90,7 @@ void Player::Attack(XMFLOAT3 targetPos, bool& flag, float& avoidTime)
 
 	if (avoidTime < 1.0f)
 	{
-		avoidTime += 0.08f;
+		avoidTime += 0.1f;
 	}
 
 	pPos = Easing::GetInstance()->easeIn(pPos, targetPos, avoidTime);
