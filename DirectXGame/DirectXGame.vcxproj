@@ -76,7 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(ProjectDir)Code\2d;$(ProjectDir)Code\3d;$(ProjectDir)Code\win;$(ProjectDir)Code\audio;$(ProjectDir)Code\operator;$(ProjectDir)Code\postEffect;$(ProjectDir)Code\game;$(ProjectDir)Code\input;$(ProjectDir)Code\fbx;$(ProjectDir)Code\json</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(ProjectDir)Code\2d;$(ProjectDir)Code\3d;$(ProjectDir)Code\win;$(ProjectDir)Code\audio;$(ProjectDir)Code\operator;$(ProjectDir)Code\postEffect;$(ProjectDir)Code\game;$(ProjectDir)Code\input;$(ProjectDir)Code\fbx;$(ProjectDir)Code\json;$(ProjectDir)Code\scene</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
