@@ -13,7 +13,6 @@ GameScene::~GameScene() {
 int GameScene::height = 0;
 int GameScene::width = 0;
 
-
 void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mouse* mouse, Audio* audio) {
 	// nullptrチェック
 	assert(dxCommon);
@@ -51,72 +50,62 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	DebugText::GetInstance()->Initialize(debugTextTexNumber);
 
 	// タイトル画像読み込み
-	if (!Image2d::LoadTexture(1, L"Resources/title.png"))
+	if (!Image2d::LoadTexture(titleNum, L"Resources/title.png"))
 	{
 		assert(0);
 	}
-	title = Image2d::Create(1, { 0.0f,0.0f });
+	title = Image2d::Create(titleNum, { 0.0f,0.0f });
 	title->SetSize({ 1280.0f,720.0f });
 
 	// リザルト画像読み込み
-	if (!Image2d::LoadTexture(2, L"Resources/result.png"))
+	if (!Image2d::LoadTexture(resultNum, L"Resources/result.png"))
 	{
 		assert(0);
 	}
-	result = Image2d::Create(2, { 0.0f,0.0f });
+	result = Image2d::Create(resultNum, { 0.0f,0.0f });
 	result->SetSize({ 1280.0f,720.0f });
 
-	if (!Image2d::LoadTexture(3, L"Resources/HPText.png"))
+	if (!Image2d::LoadTexture(HPTextNum, L"Resources/HPText.png"))
 	{
 		assert(0);
 	}
-	HPText = Image2d::Create(3, { 0.0f,0.0f });
+	HPText = Image2d::Create(HPTextNum, { 0.0f,0.0f });
 	HPText->SetSize({ 1280.0f,720.0f });
 
-	if (!Image2d::LoadTexture(4, L"Resources/HPBar.png"))
+	if (!Image2d::LoadTexture(HPBarNum, L"Resources/HPBar.png"))
 	{
 		assert(0);
 	}
-	PlayerHPBar = Image2d::Create(4, { 0.0f,45.0f });
+	PlayerHPBar = Image2d::Create(HPBarNum, { 0.0f,45.0f });
 	PlayerHPBar->SetSize({ 360.0f,60.0f });
-	EnemyHPBar = Image2d::Create(4, { 0.0f,160.0f });
-	EnemyHPBar->SetSize({ 360.0f,60.0f });
 
-	if (!Image2d::LoadTexture(5, L"Resources/PlayerHPGauge.png"))
+	if (!Image2d::LoadTexture(HPGaugeNum, L"Resources/PlayerHPGauge.png"))
 	{
 		assert(0);
 	}
-	PlayerHPGauge = Image2d::Create(5, { 0.0f,45.0f });
+	PlayerHPGauge = Image2d::Create(HPGaugeNum, { 0.0f,45.0f });
 	PlayerHPGauge->SetSize({ 30.0f,60.0f });
 
-
-	if (!Image2d::LoadTexture(6, L"Resources/EnemyHPGauge.png"))
+	if (!Image2d::LoadTexture(GameOverNum, L"Resources/GameOver.png"))
 	{
 		assert(0);
 	}
-	EnemyHPGauge = Image2d::Create(6, { 0.0f,160.0f });
-	EnemyHPGauge->SetSize({ 30.0f,60.0f });
-
-	if (!Image2d::LoadTexture(7, L"Resources/GameOver.png"))
-	{
-		assert(0);
-	}
-	GameOver = Image2d::Create(7, { 0.0f,0.0f });
+	GameOver = Image2d::Create(GameOverNum, { 0.0f,0.0f });
 	GameOver->SetSize({ 1280.0f,720.0f });
 
-	if (!Image2d::LoadTexture(8, L"Resources/black_backGround.png"))
+	if (!Image2d::LoadTexture(backNum, L"Resources/black_backGround.png"))
 	{
 		assert(0);
 	}
-	backGround = Image2d::Create(8, { 0.0f,0.0f });
+	backGround = Image2d::Create(backNum, { 0.0f,0.0f });
 	backGround->SetSize({ 1280.0f,720.0f });
 	backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.0f });
 
-	if (!Image2d::LoadTexture(9, L"Resources/Operation_Explanation.png"))
+	if (!Image2d::LoadTexture(expNum, L"Resources/Operation_Explanation.png"))
 	{
 		assert(0);
 	}
-	explanation = Image2d::Create(9, { 0.0f,0.0f });
+	explanation = Image2d::Create(expNum, { 0.0f,0.0f });
 	explanation->SetSize({ 1280.0f,720.0f });
 	explanation->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.0f });
 
@@ -472,13 +461,9 @@ void GameScene::Draw() {
 	{
 		HPText->Draw();
 		PlayerHPBar->Draw();
-		EnemyHPBar->Draw();
 
 		PlayerHPGauge->SetSize({ playerHp,60 });
 		PlayerHPGauge->Draw();
-
-		EnemyHPGauge->SetSize({ enemyHp,60 });
-		EnemyHPGauge->Draw();
 	}
 
 	if (nowScene == clear_)

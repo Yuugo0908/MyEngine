@@ -100,6 +100,11 @@ private: // メンバ変数
 		sphere_, box_, stage_, wall_
 	};
 
+	enum Image2dNum
+	{
+		titleNum = 1, resultNum, GameOverNum, HPTextNum, HPBarNum, HPGaugeNum, backNum, expNum
+	};
+
 	// jsonオブジェクト
 	std::vector<std::unique_ptr<Object3d>> jsonObject{};
 	int objectType = 0;
@@ -116,8 +121,6 @@ private: // メンバ変数
 	Image2d* HPText = nullptr;
 	Image2d* PlayerHPBar = nullptr;
 	Image2d* PlayerHPGauge = nullptr;
-	Image2d* EnemyHPBar = nullptr;
-	Image2d* EnemyHPGauge = nullptr;
 	Image2d* backGround = nullptr;
 	float alpha = 0.0f;
 	Image2d* explanation = nullptr;

@@ -7,33 +7,6 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-//static const DirectX::XMFLOAT3 operator+(const DirectX::XMFLOAT3& lhs, const DirectX::XMFLOAT3& rhs)
-//{
-//	XMFLOAT3 result;
-//	result.x = lhs.x + rhs.x;
-//	result.y = lhs.y + rhs.y;
-//	result.z = lhs.z + rhs.z;
-//	return result;
-//}
-//
-//static const DirectX::XMFLOAT3 operator-(const DirectX::XMFLOAT3& lhs, const DirectX::XMFLOAT3& rhs)
-//{
-//	XMFLOAT3 result;
-//	result.x = lhs.x - rhs.x;
-//	result.y = lhs.y - rhs.y;
-//	result.z = lhs.z - rhs.z;
-//	return result;
-//}
-//
-//const DirectX::XMFLOAT3 operator/(const DirectX::XMFLOAT3& lhs, const float rhs)
-//{
-//	XMFLOAT3 result;
-//	result.x = lhs.x / rhs;
-//	result.y = lhs.y / rhs;
-//	result.z = lhs.z / rhs;
-//	return result;
-//}
-
 Particle * Particle::Create(ID3D12Device* device, Camera* camera)
 {
 	// 3Dオブジェクトのインスタンスを生成
@@ -359,7 +332,7 @@ void Particle::InitializeGraphicsPipeline()
 	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
 
 	// ルートパラメータ
-	CD3DX12_ROOT_PARAMETER rootparams[2];
+	CD3DX12_ROOT_PARAMETER rootparams[2] = {};
 	rootparams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
 	rootparams[1].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
 
