@@ -1,6 +1,7 @@
 #pragma once
 #include "Object3d.h"
 #include "Keyboard.h"
+#include "Controller.h"
 #include "Collision.h"
 #include "Easing.h"
 #include "Operator.h"
@@ -10,7 +11,7 @@ class Player
 {
 public: // ƒƒ“ƒoŠÖ”
 
-	bool Initialize(Keyboard* keyboard, Mouse* mouse);
+	bool Initialize();
 
 	void Finalize() { delete playerModel; }
 
@@ -42,6 +43,7 @@ public: // ƒƒ“ƒoŠÖ”
 
 private: // ƒƒ“ƒo•Ï”
 
+	Controller* controller = nullptr;
 	Keyboard* keyboard = nullptr;
 	Mouse* mouse = nullptr;
 	Camera* camera = Camera::GetInstance();

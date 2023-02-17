@@ -1,84 +1,67 @@
 #pragma once
-#include <Windows.h>
-#include <wrl.h>
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
-#include "WinApp.h"
-#include "Operator.h"
+#pragma comment(lib,"XInput.lib")
+#include <windows.h>
+#include <Xinput.h>
 
 class Controller
 {
-protected: // エイリアス
-// Microsoft::WRL::を省略
-	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-public: // サブクラス
-	//ゲームパッド（ボタン）
-	enum ButtonKind
+public:
+	enum State
 	{
-		Button_A,
-		Button_B,
-		Button_X,
-		Button_Y,
-		Button_LB,
-		Button_RB,
-		Select,
-		Start,
-		Button_LS,
-		Button_RS,
-		Cross_Up,
-		Cross_Down,
-		Cross_Right,
-		Cross_Left,
-		ButtonMax
+		// デジタル
+		A = 1,	//	Aボタン
+		B,	//	Bボタン
+		X,	//	Xボタン
+		Y,	//	Yボタン
+		L_SHOULDER,  //	LB
+		R_SHOULDER,	//	RB
+		BACK,	//	Back
+		START,	//	Start
+		UP,		//	十字キーの上
+		DOWN,	//	十字キーの下
+		LEFT,	//	十字キーの左
+		RIGHT,	//	十字キーの右
+		LEFT_THUMB,		//	左スティック
+		RIGHT_THUMB,	//	右スティック
+		// アナログ
+		L_TRIGGER,	//	左トリガー
+		R_TRIGGER,	//	右トリガー
+		LEFT_U_STICK,	//	左スティックの上
+		LEFT_D_STICK,	//	左スティックの下
+		LEFT_L_STICK,	//	左スティックの左
+		LEFT_R_STICK,	//	左スティックの右
+		RIGHT_U_STICK,	//	右スティックの上
+		RIGHT_D_STICK,	//	右スティックの下
+		RIGHT_L_STICK,	//	右スティックの左
+		RIGHT_R_STICK,	//	右スティックの右
+	};
+	enum Mode
+	{
+		BUTTON,
+		STICK,
 	};
 
-	//マウス
-	enum MouseKind
+	enum Type
 	{
-		M_Left, M_Right, M_Middle
+		NONE,
+		PUSH,
+		TRIGGER,
 	};
 
-	//スティック
-	enum StickKind
-	{
-		S_Up, S_Down, S_Right, S_Left
-	};
-public: //メンバ関数
-	//初期化
-	void Initialize(WinApp* win_app);
-	//更新
-	void Update();
-	//ゲームパッドスティック
-	bool TiltLeftStick(int stick);
-	//ゲームパッドスティック（長押し不可）
-	bool TriggerLeftStick(int stick);
-	//ゲームパッドスティックを倒した比率
-	XMFLOAT2 LeftStickAngle();
-	//ゲームパッドボタン
-	bool PushButton(int Button);
-	//ゲームパッドボタン（長押し不可）
-	bool TriggerButton(int Button);
-	//ゲームパッド十字キー
-	bool PushCrossKey(int CrossKey);
-	//ゲームパッド十字キー（長押し不可）
-	bool TriggerCrossKey(int CrossKey);
-	// インスタンス
+public:
 	static Controller* GetInstance();
+	bool IsConnected();
+	bool GetPadState(State p_state, Type p_type);
 
-private: //メンバ変数
-	//DirectInputのインスタンス
-	ComPtr<IDirectInput8> dinput;
-	//ゲームコントローラー
-	ComPtr<IDirectInputDevice8> devController;
-	//ゲームパッドの判定
-	DIJOYSTATE gamePadState = {};
-	//前フレームのゲームパッドの判定
-	DIJOYSTATE oldGamePadState = {};
-	//ボタンデータ
-	bool is_push[32] = {};
-	//スティックの反応範囲
-	LONG responsive_range = 100;
-	//スティックの無反応範囲
-	LONG unresponsive_range = 20;
+private:
+	Mode mode;
+	bool GetButtonState(XINPUT_STATE state, State p_state, Type p_type);
+	bool GetStickState(XINPUT_STATE state, State p_state);
+	bool PushButton(State& p_state);
+	bool TriggerButton(XINPUT_STATE state, State& p_state);
+	void CheckMode(State p_state);
+
+	XINPUT_STATE state;
+	XINPUT_STATE statePre;
+	State stateNum;
 };
-

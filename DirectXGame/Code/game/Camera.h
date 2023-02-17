@@ -1,5 +1,6 @@
 #pragma once
 #include "Mouse.h"
+#include "Controller.h"
 #include "Operator.h"
 #include "DebugText.h"
 class Camera
@@ -20,7 +21,7 @@ public: // 静的メンバ関数
 
 	static Camera* GetInstance();
 	// 初期化
-	bool Initialize(const int window_width, const int window_height, Mouse* mouse);
+	bool Initialize(const int window_width, const int window_height);
 	// 視点座標の取得
 	const XMFLOAT3& GetEye() { return eye; }
 	// 視点座標の設定
@@ -77,7 +78,8 @@ public: // 静的メンバ関数
 
 private: // メンバ変数
 	// 入力クラスのポインタ
-	Mouse* mouse;
+	Mouse* mouse = Mouse::GetInstance();
+	Controller* controller = Controller::GetInstance();
 	// ビュー行列
 	XMMATRIX matView = DirectX::XMMatrixIdentity();
 	// ビルボード行列
@@ -125,5 +127,5 @@ private: // メンバ変数
 	float dy = 0.0f;
 	float angleX = 0;
 	float angleY = 0;
-	float speed = 0.75f;
+	float speed = 7.0f;
 };

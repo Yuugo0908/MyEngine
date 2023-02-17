@@ -10,19 +10,12 @@ GameScene::~GameScene() {
 
 }
 
-int GameScene::height = 0;
-int GameScene::width = 0;
-
-void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mouse* mouse, Audio* audio) {
+void GameScene::Initialize(DirectXCommon* dxCommon, Audio* audio) {
 	// nullptrチェック
 	assert(dxCommon);
-	assert(controller);
-	assert(mouse);
 	assert(audio);
 
 	this->dxCommon = dxCommon;
-	this->controller = controller;
-	this->mouse = mouse;
 	this->audio = audio;
 
 	easing = new Easing;
@@ -167,8 +160,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 
 	Enemy::StaticInit();
 
-	rope->Initialize(keyboard, mouse);
-	player->Initialize(keyboard, mouse);
+	rope->Initialize();
+	player->Initialize();
 	pPos = player->GetObj()->GetPosition();
 
 	for (int i = 0; i < enemyCount; i++)
@@ -184,7 +177,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Controller* controller, Mous
 	// ライトの生成
 	light = Light::Create();
 	// ライトの色を設定
-	//light->SetLightColor({ 0.8f, 0.0f, 0.6f });
+	//light->SetLightColor({ 0.8f, 0.6f, 0.6f });
 	// 3Dオブジェクトにライトをセット
 	Object3d::SetLight(light);
 	FbxObject3d::SetLight(light);
@@ -200,7 +193,7 @@ void GameScene::Update() {
 
 	if (nowScene == title_)
 	{
-		if (!fadeIn && keyboard->TriggerKey(DIK_SPACE))
+		if (!fadeIn && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(controller->A, controller->TRIGGER))
 		{
 			if (!expFlag)
 			{
@@ -287,8 +280,8 @@ void GameScene::Update() {
 					ePosSave = ePos;
 				}
 
-				if (PElength <= 15.0f)
-				{
+				//if (PElength <= 15.0f)
+				//{
 					if (RayCollision())
 					{
 						enemy->SetAttackFlag(false);
@@ -297,7 +290,7 @@ void GameScene::Update() {
 					{
 						enemy->SetAttackFlag(true);
 					}
-				}
+				//}
 
 				enemy->Update();
 			}
@@ -311,7 +304,6 @@ void GameScene::Update() {
 			}
 
 			player->GetObj()->SetPosition(pPos);
-			mouse->Update();
 		}
 
 		if (enemyHp <= 0)
@@ -359,7 +351,7 @@ void GameScene::Update() {
 			}
 		}
 
-		if (alpha <= 0.0f && keyboard->TriggerKey(DIK_SPACE))
+		if (alpha <= 0.0f && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(controller->A, controller->TRIGGER))
 		{
 			player->Reset();
 			for (std::unique_ptr<Enemy>& enemy : enemys)
@@ -550,12 +542,12 @@ void GameScene::CameraUpdate()
 		camera->CameraShake(shakeFlag);
 	}
 
-	cPos = camera->GetEye();
-	//DebugText::GetInstance()->Print(30, 30 * 15, 2, "%f", cPos.x);
-	cTarget = camera->GetTarget();
-	//DebugText::GetInstance()->Print(30, 30 * 16, 2, "%f", cPos.y);
-	//DebugText::GetInstance()->Print(30, 30 * 17, 2, "%f", cPos.z);
-	camera->Update();
+	if (moveFlag)
+	{
+		cPos = camera->GetEye();
+		cTarget = camera->GetTarget();
+		camera->Update();
+	}
 }
 
 void GameScene::jsonObjectUpdate()
@@ -681,6 +673,8 @@ bool GameScene::RayCollision()
 			XMFLOAT3 boxPos = object->GetPosition();
 			XMFLOAT3 boxScale = object->GetScale();
 
+			check = 1;
+
 			float t_min = -FLT_MAX;
 			float t_max = FLT_MAX;
 			float max[3] = { boxPos.x + boxScale.x, boxPos.y + boxScale.y, boxPos.z + boxScale.z };
@@ -694,21 +688,17 @@ bool GameScene::RayCollision()
 			float bScale = GetLength(boxPos, boxMax);
 			bCenter = bCenter - layStart;
 			float bA1 = layVec.x * layVec.x + layVec.y * layVec.y + layVec.z * layVec.z;
-
 			if (bA1 == 0.0f)// レイの長さが0
 			{
 				check = 0;
 				continue;
 			}
-
 			float bB1 = layVec.x * bCenter.x + layVec.y * bCenter.y + layVec.z * bCenter.z;
 			float bC1 = bCenter.x * bCenter.x + bCenter.y * bCenter.y + bCenter.z * bCenter.z - bScale * bScale;
 			float s1 = bB1 * bB1 - bA1 * bC1;
-
 			s1 = sqrtf(s1);
 			float a1 = (bB1 - s1) / bA1;
 			float a2 = (bB1 + s1) / bA1;
-
 			if (a1 < 0.0f || a2 < 0.0f)
 			{
 				check = 0;
@@ -723,10 +713,6 @@ bool GameScene::RayCollision()
 					{
 						check = 0; // 交差していない
 						break;
-					}
-					else
-					{
-						check = 1;
 					}
 				}
 				else
@@ -753,27 +739,21 @@ bool GameScene::RayCollision()
 						check = 0;
 						break;
 					}
-					else
-					{
-						check = 1;
-					}
 				}
 			}
+
 
 			if (check == 0)
 			{
 				continue;
 			}
-			else
-			{
-				XMFLOAT3 colPosMax = layStart + (layVec * t_max);
-				XMFLOAT3 colPosMin = layStart + (layVec * t_min);
 
-				//if (GetLength(ePos, pPos) >= GetLength(ePos, colPosMax) || GetLength(ePos, pPos) >= GetLength(ePos, colPosMin))
-				//{
-					return true;
-				//}
-			}
+			XMFLOAT3 colPosMin = layStart + (layVec * t_min);
+			XMFLOAT3 colPosMax = layStart + (layVec * t_max);
+
+			DebugText::GetInstance()->Print(30, 30 * 16, 2, "min : %f, %f, %f", colPosMin.x, colPosMin.y, colPosMin.z);
+			DebugText::GetInstance()->Print(30, 30 * 17, 2, "max : %f, %f, %f", colPosMax.x, colPosMax.y, colPosMax.z);
+			return true;
 		}
 	}
 	return false;

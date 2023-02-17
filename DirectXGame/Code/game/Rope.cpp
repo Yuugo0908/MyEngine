@@ -1,13 +1,11 @@
 #include "Rope.h"
 
-bool Rope::Initialize(Keyboard* keyboard, Mouse* mouse)
+bool Rope::Initialize()
 {
 	if (ropeModel == NULL)
 	{
-		assert(keyboard);
-		assert(mouse);
-		this->keyboard = keyboard;
-		this->mouse = mouse;
+		controller = Controller::GetInstance();
+		mouse = Mouse::GetInstance();
 
 		easing = new Easing;
 
@@ -48,7 +46,7 @@ void Rope::Update(XMFLOAT3& pPos)
 		pEaseFlag = false;
 		eEaseFlag = false;
 
-		if (!rThrowFlag && !rBackFlag && mouse->TriggerMouseLeft())
+		if (!rThrowFlag && !rBackFlag && (controller->GetPadState(controller->X, controller->PUSH) || mouse->TriggerMouseLeft()))
 		{
 			rPos = startPos;
 			moveFlag = false;

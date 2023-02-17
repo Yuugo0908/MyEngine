@@ -40,7 +40,7 @@ public: // メンバ関数
 	// デストラクタ
 	~GameScene();
 	// 初期化
-	void Initialize(DirectXCommon* dxCommon, Controller* controller, Mouse* mouse, Audio* audio);
+	void Initialize(DirectXCommon* dxCommon, Audio* audio);
 	// 解放
 	void Finalize();
 	// 毎フレーム処理
@@ -73,13 +73,14 @@ public: // メンバ関数
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
 	Keyboard* keyboard = Keyboard::GetInstance();
-	Controller* controller = nullptr;
-	Mouse* mouse = nullptr;
+	Controller* controller = Controller::GetInstance();
+	Mouse* mouse = Mouse::GetInstance();
 	Audio* audio = nullptr;
 	Camera* camera = Camera::GetInstance();
 	Collision* collision = nullptr;
 	Light* light = nullptr;
 	Easing* easing = nullptr;
+	Particle* particle = nullptr;
 
 	Rope* rope = nullptr;
 	Player* player = nullptr;
@@ -110,10 +111,6 @@ private: // メンバ変数
 	int objectType = 0;
 	bool layHit = false;
 
-	// マップ番号
-	static int height;
-	static int width;
-
 	// 画像
 	Image2d* title = nullptr;
 	Image2d* result = nullptr;
@@ -125,9 +122,6 @@ private: // メンバ変数
 	float alpha = 0.0f;
 	Image2d* explanation = nullptr;
 
-
-	Particle* particle = nullptr;
-
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
 	XMFLOAT3 pPosOld = {};
@@ -138,7 +132,7 @@ private: // メンバ変数
 	float playerHp = 360;
 
 	// エネミー
-	static const int enemyCount = 5;
+	static const int enemyCount = 1;
 	float enemyHp = 360;
 	bool eAlive = false;
 	XMFLOAT3 ePos = {};

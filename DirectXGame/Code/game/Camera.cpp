@@ -15,11 +15,8 @@ Camera* Camera::GetInstance()
 	return &instance;
 }
 
-bool Camera::Initialize(const int window_width, const int window_height, Mouse* mouse)
+bool Camera::Initialize(const int window_width, const int window_height)
 {
-	assert(mouse);
-
-	this->mouse = mouse;
 	// 画面サイズに対する相対的なスケールに調整
 	scaleX = 1.0f / (float)window_width;
 	scaleY = 1.0f / (float)window_height;
@@ -118,33 +115,45 @@ void Camera::CameraMoveEyeVector(const XMVECTOR& move)
 
 void Camera::Update()
 {
-
 	// マウスの入力を取得
 	mouseMove = mouse->GetMouseMove();
+	distance = max(distance, 10.0f);
+	distance = min(distance, 20.0f);
 
 	// マウスの左ボタンが押されていたらカメラを回転させない
-	if (moveCount <= 30)
-	{
-		moveCount++;
-	}
-	if (mouse->TriggerMouseLeft())
-	{
-		moveCount = 0;
-		angleY = 0.0f;
-	}
-
-	if (moveCount >= 30)
-	{
-		dy = mouseMove.MouseX * scaleY;
-		angleY = -dy * XM_PI * speed;
-		dirty = true;
-	}
+	dy = mouseMove.MouseX * scaleY;
+	angleY = -dy * XM_PI * 0.75f;
+	dirty = true;
 
 	// ホイール入力で距離を変更
 	if (mouseMove.MouseZ != 0) {
-		distance -= mouseMove.MouseZ / 120.0f;
-		distance = max(distance, 10.0f);
-		distance = min(distance, 20.0f);
+		distance += mouseMove.MouseZ / 120.0f;
+		dirty = true;
+	}
+
+	// 右スティック左右操作でカメラを回転
+	if (controller->GetPadState(controller->RIGHT_L_STICK, controller->NONE))
+	{
+		dy = speed * scaleY;
+		angleY = dy * XM_PI;
+		dirty = true;
+	}
+	else if(controller->GetPadState(controller->RIGHT_R_STICK, controller->NONE))
+	{
+		dy = -speed * scaleY;
+		angleY = dy * XM_PI;
+		dirty = true;
+	}
+
+	// LB + 右スティック上下操作で距離を変更
+	if (controller->GetPadState(controller->L_SHOULDER, controller->NONE) && controller->GetPadState(controller->RIGHT_U_STICK, controller->NONE))
+	{
+		distance -= 0.1f;
+		dirty = true;
+	}
+	else if (controller->GetPadState(controller->L_SHOULDER, controller->NONE) && controller->GetPadState(controller->RIGHT_D_STICK, controller->NONE))
+	{
+		distance += 0.1f;
 		dirty = true;
 	}
 

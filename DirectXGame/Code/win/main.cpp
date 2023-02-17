@@ -36,13 +36,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	keyboard = Keyboard::GetInstance();
 	keyboard->Initialize(win);
 	controller = Controller::GetInstance();
-	controller->Initialize(win);
 	mouse = Mouse::GetInstance();
 	mouse->Initialize(win);
 
 	// カメラ初期化
 	camera = Camera::GetInstance();
-	camera->Initialize(WinApp::window_width, WinApp::window_height, mouse);
+	camera->Initialize(WinApp::window_width, WinApp::window_height);
 
 	// FBXの初期化
 	FbxLoader::GetInstance()->Initialize(dxCommon->GetDevice());
@@ -78,7 +77,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	// ゲームシーンの初期化
 	gameScene = new GameScene();
-	gameScene->Initialize(dxCommon, controller, mouse, audio);
+	gameScene->Initialize(dxCommon, audio);
 
 	while (true)  // ゲームループ
 	{
@@ -93,7 +92,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{
 			// 入力関連の毎フレーム処理
 			keyboard->Update();
-			controller->Update();
+			controller->IsConnected();
 			mouse->Update();
 			// ゲームシーンの毎フレーム処理
 			gameScene->Update();

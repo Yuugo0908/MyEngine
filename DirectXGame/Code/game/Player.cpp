@@ -1,11 +1,10 @@
 #include "Player.h"
 
-bool Player::Initialize(Keyboard* keyboard, Mouse* mouse)
+bool Player::Initialize()
 {
-	assert(keyboard);
-	assert(mouse);
-	this->keyboard = keyboard;
-	this->mouse = mouse;
+	keyboard = Keyboard::GetInstance();
+	mouse = Mouse::GetInstance();
+	controller = Controller::GetInstance();
 
 	// モデルの生成
 	playerModel = playerModel->CreateFromObject("sphere");
@@ -44,6 +43,40 @@ void Player::Update(bool rFlag, bool moveFlag)
 		// 移動
 		rate = 1.0f;
 		// 移動量の倍数計算
+		if (controller->IsConnected())
+		{
+			if (controller->GetPadState(controller->LEFT_L_STICK, controller->NONE) || controller->GetPadState(controller->LEFT_R_STICK, controller->NONE))
+			{
+				if (controller->GetPadState(controller->LEFT_U_STICK, controller->NONE) || controller->GetPadState(controller->LEFT_D_STICK, controller->NONE))
+				{
+					rate = sqrtf(1.0f / 2.0f);
+				}
+			}
+
+			cameraTrack = cameraTrack * pAcc * rate;
+
+			if (controller->GetPadState(controller->LEFT_R_STICK, controller->NONE))
+			{
+				pPos.x += cameraTrack.z;
+				pPos.z -= cameraTrack.x;
+			}
+			else if (controller->GetPadState(controller->LEFT_L_STICK, controller->NONE))
+			{
+				pPos.x -= cameraTrack.z;
+				pPos.z += cameraTrack.x;
+			}
+			if (controller->GetPadState(controller->LEFT_U_STICK, controller->NONE))
+			{
+				pPos.x += cameraTrack.x;
+				pPos.z += cameraTrack.z;
+			}
+			else if (controller->GetPadState(controller->LEFT_D_STICK, controller->NONE))
+			{
+				pPos.x -= cameraTrack.x;
+				pPos.z -= cameraTrack.z;
+			}
+		}
+		
 		if (keyboard->PushKey(DIK_A) || keyboard->PushKey(DIK_D))
 		{
 			if (keyboard->PushKey(DIK_W) || keyboard->PushKey(DIK_S))
@@ -74,6 +107,7 @@ void Player::Update(bool rFlag, bool moveFlag)
 			pPos.x -= cameraTrack.x;
 			pPos.z -= cameraTrack.z;
 		}
+		
 	}
 
 	playerObj->Update();
@@ -104,7 +138,7 @@ void Player::Rush(bool rFlag)
 		pAcc -= pGra;
 	}
 	// 自機の突進
-	else if (!rFlag && mouse->TriggerMouseRight())
+	else if (!rFlag && (mouse->TriggerMouseRight() || controller->GetPadState(controller->R_TRIGGER, controller->NONE)))
 	{
 		avoidFlag = true;
 		// 加速力の更新
@@ -123,7 +157,7 @@ void Player::Rush(bool rFlag)
 
 void Player::Jump()
 {
-	if (!jumpFlag && keyboard->TriggerKey(DIK_SPACE))
+	if (!jumpFlag && (keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(controller->A, controller->TRIGGER)))
 	{
 		onGround = false;
 		jumpFlag = true;

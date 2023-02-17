@@ -18,6 +18,9 @@ protected: // エイリアス
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 public: // メンバ関数
+	// インスタンス
+	static DirectXCommon* GetInstance();
+
 	// 初期化
 	void Initialize(WinApp* win);
 	// 描画前処理

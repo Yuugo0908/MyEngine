@@ -1,6 +1,6 @@
 #pragma once
 #include "Object3d.h"
-#include "Keyboard.h"
+#include "Controller.h"
 #include "Easing.h"
 #include "Collision.h"
 #include "Operator.h"
@@ -9,7 +9,7 @@ class Rope
 {
 public: // メンバ関数
 
-	bool Initialize(Keyboard* keyboard, Mouse* mouse);
+	bool Initialize();
 
 	void Finalize()
 	{
@@ -44,6 +44,8 @@ public: // メンバ関数
 	// ロープがつながっているか
 	const bool& GetrFlag() { return rFlag; }
 	void SetrFlag(bool rFlag) { this->rFlag = rFlag; }
+	// ロープを飛ばしているか
+	void SetThrowFlag(bool throwFlag) { }
 
 
 	const XMFLOAT3& GetPos() { return rPos; }
@@ -54,7 +56,7 @@ public: // メンバ関数
 
 private: // メンバ変数
 
-	Keyboard* keyboard = nullptr;
+	Controller* controller = nullptr;
 	Mouse* mouse = nullptr;
 	Easing* easing = nullptr;
 
