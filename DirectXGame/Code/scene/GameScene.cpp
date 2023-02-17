@@ -173,6 +173,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Audio* audio) {
 
 	// カメラの設定
 	camera->SetTarget(pPos);
+	camera->Update();
 
 	// ライトの生成
 	light = Light::Create();

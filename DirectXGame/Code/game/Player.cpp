@@ -43,40 +43,13 @@ void Player::Update(bool rFlag, bool moveFlag)
 		// ˆÚ“®
 		rate = 1.0f;
 		// ˆÚ“®—Ê‚Ì”{”ŒvŽZ
-		if (controller->IsConnected())
+		if (controller->GetPadState(controller->LEFT_L_STICK, controller->NONE) || controller->GetPadState(controller->LEFT_R_STICK, controller->NONE))
 		{
-			if (controller->GetPadState(controller->LEFT_L_STICK, controller->NONE) || controller->GetPadState(controller->LEFT_R_STICK, controller->NONE))
+			if (controller->GetPadState(controller->LEFT_U_STICK, controller->NONE) || controller->GetPadState(controller->LEFT_D_STICK, controller->NONE))
 			{
-				if (controller->GetPadState(controller->LEFT_U_STICK, controller->NONE) || controller->GetPadState(controller->LEFT_D_STICK, controller->NONE))
-				{
-					rate = sqrtf(1.0f / 2.0f);
-				}
-			}
-
-			cameraTrack = cameraTrack * pAcc * rate;
-
-			if (controller->GetPadState(controller->LEFT_R_STICK, controller->NONE))
-			{
-				pPos.x += cameraTrack.z;
-				pPos.z -= cameraTrack.x;
-			}
-			else if (controller->GetPadState(controller->LEFT_L_STICK, controller->NONE))
-			{
-				pPos.x -= cameraTrack.z;
-				pPos.z += cameraTrack.x;
-			}
-			if (controller->GetPadState(controller->LEFT_U_STICK, controller->NONE))
-			{
-				pPos.x += cameraTrack.x;
-				pPos.z += cameraTrack.z;
-			}
-			else if (controller->GetPadState(controller->LEFT_D_STICK, controller->NONE))
-			{
-				pPos.x -= cameraTrack.x;
-				pPos.z -= cameraTrack.z;
+				rate = sqrtf(1.0f / 2.0f);
 			}
 		}
-		
 		if (keyboard->PushKey(DIK_A) || keyboard->PushKey(DIK_D))
 		{
 			if (keyboard->PushKey(DIK_W) || keyboard->PushKey(DIK_S))
@@ -84,30 +57,28 @@ void Player::Update(bool rFlag, bool moveFlag)
 				rate = sqrtf(1.0f / 2.0f);
 			}
 		}
-
 		cameraTrack = cameraTrack * pAcc * rate;
 
-		if (keyboard->PushKey(DIK_D))
+		if (controller->GetPadState(controller->LEFT_R_STICK, controller->NONE) || keyboard->PushKey(DIK_D))
 		{
 			pPos.x += cameraTrack.z;
 			pPos.z -= cameraTrack.x;
 		}
-		else if (keyboard->PushKey(DIK_A))
+		else if (controller->GetPadState(controller->LEFT_L_STICK, controller->NONE) || keyboard->PushKey(DIK_A))
 		{
 			pPos.x -= cameraTrack.z;
 			pPos.z += cameraTrack.x;
 		}
-		if (keyboard->PushKey(DIK_W))
+		if (controller->GetPadState(controller->LEFT_U_STICK, controller->NONE) || keyboard->PushKey(DIK_W))
 		{
 			pPos.x += cameraTrack.x;
 			pPos.z += cameraTrack.z;
 		}
-		else if (keyboard->PushKey(DIK_S))
+		else if (controller->GetPadState(controller->LEFT_D_STICK, controller->NONE) || keyboard->PushKey(DIK_S))
 		{
 			pPos.x -= cameraTrack.x;
 			pPos.z -= cameraTrack.z;
 		}
-		
 	}
 
 	playerObj->Update();

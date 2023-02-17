@@ -50,7 +50,7 @@ public:
 
 public:
 	static Controller* GetInstance();
-	bool IsConnected();
+	bool Update();
 	bool GetPadState(State p_state, Type p_type);
 
 private:

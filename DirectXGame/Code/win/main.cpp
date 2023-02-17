@@ -92,7 +92,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{
 			// 入力関連の毎フレーム処理
 			keyboard->Update();
-			controller->IsConnected();
+			controller->Update();
 			mouse->Update();
 			// ゲームシーンの毎フレーム処理
 			gameScene->Update();

@@ -7,7 +7,7 @@ Controller* Controller::GetInstance()
 	return &instance;
 }
 
-bool Controller::IsConnected()
+bool Controller::Update()
 {
 	DWORD dwResult;
 	for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
