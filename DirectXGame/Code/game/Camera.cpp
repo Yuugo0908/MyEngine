@@ -127,18 +127,18 @@ void Camera::Update()
 
 	// ホイール入力で距離を変更
 	if (mouseMove.MouseZ != 0) {
-		distance += mouseMove.MouseZ / 120.0f;
+		distance -= mouseMove.MouseZ / 120.0f;
 		dirty = true;
 	}
 
 	// 右スティック左右操作でカメラを回転
-	if (controller->GetPadState(controller->RIGHT_L_STICK, controller->NONE))
+	if (controller->GetPadState(Controller::State::RIGHT_L_STICK, Controller::Type::NONE))
 	{
 		dy = speed * scaleY;
 		angleY = dy * XM_PI;
 		dirty = true;
 	}
-	else if(controller->GetPadState(controller->RIGHT_R_STICK, controller->NONE))
+	else if(controller->GetPadState(Controller::State::RIGHT_R_STICK, Controller::Type::NONE))
 	{
 		dy = -speed * scaleY;
 		angleY = dy * XM_PI;
@@ -146,12 +146,12 @@ void Camera::Update()
 	}
 
 	// LB + 右スティック上下操作で距離を変更
-	if (controller->GetPadState(controller->L_SHOULDER, controller->NONE) && controller->GetPadState(controller->RIGHT_U_STICK, controller->NONE))
+	if (controller->GetPadState(Controller::State::RIGHT_U_STICK, Controller::Type::NONE))
 	{
 		distance -= 0.1f;
 		dirty = true;
 	}
-	else if (controller->GetPadState(controller->L_SHOULDER, controller->NONE) && controller->GetPadState(controller->RIGHT_D_STICK, controller->NONE))
+	else if (controller->GetPadState(Controller::State::RIGHT_D_STICK, Controller::Type::NONE))
 	{
 		distance += 0.1f;
 		dirty = true;
@@ -160,7 +160,6 @@ void Camera::Update()
 	if (dirty || viewDirty) {
 		// 追加回転分の回転行列を生成
 		XMMATRIX matRotNew = XMMatrixIdentity();
-		matRotNew *= XMMatrixRotationX(-angleX);
 		matRotNew *= XMMatrixRotationY(-angleY);
 		// 累積の回転行列を合成
 		matRot = matRotNew * matRot;
@@ -357,7 +356,6 @@ void Camera::Reset()
 	mouseMove = {0, 0, 0};
 
 	dirty = false;
-	angleX = 0;
 	angleY = 0;
 	speed = 0.75f;
 	dy = 0.0f;

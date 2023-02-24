@@ -92,16 +92,16 @@ void Particle::Update()
 	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
 	if (SUCCEEDED(result)) {
 		// パーティクルの情報を1つずつ反映
-		for (std::forward_list<ParticleData>::iterator it = particles.begin();
-			it != particles.end();
-			it++) {
+		for (std::forward_list<ParticleData>::iterator it = particles.begin(); it != particles.end(); it++)
+		{
 			// 座標
 			vertMap->pos = it->position;
 			// スケール
 			vertMap->scale = it->scale;
 			// 次の頂点へ
 			vertMap++;
-			if (++vertCount >= vertexCount) {
+			if (++vertCount >= vertexCount)
+			{
 				break;
 			}
 		}
@@ -111,9 +111,17 @@ void Particle::Update()
 	// 定数バッファへデータ転送
 	ConstBufferData* constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
-	constMap->mat = camera->GetMatViewProjection();
-	constMap->matBillboard = camera->GetMatBillboard();
-	constBuff->Unmap(0, nullptr);
+	if (SUCCEEDED(result))
+	{
+		constMap->mat = camera->GetMatViewProjection();
+		constMap->matBillboard = camera->GetMatBillboard();
+		// パーティクルの情報を1つずつ反映
+		for (std::forward_list<ParticleData>::iterator it = particles.begin(); it != particles.end(); it++)
+		{
+			constMap->color = it->color;
+		}
+		constBuff->Unmap(0, nullptr);
+	}
 }
 
 void Particle::Draw(ID3D12GraphicsCommandList * cmdList)
@@ -153,7 +161,7 @@ void Particle::Draw(ID3D12GraphicsCommandList * cmdList)
 	cmdList->DrawInstanced(drawNum, 1, 0, 0);
 }
 
-void Particle::Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale)
+void Particle::Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale, XMFLOAT4 start_color, XMFLOAT4 end_color)
 {
 	// リストに要素を追加
 	particles.emplace_front();
@@ -165,6 +173,8 @@ void Particle::Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 acce
 	p.s_scale = start_scale;
 	p.e_scale = end_scale;
 	p.num_frame = life;
+	p.s_color = start_color;
+	p.e_color = end_color;
 }
 
 void Particle::InitializeDescriptorHeap()

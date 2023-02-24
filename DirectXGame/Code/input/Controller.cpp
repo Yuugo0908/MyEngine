@@ -1,5 +1,15 @@
 #include "Controller.h"
 
+Controller::Controller()
+{
+
+}
+
+Controller::~Controller()
+{
+
+}
+
 Controller* Controller::GetInstance()
 {
 	static Controller instance;
@@ -10,72 +20,70 @@ Controller* Controller::GetInstance()
 bool Controller::Update()
 {
 	DWORD dwResult;
-	for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
+	statePre = state;
+	ZeroMemory(&state, sizeof(XINPUT_STATE));
+	// 情報取得
+	dwResult = XInputGetState(controllerNum, &state);
+
+	if (vCount <= 0)
 	{
-		statePre = state;
-		ZeroMemory(&state, sizeof(XINPUT_STATE));
-		// 情報取得
-		dwResult = XInputGetState(i, &state);
-		
-		if (dwResult == ERROR_SUCCESS)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
+		XInputSetState(controllerNum, &vibration);
 	}
+	else
+	{
+		vCount--;
+	}
+	
+	if (dwResult == ERROR_SUCCESS)
+	{
+		return true;
+	}
+	return false;
 }
 
 
-bool Controller::GetPadState(State p_state, Type p_type)
+bool Controller::GetPadState(Controller::State p_state, Type p_type)
 {
 	DWORD dwResult;	// 関数結果判定用
-	for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
-	{
-		// 情報取得
-		dwResult = XInputGetState(i, &state);
+	// 情報取得
+	dwResult = XInputGetState(controllerNum, &state);
 
-		if (dwResult == ERROR_SUCCESS)
+	if (dwResult == ERROR_SUCCESS)
+	{
+		CheckMode(p_state);
+		switch (mode)
 		{
-			CheckMode(p_state);
-			switch (mode)
+		case Controller::Mode::BUTTON:
+			if (GetButtonState(state, p_state, p_type))
 			{
-			case BUTTON:
-				if (GetButtonState(state, p_state, p_type))
-				{
-					return true;
-				}
-				break;
-			case STICK:
-				if (GetStickState(state, p_state))
-				{
-					return true;
-				}
-				break;
+				return true;
 			}
-		}
-		else
-		{
-			return false;
+			break;
+		case Controller::Mode::STICK:
+			if (GetStickState(state, p_state))
+			{
+				return true;
+			}
+			break;
 		}
 	}
+	return false;
 }
 
-bool Controller::GetButtonState(XINPUT_STATE state, State p_state, Type p_type)
+bool Controller::GetButtonState(XINPUT_STATE state, Controller::State p_state, Type p_type)
 {
 	switch (p_type)
 	{
-	case Controller::NONE:
-	case Controller::PUSH:
-		if (PushButton(p_state) && state.Gamepad.wButtons & p_state)
+	case Controller::Type::NONE:
+	case Controller::Type::PUSH:
+		if (PushButton(p_state) && state.Gamepad.wButtons & buttonNum)
 		{
 			return true;
 		}
 		break;
-	case Controller::TRIGGER:
-		if (TriggerButton(state, p_state) && state.Gamepad.wButtons & p_state)
+	case Controller::Type::TRIGGER:
+		if (TriggerButton(state, p_state) && state.Gamepad.wButtons & buttonNum)
 		{
 			return true;
 		}
@@ -87,7 +95,7 @@ bool Controller::GetButtonState(XINPUT_STATE state, State p_state, Type p_type)
 	return false;
 }
 
-bool Controller::GetStickState(XINPUT_STATE state, State p_state)
+bool Controller::GetStickState(XINPUT_STATE state, Controller::State p_state)
 {
 	// 範囲指定用
 	int TRIGGER_DEADZONE = 100;
@@ -95,61 +103,61 @@ bool Controller::GetStickState(XINPUT_STATE state, State p_state)
 	int R_STICK_THUMB_DEAD = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
 	switch (p_state)
 	{
-	case L_TRIGGER:
+	case Controller::State::L_TRIGGER:
 		if (statePre.Gamepad.bLeftTrigger < TRIGGER_DEADZONE && state.Gamepad.bLeftTrigger > TRIGGER_DEADZONE)
 		{
 			return true;
 		}
 		break;
-	case R_TRIGGER:
+	case Controller::State::R_TRIGGER:
 		if (statePre.Gamepad.bRightTrigger < TRIGGER_DEADZONE && state.Gamepad.bRightTrigger > TRIGGER_DEADZONE)
 		{
 			return true;
 		}
 		break;
-	case LEFT_U_STICK:
+	case Controller::State::LEFT_U_STICK:
 		if (state.Gamepad.sThumbLY > L_STICK_THUMB_DEAD)
 		{
 			return true;
 		}
 		break;
-	case LEFT_D_STICK:
+	case Controller::State::LEFT_D_STICK:
 		if (state.Gamepad.sThumbLY < -L_STICK_THUMB_DEAD)
 		{
 			return true;
 		}
 		break;
-	case LEFT_R_STICK:
+	case Controller::State::LEFT_R_STICK:
 		if (state.Gamepad.sThumbLX > L_STICK_THUMB_DEAD)
 		{
 			return true;
 		}
 		break;
-	case LEFT_L_STICK:
+	case Controller::State::LEFT_L_STICK:
 		if (state.Gamepad.sThumbLX < -L_STICK_THUMB_DEAD)
 		{
 			return true;
 		}
 		break;
-	case RIGHT_U_STICK:
+	case Controller::State::RIGHT_U_STICK:
 		if (state.Gamepad.sThumbRY > R_STICK_THUMB_DEAD)
 		{
 			return true;
 		}
 		break;
-	case RIGHT_D_STICK:
+	case Controller::State::RIGHT_D_STICK:
 		if (state.Gamepad.sThumbRY < -R_STICK_THUMB_DEAD)
 		{
 			return true;
 		}
 		break;
-	case RIGHT_R_STICK:
+	case Controller::State::RIGHT_R_STICK:
 		if (state.Gamepad.sThumbRX > R_STICK_THUMB_DEAD)
 		{
 			return true;
 		}
 		break;
-	case RIGHT_L_STICK:
+	case Controller::State::RIGHT_L_STICK:
 		if (state.Gamepad.sThumbRX < -R_STICK_THUMB_DEAD)
 		{
 			return true;
@@ -159,102 +167,102 @@ bool Controller::GetStickState(XINPUT_STATE state, State p_state)
 	return false;
 }
 
-bool Controller::PushButton(State& p_state)
+bool Controller::PushButton(Controller::State& p_state)
 {
 	switch (p_state)
 	{
-	case A:
-		p_state = (State)XINPUT_GAMEPAD_A;
+	case Controller::State::A:
+		buttonNum = XINPUT_GAMEPAD_A;
 		break;
-	case B:
-		p_state = (State)XINPUT_GAMEPAD_B;
+	case Controller::State::B:
+		buttonNum = XINPUT_GAMEPAD_B;
 		break;
-	case X:
-		p_state = (State)XINPUT_GAMEPAD_X;
+	case Controller::State::X:
+		buttonNum = XINPUT_GAMEPAD_X;
 		break;
-	case Y:
-		p_state = (State)XINPUT_GAMEPAD_Y;
+	case Controller::State::Y:
+		buttonNum = XINPUT_GAMEPAD_Y;
 		break;
-	case L_SHOULDER:
-		p_state = (State)XINPUT_GAMEPAD_LEFT_SHOULDER;
+	case Controller::State::L_SHOULDER:
+		buttonNum = XINPUT_GAMEPAD_LEFT_SHOULDER;
 		break;
-	case R_SHOULDER:
-		p_state = (State)XINPUT_GAMEPAD_RIGHT_SHOULDER;
+	case Controller::State::R_SHOULDER:
+		buttonNum = XINPUT_GAMEPAD_RIGHT_SHOULDER;
 		break;
-	case BACK:
-		p_state = (State)XINPUT_GAMEPAD_BACK;
+	case Controller::State::BACK:
+		buttonNum = XINPUT_GAMEPAD_BACK;
 		break;
-	case START:
-		p_state = (State)XINPUT_GAMEPAD_START;
+	case Controller::State::START:
+		buttonNum = XINPUT_GAMEPAD_START;
 		break;
-	case UP:
-		p_state = (State)XINPUT_GAMEPAD_DPAD_UP;
+	case Controller::State::UP:
+		buttonNum = XINPUT_GAMEPAD_DPAD_UP;
 		break;
-	case DOWN:
-		p_state = (State)XINPUT_GAMEPAD_DPAD_DOWN;
+	case Controller::State::DOWN:
+		buttonNum = XINPUT_GAMEPAD_DPAD_DOWN;
 		break;
-	case LEFT:
-		p_state = (State)XINPUT_GAMEPAD_DPAD_LEFT;
+	case Controller::State::LEFT:
+		buttonNum = XINPUT_GAMEPAD_DPAD_LEFT;
 		break;
-	case RIGHT:
-		p_state = (State)XINPUT_GAMEPAD_DPAD_RIGHT;
+	case Controller::State::RIGHT:
+		buttonNum = XINPUT_GAMEPAD_DPAD_RIGHT;
 		break;
-	case LEFT_THUMB:
-		p_state = (State)XINPUT_GAMEPAD_LEFT_THUMB;
+	case Controller::State::LEFT_THUMB:
+		buttonNum = XINPUT_GAMEPAD_LEFT_THUMB;
 		break;
-	case RIGHT_THUMB:
-		p_state = (State)XINPUT_GAMEPAD_RIGHT_THUMB;
+	case Controller::State::RIGHT_THUMB:
+		buttonNum = XINPUT_GAMEPAD_RIGHT_THUMB;
 		break;
 	}
 
 	return true;
 }
 
-bool Controller::TriggerButton(XINPUT_STATE state, State& p_state)
+bool Controller::TriggerButton(XINPUT_STATE state, Controller::State& p_state)
 {
 	switch (p_state)
 	{
-	case A:
-		p_state = (State)XINPUT_GAMEPAD_A;
+	case Controller::State::A:
+		buttonNum = XINPUT_GAMEPAD_A;
 		break;
-	case B:
-		p_state = (State)XINPUT_GAMEPAD_B;
+	case Controller::State::B:
+		buttonNum = XINPUT_GAMEPAD_B;
 		break;
-	case X:
-		p_state = (State)XINPUT_GAMEPAD_X;
+	case Controller::State::X:
+		buttonNum = XINPUT_GAMEPAD_X;
 		break;
-	case Y:
-		p_state = (State)XINPUT_GAMEPAD_Y;
+	case Controller::State::Y:
+		buttonNum = XINPUT_GAMEPAD_Y;
 		break;
-	case L_SHOULDER:
-		p_state = (State)XINPUT_GAMEPAD_LEFT_SHOULDER;
+	case Controller::State::L_SHOULDER:
+		buttonNum = XINPUT_GAMEPAD_LEFT_SHOULDER;
 		break;
-	case R_SHOULDER:
-		p_state = (State)XINPUT_GAMEPAD_RIGHT_SHOULDER;
+	case Controller::State::R_SHOULDER:
+		buttonNum = XINPUT_GAMEPAD_RIGHT_SHOULDER;
 		break;
-	case BACK:
-		p_state = (State)XINPUT_GAMEPAD_BACK;
+	case Controller::State::BACK:
+		buttonNum = XINPUT_GAMEPAD_BACK;
 		break;
-	case START:
-		p_state = (State)XINPUT_GAMEPAD_START;
+	case Controller::State::START:
+		buttonNum = XINPUT_GAMEPAD_START;
 		break;
-	case UP:
-		p_state = (State)XINPUT_GAMEPAD_DPAD_UP;
+	case Controller::State::UP:
+		buttonNum = XINPUT_GAMEPAD_DPAD_UP;
 		break;
-	case DOWN:
-		p_state = (State)XINPUT_GAMEPAD_DPAD_DOWN;
+	case Controller::State::DOWN:
+		buttonNum = XINPUT_GAMEPAD_DPAD_DOWN;
 		break;
-	case LEFT:
-		p_state = (State)XINPUT_GAMEPAD_DPAD_LEFT;
+	case Controller::State::LEFT:
+		buttonNum = XINPUT_GAMEPAD_DPAD_LEFT;
 		break;
-	case RIGHT:
-		p_state = (State)XINPUT_GAMEPAD_DPAD_RIGHT;
+	case Controller::State::RIGHT:
+		buttonNum = XINPUT_GAMEPAD_DPAD_RIGHT;
 		break;
-	case LEFT_THUMB:
-		p_state = (State)XINPUT_GAMEPAD_LEFT_THUMB;
+	case Controller::State::LEFT_THUMB:
+		buttonNum = XINPUT_GAMEPAD_LEFT_THUMB;
 		break;
-	case RIGHT_THUMB:
-		p_state = (State)XINPUT_GAMEPAD_RIGHT_THUMB;
+	case Controller::State::RIGHT_THUMB:
+		buttonNum = XINPUT_GAMEPAD_RIGHT_THUMB;
 		break;
 	}
 
@@ -265,17 +273,24 @@ bool Controller::TriggerButton(XINPUT_STATE state, State& p_state)
 	return false;
 }
 
-void Controller::CheckMode(State p_state)
+void Controller::CheckMode(Controller::State p_state)
 {
 	stateNum = p_state;
-	int LastDigitalNum = RIGHT_THUMB;
 
-	if (stateNum <= LastDigitalNum)
+	if (stateNum <= Controller::State::RIGHT_THUMB)
 	{
-		mode = BUTTON;
+		mode = Controller::Mode::BUTTON;
 	}
 	else
 	{
-		mode = STICK;
+		mode = Controller::Mode::STICK;
 	}
+}
+
+void Controller::Vibration()
+{
+	vibration.wLeftMotorSpeed = USHRT_MAX; // 数値は0～65535
+	vibration.wRightMotorSpeed = USHRT_MAX; // 数値は0～65535
+	XInputSetState(controllerNum, &vibration);
+	vCount = 20;
 }

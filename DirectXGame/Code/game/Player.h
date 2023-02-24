@@ -19,18 +19,22 @@ public: // メンバ関数
 
 	void Draw() { playerObj->Draw(); }
 
-	void Attack(XMFLOAT3 targetPos, bool& flag, float& avoidTime);
+	void Rush(XMFLOAT3 targetPos, bool& flag, float& avoidTime);
 
-	void Rush(bool rFlag);
+	void Avoid(bool rFlag);
 
 	void Jump();
 
 	void Reset();
 
+	void ReSpawn();
+
 	// マップチップ当たり判定
 	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale);
 
 	bool StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale);
+
+	bool PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale);
 
 	// オブジェクト
 	const std::unique_ptr<Object3d>& GetObj() { return playerObj; }
@@ -40,6 +44,9 @@ public: // メンバ関数
 	// 着地
 	const bool& GetOnGround() { return onGround; }
 	void SetOnGround(bool onGround) { this->onGround = onGround; }
+
+	// ジャンプ
+	void SetJumpFlag(bool jumpFlag) { this->jumpFlag = jumpFlag; }
 
 private: // メンバ変数
 

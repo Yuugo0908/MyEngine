@@ -125,7 +125,6 @@ private: // ƒƒ“ƒo•Ï”
 
 	bool dirty = false;
 	float dy = 0.0f;
-	float angleX = 0;
 	float angleY = 0;
 	float speed = 7.0f;
 };

@@ -46,7 +46,7 @@ void Rope::Update(XMFLOAT3& pPos)
 		pEaseFlag = false;
 		eEaseFlag = false;
 
-		if (!rThrowFlag && !rBackFlag && (controller->GetPadState(controller->X, controller->PUSH) || mouse->TriggerMouseLeft()))
+		if (!rThrowFlag && !rBackFlag && (controller->GetPadState(Controller::State::X, Controller::Type::TRIGGER) || mouse->TriggerMouseLeft()))
 		{
 			rPos = startPos;
 			moveFlag = false;

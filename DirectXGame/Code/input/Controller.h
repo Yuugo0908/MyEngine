@@ -3,10 +3,15 @@
 #include <windows.h>
 #include <Xinput.h>
 
+
 class Controller
 {
+private:
+	Controller();
+
+	~Controller();
 public:
-	enum State
+	enum class State
 	{
 		// デジタル
 		A = 1,	//	Aボタン
@@ -35,13 +40,13 @@ public:
 		RIGHT_L_STICK,	//	右スティックの左
 		RIGHT_R_STICK,	//	右スティックの右
 	};
-	enum Mode
+	enum class Mode
 	{
 		BUTTON,
 		STICK,
 	};
 
-	enum Type
+	enum class Type
 	{
 		NONE,
 		PUSH,
@@ -52,16 +57,21 @@ public:
 	static Controller* GetInstance();
 	bool Update();
 	bool GetPadState(State p_state, Type p_type);
+	void Vibration();
 
 private:
-	Mode mode;
 	bool GetButtonState(XINPUT_STATE state, State p_state, Type p_type);
 	bool GetStickState(XINPUT_STATE state, State p_state);
 	bool PushButton(State& p_state);
 	bool TriggerButton(XINPUT_STATE state, State& p_state);
 	void CheckMode(State p_state);
 
-	XINPUT_STATE state;
-	XINPUT_STATE statePre;
-	State stateNum;
+	Mode mode{};
+	XINPUT_STATE state{};
+	XINPUT_STATE statePre{};
+	State stateNum{};
+	WORD buttonNum{};
+	XINPUT_VIBRATION vibration{};
+	const int controllerNum = 0;
+	int vCount = 0;
 };

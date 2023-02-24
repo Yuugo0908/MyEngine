@@ -1,12 +1,14 @@
-#include "GameScene.h"
+﻿#include "GameScene.h"
 #include <imgui.h>
 #include <cassert>
 
-GameScene::GameScene() {
+GameScene::GameScene()
+{
 
 }
 
-GameScene::~GameScene() {
+GameScene::~GameScene()
+{
 
 }
 
@@ -107,7 +109,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Audio* audio) {
 	particle = Particle::Create(dxCommon->GetDevice(), camera);
 
 	// レベルデータの読み込み
-	levelData = LevelLoader::LoadFile("gameScene");
+	levelData = LevelLoader::LoadFile("testScene2");
 
 	// レベルデータからオブジェクトを生成、配置
 	for (LevelData::ObjectData& objectData : levelData->objects)
@@ -125,33 +127,35 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Audio* audio) {
 		newObject->SetModel(model);
 
 		// 座標
-		DirectX::XMFLOAT3 pos;
-		DirectX::XMStoreFloat3(&pos, objectData.trans);
+		XMFLOAT3 pos;
+		XMStoreFloat3(&pos, objectData.trans);
 		newObject->SetPosition(pos);
 
 		// 回転角
-		DirectX::XMFLOAT3 rot;
-		DirectX::XMStoreFloat3(&rot, objectData.rot);
+		XMFLOAT3 rot;
+		XMStoreFloat3(&rot, objectData.rot);
 		newObject->SetRotation(rot);
 
 		// 座標
-		DirectX::XMFLOAT3 scale;
-		DirectX::XMStoreFloat3(&scale, objectData.scale);
+		XMFLOAT3 scale;
+		XMStoreFloat3(&scale, objectData.scale);
 		newObject->SetScale(scale);
 
 		if (objectData.fileName == "stage")
 		{
 			newObject->SetType(stage_);
 		}
-
-		if (objectData.fileName == "cube")
+		else if (objectData.fileName == "cube")
 		{
 			newObject->SetType(box_);
 		}
-
-		if (objectData.fileName == "wall")
+		else if (objectData.fileName == "wall")
 		{
 			newObject->SetType(wall_);
+		}
+		else if (objectData.fileName == "pole")
+		{
+			newObject->SetType(pole_);
 		}
 
 		// 配列に登録
@@ -194,7 +198,7 @@ void GameScene::Update() {
 
 	if (nowScene == title_)
 	{
-		if (!fadeIn && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(controller->A, controller->TRIGGER))
+		if (!fadeIn && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
 		{
 			if (!expFlag)
 			{
@@ -232,7 +236,7 @@ void GameScene::Update() {
 		pScale = player->GetObj()->GetScale();
 		if (attackFlag)
 		{
-			player->Attack(catchPos, attackFlag, avoidTime);
+			player->Rush(catchPos, attackFlag, avoidTime);
 		}
 
 		// jsonファイルから読み込んだオブジェクトの更新
@@ -278,29 +282,40 @@ void GameScene::Update() {
 				if (PElength < minLength)
 				{
 					minLength = PElength;
-					ePosSave = ePos;
+					posSave = ePos;
 				}
 
 				//if (PElength <= 15.0f)
 				//{
-					if (RayCollision())
+				for (auto& object : jsonObject)
+				{
+					if (object->GetType() == box_)
 					{
-						enemy->SetAttackFlag(false);
+						if (RayCollision())
+						{
+							enemy->SetAttackFlag(false);
+						}
+						else
+						{
+							enemy->SetAttackFlag(true);
+						}
 					}
-					else
-					{
-						enemy->SetAttackFlag(true);
-					}
+				}
 				//}
 
 				enemy->Update();
 			}
 
+			if (pPos.y <= -30.0f)
+			{
+				player->ReSpawn();
+				minLength = 10.0f;
+			}
 
 			if (throwCount == 30)
 			{
-				rope->Throw(pPos, ePosSave, minLength);
-				ePosSave = {};
+				rope->Throw(pPos, posSave, minLength);
+				posSave = {};
 				minLength = 15.0f;
 			}
 
@@ -352,7 +367,7 @@ void GameScene::Update() {
 			}
 		}
 
-		if (alpha <= 0.0f && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(controller->A, controller->TRIGGER))
+		if (alpha <= 0.0f && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
 		{
 			player->Reset();
 			for (std::unique_ptr<Enemy>& enemy : enemys)
@@ -517,7 +532,11 @@ void GameScene::CreateParticles(XMFLOAT3 setPos)
 		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
 
 		// 追加
-		particle->Add(60, pos, vel, acc, 5.0f, 0.0f);
+		float sScale = 0.0f;
+		float eScale = 5.0f;
+		XMFLOAT4 sColor = { 1.0f, 0.0f, 0.0f, 1.0f};
+		XMFLOAT4 eColor = { 0.0f, 1.0f, 0.0f, 1.0f};
+		particle->Add(60, pos, vel, acc, sScale, eScale, sColor, eColor);
 	}
 }
 
@@ -588,6 +607,38 @@ void GameScene::jsonObjectUpdate()
 				}
 			}
 		}
+		else if (object->GetType() == pole_)
+		{
+			pPos = player->GetObj()->GetPosition();
+			XMFLOAT3 pos = object->GetPosition();
+			XMFLOAT3 scale = object->GetScale();
+			float length = GetLength(pPos, pos);
+
+			if (length < minLength)
+			{
+				minLength = length;
+				posSave = pos;
+				object->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+			}
+			else
+			{
+				object->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+			}
+
+			if (rope->Collision(object, pPos))
+			{
+				attackFlag = true;
+				catchPos = object->GetPosition();
+			}
+
+			if (attackFlag && player->PoleCollide(pos, scale))
+			{
+				rope->SetrFlag(false);
+				attackFlag = false;
+				catchPos = {};
+				avoidTime = 0.0f;
+			}
+		}
 	}
 }
 
@@ -603,11 +654,6 @@ void GameScene::CollisionUpdate()
 			{
 				attackFlag = true;
 				catchPos = enemy->GetObj()->GetPosition();
-				enemy->SetCatchFlag(true);
-			}
-			else
-			{
-				enemy->SetCatchFlag(false);
 			}
 		}
 	}
@@ -621,15 +667,16 @@ void GameScene::CollisionUpdate()
 			moveFlag = true;
 			rope->SetmoveFlag(moveFlag);
 
-
 			if (rFlag)
 			{
 				// パーティクル生成
 				CreateParticles(enemy->GetObj()->GetPosition());
 				rope->SetrFlag(false);
 				attackFlag = false;
+				catchPos = {};
 				avoidTime = 0.0f;
 				enemyHp -= 72;
+				controller->Vibration();
 				break;
 			}
 			else
@@ -662,7 +709,7 @@ bool GameScene::RayCollision()
 		if (object->GetType() == box_)
 		{
 			// ワールド空間での光線の基点
-			XMFLOAT3 layStart = ePos;
+			XMFLOAT3 layStart = pPos;
 			// ワールド空間での光線の方向
 			XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
 			XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
@@ -686,7 +733,7 @@ bool GameScene::RayCollision()
 			// マップオブジェクトの座標と大きさ
 			XMFLOAT3 boxMax = boxPos + boxScale;
 			XMFLOAT3 bCenter = boxPos;
-			float bScale = GetLength(boxPos, boxMax);
+			float bScale = GetLength(boxPos, boxMax) / 2;
 			bCenter = bCenter - layStart;
 			float bA1 = layVec.x * layVec.x + layVec.y * layVec.y + layVec.z * layVec.z;
 			if (bA1 == 0.0f)// レイの長さが0

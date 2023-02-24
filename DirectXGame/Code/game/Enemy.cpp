@@ -30,8 +30,8 @@ bool Enemy::Initialize(Player* player)
 
 	phase = Enemy::Phase::stay;
 	pPos = player->GetObj()->GetPosition();
-	ePos = { randPos.x, 15.0f, randPos.z };
-	//ePos = { 0.0f, 15.0f, 10.0f };
+	//ePos = { randPos.x, 15.0f, randPos.z };
+	ePos = { 0.0f, 15.0f, 10.0f };
 	eScale = { 1.0f, 1.0f, 1.0f };
 
 	enemyObj->SetPosition(ePos);
@@ -73,6 +73,10 @@ void Enemy::Update()
 	if (attackCount <= 30)
 	{
 		attackCount++;
+	}
+	if (ePos.y <= -30.0f)
+	{
+		Spawn();
 	}
 
 	eOldPos = enemyObj->GetPosition();
@@ -203,7 +207,8 @@ void Enemy::Spawn()
 	randPos.z = (float)(-40 + rand() % 80);
 
 	phase = Enemy::Phase::stay;
-	ePos = { randPos.x, 15.0f, randPos.z };
+	//ePos = { randPos.x, 15.0f, randPos.z };
+	ePos = { 0.0f, 15.0f, 10.0f };
 	eScale = { 1.0f, 1.0f, 1.0f };
 
 	enemyObj->SetPosition(ePos);
@@ -229,7 +234,6 @@ bool Enemy::EnemyCollision(const std::unique_ptr<Object3d>& object)
 	{
 		eAlive = false;
 		eAliveCount = 0;
-		catchFlag = false;
 		bullets.erase(bullets.begin(), bullets.end());
 		return true;
 	}

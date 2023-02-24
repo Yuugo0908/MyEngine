@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "DirectXCommon.h"
 #include "Keyboard.h"
@@ -98,7 +98,7 @@ private: // メンバ変数
 
 	enum ObjectType
 	{
-		sphere_, box_, stage_, wall_
+		sphere_, box_, stage_, wall_, pole_
 	};
 
 	enum Image2dNum
@@ -138,8 +138,6 @@ private: // メンバ変数
 	XMFLOAT3 ePos = {};
 	XMFLOAT3 ePosOld = {};
 	XMFLOAT3 eScale = {};
-	XMFLOAT3 ePosSave = {};
-	float minLength = 10.0f;
 
 	// ロープ
 	bool rFlag = false;
@@ -160,9 +158,16 @@ private: // メンバ変数
 
 	// シェイク用
 	bool shakeFlag = false;
-
 	bool attackFlag = false; // 突進開始フラグ
 	float avoidTime = 0.0f;
 
+	// コントローラー
+	// 振動用変数
+	int vSpeedL = 0;
+	int vSpeedR = 0;
+
+	// 確認用
 	int check = 0;
+	XMFLOAT3 posSave = {};
+	float minLength = 10.0f;
 };

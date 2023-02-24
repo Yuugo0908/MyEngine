@@ -30,6 +30,7 @@ struct LevelData
 	Model* skydomeModel = nullptr; 
 	Model* cubeModel = nullptr;
 	Model* wallModel = nullptr;
+	Model* poleModel = nullptr;
 	std::map<std::string, Model*> models;
 };
 

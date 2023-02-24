@@ -12,7 +12,7 @@ bool Player::Initialize()
 	playerObj->SetModel(playerModel);
 
 	// 位置を変数に格納
-	pPos = { 0.0f, 10.0f, -10.0f };
+	pPos = { 0.0f, 10.0f, 0.0f };
 	pPosOld = pPos;
 	pScale = { 0.8f,0.8f,0.8f };
 
@@ -38,14 +38,24 @@ void Player::Update(bool rFlag, bool moveFlag)
 	if (moveFlag)
 	{
 		Jump();
-		Rush(rFlag);
+		// 重力
+		if (!jumpFlag)
+		{
+			pDown = -0.75f;
+			pPos.y += pDown;
+			if (onGround)
+			{
+				pDown = 0.0f;
+			}
+		}
+		Avoid(rFlag);
 
 		// 移動
 		rate = 1.0f;
 		// 移動量の倍数計算
-		if (controller->GetPadState(controller->LEFT_L_STICK, controller->NONE) || controller->GetPadState(controller->LEFT_R_STICK, controller->NONE))
+		if (controller->GetPadState(Controller::State::LEFT_L_STICK, Controller::Type::NONE) || controller->GetPadState(Controller::State::LEFT_R_STICK, Controller::Type::NONE))
 		{
-			if (controller->GetPadState(controller->LEFT_U_STICK, controller->NONE) || controller->GetPadState(controller->LEFT_D_STICK, controller->NONE))
+			if (controller->GetPadState(Controller::State::LEFT_U_STICK, Controller::Type::NONE) || controller->GetPadState(Controller::State::LEFT_D_STICK, Controller::Type::NONE))
 			{
 				rate = sqrtf(1.0f / 2.0f);
 			}
@@ -59,22 +69,22 @@ void Player::Update(bool rFlag, bool moveFlag)
 		}
 		cameraTrack = cameraTrack * pAcc * rate;
 
-		if (controller->GetPadState(controller->LEFT_R_STICK, controller->NONE) || keyboard->PushKey(DIK_D))
+		if (controller->GetPadState(Controller::State::LEFT_R_STICK, Controller::Type::NONE) || keyboard->PushKey(DIK_D))
 		{
 			pPos.x += cameraTrack.z;
 			pPos.z -= cameraTrack.x;
 		}
-		else if (controller->GetPadState(controller->LEFT_L_STICK, controller->NONE) || keyboard->PushKey(DIK_A))
+		else if (controller->GetPadState(Controller::State::LEFT_L_STICK, Controller::Type::NONE) || keyboard->PushKey(DIK_A))
 		{
 			pPos.x -= cameraTrack.z;
 			pPos.z += cameraTrack.x;
 		}
-		if (controller->GetPadState(controller->LEFT_U_STICK, controller->NONE) || keyboard->PushKey(DIK_W))
+		if (controller->GetPadState(Controller::State::LEFT_U_STICK, Controller::Type::NONE) || keyboard->PushKey(DIK_W))
 		{
 			pPos.x += cameraTrack.x;
 			pPos.z += cameraTrack.z;
 		}
-		else if (controller->GetPadState(controller->LEFT_D_STICK, controller->NONE) || keyboard->PushKey(DIK_S))
+		else if (controller->GetPadState(Controller::State::LEFT_D_STICK, Controller::Type::NONE) || keyboard->PushKey(DIK_S))
 		{
 			pPos.x -= cameraTrack.x;
 			pPos.z -= cameraTrack.z;
@@ -84,7 +94,7 @@ void Player::Update(bool rFlag, bool moveFlag)
 	playerObj->Update();
 }
 
-void Player::Attack(XMFLOAT3 targetPos, bool& flag, float& avoidTime)
+void Player::Rush(XMFLOAT3 targetPos, bool& flag, float& avoidTime)
 {
 	// フラグがtrueじゃない場合はリターンする
 	if (!flag)
@@ -102,14 +112,14 @@ void Player::Attack(XMFLOAT3 targetPos, bool& flag, float& avoidTime)
 	playerObj->Update();
 }
 
-void Player::Rush(bool rFlag)
+void Player::Avoid(bool rFlag)
 {
 	if (avoidFlag)
 	{
 		pAcc -= pGra;
 	}
 	// 自機の突進
-	else if (!rFlag && (mouse->TriggerMouseRight() || controller->GetPadState(controller->R_TRIGGER, controller->NONE)))
+	else if (!rFlag && (mouse->TriggerMouseRight() || controller->GetPadState(Controller::State::R_TRIGGER, Controller::Type::NONE)))
 	{
 		avoidFlag = true;
 		// 加速力の更新
@@ -128,7 +138,7 @@ void Player::Rush(bool rFlag)
 
 void Player::Jump()
 {
-	if (!jumpFlag && (keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(controller->A, controller->TRIGGER)))
+	if (!jumpFlag && (keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER)))
 	{
 		onGround = false;
 		jumpFlag = true;
@@ -145,16 +155,6 @@ void Player::Jump()
 		{
 			jumpFlag = false;
 			pVal = 0.0f;
-		}
-	}
-	// 重力
-	else
-	{
-		pDown = -0.75f;
-		pPos.y += pDown;
-		if (onGround)
-		{
-			pDown = 0.0f;
 		}
 	}
 }
@@ -188,6 +188,17 @@ void Player::Reset()
 	// カメラ距離取得用
 	cameraTrack = {};
 	cameraRot = 0.0f;
+}
+
+void Player::ReSpawn()
+{
+	// 位置を変数に格納
+	pPos = { 0.0f, 10.0f, 0.0f };
+	pPosOld = pPos;
+
+	playerObj->SetPosition(pPos);
+	playerObj->SetScale(pScale);
+	playerObj->Update();
 }
 
 bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
@@ -282,11 +293,93 @@ bool Player::StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale)
 	{
 		if (maxY + pScale.y > pPos.y && stagePos.y < pPosOld.y)
 		{
-			if (stagePos.y + pScale.y >= pPos.y)
+			if (stagePos.y + pScale.y > pPos.y)
 			{
 				pPos.y = pPosOld.y;
 			}
 			hitFlag = true;
+		}
+	}
+
+	playerObj->SetPosition(pPos);
+	playerObj->Update();
+
+	return hitFlag;
+}
+
+bool Player::PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale)
+{
+	//フラグ
+	bool hitFlag = false;
+
+	// 判定
+	float maxBoxX = polePos.x + poleScale.x;
+	float minBoxX = polePos.x - poleScale.x;
+	float maxBoxY = polePos.y + poleScale.y;
+	float minBoxY = polePos.y - poleScale.y;
+	float maxBoxZ = polePos.z + poleScale.z;
+	float minBoxZ = polePos.z - poleScale.z;
+
+	if ((pPos.x <= maxBoxX && pPos.x >= minBoxX) &&
+		(pPos.z <= maxBoxZ && pPos.z >= minBoxZ))
+	{
+		if (maxBoxY + pScale.y > pPos.y && polePos.y < pPosOld.y)
+		{
+			hitFlag = true;
+			onGround = false;
+			jumpFlag = true;
+			// 上昇率の更新
+			pVal = 1.25f;
+		}
+		else if (minBoxY - pScale.y < pPos.y && polePos.y > pPosOld.y)
+		{
+			hitFlag = true;
+			onGround = false;
+			jumpFlag = true;
+			// 上昇率の更新
+			pVal = 1.25f;
+		}
+	}
+
+	if ((pPos.x <= maxBoxX && pPos.x >= minBoxX) &&
+		(pPos.y <= maxBoxY && pPos.y >= minBoxY))
+	{
+		if (maxBoxZ + pScale.z > pPos.z && polePos.z < pPosOld.z)
+		{
+			hitFlag = true;
+			onGround = false;
+			jumpFlag = true;
+			// 上昇率の更新
+			pVal = 1.25f;
+		}
+		else if (minBoxZ - pScale.z < pPos.z && polePos.z > pPosOld.z)
+		{
+			hitFlag = true;
+			onGround = false;
+			jumpFlag = true;
+			// 上昇率の更新
+			pVal = 1.25f;
+		}
+	}
+
+	if ((pPos.z <= maxBoxZ && pPos.z >= minBoxZ) &&
+		(pPos.y <= maxBoxY && pPos.y >= minBoxY))
+	{
+		if (maxBoxX + pScale.x > pPos.x && polePos.x < pPosOld.x)
+		{
+			hitFlag = true;
+			onGround = false;
+			jumpFlag = true;
+			// 上昇率の更新
+			pVal = 1.25f;
+		}
+		else if (minBoxX - pScale.x < pPos.x && polePos.x > pPosOld.x)
+		{
+			hitFlag = true;
+			onGround = false;
+			jumpFlag = true;
+			// 上昇率の更新
+			pVal = 1.25f;
 		}
 	}
 
