@@ -111,12 +111,6 @@
     <ClCompile Include="Code\win\main.cpp">
       <Filter>ソースファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Code\3d\Material.cpp">
-      <Filter>ソースファイル\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\3d\Mesh.cpp">
-      <Filter>ソースファイル\3d</Filter>
-    </ClCompile>
     <ClCompile Include="Code\3d\Model.cpp">
       <Filter>ソースファイル\3d</Filter>
     </ClCompile>
@@ -238,12 +232,6 @@
     </ClInclude>
     <ClInclude Include="Code\win\SafeDelete.h">
       <Filter>ヘッダーファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\3d\Material.h">
-      <Filter>ヘッダーファイル\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\3d\Mesh.h">
-      <Filter>ヘッダーファイル\3d</Filter>
     </ClInclude>
     <ClInclude Include="Code\3d\Model.h">
       <Filter>ヘッダーファイル\3d</Filter>

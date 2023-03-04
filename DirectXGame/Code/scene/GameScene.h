@@ -55,12 +55,15 @@ public: // メンバ関数
 	void LightUpdate();
 	// カメラの更新
 	void CameraUpdate();
-	// jsonオブジェクトの更新
-	void jsonObjectUpdate();
 	// 当たり判定
 	void CollisionUpdate();
 	// 遮蔽物があるかの判別
 	bool RayCollision();
+
+	// jsonオブジェクトの初期化
+	void jsonObjectInit(const std::string sceneName);
+	// jsonオブジェクトの更新
+	void jsonObjectUpdate();
 
 	void GameScene::CreateParticles(XMFLOAT3 pos);
 
@@ -98,7 +101,7 @@ private: // メンバ変数
 
 	enum ObjectType
 	{
-		sphere_, box_, stage_, wall_, pole_
+		sphere_, box_, stage_, wall_, pole_,
 	};
 
 	enum Image2dNum
@@ -132,7 +135,7 @@ private: // メンバ変数
 	float playerHp = 360;
 
 	// エネミー
-	static const int enemyCount = 1;
+	int enemyCount = 0;
 	float enemyHp = 360;
 	bool eAlive = false;
 	XMFLOAT3 ePos = {};
@@ -166,8 +169,7 @@ private: // メンバ変数
 	int vSpeedL = 0;
 	int vSpeedR = 0;
 
-	// 確認用
-	int check = 0;
+	// 距離確認用
 	XMFLOAT3 posSave = {};
-	float minLength = 10.0f;
+	float minLength = 15.0f;
 };

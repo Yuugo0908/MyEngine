@@ -45,12 +45,12 @@ LevelData* LevelLoader::LoadFile(const std::string& fileName)
 
 	levelData->stageModel = levelData->stageModel->CreateFromObject("stage");
 	levelData->skydomeModel = levelData->skydomeModel->CreateFromObject("skydome");
-	levelData->cubeModel = levelData->cubeModel->CreateFromObject("cube");
-	levelData->wallModel = levelData->wallModel->CreateFromObject("cube");
-	levelData->poleModel = levelData->poleModel->CreateFromObject("cube");
+	levelData->boxModel = levelData->boxModel->CreateFromObject("box");
+	levelData->wallModel = levelData->wallModel->CreateFromObject("wall");
+	levelData->poleModel = levelData->poleModel->CreateFromObject("pole");
 	levelData->models.insert(std::make_pair("stage", levelData->stageModel));
 	levelData->models.insert(std::make_pair("skydome", levelData->skydomeModel));
-	levelData->models.insert(std::make_pair("cube", levelData->cubeModel));
+	levelData->models.insert(std::make_pair("box", levelData->boxModel));
 	levelData->models.insert(std::make_pair("wall", levelData->wallModel));
 	levelData->models.insert(std::make_pair("pole", levelData->poleModel));
 

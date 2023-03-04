@@ -152,7 +152,7 @@ void Model::CreateModel(const std::string& text)
 	//.odjファイルを開く
 	const string modelname = text;
 	const string filename = modelname + ".obj";
-	const string directoryPath = "Resources/" + modelname + "/";
+	const string directoryPath = "Resources/Obj_3d/" + modelname + "/";
 	file.open(directoryPath + filename);
 	// ファイルオープン失敗をチェック
 	if (file.fail())

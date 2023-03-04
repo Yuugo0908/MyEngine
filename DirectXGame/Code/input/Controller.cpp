@@ -1,4 +1,6 @@
 #include "Controller.h"
+#include <DebugText.h>
+#include <WinApp.h>
 
 Controller::Controller()
 {
@@ -37,6 +39,7 @@ bool Controller::Update()
 	
 	if (dwResult == ERROR_SUCCESS)
 	{
+		//DebugText::GetInstance()->Print((float)WinApp::window_width / 2.0f, (float)WinApp::window_height / 2.0f, 2.0f, "ControllerConnecting");
 		return true;
 	}
 	return false;
@@ -103,13 +106,13 @@ bool Controller::GetStickState(XINPUT_STATE state, Controller::State p_state)
 	int R_STICK_THUMB_DEAD = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
 	switch (p_state)
 	{
-	case Controller::State::L_TRIGGER:
+	case Controller::State::LT:
 		if (statePre.Gamepad.bLeftTrigger < TRIGGER_DEADZONE && state.Gamepad.bLeftTrigger > TRIGGER_DEADZONE)
 		{
 			return true;
 		}
 		break;
-	case Controller::State::R_TRIGGER:
+	case Controller::State::RT:
 		if (statePre.Gamepad.bRightTrigger < TRIGGER_DEADZONE && state.Gamepad.bRightTrigger > TRIGGER_DEADZONE)
 		{
 			return true;
@@ -183,10 +186,10 @@ bool Controller::PushButton(Controller::State& p_state)
 	case Controller::State::Y:
 		buttonNum = XINPUT_GAMEPAD_Y;
 		break;
-	case Controller::State::L_SHOULDER:
+	case Controller::State::LB:
 		buttonNum = XINPUT_GAMEPAD_LEFT_SHOULDER;
 		break;
-	case Controller::State::R_SHOULDER:
+	case Controller::State::RB:
 		buttonNum = XINPUT_GAMEPAD_RIGHT_SHOULDER;
 		break;
 	case Controller::State::BACK:
@@ -234,10 +237,10 @@ bool Controller::TriggerButton(XINPUT_STATE state, Controller::State& p_state)
 	case Controller::State::Y:
 		buttonNum = XINPUT_GAMEPAD_Y;
 		break;
-	case Controller::State::L_SHOULDER:
+	case Controller::State::LB:
 		buttonNum = XINPUT_GAMEPAD_LEFT_SHOULDER;
 		break;
-	case Controller::State::R_SHOULDER:
+	case Controller::State::RB:
 		buttonNum = XINPUT_GAMEPAD_RIGHT_SHOULDER;
 		break;
 	case Controller::State::BACK:

@@ -22,6 +22,7 @@ bool Rope::Initialize()
 	// 位置、スケールを変数に格納
 	ropeObj->SetScale({ 0.0f, 0.0f, 0.0f });
 	rPos = ropeObj->GetPosition();
+	rPosOld = rPos;
 	rScale = ropeObj->GetScale();
 	ropeObj->Update();
 
@@ -32,13 +33,9 @@ void Rope::Update(XMFLOAT3& pPos)
 {
 	startPos = pPos;
 
-	if (throwCount < 30)
-	{
-		throwCount++;
-	}
-
 	if (!rFlag)
 	{
+		rPosOld = rPos;
 		rPos = startPos + manageRopePos;
 		rScale = manageRopeScale;
 		ropeObj->SetPosition(rPos);
@@ -65,6 +62,7 @@ void Rope::Update(XMFLOAT3& pPos)
 	vecXZ = sqrtf((startPos.x - endPos.x) * (startPos.x - endPos.x) + (startPos.z - endPos.z) * (startPos.z - endPos.z));
 	angleX = (float)atan2(endPos.y - startPos.y, vecXZ);
 
+	rPosOld = rPos;
 	rPos = { (startPos.x + endPos.x) / 2, (startPos.y + endPos.y) / 2, (startPos.z + endPos.z) / 2 };
 	rScale = { 0.2f, 0.2f , objLength / 2.0f };
 	ropeObj->SetPosition(rPos);
@@ -73,7 +71,7 @@ void Rope::Update(XMFLOAT3& pPos)
 	ropeObj->Update();
 }
 
-void Rope::Throw(XMFLOAT3 pPos, XMFLOAT3& ePos, float& length)
+void Rope::Throw(XMFLOAT3 pPos, const XMFLOAT3 targetPos, const float targetLength)
 {
 	// フラグがtrueじゃない場合は初期化してリターンする
 	if (!rThrowFlag && !rBackFlag)
@@ -84,13 +82,15 @@ void Rope::Throw(XMFLOAT3 pPos, XMFLOAT3& ePos, float& length)
 		return;
 	}
 
-	if (length < 15.0f)
+	if (!rRotFlag && targetLength < 15.0f)
 	{
+		tPos = targetPos;
+		tLength = targetLength;
 		rRotFlag = true;
 	}
 
 	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
-	XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
+	XMVECTOR enemyPos = { tPos.x, tPos.y, tPos.z, 1 };
 
 	XMVECTOR subPlayerEnemy = XMVectorSubtract(enemyPos, playerPos);
 	XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
@@ -105,10 +105,10 @@ void Rope::Throw(XMFLOAT3 pPos, XMFLOAT3& ePos, float& length)
 		if (rRotFlag)
 		{
 			// Y軸周りの角度
-			angleY = (float)atan2(pPos.x - ePos.x, pPos.z - ePos.z);
-			vecXZ = sqrtf((pPos.x - ePos.x) * (pPos.x - ePos.x) + (pPos.z - ePos.z) * (pPos.z - ePos.z));
+			angleY = (float)atan2(pPos.x - tPos.x, pPos.z - tPos.z);
+			vecXZ = sqrtf((pPos.x - tPos.x) * (pPos.x - tPos.x) + (pPos.z - tPos.z) * (pPos.z - tPos.z));
 			// X軸周りの角度
-			angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
+			angleX = (float)atan2(tPos.y - pPos.y, vecXZ);
 			rRot = { XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 };
 			ropeObj->SetRotation(rRot);
 			manageRopePos.x += subPE.x;
@@ -143,10 +143,10 @@ void Rope::Throw(XMFLOAT3 pPos, XMFLOAT3& ePos, float& length)
 		if (rRotFlag)
 		{
 			// Y軸周りの角度
-			angleY = (float)atan2(pPos.x - ePos.x, pPos.z - ePos.z);
-			vecXZ = sqrtf((pPos.x - ePos.x) * (pPos.x - ePos.x) + (pPos.z - ePos.z) * (pPos.z - ePos.z));
+			angleY = (float)atan2(pPos.x - tPos.x, pPos.z - tPos.z);
+			vecXZ = sqrtf((pPos.x - tPos.x) * (pPos.x - tPos.x) + (pPos.z - tPos.z) * (pPos.z - tPos.z));
 			// X軸周りの角度
-			angleX = (float)atan2(ePos.y - pPos.y, vecXZ);
+			angleX = (float)atan2(tPos.y - pPos.y, vecXZ);
 			ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
 			manageRopePos.x -= subPE.x;
 			manageRopePos.y -= subPE.y;
@@ -172,14 +172,10 @@ void Rope::Throw(XMFLOAT3 pPos, XMFLOAT3& ePos, float& length)
 			rBackFlag = false;
 			rRotFlag = false;
 			moveFlag = true;
-			throwCount = 0;
 			manageRopePos = {};
 			manageRopeScale = {};
 			cSpeed = {};
 			cRot = 0.0f;
-
-			ePos = { 0.0f, -1000.0f, 0.0f };
-			length = 10.0f;
 		}
 	}
 }
@@ -200,6 +196,7 @@ bool Rope::Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos)
 	XMFLOAT3 vec = manageRopePos;
 	XMFLOAT3 center = pos;
 	float radius = scale.x;
+	bool hitFlag = false;
 
 	center = center - lay;
 
@@ -228,12 +225,14 @@ bool Rope::Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos)
 	}
 
 	// 球の当たり判定
-	//長さ
 	float l_x = rPos.x - pos.x;
 	float l_y = rPos.y - pos.y;
 	float l_z = rPos.z - pos.z;
-
 	float r = (scale.z + manageRopeScale.z);
+
+	rPosOld = rPos;
+	rPos = ropeObj->GetPosition();
+	rScale = ropeObj->GetScale();
 
 	if ((l_x * l_x) + (l_y * l_y) + (l_z * l_z) <= (r * r))
 	{
@@ -244,10 +243,14 @@ bool Rope::Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos)
 		rThrowFlag = false;
 		rBackFlag = false;
 		rRotFlag = false;
+		tPos = {};
+		tLength = 0.0f;
 		rFlag = true;
-		throwCount = 0;
 		return true;
 	}
+
+	ropeObj->SetPosition(rPos);
+	ropeObj->Update();
 
 	return false;
 }
@@ -269,7 +272,6 @@ void Rope::Reset()
 	vecXZ = 0.0f; // XZ平面上のベクトル
 	objLength = 0.0f;
 	rFlag = false; // 接触フラグ
-	throwCount = 0;
 
 	// 突進用
 	startPos = {}; // 開始位置

@@ -2,48 +2,6 @@
     "name": "scene",
     "objects": [
         {
-            "type": "LIGHT",
-            "name": "Light",
-            "transform": {
-                "translation": [
-                    1.0054539442062378,
-                    5.903861999511719,
-                    -4.076245307922363
-                ],
-                "rotation": [
-                    -3.1637072563171387,
-                    -106.93630981445312,
-                    37.261043548583984
-                ],
-                "scaling": [
-                    0.9999999403953552,
-                    1.0,
-                    1.0
-                ]
-            }
-        },
-        {
-            "type": "CAMERA",
-            "name": "Camera",
-            "transform": {
-                "translation": [
-                    -6.925790786743164,
-                    4.958309173583984,
-                    -7.358891487121582
-                ],
-                "rotation": [
-                    2.664711473698844e-06,
-                    -46.69194793701172,
-                    63.559303283691406
-                ],
-                "scaling": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            }
-        },
-        {
             "type": "MESH",
             "name": "skydome",
             "transform": {
@@ -58,21 +16,21 @@
                     0.0
                 ],
                 "scaling": [
-                    5.0,
-                    5.0,
-                    5.0
+                    3.0,
+                    3.0,
+                    3.0
                 ]
             },
             "file_name": "skydome"
         },
         {
             "type": "MESH",
-            "name": "cube.002",
+            "name": "wall.001",
             "transform": {
                 "translation": [
                     0.0,
                     5.0,
-                    -20.0
+                    -19.0
                 ],
                 "rotation": [
                     0.0,
@@ -85,11 +43,11 @@
                     1.0
                 ]
             },
-            "file_name": "cube"
+            "file_name": "wall"
         },
         {
             "type": "MESH",
-            "name": "cube.003",
+            "name": "wall.002",
             "transform": {
                 "translation": [
                     20.0,
@@ -111,29 +69,7 @@
         },
         {
             "type": "MESH",
-            "name": "stage.001",
-            "transform": {
-                "translation": [
-                    -16.338064193725586,
-                    0.0,
-                    46.915122985839844
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    10.0,
-                    1.0,
-                    10.0
-                ]
-            },
-            "file_name": "stage"
-        },
-        {
-            "type": "MESH",
-            "name": "cube.001",
+            "name": "wall",
             "transform": {
                 "translation": [
                     -20.0,
@@ -151,11 +87,11 @@
                     20.0
                 ]
             },
-            "file_name": "cube"
+            "file_name": "wall"
         },
         {
             "type": "MESH",
-            "name": "stage.002",
+            "name": "stage.001",
             "transform": {
                 "translation": [
                     0.0,
@@ -177,12 +113,12 @@
         },
         {
             "type": "MESH",
-            "name": "cube",
+            "name": "pole",
             "transform": {
                 "translation": [
-                    -24.10047721862793,
-                    5.300078392028809,
-                    30.872087478637695
+                    7.0,
+                    5.0,
+                    25.0
                 ],
                 "rotation": [
                     0.0,
@@ -199,12 +135,12 @@
         },
         {
             "type": "MESH",
-            "name": "cube.004",
+            "name": "wall.003",
             "transform": {
                 "translation": [
-                    -27.09575653076172,
+                    -10.0,
                     5.0,
-                    41.43110275268555
+                    25.0
                 ],
                 "rotation": [
                     0.0,
@@ -214,7 +150,491 @@
                 "scaling": [
                     1.0,
                     5.0,
+                    5.0
+                ]
+            },
+            "file_name": "wall"
+        },
+        {
+            "type": "MESH",
+            "name": "wall.004",
+            "transform": {
+                "translation": [
+                    10.0,
+                    5.0,
+                    25.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    5.0,
+                    5.0
+                ]
+            },
+            "file_name": "wall"
+        },
+        {
+            "type": "MESH",
+            "name": "wall.005",
+            "transform": {
+                "translation": [
+                    -15.0,
+                    5.0,
                     20.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    6.0,
+                    5.0,
+                    1.0
+                ]
+            },
+            "file_name": "wall"
+        },
+        {
+            "type": "MESH",
+            "name": "wall.006",
+            "transform": {
+                "translation": [
+                    15.0,
+                    5.0,
+                    20.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    6.0,
+                    5.0,
+                    1.0
+                ]
+            },
+            "file_name": "wall"
+        },
+        {
+            "type": "MESH",
+            "name": "stage.003",
+            "transform": {
+                "translation": [
+                    -20.0,
+                    0.0,
+                    60.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    10.0,
+                    1.0,
+                    10.0
+                ]
+            },
+            "file_name": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "stage.004",
+            "transform": {
+                "translation": [
+                    20.0,
+                    0.0,
+                    80.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    10.0,
+                    1.0,
+                    10.0
+                ]
+            },
+            "file_name": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "stage.005",
+            "transform": {
+                "translation": [
+                    20.0,
+                    0.0,
+                    60.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    10.0,
+                    1.0,
+                    10.0
+                ]
+            },
+            "file_name": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "stage.006",
+            "transform": {
+                "translation": [
+                    -20.0,
+                    0.0,
+                    40.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    10.0,
+                    1.0,
+                    10.0
+                ]
+            },
+            "file_name": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "pole.001",
+            "transform": {
+                "translation": [
+                    -7.0,
+                    5.0,
+                    25.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    2.0,
+                    0.5,
+                    0.5
+                ]
+            },
+            "file_name": "pole"
+        },
+        {
+            "type": "MESH",
+            "name": "pole.002",
+            "transform": {
+                "translation": [
+                    -3.5,
+                    5.0,
+                    25.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    2.0,
+                    0.5,
+                    0.5
+                ]
+            },
+            "file_name": "pole"
+        },
+        {
+            "type": "MESH",
+            "name": "pole.003",
+            "transform": {
+                "translation": [
+                    3.5,
+                    5.0,
+                    25.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    2.0,
+                    0.5,
+                    0.5
+                ]
+            },
+            "file_name": "pole"
+        },
+        {
+            "type": "MESH",
+            "name": "pole.004",
+            "transform": {
+                "translation": [
+                    0.0,
+                    5.0,
+                    25.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    2.0,
+                    0.5,
+                    0.5
+                ]
+            },
+            "file_name": "pole"
+        },
+        {
+            "type": "MESH",
+            "name": "stage.002",
+            "transform": {
+                "translation": [
+                    20.0,
+                    0.0,
+                    40.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    10.0,
+                    1.0,
+                    10.0
+                ]
+            },
+            "file_name": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "stage.007",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    40.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    10.0,
+                    1.0,
+                    10.0
+                ]
+            },
+            "file_name": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "stage.008",
+            "transform": {
+                "translation": [
+                    -20.0,
+                    0.0,
+                    80.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    10.0,
+                    1.0,
+                    10.0
+                ]
+            },
+            "file_name": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "stage.009",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    80.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    10.0,
+                    1.0,
+                    10.0
+                ]
+            },
+            "file_name": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "stage.010",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    60.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    10.0,
+                    1.0,
+                    10.0
+                ]
+            },
+            "file_name": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "box",
+            "transform": {
+                "translation": [
+                    20.0,
+                    5.0,
+                    60.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    3.0,
+                    5.0,
+                    3.0
+                ]
+            },
+            "file_name": "cube"
+        },
+        {
+            "type": "MESH",
+            "name": "box.001",
+            "transform": {
+                "translation": [
+                    -20.0,
+                    5.0,
+                    60.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    3.0,
+                    5.0,
+                    3.0
+                ]
+            },
+            "file_name": "cube"
+        },
+        {
+            "type": "MESH",
+            "name": "enemy.001",
+            "transform": {
+                "translation": [
+                    20.0,
+                    3.0,
+                    80.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "enemy"
+        },
+        {
+            "type": "MESH",
+            "name": "enemy",
+            "transform": {
+                "translation": [
+                    -20.0,
+                    3.0,
+                    80.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "enemy"
+        },
+        {
+            "type": "MESH",
+            "name": "player",
+            "transform": {
+                "translation": [
+                    0.0,
+                    5.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "player"
+        },
+        {
+            "type": "MESH",
+            "name": "box.002",
+            "transform": {
+                "translation": [
+                    -10.0,
+                    2.0,
+                    10.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    3.0,
+                    1.0,
+                    3.0
                 ]
             },
             "file_name": "cube"

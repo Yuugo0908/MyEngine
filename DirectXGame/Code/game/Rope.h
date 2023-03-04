@@ -23,7 +23,7 @@ public: // メンバ関数
 
 	void Update(XMFLOAT3& pPos);
 
-	void Throw(XMFLOAT3 pPos, XMFLOAT3& ePos, float& length);
+	void Throw(XMFLOAT3 pPos, const XMFLOAT3 ePos, const float length);
 
 	bool Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos);
 
@@ -66,6 +66,7 @@ private: // メンバ変数
 
 	// 変数
 	XMFLOAT3 rPos = {};
+	XMFLOAT3 rPosOld = {};
 	XMFLOAT3 rScale = {};
 	XMFLOAT3 rRot = {};
 	XMFLOAT3 manageRopePos = {}; // ロープ位置管理用
@@ -79,10 +80,12 @@ private: // メンバ変数
 	bool rThrowFlag = false; // ロープを飛ばす
 	bool rBackFlag = false; // ロープを戻す
 	bool rRotFlag = false;
-	int throwCount = 0;
 
 	XMFLOAT3 cSpeed = {};
 	float cRot = 0.0f;
+
+	XMFLOAT3 tPos = {};
+	float tLength = 20.0f;
 
 	// 突進用
 	XMFLOAT3 startPos = {}; // 開始位置

@@ -11,7 +11,7 @@ class Player
 {
 public: // ƒƒ“ƒoŠÖ”
 
-	bool Initialize();
+	bool Initialize(const XMFLOAT3 pos);
 
 	void Finalize() { delete playerModel; }
 
@@ -21,7 +21,7 @@ public: // ƒƒ“ƒoŠÖ”
 
 	void Rush(XMFLOAT3 targetPos, bool& flag, float& avoidTime);
 
-	void Avoid(bool rFlag);
+	void Avoid();
 
 	void Jump();
 

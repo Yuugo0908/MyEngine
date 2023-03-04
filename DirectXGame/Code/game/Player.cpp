@@ -1,6 +1,6 @@
 #include "Player.h"
 
-bool Player::Initialize()
+bool Player::Initialize(const XMFLOAT3 pos)
 {
 	keyboard = Keyboard::GetInstance();
 	mouse = Mouse::GetInstance();
@@ -11,9 +11,7 @@ bool Player::Initialize()
 	playerObj = Object3d::Create();
 	playerObj->SetModel(playerModel);
 
-	// 位置を変数に格納
-	pPos = { 0.0f, 10.0f, 0.0f };
-	pPosOld = pPos;
+	pPos = pos;
 	pScale = { 0.8f,0.8f,0.8f };
 
 	playerObj->SetPosition(pPos);
@@ -35,20 +33,18 @@ void Player::Update(bool rFlag, bool moveFlag)
 	playerObj->SetScale(pScale);
 	playerObj->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
 
+	if (pPos.y <= -30.0f)
+	{
+		ReSpawn();
+	}
+
 	if (moveFlag)
 	{
-		Jump();
-		// 重力
-		if (!jumpFlag)
+		if (!rFlag)
 		{
-			pDown = -0.75f;
-			pPos.y += pDown;
-			if (onGround)
-			{
-				pDown = 0.0f;
-			}
+			Jump();
+			Avoid();
 		}
-		Avoid(rFlag);
 
 		// 移動
 		rate = 1.0f;
@@ -112,14 +108,14 @@ void Player::Rush(XMFLOAT3 targetPos, bool& flag, float& avoidTime)
 	playerObj->Update();
 }
 
-void Player::Avoid(bool rFlag)
+void Player::Avoid()
 {
 	if (avoidFlag)
 	{
 		pAcc -= pGra;
 	}
 	// 自機の突進
-	else if (!rFlag && (mouse->TriggerMouseRight() || controller->GetPadState(Controller::State::R_TRIGGER, Controller::Type::NONE)))
+	else if (mouse->TriggerMouseRight() || controller->GetPadState(Controller::State::RT, Controller::Type::NONE))
 	{
 		avoidFlag = true;
 		// 加速力の更新
@@ -151,10 +147,21 @@ void Player::Jump()
 	{
 		pVal -= pGra;
 		pPos.y += pVal;
+		playerObj->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
 		if (onGround)
 		{
 			jumpFlag = false;
 			pVal = 0.0f;
+		}
+	}
+	// 重力
+	else
+	{
+		pDown = -0.75f;
+		pPos.y += pDown;
+		if (onGround)
+		{
+			pDown = 0.0f;
 		}
 	}
 }
@@ -196,6 +203,9 @@ void Player::ReSpawn()
 	pPos = { 0.0f, 10.0f, 0.0f };
 	pPosOld = pPos;
 
+	pDown = 0.0f;
+	pVal = 0.0f;
+	jumpFlag = false;
 	playerObj->SetPosition(pPos);
 	playerObj->SetScale(pScale);
 	playerObj->Update();
@@ -258,7 +268,7 @@ bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 	{
 		if (maxBoxX + pScale.x > pPos.x && boxPos.x < pPosOld.x)
 		{
-			pPos.x = maxBoxX + pScale.x;
+ 			pPos.x = maxBoxX + pScale.x;
 			hitFlag = true;
 			avoidFlag = false;
 		}
@@ -273,11 +283,15 @@ bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 	playerObj->SetPosition(pPos);
 	playerObj->Update();
 
+
 	return hitFlag;
 }
 
 bool Player::StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale)
 {
+	//フラグ
+	bool hitFlag = false;
+
 	// 判定
 	float maxX = stagePos.x + stageScale.x;
 	float maxY = stagePos.y + stageScale.y;
@@ -286,18 +300,18 @@ bool Player::StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale)
 	float minY = stagePos.y - stageScale.y;
 	float minZ = stagePos.z - stageScale.z;
 
-	bool hitFlag = false;
-
-	if ((pPos.x < maxX && pPos.x > minX) &&
-		(pPos.z < maxZ && pPos.z > minZ))
+	if ((pPos.x <= maxX && pPos.x >= minX) &&
+		(pPos.z <= maxZ && pPos.z >= minZ))
 	{
 		if (maxY + pScale.y > pPos.y && stagePos.y < pPosOld.y)
 		{
+			hitFlag = true;
 			if (stagePos.y + pScale.y > pPos.y)
 			{
 				pPos.y = pPosOld.y;
 			}
-			hitFlag = true;
+			onGround = true;
+			playerObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 		}
 	}
 
@@ -319,6 +333,9 @@ bool Player::PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale)
 	float minBoxY = polePos.y - poleScale.y;
 	float maxBoxZ = polePos.z + poleScale.z;
 	float minBoxZ = polePos.z - poleScale.z;
+
+	pPosOld = playerObj->GetPosition();
+	playerObj->SetPosition(pPos);
 
 	if ((pPos.x <= maxBoxX && pPos.x >= minBoxX) &&
 		(pPos.z <= maxBoxZ && pPos.z >= minBoxZ))

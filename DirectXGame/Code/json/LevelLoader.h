@@ -28,7 +28,7 @@ struct LevelData
 	// ƒ‚ƒfƒ‹ƒŠƒXƒg
 	Model* stageModel = nullptr;
 	Model* skydomeModel = nullptr; 
-	Model* cubeModel = nullptr;
+	Model* boxModel = nullptr;
 	Model* wallModel = nullptr;
 	Model* poleModel = nullptr;
 	std::map<std::string, Model*> models;

@@ -24,22 +24,7 @@ bool Enemy::Initialize(Player* player)
 
 	enemyObj = Object3d::Create();
 	enemyObj->SetModel(enemyModel);
-
-	randPos.x = (float)(-40 + rand() % 80);
-	randPos.z = (float)(-40 + rand() % 80);
-
-	phase = Enemy::Phase::stay;
-	pPos = player->GetObj()->GetPosition();
-	//ePos = { randPos.x, 15.0f, randPos.z };
-	ePos = { 0.0f, 15.0f, 10.0f };
-	eScale = { 1.0f, 1.0f, 1.0f };
-
-	enemyObj->SetPosition(ePos);
-	enemyObj->SetScale(eScale);
-	enemyObj->SetColor({ 0.0f, 0.8f, 0.0f, 1.0f });
-	enemyObj->Update();
-	spawnPos = { ePos.x, 0.0f, ePos.z };
-	eAlive = true;
+	eAlive = false;
 
 	return true;
 }
@@ -60,12 +45,15 @@ void Enemy::Update()
 		if (eAliveCount <= 60)
 		{
 			eAliveCount++;
+			return;
+
 		}
 		else
 		{
 			Spawn();
 			eAlive = true;
 			phase = Enemy::Phase::stay;
+			attackCount = -150;
 			return;
 		}
 	}
@@ -154,27 +142,12 @@ void Enemy::Move()
 
 	ePos.x += subPE.x / 5;
 	ePos.z += subPE.z / 5;
+	enemyObj->Update();
 }
 
 void Enemy::Stay()
 {
-	XMVECTOR oldEnemyPos = { spawnPos.x, spawnPos.y, spawnPos.z, 1 };
-	XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
-
-	XMVECTOR subOldEnemy = XMVectorSubtract(oldEnemyPos, enemyPos);
-	XMVECTOR NsubOldEnemy = XMVector3Normalize(subOldEnemy);
-
-	XMFLOAT3 subPE = { NsubOldEnemy.m128_f32[0], NsubOldEnemy.m128_f32[1], NsubOldEnemy.m128_f32[2] };
-
-	if (lengthOld <= 0.0f)
-	{
-		ePos = spawnPos;
-	}
-	else
-	{
-		ePos.x += subPE.x / 5;
-		ePos.z += subPE.z / 5;
-	}
+	enemyObj->Update();
 }
 
 void Enemy::Jump()
@@ -192,7 +165,7 @@ void Enemy::Jump()
 	}
 	else
 	{
-		eDown -= 0.75f;
+		eDown = -0.75f;
 		ePos.y += eDown;
 		if (onGround)
 		{
@@ -203,19 +176,16 @@ void Enemy::Jump()
 
 void Enemy::Spawn()
 {
-	randPos.x = (float)(-40 + rand() % 80);
-	randPos.z = (float)(-40 + rand() % 80);
-
 	phase = Enemy::Phase::stay;
-	//ePos = { randPos.x, 15.0f, randPos.z };
-	ePos = { 0.0f, 15.0f, 10.0f };
+
+	ePos = enemyObj->GetPosition();
+	eOldPos = ePos;
 	eScale = { 1.0f, 1.0f, 1.0f };
 
 	enemyObj->SetPosition(ePos);
 	enemyObj->SetScale(eScale);
 	enemyObj->SetColor({ 0.0f, 0.8f, 0.0f, 1.0f });
 	enemyObj->Update();
-	spawnPos = { ePos.x, 0.0f, ePos.z };
 }
 
 void Enemy::Reset()
@@ -259,6 +229,11 @@ bool Enemy::BulletCollision()
 
 bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 {
+	if (!eAlive)
+	{
+		return false;
+	}
+
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
 		if (bullet->MapCollide(boxPos, boxScale))
@@ -367,6 +342,11 @@ bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 
 bool Enemy::StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale)
 {
+	if (!eAlive)
+	{
+		return false;
+	}
+
 	// ”»’è
 	float maxX = stagePos.x + stageScale.x;
 	float maxY = stagePos.y + stageScale.y;
@@ -375,25 +355,23 @@ bool Enemy::StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale)
 	float minY = stagePos.y - stageScale.y;
 	float minZ = stagePos.z - stageScale.z;
 
-	bool hitFlag = false;
-
-	if ((ePos.x < maxX && ePos.x > minX) &&
-		(ePos.z < maxZ && ePos.z > minZ))
+	if ((ePos.x <= maxX && ePos.x >= minX) &&
+		(ePos.z <= maxZ && ePos.z >= minZ))
 	{
 		if (maxY + eScale.y > ePos.y && stagePos.y < eOldPos.y)
 		{
 			if (stagePos.y + eScale.y >= ePos.y)
 			{
-				ePos.y = eOldPos.y;
+ 				ePos.y = eOldPos.y;
 			}
-			hitFlag = true;
+			onGround = true;
 		}
 	}
 
 	enemyObj->SetPosition(ePos);
 	enemyObj->Update();
 
-	return hitFlag;
+	return onGround;
 }
 
 void Enemy::Draw()

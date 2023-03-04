@@ -18,8 +18,8 @@ public:
 		B,	//	Bボタン
 		X,	//	Xボタン
 		Y,	//	Yボタン
-		L_SHOULDER,  //	LB
-		R_SHOULDER,	//	RB
+		LB,  //	LB
+		RB,	//	RB
 		BACK,	//	Back
 		START,	//	Start
 		UP,		//	十字キーの上
@@ -29,8 +29,8 @@ public:
 		LEFT_THUMB,		//	左スティック
 		RIGHT_THUMB,	//	右スティック
 		// アナログ
-		L_TRIGGER,	//	左トリガー
-		R_TRIGGER,	//	右トリガー
+		LT,	//	左トリガー
+		RT,	//	右トリガー
 		LEFT_U_STICK,	//	左スティックの上
 		LEFT_D_STICK,	//	左スティックの下
 		LEFT_L_STICK,	//	左スティックの左

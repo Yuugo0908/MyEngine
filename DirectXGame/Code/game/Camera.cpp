@@ -146,12 +146,12 @@ void Camera::Update()
 	}
 
 	// LB + 右スティック上下操作で距離を変更
-	if (controller->GetPadState(Controller::State::RIGHT_U_STICK, Controller::Type::NONE))
+	if (controller->GetPadState(Controller::State::LB, Controller::Type::PUSH) && controller->GetPadState(Controller::State::RIGHT_U_STICK, Controller::Type::NONE))
 	{
 		distance -= 0.1f;
 		dirty = true;
 	}
-	else if (controller->GetPadState(Controller::State::RIGHT_D_STICK, Controller::Type::NONE))
+	else if (controller->GetPadState(Controller::State::LB, Controller::Type::PUSH) && controller->GetPadState(Controller::State::RIGHT_D_STICK, Controller::Type::NONE))
 	{
 		distance += 0.1f;
 		dirty = true;
@@ -357,15 +357,26 @@ void Camera::Reset()
 
 	dirty = false;
 	angleY = 0;
-	speed = 0.75f;
+	speed = 7.0f;
 	dy = 0.0f;
 
-	// カメラの方向をリセットして再計算
-	matRot *= XMMatrixRotationX(XMConvertToRadians(0.0f));
-	matRot *= XMMatrixRotationY(XMConvertToRadians(0.0f));
+	// ビュー行列
+	matView = DirectX::XMMatrixIdentity();
+	// ビルボード行列
+	matBillboard = DirectX::XMMatrixIdentity();
+	// Y軸回りビルボード行列
+	matBillboardY = DirectX::XMMatrixIdentity();
+	// 射影行列
+	matProjection = DirectX::XMMatrixIdentity();
+	// ビュー射影行列
+	matViewProjection = DirectX::XMMatrixIdentity();
+	// 回転行列
+	matRot = DirectX::XMMatrixIdentity();
 
 	//ビュー行列の計算
 	UpdateViewMatrix();
 	// 射影行列の計算
 	UpdateProjectionMatrix();
+	// ビュープロジェクションの合成
+	matViewProjection = matView * matProjection;
 }
