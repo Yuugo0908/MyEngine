@@ -5,7 +5,7 @@ bool Bullet::Initialize(Model* bulletModel, const XMFLOAT3& pPos, const XMFLOAT3
 	this->pPos = pPos;
 	this->ePos = ePos;
 	bPos = ePos;
-	bScale = { 0.5, 0.5, 0.5 };
+	bScale = { 0.4f, 0.4f, 0.4f };
 	bOldPos = bPos;
 
 	Search();
@@ -14,7 +14,7 @@ bool Bullet::Initialize(Model* bulletModel, const XMFLOAT3& pPos, const XMFLOAT3
 	bulletObj->SetModel(bulletModel);
 	bulletObj->SetPosition(bPos);
 	bulletObj->SetScale(bScale);
-	bulletObj->SetColor({ 0.0f, 0.0f, 1.0f, 1.0f });
+	bulletObj->SetColor({ 0.1f, 0.1f, 1.0f, 1.0f });
 	return true;
 }
 
@@ -94,9 +94,6 @@ bool Bullet::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 			return true;
 		}
 	}
-
-	//bulletObj->SetPosition(bPos);
-	//bulletObj->Update();
 
 	return false;
 }

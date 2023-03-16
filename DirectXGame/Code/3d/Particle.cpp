@@ -1,13 +1,15 @@
 ﻿#include "Particle.h"
 #include <d3dcompiler.h>
 #include <DirectXTex.h>
+#include <string>
 
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
+using namespace std;
 
-Particle * Particle::Create(ID3D12Device* device, Camera* camera)
+Particle * Particle::Create(ID3D12Device* device, Camera* camera, const wchar_t* fileName)
 {
 	// 3Dオブジェクトのインスタンスを生成
 	Particle* partMan = new Particle(device, camera);
@@ -16,12 +18,12 @@ Particle * Particle::Create(ID3D12Device* device, Camera* camera)
 	}
 
 	// 初期化
-	partMan->Initialize();
+	partMan->Initialize(fileName);
 
 	return partMan;
 }
 
-void Particle::Initialize()
+void Particle::Initialize(const wchar_t* fileName)
 {
 	// nullptrチェック
 	assert(device);
@@ -35,7 +37,7 @@ void Particle::Initialize()
 	InitializeGraphicsPipeline();
 
 	// テクスチャ読み込み
-	LoadTexture();
+	LoadTexture(fileName);
 
 	// モデル生成
 	CreateModel();
@@ -372,7 +374,7 @@ void Particle::InitializeGraphicsPipeline()
 	}
 }
 
-void Particle::LoadTexture()
+void Particle::LoadTexture(const wchar_t* fileName)
 {
 	HRESULT result = S_FALSE;
 
@@ -381,7 +383,7 @@ void Particle::LoadTexture()
 	ScratchImage scratchImg{};
 
 	result = LoadFromWICFile(
-		L"Resources/effect.png", WIC_FLAGS_NONE,
+		fileName, WIC_FLAGS_NONE,
 		&metadata, scratchImg);
 	if (FAILED(result)) {
 		assert(0);

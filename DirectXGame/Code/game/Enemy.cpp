@@ -5,8 +5,8 @@ Model* Enemy::enemyModel = nullptr;
 
 bool Enemy::StaticInit()
 {
-	bulletModel = bulletModel->CreateFromObject("sphere");
-	enemyModel = enemyModel->CreateFromObject("sphere");
+	bulletModel = bulletModel->CreateFromObject("box");
+	enemyModel = enemyModel->CreateFromObject("enemy");
 
 	if (bulletModel == nullptr || enemyModel == nullptr)
 	{
@@ -180,11 +180,11 @@ void Enemy::Spawn()
 
 	ePos = enemyObj->GetPosition();
 	eOldPos = ePos;
-	eScale = { 1.0f, 1.0f, 1.0f };
+	eScale = { 0.8f, 0.8f, 0.8f };
 
 	enemyObj->SetPosition(ePos);
 	enemyObj->SetScale(eScale);
-	enemyObj->SetColor({ 0.0f, 0.8f, 0.0f, 1.0f });
+	enemyObj->SetColor({ 0.0f, 1.0f, 0.0f, 1.0f });
 	enemyObj->Update();
 }
 
@@ -283,7 +283,7 @@ bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 		{
 			ePos.z = maxBoxZ + eScale.z;
 			hitFlag = true;
-			if (!jumpFlag && onGround)
+			if (!jumpFlag && onGround && boxScale.y <= 3.0f)
 			{
 				onGround = false;
 				jumpFlag = true;
@@ -295,7 +295,7 @@ bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 		{
 			ePos.z = minBoxZ - eScale.z;
 			hitFlag = true;
-			if (!jumpFlag && onGround)
+			if (!jumpFlag && onGround && boxScale.y <= 3.0f)
 			{
 				onGround = false;
 				jumpFlag = true;
@@ -312,7 +312,7 @@ bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 		{
 			ePos.x = maxBoxX + eScale.x;
 			hitFlag = true;
-			if (!jumpFlag && onGround)
+			if (!jumpFlag && onGround && boxScale.y <= 3.0f)
 			{
 				onGround = false;
 				jumpFlag = true;
@@ -324,7 +324,7 @@ bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 		{
 			ePos.x = minBoxX - eScale.x;
 			hitFlag = true;
-			if (!jumpFlag && onGround)
+			if (!jumpFlag && onGround && boxScale.y <= 3.0f)
 			{
 				onGround = false;
 				jumpFlag = true;

@@ -11,15 +11,7 @@ public: // メンバ関数
 
 	bool Initialize();
 
-	void Finalize()
-	{
-		delete ropeModel;
-	}
-
-	void Draw()
-	{
-		ropeObj->Draw();
-	}
+	void Draw();
 
 	void Update(XMFLOAT3& pPos);
 
@@ -66,7 +58,6 @@ private: // メンバ変数
 
 	// 変数
 	XMFLOAT3 rPos = {};
-	XMFLOAT3 rPosOld = {};
 	XMFLOAT3 rScale = {};
 	XMFLOAT3 rRot = {};
 	XMFLOAT3 manageRopePos = {}; // ロープ位置管理用

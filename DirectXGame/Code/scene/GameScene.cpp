@@ -53,7 +53,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Audio* audio) {
 	title->SetSize({ 1280.0f,720.0f });
 
 	// リザルト画像読み込み
-	if (!Image2d::LoadTexture(resultNum, L"Resources/result.png"))
+	if (!Image2d::LoadTexture(resultNum, L"Resources/GameClear.png"))
 	{
 		assert(0);
 	}
@@ -88,13 +88,13 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Audio* audio) {
 	GameOver = Image2d::Create(GameOverNum, { 0.0f,0.0f });
 	GameOver->SetSize({ 1280.0f,720.0f });
 
-	if (!Image2d::LoadTexture(backNum, L"Resources/black_backGround.png"))
+	if (!Image2d::LoadTexture(fadeNum, L"Resources/black_backGround.png"))
 	{
 		assert(0);
 	}
-	backGround = Image2d::Create(backNum, { 0.0f,0.0f });
-	backGround->SetSize({ 1280.0f,720.0f });
-	backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.0f });
+	fadeTex = Image2d::Create(fadeNum, { 0.0f,0.0f });
+	fadeTex->SetSize({ 1280.0f,720.0f });
+	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 
 	if (!Image2d::LoadTexture(expNum, L"Resources/Operation_Explanation.png"))
 	{
@@ -102,10 +102,19 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Audio* audio) {
 	}
 	explanation = Image2d::Create(expNum, { 0.0f,0.0f });
 	explanation->SetSize({ 1280.0f,720.0f });
-	explanation->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.0f });
+	explanation->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 
-	// パーティクルマネージャ生成
-	particle = Particle::Create(dxCommon->GetDevice(), camera);
+	if (!Image2d::LoadTexture(backNum, L"Resources/backGround.png"))
+	{
+		assert(0);
+	}
+	backGround = Image2d::Create(backNum, { 0.0f,0.0f });
+	backGround->SetSize({ 1280.0f,720.0f });
+	backGround->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+
+	// パーティクル生成
+	box_effect = Particle::Create(dxCommon->GetDevice(), camera, L"Resources/box_effect.png");
+
 
 	Enemy::StaticInit();
 	rope->Initialize();
@@ -117,12 +126,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Audio* audio) {
 	// 3Dオブジェクトにライトをセット
 	Object3d::SetLight(light);
 	FbxObject3d::SetLight(light);
-}
-
-void GameScene::Finalize()
-{
-	player->Finalize();
-	rope->Finalize();
 }
 
 void GameScene::jsonObjectInit(const std::string sceneName)
@@ -186,10 +189,15 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 		XMStoreFloat3(&rot, objectData.rot);
 		newObject->SetRotation(rot);
 
-		// 座標
+		// 大きさ
 		XMFLOAT3 scale;
 		XMStoreFloat3(&scale, objectData.scale);
 		newObject->SetScale(scale);
+
+		// 当たり判定
+		XMFLOAT3 colScale;
+		XMStoreFloat3(&colScale, objectData.size);
+		newObject->SetCollisionScale(colScale);
 
 		if (objectData.fileName == "stage")
 		{
@@ -205,6 +213,7 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 		}
 		else if (objectData.fileName == "pole")
 		{
+			newObject->SetColor({ 1.0f, 0.1f, 0.1f, 1.0f });
 			newObject->SetType(pole_);
 		}
 
@@ -215,33 +224,38 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 
 void GameScene::Update() {
 
+	// タイトル
 	if (nowScene == title_)
 	{
 		if (!fadeIn && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
 		{
+			backGround->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+			// 操作説明はプレイ中、一度だけ表示する
 			if (!expFlag)
 			{
 				expFlag = true;
-				explanation->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f });
+				title->SetColor({ 0.0f, 0.0f, 0.0f, 0.0f });
+				explanation->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 			}
 
 			else if (!fadeIn)
 			{
 				fadeIn = true;
-				jsonObjectInit("gameScene");
 			}
 		}
 
 		if(fadeIn)
 		{
 			alpha += 0.02f;
-			backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
+			fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
 			if (alpha >= 1.0f)
 			{
+				jsonObjectInit("gameScene");
 				nowScene = game_;
 				fadeIn = false;
 				fadeOut = true; 
-				explanation->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.0f });
+				explanation->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
+				backGround->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 			}
 		}
 	}
@@ -265,13 +279,13 @@ void GameScene::Update() {
 		CollisionUpdate();
 		LightUpdate();
 		CameraUpdate();
-		particle->Update();
+		box_effect->Update();
 
 		// フェードアウトが終わるまではここでリターン
 		if (fadeOut)
 		{
 			alpha -= 0.02f;
-			backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });			
+			fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });			
 			if (alpha <= 0.0f)
 			{
 				fadeOut = false;
@@ -308,7 +322,7 @@ void GameScene::Update() {
 			if (fadeIn)
 			{
 				alpha += 0.02f;
-				backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
+				fadeTex->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
 				if (alpha >= 1.0)
 				{
 					nowScene = clear_;
@@ -324,7 +338,7 @@ void GameScene::Update() {
 			if (fadeIn)
 			{
 				alpha += 0.02f;
-				backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
+				fadeTex->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
 				if (alpha >= 1.0f)
 				{
 					nowScene = failure_;
@@ -339,8 +353,9 @@ void GameScene::Update() {
 	{
 		if (fadeOut)
 		{
+			backGround->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 			alpha -= 0.02f;
-			backGround->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
+			fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
 			if (alpha <= 0.0f)
 			{
 				fadeOut = false;
@@ -354,8 +369,10 @@ void GameScene::Update() {
 			{
 				enemy->Reset();
 			}
+			enemys.erase(enemys.begin(), enemys.end());
 			rope->Reset();
 			reset();
+			title->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 			nowScene = title_;
 		}
 	}
@@ -429,7 +446,7 @@ void GameScene::Draw() {
 		}
 
 		// パーティクルの描画
-		particle->Draw(dxCommon->GetCommandList());
+		box_effect->Draw(dxCommon->GetCommandList());
 	}
 
 	// 3Dオブジェクト描画後処理
@@ -442,6 +459,7 @@ void GameScene::Draw() {
 
 	// 前景画像の描画
 
+	backGround->Draw();
 	if (nowScene == title_)
 	{
 		title->Draw();
@@ -467,7 +485,7 @@ void GameScene::Draw() {
 	}
 
 	explanation->Draw();
-	backGround->Draw();
+	fadeTex->Draw();
 
 	// デバッグテキストの描画
 	DebugText::GetInstance()->DrawAll(dxCommon->GetCommandList());
@@ -491,9 +509,9 @@ void GameScene::SetImgui()
 	ImGui::End();
 }
 
-void GameScene::CreateParticles(XMFLOAT3 setPos)
+void GameScene::CreateParticles(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count)
 {
-	for (int i = 0; i < 1; i++) {
+	for (int i = 0; i < count; i++) {
 		// X,Y,Z全て[-5.0f,+5.0f]でランダムに分布
 		XMFLOAT3 pos{};
 		pos.x = setPos.x;
@@ -511,11 +529,7 @@ void GameScene::CreateParticles(XMFLOAT3 setPos)
 		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
 
 		// 追加
-		float sScale = 0.0f;
-		float eScale = 5.0f;
-		XMFLOAT4 sColor = { 1.0f, 0.0f, 0.0f, 1.0f};
-		XMFLOAT4 eColor = { 0.0f, 1.0f, 0.0f, 1.0f};
-		particle->Add(60, pos, vel, acc, sScale, eScale, sColor, eColor);
+		box_effect->Add(60, pos, vel, acc, startScale, endScale, startColor, endColor);
 	}
 }
 
@@ -530,7 +544,14 @@ void GameScene::LightUpdate()
 
 void GameScene::CameraUpdate()
 {
-	camera->SetTarget(pPos);
+	if (pPos.y >= trackLimit)
+	{
+		camera->SetTarget(pPos);
+	}
+	else
+	{
+		playerHp = 0;
+	}
 
 	cameraLength = { cPos.x - pPos.x, cPos.y - pPos.y, cPos.z - pPos.z, 1.0f };
 	cameraLength = XMVector3Normalize(cameraLength);
@@ -555,10 +576,10 @@ void GameScene::jsonObjectUpdate()
 	{
 		object->Update();
 
-		if (object->GetType() == box_ || object->GetType() == wall_)
+		if (object->GetType() == box_)
 		{
 			XMFLOAT3 boxPos = object->GetPosition();
-			XMFLOAT3 boxScale = object->GetScale();
+			XMFLOAT3 boxScale = object->GetCollisionScale();
 			player->MapCollide(boxPos, boxScale);
 			pPos = player->GetObj()->GetPosition();
 
@@ -568,10 +589,23 @@ void GameScene::jsonObjectUpdate()
 			}
 		}
 
-		if (object->GetType() == stage_)
+		else if (object->GetType() == wall_)
+		{
+			XMFLOAT3 wallPos = object->GetPosition();
+			XMFLOAT3 wallScale = object->GetCollisionScale();
+			player->MapCollide(wallPos, wallScale);
+			pPos = player->GetObj()->GetPosition();
+
+			for (std::unique_ptr<Enemy>& enemy : enemys)
+			{
+				enemy->MapCollide(wallPos, wallScale);
+			}
+		}
+
+		else if (object->GetType() == stage_)
 		{
 			XMFLOAT3 stagePos = object->GetPosition();
-			XMFLOAT3 stageScale = object->GetScale();
+			XMFLOAT3 stageScale = object->GetCollisionScale();
 			player->StageCollide(stagePos, stageScale);
 			pPos = player->GetObj()->GetPosition();
 
@@ -581,11 +615,11 @@ void GameScene::jsonObjectUpdate()
 			}
 		}
 
-		if (object->GetType() == pole_)
+		else if (object->GetType() == pole_)
 		{
 			pPos = player->GetObj()->GetPosition();
 			XMFLOAT3 pos = object->GetPosition();
-			XMFLOAT3 scale = object->GetScale();
+			XMFLOAT3 scale = object->GetCollisionScale();
 			float length = GetLength(pPos, pos);
 
 			if (length < minLength)
@@ -627,7 +661,7 @@ void GameScene::CollisionUpdate()
 			posSave = ePos;
 		}
 
-		//if (PElength <= 15.0f)
+		if (PElength <= 15.0f)
 		{
 			if (RayCollision())
 			{
@@ -656,7 +690,13 @@ void GameScene::CollisionUpdate()
 				if (rFlag)
 				{
 					// パーティクル生成
-					CreateParticles(enemy->GetObj()->GetPosition());
+					CreateParticles(
+						enemy->GetObj()->GetPosition(),
+						2.0f, 5.0f,
+						{ 1.0f, 0.0f, 0.0f, 1.0f },
+						{ 0.0f, 1.0f, 0.0f, 1.0f },
+						5
+					);
 					rope->SetrFlag(false);
 					attackFlag = false;
 					catchPos = {};
@@ -761,11 +801,6 @@ bool GameScene::RayCollision()
 
 				if (GetLength(pPos, colPosMin) > GetLength(pPos, colPosMax) && GetLength(ePos, colPosMin) < GetLength(ePos, colPosMax))
 				{
-					CreateParticles(colPosMax);
-					CreateParticles(colPosMin);
-
-					DebugText::GetInstance()->Print(30, 30 * 16, 2, "min : %f, %f, %f", colPosMin.x, colPosMin.y, colPosMin.z);
-					DebugText::GetInstance()->Print(30, 30 * 17, 2, "max : %f, %f, %f", colPosMax.x, colPosMax.y, colPosMax.z);
 					return true;
 				}
 				else

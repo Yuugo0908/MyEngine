@@ -22,11 +22,15 @@ bool Rope::Initialize()
 	// 位置、スケールを変数に格納
 	ropeObj->SetScale({ 0.0f, 0.0f, 0.0f });
 	rPos = ropeObj->GetPosition();
-	rPosOld = rPos;
 	rScale = ropeObj->GetScale();
 	ropeObj->Update();
 
 	return true;
+}
+
+void Rope::Draw()
+{
+	ropeObj->Draw();
 }
 
 void Rope::Update(XMFLOAT3& pPos)
@@ -35,7 +39,6 @@ void Rope::Update(XMFLOAT3& pPos)
 
 	if (!rFlag)
 	{
-		rPosOld = rPos;
 		rPos = startPos + manageRopePos;
 		rScale = manageRopeScale;
 		ropeObj->SetPosition(rPos);
@@ -62,7 +65,6 @@ void Rope::Update(XMFLOAT3& pPos)
 	vecXZ = sqrtf((startPos.x - endPos.x) * (startPos.x - endPos.x) + (startPos.z - endPos.z) * (startPos.z - endPos.z));
 	angleX = (float)atan2(endPos.y - startPos.y, vecXZ);
 
-	rPosOld = rPos;
 	rPos = { (startPos.x + endPos.x) / 2, (startPos.y + endPos.y) / 2, (startPos.z + endPos.z) / 2 };
 	rScale = { 0.2f, 0.2f , objLength / 2.0f };
 	ropeObj->SetPosition(rPos);
@@ -230,7 +232,6 @@ bool Rope::Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos)
 	float l_z = rPos.z - pos.z;
 	float r = (scale.z + manageRopeScale.z);
 
-	rPosOld = rPos;
 	rPos = ropeObj->GetPosition();
 	rScale = ropeObj->GetScale();
 

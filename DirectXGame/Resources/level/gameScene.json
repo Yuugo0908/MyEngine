@@ -25,490 +25,6 @@
         },
         {
             "type": "MESH",
-            "name": "wall.001",
-            "transform": {
-                "translation": [
-                    0.0,
-                    5.0,
-                    -19.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    20.0,
-                    5.0,
-                    1.0
-                ]
-            },
-            "file_name": "wall"
-        },
-        {
-            "type": "MESH",
-            "name": "wall.002",
-            "transform": {
-                "translation": [
-                    20.0,
-                    5.0,
-                    -0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    1.0,
-                    5.0,
-                    20.0
-                ]
-            },
-            "file_name": "wall"
-        },
-        {
-            "type": "MESH",
-            "name": "wall",
-            "transform": {
-                "translation": [
-                    -20.0,
-                    5.0,
-                    -0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    1.0,
-                    5.0,
-                    20.0
-                ]
-            },
-            "file_name": "wall"
-        },
-        {
-            "type": "MESH",
-            "name": "stage.001",
-            "transform": {
-                "translation": [
-                    0.0,
-                    0.0,
-                    -0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    20.0,
-                    1.0,
-                    20.0
-                ]
-            },
-            "file_name": "stage"
-        },
-        {
-            "type": "MESH",
-            "name": "pole",
-            "transform": {
-                "translation": [
-                    7.0,
-                    5.0,
-                    25.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    2.0,
-                    0.5,
-                    0.5
-                ]
-            },
-            "file_name": "pole"
-        },
-        {
-            "type": "MESH",
-            "name": "wall.003",
-            "transform": {
-                "translation": [
-                    -10.0,
-                    5.0,
-                    25.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    1.0,
-                    5.0,
-                    5.0
-                ]
-            },
-            "file_name": "wall"
-        },
-        {
-            "type": "MESH",
-            "name": "wall.004",
-            "transform": {
-                "translation": [
-                    10.0,
-                    5.0,
-                    25.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    1.0,
-                    5.0,
-                    5.0
-                ]
-            },
-            "file_name": "wall"
-        },
-        {
-            "type": "MESH",
-            "name": "wall.005",
-            "transform": {
-                "translation": [
-                    -15.0,
-                    5.0,
-                    20.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    6.0,
-                    5.0,
-                    1.0
-                ]
-            },
-            "file_name": "wall"
-        },
-        {
-            "type": "MESH",
-            "name": "wall.006",
-            "transform": {
-                "translation": [
-                    15.0,
-                    5.0,
-                    20.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    6.0,
-                    5.0,
-                    1.0
-                ]
-            },
-            "file_name": "wall"
-        },
-        {
-            "type": "MESH",
-            "name": "stage.003",
-            "transform": {
-                "translation": [
-                    -20.0,
-                    0.0,
-                    60.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    10.0,
-                    1.0,
-                    10.0
-                ]
-            },
-            "file_name": "stage"
-        },
-        {
-            "type": "MESH",
-            "name": "stage.004",
-            "transform": {
-                "translation": [
-                    20.0,
-                    0.0,
-                    80.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    10.0,
-                    1.0,
-                    10.0
-                ]
-            },
-            "file_name": "stage"
-        },
-        {
-            "type": "MESH",
-            "name": "stage.005",
-            "transform": {
-                "translation": [
-                    20.0,
-                    0.0,
-                    60.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    10.0,
-                    1.0,
-                    10.0
-                ]
-            },
-            "file_name": "stage"
-        },
-        {
-            "type": "MESH",
-            "name": "stage.006",
-            "transform": {
-                "translation": [
-                    -20.0,
-                    0.0,
-                    40.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    10.0,
-                    1.0,
-                    10.0
-                ]
-            },
-            "file_name": "stage"
-        },
-        {
-            "type": "MESH",
-            "name": "pole.001",
-            "transform": {
-                "translation": [
-                    -7.0,
-                    5.0,
-                    25.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    2.0,
-                    0.5,
-                    0.5
-                ]
-            },
-            "file_name": "pole"
-        },
-        {
-            "type": "MESH",
-            "name": "pole.002",
-            "transform": {
-                "translation": [
-                    -3.5,
-                    5.0,
-                    25.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    2.0,
-                    0.5,
-                    0.5
-                ]
-            },
-            "file_name": "pole"
-        },
-        {
-            "type": "MESH",
-            "name": "pole.003",
-            "transform": {
-                "translation": [
-                    3.5,
-                    5.0,
-                    25.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    2.0,
-                    0.5,
-                    0.5
-                ]
-            },
-            "file_name": "pole"
-        },
-        {
-            "type": "MESH",
-            "name": "pole.004",
-            "transform": {
-                "translation": [
-                    0.0,
-                    5.0,
-                    25.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    2.0,
-                    0.5,
-                    0.5
-                ]
-            },
-            "file_name": "pole"
-        },
-        {
-            "type": "MESH",
-            "name": "stage.002",
-            "transform": {
-                "translation": [
-                    20.0,
-                    0.0,
-                    40.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    10.0,
-                    1.0,
-                    10.0
-                ]
-            },
-            "file_name": "stage"
-        },
-        {
-            "type": "MESH",
-            "name": "stage.007",
-            "transform": {
-                "translation": [
-                    0.0,
-                    0.0,
-                    40.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    10.0,
-                    1.0,
-                    10.0
-                ]
-            },
-            "file_name": "stage"
-        },
-        {
-            "type": "MESH",
-            "name": "stage.008",
-            "transform": {
-                "translation": [
-                    -20.0,
-                    0.0,
-                    80.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    10.0,
-                    1.0,
-                    10.0
-                ]
-            },
-            "file_name": "stage"
-        },
-        {
-            "type": "MESH",
-            "name": "stage.009",
-            "transform": {
-                "translation": [
-                    0.0,
-                    0.0,
-                    80.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    10.0,
-                    1.0,
-                    10.0
-                ]
-            },
-            "file_name": "stage"
-        },
-        {
-            "type": "MESH",
-            "name": "stage.010",
-            "transform": {
-                "translation": [
-                    0.0,
-                    0.0,
-                    60.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    10.0,
-                    1.0,
-                    10.0
-                ]
-            },
-            "file_name": "stage"
-        },
-        {
-            "type": "MESH",
             "name": "box",
             "transform": {
                 "translation": [
@@ -527,7 +43,20 @@
                     3.0
                 ]
             },
-            "file_name": "box"
+            "file_name": "box",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    3.0,
+                    5.0,
+                    3.0
+                ]
+            }
         },
         {
             "type": "MESH",
@@ -549,7 +78,20 @@
                     3.0
                 ]
             },
-            "file_name": "box"
+            "file_name": "box",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    3.0,
+                    5.0,
+                    3.0
+                ]
+            }
         },
         {
             "type": "MESH",
@@ -571,7 +113,20 @@
                     1.0
                 ]
             },
-            "file_name": "enemy"
+            "file_name": "enemy",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
         },
         {
             "type": "MESH",
@@ -593,7 +148,20 @@
                     1.0
                 ]
             },
-            "file_name": "enemy"
+            "file_name": "enemy",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
         },
         {
             "type": "MESH",
@@ -615,16 +183,29 @@
                     1.0
                 ]
             },
-            "file_name": "player"
+            "file_name": "player",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
         },
         {
             "type": "MESH",
-            "name": "box.002",
+            "name": "pole",
             "transform": {
                 "translation": [
-                    -10.0,
-                    1.0,
-                    10.0
+                    4.0,
+                    5.0,
+                    25.0
                 ],
                 "rotation": [
                     0.0,
@@ -632,12 +213,480 @@
                     0.0
                 ],
                 "scaling": [
-                    3.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    2.0,
+                    0.5,
+                    0.5
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "pole.001",
+            "transform": {
+                "translation": [
+                    -4.0,
+                    5.0,
+                    25.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    2.0,
+                    0.5,
+                    0.5
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "pole.002",
+            "transform": {
+                "translation": [
+                    8.0,
+                    5.0,
+                    25.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    2.0,
+                    0.5,
+                    0.5
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "pole.003",
+            "transform": {
+                "translation": [
+                    -8.0,
+                    5.0,
+                    25.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    2.0,
+                    0.5,
+                    0.5
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "pole.004",
+            "transform": {
+                "translation": [
+                    0.0,
+                    5.0,
+                    25.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    2.0,
+                    0.5,
+                    0.5
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "stage",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    0.5
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    10.0,
+                    0.10000000149011612,
+                    9.5
+                ]
+            },
+            "file_name": "stage",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    20.0,
+                    1.0,
+                    20.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "stage.001",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    60.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    15.0,
+                    0.10000000149011612,
+                    15.0
+                ]
+            },
+            "file_name": "stage",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    30.0,
+                    1.0,
+                    30.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "wall.001",
+            "transform": {
+                "translation": [
+                    10.0,
+                    5.0,
+                    25.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
                     1.0,
                     3.0
                 ]
             },
-            "file_name": "box"
+            "file_name": "wall",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    5.0,
+                    6.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "wall.002",
+            "transform": {
+                "translation": [
+                    -10.0,
+                    5.0,
+                    25.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    3.0
+                ]
+            },
+            "file_name": "wall",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    5.0,
+                    6.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "pole.005",
+            "transform": {
+                "translation": [
+                    20.0,
+                    7.0,
+                    56.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    0.20000000298023224,
+                    1.0,
+                    4.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.4000000059604645,
+                    0.5,
+                    2.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "pole.006",
+            "transform": {
+                "translation": [
+                    -20.0,
+                    7.0,
+                    56.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    0.20000000298023224,
+                    1.0,
+                    4.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.4000000059604645,
+                    0.5,
+                    2.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "stage.002",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    110.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    5.0,
+                    0.10000000149011612,
+                    5.0
+                ]
+            },
+            "file_name": "stage",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    10.0,
+                    1.0,
+                    10.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "pole.007",
+            "transform": {
+                "translation": [
+                    0.0,
+                    2.0,
+                    102.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    0.20000000298023224,
+                    4.0,
+                    1.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.4000000059604645,
+                    2.0,
+                    0.5
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "enemy.002",
+            "transform": {
+                "translation": [
+                    0.0,
+                    3.0,
+                    112.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "enemy",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
         }
     ]
 }

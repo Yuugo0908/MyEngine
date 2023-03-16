@@ -13,8 +13,6 @@ public: // メンバ関数
 
 	bool Initialize(const XMFLOAT3 pos);
 
-	void Finalize() { delete playerModel; }
-
 	void Update(bool rFlag, bool moveFlag);
 
 	void Draw() { playerObj->Draw(); }
@@ -26,8 +24,6 @@ public: // メンバ関数
 	void Jump();
 
 	void Reset();
-
-	void ReSpawn();
 
 	// マップチップ当たり判定
 	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale);
@@ -71,7 +67,7 @@ private: // メンバ変数
 	bool moveFlag = false;//移動管理フラグ
 	float pMove = 0.0f;//移動量
 	float pAcc = 0.2f;//加速
-	float pVal = 0.2f;//速度
+	float pVel = 0.2f;//速度
 	float pDown = 0.0f;
 	float pGra = 0.1f;//重力
 	float rate = 1.0f; // 斜め移動時の制限

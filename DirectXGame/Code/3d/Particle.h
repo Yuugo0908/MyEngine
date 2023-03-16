@@ -85,14 +85,14 @@ public: // 静的メンバ関数
 	/// インスタンス生成
 	/// </summary>
 	/// <returns>インスタンス</returns>
-	static Particle* Create(ID3D12Device* device, Camera* camera);
+	static Particle* Create(ID3D12Device* device, Camera* camera, const wchar_t* fileName);
 
 public: // メンバ関数	
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <returns></returns>
-	void Initialize();
+	void Initialize(const wchar_t* fileName);
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
@@ -130,7 +130,7 @@ public: // メンバ関数
 	/// テクスチャ読み込み
 	/// </summary>
 	/// <returns>成否</returns>
-	void LoadTexture();
+	void LoadTexture(const wchar_t* fileName);
 
 	/// <summary>
 	/// モデル作成

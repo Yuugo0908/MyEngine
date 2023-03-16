@@ -41,8 +41,6 @@ public: // メンバ関数
 	~GameScene();
 	// 初期化
 	void Initialize(DirectXCommon* dxCommon, Audio* audio);
-	// 解放
-	void Finalize();
 	// 毎フレーム処理
 	void Update();
 	//pos初期化
@@ -65,7 +63,7 @@ public: // メンバ関数
 	// jsonオブジェクトの更新
 	void jsonObjectUpdate();
 
-	void GameScene::CreateParticles(XMFLOAT3 pos);
+	void GameScene::CreateParticles(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count);
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
@@ -83,7 +81,6 @@ private: // メンバ変数
 	Collision* collision = nullptr;
 	Light* light = nullptr;
 	Easing* easing = nullptr;
-	Particle* particle = nullptr;
 
 	Rope* rope = nullptr;
 	Player* player = nullptr;
@@ -106,7 +103,7 @@ private: // メンバ変数
 
 	enum Image2dNum
 	{
-		titleNum = 1, resultNum, GameOverNum, HPTextNum, HPBarNum, HPGaugeNum, backNum, expNum
+		titleNum = 1, resultNum, GameOverNum, HPTextNum, HPBarNum, HPGaugeNum, backNum, expNum, fadeNum,
 	};
 
 	// jsonオブジェクト
@@ -122,8 +119,12 @@ private: // メンバ変数
 	Image2d* PlayerHPBar = nullptr;
 	Image2d* PlayerHPGauge = nullptr;
 	Image2d* backGround = nullptr;
+	Image2d* fadeTex = nullptr;
 	float alpha = 0.0f;
 	Image2d* explanation = nullptr;
+
+	// パーティクル
+	Particle* box_effect = nullptr;
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
@@ -152,6 +153,7 @@ private: // メンバ変数
 	XMFLOAT3 cPos = {};
 	XMFLOAT3 cTarget = {};
 	XMVECTOR cameraLength = {};
+	const float trackLimit = -30.0f;
 
 	// シーン管理用
 	int nowScene = title_;

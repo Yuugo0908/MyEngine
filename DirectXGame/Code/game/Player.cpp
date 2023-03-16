@@ -7,12 +7,12 @@ bool Player::Initialize(const XMFLOAT3 pos)
 	controller = Controller::GetInstance();
 
 	// モデルの生成
-	playerModel = playerModel->CreateFromObject("sphere");
+	playerModel = playerModel->CreateFromObject("player");
 	playerObj = Object3d::Create();
 	playerObj->SetModel(playerModel);
 
 	pPos = pos;
-	pScale = { 0.8f,0.8f,0.8f };
+	pScale = { 0.8f, 0.8f, 0.8f };
 
 	playerObj->SetPosition(pPos);
 	playerObj->SetScale(pScale);
@@ -24,6 +24,7 @@ bool Player::Initialize(const XMFLOAT3 pos)
 
 void Player::Update(bool rFlag, bool moveFlag)
 {
+	// カメラが向いている方向を調べる
 	cameraTrack = camera->CameraTrack(pPos);
 	cameraRot = camera->CameraRot(pPos);
 	cameraTrack = cameraTrack * pSpeed;
@@ -31,12 +32,8 @@ void Player::Update(bool rFlag, bool moveFlag)
 	pPosOld = playerObj->GetPosition();
 	playerObj->SetPosition(pPos);
 	playerObj->SetScale(pScale);
+	// カメラが向いている方向にプレイヤーも向く
 	playerObj->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
-
-	if (pPos.y <= -30.0f)
-	{
-		ReSpawn();
-	}
 
 	if (moveFlag)
 	{
@@ -139,19 +136,18 @@ void Player::Jump()
 		onGround = false;
 		jumpFlag = true;
 		// 上昇率の更新
-		pVal = 1.25f;
+		pVel = 1.25f;
 	}
 
 	// ジャンプ
 	if (jumpFlag)
 	{
-		pVal -= pGra;
-		pPos.y += pVal;
-		playerObj->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+		pVel -= pGra;
+		pPos.y += pVel;
 		if (onGround)
 		{
 			jumpFlag = false;
-			pVal = 0.0f;
+			pVel = 0.0f;
 		}
 	}
 	// 重力
@@ -183,7 +179,7 @@ void Player::Reset()
 	moveFlag = false;//移動管理フラグ
 	pMove = 0.0f;//移動量
 	pAcc = 0.2f;//加速
-	pVal = 0.2f;//速度
+	pVel = 0.2f;//速度
 	pDown = 0.0f;
 	pGra = 0.1f;//重力
 	rate = 1.0f; // 斜め移動時の制限
@@ -195,20 +191,6 @@ void Player::Reset()
 	// カメラ距離取得用
 	cameraTrack = {};
 	cameraRot = 0.0f;
-}
-
-void Player::ReSpawn()
-{
-	// 位置を変数に格納
-	pPos = { 0.0f, 10.0f, 0.0f };
-	pPosOld = pPos;
-
-	pDown = 0.0f;
-	pVal = 0.0f;
-	jumpFlag = false;
-	playerObj->SetPosition(pPos);
-	playerObj->SetScale(pScale);
-	playerObj->Update();
 }
 
 bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
@@ -311,7 +293,6 @@ bool Player::StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale)
 				pPos.y = pPosOld.y;
 			}
 			onGround = true;
-			playerObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 		}
 	}
 
@@ -346,7 +327,7 @@ bool Player::PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale)
 			onGround = false;
 			jumpFlag = true;
 			// 上昇率の更新
-			pVal = 1.25f;
+			pVel = 1.25f;
 		}
 		else if (minBoxY - pScale.y < pPos.y && polePos.y > pPosOld.y)
 		{
@@ -354,7 +335,7 @@ bool Player::PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale)
 			onGround = false;
 			jumpFlag = true;
 			// 上昇率の更新
-			pVal = 1.25f;
+			pVel = 1.25f;
 		}
 	}
 
@@ -367,7 +348,7 @@ bool Player::PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale)
 			onGround = false;
 			jumpFlag = true;
 			// 上昇率の更新
-			pVal = 1.25f;
+			pVel = 1.25f;
 		}
 		else if (minBoxZ - pScale.z < pPos.z && polePos.z > pPosOld.z)
 		{
@@ -375,7 +356,7 @@ bool Player::PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale)
 			onGround = false;
 			jumpFlag = true;
 			// 上昇率の更新
-			pVal = 1.25f;
+			pVel = 1.25f;
 		}
 	}
 
@@ -388,7 +369,7 @@ bool Player::PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale)
 			onGround = false;
 			jumpFlag = true;
 			// 上昇率の更新
-			pVal = 1.25f;
+			pVel = 1.25f;
 		}
 		else if (minBoxX - pScale.x < pPos.x && polePos.x > pPosOld.x)
 		{
@@ -396,7 +377,7 @@ bool Player::PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale)
 			onGround = false;
 			jumpFlag = true;
 			// 上昇率の更新
-			pVal = 1.25f;
+			pVel = 1.25f;
 		}
 	}
 

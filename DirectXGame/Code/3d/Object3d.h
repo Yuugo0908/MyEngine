@@ -94,6 +94,11 @@ public: // メンバ関数
 	// オブジェクトタイプの取得
 	const int& GetType() { return type; }
 
+	// レベルエディタ用 当たり判定スケール設定
+	void SetCollisionScale(XMFLOAT3 collisionScale) { this->collisionScale = collisionScale; }
+	// レベルエディタ用 当たり判定スケール取得
+	const XMFLOAT3& GetCollisionScale() { return collisionScale; }
+
 private: // メンバ変数
 	ComPtr<ID3D12Resource> constBufferB0; // 定数バッファ
 	// 色
@@ -111,4 +116,6 @@ private: // メンバ変数
 	Model* model = nullptr;
 	// オブジェクトタイプ
 	int type = 0;
+	// コリジョンスケール
+	XMFLOAT3 collisionScale = {};
 };
