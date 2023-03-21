@@ -39,7 +39,7 @@ public: // メンバ関数
 
 private: // メンバ変数
 	// ウィンドウズアプリケーション管理
-	WinApp* winApp;
+	WinApp* winApp = nullptr;
 
 	// Direct3D関連
 	ComPtr<IDXGIFactory6> dxgiFactory;

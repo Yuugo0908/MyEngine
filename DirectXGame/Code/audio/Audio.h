@@ -42,6 +42,6 @@ public: // ƒƒ“ƒoŠÖ”
 	void Stop();
 private: // ƒƒ“ƒo•Ï”
 	ComPtr<IXAudio2> xAudio2;
-	IXAudio2MasteringVoice *masterVoice;
+	IXAudio2MasteringVoice *masterVoice = nullptr;
 	IXAudio2SourceVoice *pSourceVoice = nullptr;
 };
