@@ -26,6 +26,7 @@
 #include <SafeDelete.h>
 #include <stdlib.h>
 #include <time.h>
+#include <list>
 
 class GameScene {
 private: // 静的メンバ変数

@@ -9,9 +9,7 @@ GameScene::GameScene()
 
 GameScene::~GameScene()
 {
-	//jsonObject.erase(jsonObject.begin(), jsonObject.end());
-	//delete player;
-	//delete enemy;
+
 }
 
 void GameScene::Initialize(DirectXCommon* dxCommon, Audio* audio) {
