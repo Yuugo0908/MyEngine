@@ -33,13 +33,10 @@ private: // 静的メンバ変数
 	static const int debugTextTexNumber = 0;
 
 public: // メンバ関数
-
-	// コンストクラタ
-	GameScene();
-	// デストラクタ
-	~GameScene();
 	// 初期化
-	void Initialize(DirectXCommon* dxCommon, Audio* audio);
+	void Initialize();
+	// 終了
+	void Finalize();
 	// 毎フレーム処理
 	void Update();
 	//pos初期化
@@ -71,15 +68,12 @@ public: // メンバ関数
 	}
 
 private: // メンバ変数
-	DirectXCommon* dxCommon = nullptr;
 	Keyboard* keyboard = Keyboard::GetInstance();
 	Controller* controller = Controller::GetInstance();
 	Mouse* mouse = Mouse::GetInstance();
-	Audio* audio = nullptr;
+	Audio* audio = Audio::GetInstance();
 	Camera* camera = Camera::GetInstance();
-	Collision* collision = nullptr;
 	Light* light = nullptr;
-	Easing* easing = nullptr;
 
 	Rope* rope = nullptr;
 	Player* player = nullptr;

@@ -1,37 +1,17 @@
 #pragma once
-#include "WinApp.h"
-#include "DirectXCommon.h"
-#include "Audio.h"
-#include "GameScene.h"
-#include "Controller.h"
-#include "Light.h"
-#include "Mouse.h"
+#include "Framework.h"
 
 // ゲーム全体
-class MyGame
+class MyGame : public Framework
 {
-public:
+public: // メンバ関数
 
 	// 初期化
-	void Initialize();
+	void Initialize() override;
 	// 終了
-	void Finalize();
+	void Finalize() override;
 	// 毎フレーム更新
-	void Update();
+	void Update() override;
 	// 描画
-	void Draw();
-	// 終了リクエスト
-	bool IsEndRequest();
-
-	//ポインタ置き場
-	WinApp* win = nullptr;
-	DirectXCommon* dxCommon = nullptr;
-	Keyboard* keyboard = nullptr;
-	Mouse* mouse = nullptr;
-	Audio* audio = nullptr;
-	GameScene* gameScene = nullptr;
-	Camera* camera = nullptr;
-	Image2d* image2d = nullptr;
-	Controller* controller = nullptr;
-	Light* light = nullptr;
+	void Draw() override;
 };

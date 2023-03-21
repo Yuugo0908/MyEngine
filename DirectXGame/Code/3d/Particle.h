@@ -85,7 +85,7 @@ public: // 静的メンバ関数
 	/// インスタンス生成
 	/// </summary>
 	/// <returns>インスタンス</returns>
-	static Particle* Create(ID3D12Device* device, Camera* camera, const wchar_t* fileName);
+	static Particle* Create(const wchar_t* fileName);
 
 public: // メンバ関数	
 	/// <summary>
@@ -162,14 +162,5 @@ private: // メンバ変数
 	ComPtr<ID3D12Resource> constBuff;
 	// パーティクル配列
 	std::forward_list<ParticleData> particles;
-	// カメラ
-	Camera* camera = nullptr;
-private:
-	/// <summary>
-	/// コンストラクタ
-	/// </summary>
-	/// <param name="device">デバイス</param>
-	/// <param name="camera">カメラ</param>
-	Particle(ID3D12Device* device, Camera* camera);
 };
 

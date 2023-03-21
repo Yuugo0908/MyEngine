@@ -2,6 +2,7 @@
 #include <d3dcompiler.h>
 #include <DirectXTex.h>
 #include <string>
+#include <DirectXCommon.h>
 
 #pragma comment(lib, "d3dcompiler.lib")
 
@@ -9,10 +10,10 @@ using namespace DirectX;
 using namespace Microsoft::WRL;
 using namespace std;
 
-Particle * Particle::Create(ID3D12Device* device, Camera* camera, const wchar_t* fileName)
+Particle * Particle::Create(const wchar_t* fileName)
 {
 	// 3Dオブジェクトのインスタンスを生成
-	Particle* partMan = new Particle(device, camera);
+	Particle* partMan = new Particle;
 	if (partMan == nullptr) {
 		return nullptr;
 	}
@@ -25,11 +26,7 @@ Particle * Particle::Create(ID3D12Device* device, Camera* camera, const wchar_t*
 
 void Particle::Initialize(const wchar_t* fileName)
 {
-	// nullptrチェック
-	assert(device);
-
 	HRESULT result;
-
 	// デスクリプタヒープの初期化
 	InitializeDescriptorHeap();
 
@@ -43,7 +40,7 @@ void Particle::Initialize(const wchar_t* fileName)
 	CreateModel();
 
 	// 定数バッファの生成
-	result = device->CreateCommittedResource(
+	result = DirectXCommon::GetInstance()->GetDevice()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xff)&~0xff),
@@ -115,8 +112,8 @@ void Particle::Update()
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
 	if (SUCCEEDED(result))
 	{
-		constMap->mat = camera->GetMatViewProjection();
-		constMap->matBillboard = camera->GetMatBillboard();
+		constMap->mat = Camera::GetInstance()->GetMatViewProjection();
+		constMap->matBillboard = Camera::GetInstance()->GetMatBillboard();
 		// パーティクルの情報を1つずつ反映
 		for (std::forward_list<ParticleData>::iterator it = particles.begin(); it != particles.end(); it++)
 		{
@@ -188,13 +185,13 @@ void Particle::InitializeDescriptorHeap()
 	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;//シェーダから見えるように
 	descHeapDesc.NumDescriptors = 1; // シェーダーリソースビュー1つ
-	result = device->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descHeap));//生成
+	result = DirectXCommon::GetInstance()->GetDevice()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descHeap));//生成
 	if (FAILED(result)) {
 		assert(0);
 	}
 
 	// デスクリプタサイズを取得
-	descriptorHandleIncrementSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	descriptorHandleIncrementSize = DirectXCommon::GetInstance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
 void Particle::InitializeGraphicsPipeline()
@@ -359,7 +356,7 @@ void Particle::InitializeGraphicsPipeline()
 	// バージョン自動判定のシリアライズ
 	result = D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
 	// ルートシグネチャの生成
-	result = device->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
+	result = DirectXCommon::GetInstance()->GetDevice()->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
 	if (FAILED(result)) {
 		assert(0);
 	}
@@ -367,7 +364,7 @@ void Particle::InitializeGraphicsPipeline()
 	gpipeline.pRootSignature = rootsignature.Get();
 
 	// グラフィックスパイプラインの生成
-	result = device->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate));
+	result = DirectXCommon::GetInstance()->GetDevice()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate));
 
 	if (FAILED(result)) {
 		assert(0);
@@ -401,7 +398,7 @@ void Particle::LoadTexture(const wchar_t* fileName)
 	);
 
 	// テクスチャ用バッファの生成
-	result = device->CreateCommittedResource(
+	result = DirectXCommon::GetInstance()->GetDevice()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0),
 		D3D12_HEAP_FLAG_NONE,
 		&texresDesc,
@@ -436,7 +433,7 @@ void Particle::LoadTexture(const wchar_t* fileName)
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
 	srvDesc.Texture2D.MipLevels = 1;
 
-	device->CreateShaderResourceView(texbuff.Get(), //ビューと関連付けるバッファ
+	DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(texbuff.Get(), //ビューと関連付けるバッファ
 		&srvDesc, //テクスチャ設定情報
 		cpuDescHandleSRV
 	);
@@ -447,7 +444,7 @@ void Particle::CreateModel()
 	HRESULT result = S_FALSE;
 
 	// 頂点バッファ生成
-	result = device->CreateCommittedResource(
+	result = DirectXCommon::GetInstance()->GetDevice()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer(sizeof(VertexPos)*vertexCount),
@@ -463,10 +460,4 @@ void Particle::CreateModel()
 	vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
 	vbView.SizeInBytes = sizeof(VertexPos)*vertexCount;
 	vbView.StrideInBytes = sizeof(VertexPos);
-}
-
-Particle::Particle(ID3D12Device * device, Camera * camera)
-{
-	this->device = device;
-	this->camera = camera;
 }

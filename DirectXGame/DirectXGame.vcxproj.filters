@@ -168,6 +168,9 @@
     <ClCompile Include="Code\win\MyGame.cpp">
       <Filter>ソースファイル\win</Filter>
     </ClCompile>
+    <ClCompile Include="Code\win\Framework.cpp">
+      <Filter>ソースファイル\win</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\win\SafeDelete.h">
@@ -258,6 +261,9 @@
       <Filter>ヘッダーファイル\3d</Filter>
     </ClInclude>
     <ClInclude Include="Code\win\MyGame.h">
+      <Filter>ヘッダーファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\win\Framework.h">
       <Filter>ヘッダーファイル\win</Filter>
     </ClInclude>
   </ItemGroup>

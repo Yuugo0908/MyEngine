@@ -2,30 +2,19 @@
 #include <imgui.h>
 #include <cassert>
 
-GameScene::GameScene()
-{
-
-}
-
-GameScene::~GameScene()
-{
-
-}
-
-void GameScene::Initialize(DirectXCommon* dxCommon, Audio* audio) {
-	// nullptrチェック
-	assert(dxCommon);
-	assert(audio);
-
-	this->dxCommon = dxCommon;
-	this->audio = audio;
-
+void GameScene::Initialize() {
 	rope = new Rope;
 	player = new Player;
 	enemy = new Enemy;
 
 	// 3Dオブジェクトにカメラをセット
 	Object3d::SetCamera(camera);
+
+	// オーディオの初期化
+	if (!audio->Initialize())
+	{
+		assert(0);
+	}
 
 	// デバッグテキスト用テクスチャ読み込み
 	if (!Image2d::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png"))
@@ -105,7 +94,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Audio* audio) {
 	backGround->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 
 	// パーティクル生成
-	box_effect = Particle::Create(dxCommon->GetDevice(), camera, L"Resources/box_effect.png");
+	box_effect = Particle::Create(L"Resources/box_effect.png");
 
 
 	Enemy::StaticInit();
@@ -117,6 +106,14 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Audio* audio) {
 	light->SetLightColor({ 1.0f, 1.0f, 1.0f });
 	// 3Dオブジェクトにライトをセット
 	Object3d::SetLight(light);
+}
+
+void GameScene::Finalize()
+{
+	safe_delete(player);
+	safe_delete(enemy);
+	safe_delete(rope);
+	safe_delete(light);
 }
 
 void GameScene::jsonObjectInit(const std::string sceneName)
@@ -132,10 +129,13 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 			// 座標
 			XMFLOAT3 pos;
 			XMStoreFloat3(&pos, objectData.trans);
+			XMFLOAT3 size;
+			XMStoreFloat3(&size, objectData.size);
 
 			// プレイヤーを生成
 			player->Initialize(pos);
 			pPos = player->GetObj()->GetPosition();
+			player->GetObj()->SetCollisionScale(size);
 			// カメラの設定
 			camera->Reset();
 			camera->SetTarget(pPos);
@@ -148,11 +148,14 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 			// 座標
 			XMFLOAT3 pos;
 			XMStoreFloat3(&pos, objectData.trans);
+			XMFLOAT3 size;
+			XMStoreFloat3(&size, objectData.size);
 
 			// エネミーを生成
 			std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
 			newEnemy->Initialize(player);
 			newEnemy->GetObj()->SetPosition(pos);
+			newEnemy->GetObj()->SetCollisionScale(size);
 			enemys.push_back(std::move(newEnemy));
 			enemyCount++;
 			continue;
@@ -411,18 +414,18 @@ void GameScene::Draw() {
 
 #pragma region 背景画像描画
 	// 背景画像描画前処理
-	Image2d::PreDraw(dxCommon->GetCommandList());
+	Image2d::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 
 
 	// 画像描画後処理
 	Image2d::PostDraw();
 	// 深度バッファクリア
-	dxCommon->ClearDepthBuffer();
+	DirectXCommon::GetInstance()->ClearDepthBuffer();
 #pragma endregion 背景画像描画
 
 #pragma region 3Dオブジェクト描画
 	// 3Dオブジェクト描画前処理
-	Object3d::PreDraw(dxCommon->GetCommandList());
+	Object3d::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 
 	// 3Dオブクジェクトの描画
 	if (nowScene == game_)
@@ -441,7 +444,7 @@ void GameScene::Draw() {
 		}
 
 		// パーティクルの描画
-		box_effect->Draw(dxCommon->GetCommandList());
+		box_effect->Draw(DirectXCommon::GetInstance()->GetCommandList());
 	}
 
 	// 3Dオブジェクト描画後処理
@@ -450,7 +453,7 @@ void GameScene::Draw() {
 
 #pragma region 前景画像描画
 	// 前景画像描画前処理
-	Image2d::PreDraw(dxCommon->GetCommandList());
+	Image2d::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 
 	// 前景画像の描画
 
@@ -483,7 +486,7 @@ void GameScene::Draw() {
 	fadeTex->Draw();
 
 	// デバッグテキストの描画
-	DebugText::GetInstance()->DrawAll(dxCommon->GetCommandList());
+	DebugText::GetInstance()->DrawAll(DirectXCommon::GetInstance()->GetCommandList());
 	// 画像描画後処理
 	Image2d::PostDraw();
 #pragma endregion 前景画像描画
