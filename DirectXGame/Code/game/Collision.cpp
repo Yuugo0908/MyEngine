@@ -142,6 +142,85 @@ bool Collision::CollisionRaySphere(const Ray& ray, const Sphere& sphere)
 	return true;
 }
 
+bool Collision::CollisionRayBox(const XMFLOAT3 startPos, const XMFLOAT3 endPos, const XMFLOAT3 boxPos, const XMFLOAT3 boxScale)
+{
+	// ワールド空間での光線の基点
+	XMFLOAT3 layStart = startPos;
+	// ワールド空間での光線の方向
+	XMVECTOR playerPos = { startPos.x, startPos.y, startPos.z, 0 };
+	XMVECTOR enemyPos = { endPos.x, endPos.y, endPos.z, 0 };
+	XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, enemyPos);
+	XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
+	XMFLOAT3 layVec = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
+
+	bool crossFlag = true;
+
+	float t_min = -FLT_MAX;
+	float t_max = FLT_MAX;
+	float max[3] = { boxPos.x + boxScale.x, boxPos.y + boxScale.y, boxPos.z + boxScale.z };
+	float min[3] = { boxPos.x - boxScale.x, boxPos.y - boxScale.y, boxPos.z - boxScale.z };
+	float p[3] = { layStart.x, layStart.y, layStart.z };
+	float d[3] = { layVec.x, layVec.y, layVec.z };
+
+	for (int i = 0; i < 3; i++)
+	{
+		if (abs(d[i]) < FLT_EPSILON)
+		{
+			if (p[i] < min[i] || p[i] > max[i])
+			{
+				crossFlag = false; // 交差していない
+				continue;
+			}
+		}
+		else
+		{
+			// スラブとの距離を算出
+			// t1が近スラブ、t2が遠スラブとの距離
+			float odd = 1.0f / d[i];
+			float t1 = (min[i] - p[i]) * odd;
+			float t2 = (max[i] - p[i]) * odd;
+
+			if (t1 > t2)
+			{
+				float tmp = t1;
+				t1 = t2;
+				t2 = tmp;
+			}
+
+			if (t1 > t_min) t_min = t1;
+			if (t2 < t_max) t_max = t2;
+
+			// スラブ交差チェック
+			if (t_min >= t_max)
+			{
+				crossFlag = false;
+				continue;
+			}
+		}
+	}
+
+	if (!crossFlag)
+	{
+		return false;
+	}
+	else
+	{
+		XMFLOAT3 colPosMin = layStart + (layVec * t_min);
+		XMFLOAT3 colPosMax = layStart + (layVec * t_max);
+
+		if (GetLength(startPos, colPosMin) > GetLength(startPos, colPosMax) && GetLength(endPos, colPosMin) < GetLength(endPos, colPosMax))
+		{
+			//DebugText::GetInstance()->Print()
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	return false;
+}
+
 bool Collision::CollisionBoxPoint(const XMFLOAT3 boxPos, const XMFLOAT3 boxRadius, XMFLOAT3& pos, const XMFLOAT3 radius, XMFLOAT3 oldPos)
 {
 	//マップチップ

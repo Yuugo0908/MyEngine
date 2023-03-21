@@ -192,7 +192,7 @@ bool Rope::Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos)
 
 	// ƒŒƒC‚Ì“–‚½‚è”»’è(’¼üã‚É“G‚ª‚¢‚ê‚Îtrue‚»‚êˆÈŠO‚Ífalse)
 	XMFLOAT3 pos = object->GetPosition();
-	XMFLOAT3 scale = object->GetScale();
+	XMFLOAT3 scale = object->GetCollisionScale();
 
 	XMFLOAT3 lay = pPos;
 	XMFLOAT3 vec = manageRopePos;

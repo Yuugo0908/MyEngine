@@ -5,7 +5,7 @@ Model* Enemy::enemyModel = nullptr;
 
 bool Enemy::StaticInit()
 {
-	bulletModel = bulletModel->CreateFromObject("box");
+	bulletModel = bulletModel->CreateFromObject("bullet");
 	enemyModel = enemyModel->CreateFromObject("enemy");
 
 	if (bulletModel == nullptr || enemyModel == nullptr)
@@ -147,6 +147,7 @@ void Enemy::Move()
 
 void Enemy::Stay()
 {
+
 	enemyObj->Update();
 }
 

@@ -50,6 +50,8 @@ public: // 静的メンバ関数
 	static bool CollisionRayPlane(const Ray& ray, const Plane& plane, float* distance = nullptr, XMVECTOR* inter = nullptr);
 	// レイと球の当たり判定
 	static bool CollisionRaySphere(const Ray& ray, const Sphere& sphere);
+	// レイとBOXの当たり判定
+	static bool CollisionRayBox(const XMFLOAT3 startPos, const XMFLOAT3 endPos, const XMFLOAT3 boxPos, const XMFLOAT3 boxScale);
 
 	// BOXと点の当たり判定
 	static bool CollisionBoxPoint(const XMFLOAT3 boxPos, const XMFLOAT3 boxRadius, XMFLOAT3& pos, const XMFLOAT3 radius, XMFLOAT3 oldPos);
@@ -59,6 +61,6 @@ public: // 静的メンバ関数
 public: // メンバ関数
 
 	// オブジェクト同士の距離を取得
-	float GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b);
+	static float GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b);
 };
 

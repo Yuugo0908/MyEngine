@@ -59,7 +59,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(ProjectDir)Code\2d;$(ProjectDir)Code\3d;$(ProjectDir)Code\win;$(ProjectDir)Code\audio;$(ProjectDir)Code\operator;$(ProjectDir)Code\postEffect;$(ProjectDir)Code\game;$(ProjectDir)Code\input;$(ProjectDir)Code\fbx;$(ProjectDir)Code\json;$(ProjectDir)Code\scene</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(ProjectDir)Code\2d;$(ProjectDir)Code\3d;$(ProjectDir)Code\win;$(ProjectDir)Code\audio;$(ProjectDir)Code\operator;$(ProjectDir)Code\postEffect;$(ProjectDir)Code\game;$(ProjectDir)Code\input;$(ProjectDir)Code\json;$(ProjectDir)Code\scene</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -76,7 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(ProjectDir)Code\2d;$(ProjectDir)Code\3d;$(ProjectDir)Code\win;$(ProjectDir)Code\audio;$(ProjectDir)Code\operator;$(ProjectDir)Code\postEffect;$(ProjectDir)Code\game;$(ProjectDir)Code\input;$(ProjectDir)Code\fbx;$(ProjectDir)Code\json;$(ProjectDir)Code\scene</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(ProjectDir)Code\2d;$(ProjectDir)Code\3d;$(ProjectDir)Code\win;$(ProjectDir)Code\audio;$(ProjectDir)Code\operator;$(ProjectDir)Code\postEffect;$(ProjectDir)Code\game;$(ProjectDir)Code\input;$(ProjectDir)Code\json;$(ProjectDir)Code\scene</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -95,9 +95,6 @@
     <ClCompile Include="Code\3d\Object3d.cpp" />
     <ClCompile Include="Code\3d\Particle.cpp" />
     <ClCompile Include="Code\audio\Audio.cpp" />
-    <ClCompile Include="Code\fbx\FbxLoader.cpp" />
-    <ClCompile Include="Code\fbx\FbxModel.cpp" />
-    <ClCompile Include="Code\fbx\FbxObject3d.cpp" />
     <ClCompile Include="Code\game\Bullet.cpp" />
     <ClCompile Include="Code\game\Camera.cpp" />
     <ClCompile Include="Code\game\Collision.cpp" />
@@ -120,6 +117,7 @@
     <ClCompile Include="Code\scene\TitleScene.cpp" />
     <ClCompile Include="Code\win\DirectXCommon.cpp" />
     <ClCompile Include="Code\win\main.cpp" />
+    <ClCompile Include="Code\win\MyGame.cpp" />
     <ClCompile Include="Code\win\WinApp.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -136,9 +134,6 @@
     <ClInclude Include="Code\3d\Object3d.h" />
     <ClInclude Include="Code\3d\Particle.h" />
     <ClInclude Include="Code\audio\Audio.h" />
-    <ClInclude Include="Code\fbx\FbxLoader.h" />
-    <ClInclude Include="Code\fbx\FbxModel.h" />
-    <ClInclude Include="Code\fbx\FbxObject3d.h" />
     <ClInclude Include="Code\game\Bullet.h" />
     <ClInclude Include="Code\game\Camera.h" />
     <ClInclude Include="Code\game\Collision.h" />
@@ -160,6 +155,7 @@
     <ClInclude Include="Code\scene\GameScene.h" />
     <ClInclude Include="Code\scene\TitleScene.h" />
     <ClInclude Include="Code\win\DirectXCommon.h" />
+    <ClInclude Include="Code\win\MyGame.h" />
     <ClInclude Include="Code\win\SafeDelete.h" />
     <ClInclude Include="Code\win\WinApp.h" />
     <ClInclude Include="imgui\imconfig.h" />

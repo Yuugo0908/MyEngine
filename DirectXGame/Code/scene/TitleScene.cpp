@@ -1,5 +1,4 @@
 #include "TitleScene.h"
-#include "TitleScene.h"
 #include <imgui.h>
 #include <cassert>
 
@@ -12,10 +11,6 @@ TitleScene::~TitleScene() {
 }
 
 void TitleScene::Initialize() {
-	// デバイスのセット
-	FbxObject3d::SetDevice(dxCommon->GetDevice());
-	// グラフィックスパイプライン生成
-	FbxObject3d::CreateGraphicsPipeline();
 
 	// タイトル画像読み込み
 	if (!Image2d::LoadTexture(1, L"Resources/title.png"))

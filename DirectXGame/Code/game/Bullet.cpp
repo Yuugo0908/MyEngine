@@ -14,7 +14,6 @@ bool Bullet::Initialize(Model* bulletModel, const XMFLOAT3& pPos, const XMFLOAT3
 	bulletObj->SetModel(bulletModel);
 	bulletObj->SetPosition(bPos);
 	bulletObj->SetScale(bScale);
-	bulletObj->SetColor({ 0.1f, 0.1f, 1.0f, 1.0f });
 	return true;
 }
 

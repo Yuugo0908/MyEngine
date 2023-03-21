@@ -8,8 +8,6 @@
 #include "DebugText.h"
 #include "Object3d.h"
 #include "Model.h"
-#include "FbxLoader.h"
-#include "FbxObject3d.h"
 #include "Operator.h"
 
 #include "Camera.h"

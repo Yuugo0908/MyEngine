@@ -37,9 +37,6 @@
     <Filter Include="ソースファイル\game">
       <UniqueIdentifier>{cca2c0cc-dbcf-49eb-b8df-cd221dac1fff}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソースファイル\fbx">
-      <UniqueIdentifier>{78eda3b9-d558-4fa2-9155-fb8c700c4fbf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソースファイル\postEffect">
       <UniqueIdentifier>{a40b30a6-e501-4b18-a8c1-6a0afcd8a170}</UniqueIdentifier>
     </Filter>
@@ -60,9 +57,6 @@
     </Filter>
     <Filter Include="ヘッダーファイル\game">
       <UniqueIdentifier>{b5b818f0-054f-4355-93c9-e9380aa1e04d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダーファイル\fbx">
-      <UniqueIdentifier>{bf16e4b7-da25-418b-9bce-547a9805fbfb}</UniqueIdentifier>
     </Filter>
     <Filter Include="ヘッダーファイル\input">
       <UniqueIdentifier>{df0ac184-0eff-4929-94c1-62b6463e4b4d}</UniqueIdentifier>
@@ -138,15 +132,6 @@
     <ClCompile Include="Code\game\Player.cpp">
       <Filter>ソースファイル\game</Filter>
     </ClCompile>
-    <ClCompile Include="Code\fbx\FbxLoader.cpp">
-      <Filter>ソースファイル\fbx</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\fbx\FbxModel.cpp">
-      <Filter>ソースファイル\fbx</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\fbx\FbxObject3d.cpp">
-      <Filter>ソースファイル\fbx</Filter>
-    </ClCompile>
     <ClCompile Include="Code\audio\Audio.cpp">
       <Filter>ソースファイル\audio</Filter>
     </ClCompile>
@@ -203,6 +188,9 @@
     </ClCompile>
     <ClCompile Include="Code\3d\Particle.cpp">
       <Filter>ソースファイル\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\win\MyGame.cpp">
+      <Filter>ソースファイル\win</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -263,15 +251,6 @@
     <ClInclude Include="Code\game\Enemy.h">
       <Filter>ヘッダーファイル\game</Filter>
     </ClInclude>
-    <ClInclude Include="Code\fbx\FbxLoader.h">
-      <Filter>ヘッダーファイル\fbx</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\fbx\FbxModel.h">
-      <Filter>ヘッダーファイル\fbx</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\fbx\FbxObject3d.h">
-      <Filter>ヘッダーファイル\game</Filter>
-    </ClInclude>
     <ClInclude Include="Code\game\Light.h">
       <Filter>ヘッダーファイル\game</Filter>
     </ClInclude>
@@ -325,6 +304,9 @@
     </ClInclude>
     <ClInclude Include="Code\3d\Particle.h">
       <Filter>ヘッダーファイル\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\win\MyGame.h">
+      <Filter>ヘッダーファイル\win</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

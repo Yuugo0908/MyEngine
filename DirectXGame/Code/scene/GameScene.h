@@ -8,8 +8,6 @@
 #include "DebugText.h"
 #include "Object3d.h"
 #include "Model.h"
-#include "FbxLoader.h"
-#include "FbxObject3d.h"
 #include "Operator.h"
 
 #include "Camera.h"
@@ -56,7 +54,7 @@ public: // メンバ関数
 	// 当たり判定
 	void CollisionUpdate();
 	// 遮蔽物があるかの判別
-	bool RayCollision();
+	bool RayCollision(const XMFLOAT3 startPos, const XMFLOAT3 endPos, const XMFLOAT3 boxPos, const XMFLOAT3 boxScale);
 
 	// jsonオブジェクトの初期化
 	void jsonObjectInit(const std::string sceneName);
@@ -98,7 +96,7 @@ private: // メンバ変数
 
 	enum ObjectType
 	{
-		sphere_, box_, stage_, wall_, pole_,
+		sphere_, box_, stage_, wall_, pole_, skydome_,
 	};
 
 	enum Image2dNum
@@ -110,6 +108,12 @@ private: // メンバ変数
 	std::vector<std::unique_ptr<Object3d>> jsonObject{};
 	int objectType = 0;
 	bool layHit = false;
+	XMFLOAT3 boxPos = {};
+	XMFLOAT3 boxScale = {};
+
+	XMFLOAT3 polePos = {};
+	XMFLOAT3 poleScale = {};
+	float poleLength = 15.0f;
 
 	// 画像
 	Image2d* title = nullptr;
@@ -146,7 +150,6 @@ private: // メンバ変数
 	// ロープ
 	bool rFlag = false;
 	int throwCount = 0;
-	float PElength = 0.0f;
 	XMFLOAT3 catchPos = {};
 
 	// カメラ
