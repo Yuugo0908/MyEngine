@@ -7,12 +7,14 @@
 #include "Image2d.h"
 #include "DebugText.h"
 #include "Object3d.h"
+
+#include "Camera.h"
 #include "Audio.h"
+#include "Light.h"
 #include "BaseScene.h"
 
 #include <SafeDelete.h>
-
-class TitleScene : public BaseScene
+class GameOverScene : public BaseScene
 {
 private: // 静的メンバ変数
 	static const int debugTextTexNumber = 0;
@@ -27,39 +29,24 @@ public: // メンバ関数
 	// 描画
 	void Draw() override;
 
-	// ライトの更新
-	void LightUpdate();
-	// カメラの更新
-	void CameraUpdate();
-
-
-	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
-	{
-		XMFLOAT3 len = { posA.x - posB.x, posA.y - posB.y, posA.z - posB.z };
-		return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
-	}
-
 private: // メンバ変数
 	Keyboard* keyboard = Keyboard::GetInstance();
 	Controller* controller = Controller::GetInstance();
 	Mouse* mouse = Mouse::GetInstance();
 	Audio* audio = Audio::GetInstance();
 	Camera* camera = Camera::GetInstance();
-	Light* light = nullptr;
 
 	enum Image2dNum
 	{
-		titleNum = 1, backNum, expNum, fadeNum,
+		GameOverNum, backNum, fadeNum,
 	};
 
 	// 画像
-	Image2d* title = nullptr;
-	Image2d* fadeTex = nullptr;
-	Image2d* explanation = nullptr;
+	Image2d* GameOver = nullptr;
 	Image2d* backGround = nullptr;
+	Image2d* fadeTex = nullptr;
 
-	float alpha = 0.0f;
-	bool fadeIn = false;
-	bool fadeOut = false;
-	bool expFlag = false;
+	float alpha = 1.0f;
+	bool fadeFlag = false;
 };
+

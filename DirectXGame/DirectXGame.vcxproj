@@ -116,8 +116,11 @@
     <ClCompile Include="Code\postEffect\MultiRT.cpp" />
     <ClCompile Include="Code\postEffect\MultiTex.cpp" />
     <ClCompile Include="Code\postEffect\PostEffect.cpp" />
-    <ClCompile Include="Code\scene\EndScene.cpp" />
+    <ClCompile Include="Code\scene\GameClearScene.cpp" />
+    <ClCompile Include="Code\scene\GameOverScene.cpp" />
     <ClCompile Include="Code\scene\GameScene.cpp" />
+    <ClCompile Include="Code\scene\SceneFactory.cpp" />
+    <ClCompile Include="Code\scene\SceneManager.cpp" />
     <ClCompile Include="Code\scene\TitleScene.cpp" />
     <ClCompile Include="Code\win\DirectXCommon.cpp" />
     <ClCompile Include="Code\win\Framework.cpp" />
@@ -149,8 +152,13 @@
     <ClInclude Include="Code\postEffect\MultiRT.h" />
     <ClInclude Include="Code\postEffect\MultiTex.h" />
     <ClInclude Include="Code\postEffect\PostEffect.h" />
-    <ClInclude Include="Code\scene\EndScene.h" />
+    <ClInclude Include="Code\scene\AbstructSceneFactory.h" />
+    <ClInclude Include="Code\scene\BaseScene.h" />
+    <ClInclude Include="Code\scene\GameClearScene.h" />
+    <ClInclude Include="Code\scene\GameOverScene.h" />
     <ClInclude Include="Code\scene\GameScene.h" />
+    <ClInclude Include="Code\scene\SceneFactory.h" />
+    <ClInclude Include="Code\scene\SceneManager.h" />
     <ClInclude Include="Code\scene\TitleScene.h" />
     <ClInclude Include="Code\win\DirectXCommon.h" />
     <ClInclude Include="Code\win\Framework.h" />

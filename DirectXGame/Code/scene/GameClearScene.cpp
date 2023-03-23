@@ -1,9 +1,8 @@
-#include "TitleScene.h"
-#include <cassert>
+#include "GameClearScene.h"
 #include <SceneManager.h>
 
-void TitleScene::Initialize() {
-
+void GameClearScene::Initialize()
+{
 	// オーディオの初期化
 	if (!audio->Initialize())
 	{
@@ -19,14 +18,13 @@ void TitleScene::Initialize() {
 	// デバッグテキスト初期化
 	DebugText::GetInstance()->Initialize(debugTextTexNumber);
 
-	// タイトル画像読み込み
-	if (!Image2d::LoadTexture(titleNum, L"Resources/title.png"))
+	// ゲームクリア画像読み込み
+	if (!Image2d::LoadTexture(GameClearNum, L"Resources/GameClear.png"))
 	{
 		assert(0);
 	}
-	title = Image2d::Create(titleNum, { 0.0f,0.0f });
-	title->SetSize({ 1280.0f,720.0f });
-
+	GameClear = Image2d::Create(GameClearNum, { 0.0f,0.0f });
+	GameClear->SetSize({ 1280.0f,720.0f });
 
 	if (!Image2d::LoadTexture(fadeNum, L"Resources/fade.png"))
 	{
@@ -35,14 +33,6 @@ void TitleScene::Initialize() {
 	fadeTex = Image2d::Create(fadeNum, { 0.0f,0.0f });
 	fadeTex->SetSize({ 1280.0f,720.0f });
 	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
-
-	if (!Image2d::LoadTexture(expNum, L"Resources/Operation_Explanation.png"))
-	{
-		assert(0);
-	}
-	explanation = Image2d::Create(expNum, { 0.0f,0.0f });
-	explanation->SetSize({ 1280.0f,720.0f });
-	explanation->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 
 	if (!Image2d::LoadTexture(backNum, L"Resources/backGround.png"))
 	{
@@ -53,46 +43,28 @@ void TitleScene::Initialize() {
 	backGround->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 }
 
-void TitleScene::Finalize()
+void GameClearScene::Finalize()
 {
-
+	safe_delete(GameClear);
 }
 
-void TitleScene::Update()
+void GameClearScene::Update()
 {
-	if (!fadeIn && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
+	if (fadeFlag == false && alpha > 0.0f)
 	{
-		backGround->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-		// 操作説明はプレイ中、一度だけ表示する
-		if (!expFlag)
+		alpha -= 0.02f;
+	}
+	else
+	{
+		if (keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
 		{
-			expFlag = true;
-			title->SetColor({ 0.0f, 0.0f, 0.0f, 0.0f });
-			explanation->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-		}
-
-		else if (!fadeIn)
-		{
-			fadeIn = true;
+			SceneManager::GetInstance()->ChangeScene("Title");
 		}
 	}
-
-	if (fadeIn)
-	{
-		alpha += 0.02f;
-		fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
-		if (alpha >= 1.0f)
-		{
-			fadeIn = false;
-			fadeOut = true;
-			explanation->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
-			backGround->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
-			SceneManager::GetInstance()->ChangeScene("Game");
-		}
-	}
+	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
 }
 
-void TitleScene::Draw()
+void GameClearScene::Draw()
 {
 #pragma region 背景画像描画
 	// 背景画像描画前処理
@@ -121,9 +93,7 @@ void TitleScene::Draw()
 	Image2d::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 
 	// 前景画像の描画
-
-	title->Draw();
-	explanation->Draw();
+	GameClear->Draw();
 	fadeTex->Draw();
 
 	// デバッグテキストの描画
@@ -131,18 +101,4 @@ void TitleScene::Draw()
 	// 画像描画後処理
 	Image2d::PostDraw();
 #pragma endregion 前景画像描画
-}
-
-void TitleScene::LightUpdate()
-{
-	//光線方向初期値
-	static XMVECTOR lightDir = { 5, -5, 5, 0 };
-
-	light->SetLightDir(lightDir);
-	light->Update();
-}
-
-void TitleScene::CameraUpdate()
-{
-
 }

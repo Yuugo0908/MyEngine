@@ -1,6 +1,7 @@
 ﻿#include "GameScene.h"
 #include <imgui.h>
 #include <cassert>
+#include <SceneManager.h>
 
 void GameScene::Initialize() {
 	rope = new Rope;
@@ -25,22 +26,6 @@ void GameScene::Initialize() {
 	// デバッグテキスト初期化
 	DebugText::GetInstance()->Initialize(debugTextTexNumber);
 
-	// タイトル画像読み込み
-	if (!Image2d::LoadTexture(titleNum, L"Resources/title.png"))
-	{
-		assert(0);
-	}
-	title = Image2d::Create(titleNum, { 0.0f,0.0f });
-	title->SetSize({ 1280.0f,720.0f });
-
-	// ゲームクリア画像読み込み
-	if (!Image2d::LoadTexture(resultNum, L"Resources/GameClear.png"))
-	{
-		assert(0);
-	}
-	result = Image2d::Create(resultNum, { 0.0f,0.0f });
-	result->SetSize({ 1280.0f,720.0f });
-
 	if (!Image2d::LoadTexture(HPTextNum, L"Resources/HPText.png"))
 	{
 		assert(0);
@@ -62,14 +47,7 @@ void GameScene::Initialize() {
 	PlayerHPGauge = Image2d::Create(HPGaugeNum, { 0.0f,45.0f });
 	PlayerHPGauge->SetSize({ 30.0f,60.0f });
 
-	if (!Image2d::LoadTexture(GameOverNum, L"Resources/GameOver.png"))
-	{
-		assert(0);
-	}
-	GameOver = Image2d::Create(GameOverNum, { 0.0f,0.0f });
-	GameOver->SetSize({ 1280.0f,720.0f });
-
-	if (!Image2d::LoadTexture(fadeNum, L"Resources/black_backGround.png"))
+	if (!Image2d::LoadTexture(fadeNum, L"Resources/fade.png"))
 	{
 		assert(0);
 	}
@@ -77,25 +55,8 @@ void GameScene::Initialize() {
 	fadeTex->SetSize({ 1280.0f,720.0f });
 	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 
-	if (!Image2d::LoadTexture(expNum, L"Resources/Operation_Explanation.png"))
-	{
-		assert(0);
-	}
-	explanation = Image2d::Create(expNum, { 0.0f,0.0f });
-	explanation->SetSize({ 1280.0f,720.0f });
-	explanation->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
-
-	if (!Image2d::LoadTexture(backNum, L"Resources/backGround.png"))
-	{
-		assert(0);
-	}
-	backGround = Image2d::Create(backNum, { 0.0f,0.0f });
-	backGround->SetSize({ 1280.0f,720.0f });
-	backGround->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-
 	// パーティクル生成
 	box_effect = Particle::Create(L"Resources/box_effect.png");
-
 
 	Enemy::StaticInit();
 	rope->Initialize();
@@ -106,6 +67,8 @@ void GameScene::Initialize() {
 	light->SetLightColor({ 1.0f, 1.0f, 1.0f });
 	// 3Dオブジェクトにライトをセット
 	Object3d::SetLight(light);
+
+	jsonObjectInit("gameScene");
 }
 
 void GameScene::Finalize()
@@ -114,6 +77,7 @@ void GameScene::Finalize()
 	safe_delete(enemy);
 	safe_delete(rope);
 	safe_delete(light);
+	safe_delete(levelData);
 }
 
 void GameScene::jsonObjectInit(const std::string sceneName)
@@ -220,164 +184,80 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 	}
 }
 
-void GameScene::Update() {
-
-	// タイトル
-	if (nowScene == title_)
-	{
-		if (!fadeIn && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
-		{
-			backGround->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-			// 操作説明はプレイ中、一度だけ表示する
-			if (!expFlag)
-			{
-				expFlag = true;
-				title->SetColor({ 0.0f, 0.0f, 0.0f, 0.0f });
-				explanation->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-			}
-
-			else if (!fadeIn)
-			{
-				fadeIn = true;
-			}
-		}
-
-		if(fadeIn)
-		{
-			alpha += 0.02f;
-			fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
-			if (alpha >= 1.0f)
-			{
-				jsonObjectInit("gameScene");
-				nowScene = game_;
-				fadeIn = false;
-				fadeOut = true; 
-				explanation->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
-				backGround->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
-			}
-		}
-	}
-
+void GameScene::Update()
+{
 	// タイトルから移行後の更新
-	if (nowScene == game_)
+	//	プレイヤーの座標、半径の設定
+	player->Update(rFlag, moveFlag);
+	pPos = player->GetObj()->GetPosition();
+	pScale = player->GetObj()->GetScale();
+	if (attackFlag)
 	{
-		//	プレイヤーの座標、半径の設定
-		player->Update(rFlag, moveFlag);
-		pPos = player->GetObj()->GetPosition();
-		pScale = player->GetObj()->GetScale();
-		if (attackFlag)
-		{
-			player->Rush(catchPos, attackFlag, avoidTime);
-		}
-		rope->Update(pPos);
+		player->Rush(catchPos, attackFlag, avoidTime);
+	}
+	rope->Update(pPos);
 
-		// jsonファイルから読み込んだオブジェクトの更新
-		jsonObjectUpdate();
+	// jsonファイルから読み込んだオブジェクトの更新
+	jsonObjectUpdate();
+	CollisionUpdate();
+	LightUpdate();
+	CameraUpdate();
+	box_effect->Update();
 
-		CollisionUpdate();
-		LightUpdate();
-		CameraUpdate();
-		box_effect->Update();
+	// フラグの取得
+	rFlag = rope->GetrFlag();
+	moveFlag = rope->GetmoveFlag();
+	avoidFlag = player->GetAvoidFlag();
+	onGround = player->GetOnGround();
 
-		// フェードアウトが終わるまではここでリターン
-		if (fadeOut)
-		{
-			alpha -= 0.02f;
-			fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });			
-			if (alpha <= 0.0f)
-			{
-				fadeOut = false;
-			}
-		}
-		
-
-		if (!fadeIn && !fadeOut)
-		{
-			// フラグの取得
-			rFlag = rope->GetrFlag();
-			moveFlag = rope->GetmoveFlag();
-			avoidFlag = player->GetAvoidFlag();
-			onGround = player->GetOnGround();
-
-			if (throwCount < 30)
-			{
-				throwCount++;
-			}
-
-			if (throwCount == 30)
-			{
-				rope->Throw(pPos, posSave, minLength);
-				posSave = {};
-				minLength = 15.0f;
-			}
-
-			player->GetObj()->SetPosition(pPos);
-		}
-
-		if (enemyHp <= 0)
-		{
-			fadeIn = true;
-			if (fadeIn)
-			{
-				alpha += 0.02f;
-				fadeTex->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
-				if (alpha >= 1.0)
-				{
-					nowScene = clear_;
-					fadeIn = false;
-					fadeOut = true;
-				}
-			}
-		}
-
-		if (playerHp <= 0)
-		{
-			fadeIn = true;
-			if (fadeIn)
-			{
-				alpha += 0.02f;
-				fadeTex->SetColor(XMFLOAT4{ 1.0f, 1.0f, 1.0f, alpha });
-				if (alpha >= 1.0f)
-				{
-					nowScene = failure_;
-					fadeIn = false;
-					fadeOut = true;
-				}
-			}
-		}
+	if (throwCount < 30)
+	{
+		throwCount++;
 	}
 
-	if (nowScene == clear_ || nowScene == failure_)
+	if (throwCount == 30)
 	{
-		if (fadeOut)
-		{
-			backGround->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-			alpha -= 0.02f;
-			fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
-			if (alpha <= 0.0f)
-			{
-				fadeOut = false;
-			}
-		}
+		rope->Throw(pPos, posSave, minLength);
+		posSave = {};
+		minLength = 15.0f;
+	}
+	player->GetObj()->SetPosition(pPos);
 
-		if (alpha <= 0.0f && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
+	if (enemyHp <= 0)
+	{
+		fadeFlag = true;
+		gameClearFlag = true;
+	}
+	else if (playerHp <= 0)
+	{
+		fadeFlag = true;
+		gameOverFlag = true;
+	}
+
+	if (fadeFlag == false && alpha > 0.0f)
+	{
+		alpha -= 0.02f;
+	}
+	else
+	{
+		alpha += 0.02f;
+		if (alpha >= 1.0f)
 		{
-			player->Reset();
-			for (std::unique_ptr<Enemy>& enemy : enemys)
-			{
-				enemy->Reset();
-			}
-			enemys.erase(enemys.begin(), enemys.end());
-			rope->Reset();
 			reset();
-			title->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-			nowScene = title_;
 		}
 	}
+	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
 }
 
 void GameScene::reset()
 {
+	player->Reset();
+	for (std::unique_ptr<Enemy>& enemy : enemys)
+	{
+		enemy->Reset();
+	}
+	enemys.erase(enemys.begin(), enemys.end());
+	rope->Reset();
 	jsonObject.erase(jsonObject.begin(), jsonObject.end());
 
 	// プレイヤー
@@ -406,6 +286,15 @@ void GameScene::reset()
 
 	// シェイク用
 	shakeFlag = false;
+
+	if (gameClearFlag)
+	{
+		SceneManager::GetInstance()->ChangeScene("GameClear");
+	}
+	else if (gameOverFlag)
+	{
+		SceneManager::GetInstance()->ChangeScene("GameOver");
+	}
 }
 
 void GameScene::Draw() {
@@ -428,24 +317,21 @@ void GameScene::Draw() {
 	Object3d::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 
 	// 3Dオブクジェクトの描画
-	if (nowScene == game_)
+	player->GetObj()->Draw();
+
+	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
-		player->GetObj()->Draw();
-
-		for (std::unique_ptr<Enemy>& enemy : enemys)
-		{
-			enemy->Draw();
-		}
-		rope->Draw();
-
-		for (auto& object : jsonObject)
-		{
-			object->Draw();
-		}
-
-		// パーティクルの描画
-		box_effect->Draw(DirectXCommon::GetInstance()->GetCommandList());
+		enemy->Draw();
 	}
+	rope->Draw();
+
+	for (auto& object : jsonObject)
+	{
+		object->Draw();
+	}
+
+	// パーティクルの描画
+	box_effect->Draw(DirectXCommon::GetInstance()->GetCommandList());
 
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
@@ -456,33 +342,12 @@ void GameScene::Draw() {
 	Image2d::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 
 	// 前景画像の描画
+	HPText->Draw();
+	PlayerHPBar->Draw();
 
-	backGround->Draw();
-	if (nowScene == title_)
-	{
-		title->Draw();
-	}
+	PlayerHPGauge->SetSize({ playerHp,60 });
+	PlayerHPGauge->Draw();
 
-	if (nowScene == game_)
-	{
-		HPText->Draw();
-		PlayerHPBar->Draw();
-
-		PlayerHPGauge->SetSize({ playerHp,60 });
-		PlayerHPGauge->Draw();
-	}
-
-	if (nowScene == clear_)
-	{
-		result->Draw();
-	}
-
-	if (nowScene == failure_)
-	{
-		GameOver->Draw();
-	}
-
-	explanation->Draw();
 	fadeTex->Draw();
 
 	// デバッグテキストの描画
@@ -811,7 +676,7 @@ bool GameScene::RayCollision(const XMFLOAT3 startPos, const XMFLOAT3 endPos, con
 		XMFLOAT3 colPosMin = layStart + (layVec * t_min);
 		XMFLOAT3 colPosMax = layStart + (layVec * t_max);
 
-		if (GetLength(startPos, colPosMin) > GetLength(startPos, colPosMax) && GetLength(endPos, colPosMin) < GetLength(endPos, colPosMax))
+		if (GetLength(startPos, colPosMin) >= GetLength(startPos, colPosMax) && GetLength(endPos, colPosMin) <= GetLength(endPos, colPosMax))
 		{
 			CreateParticles(colPosMin, 0.0f, 5.0f, { 1.0f, 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }, 1);
 			CreateParticles(colPosMax, 0.0f, 5.0f, { 1.0f, 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }, 1);

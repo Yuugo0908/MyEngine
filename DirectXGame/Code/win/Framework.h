@@ -1,10 +1,15 @@
 #pragma once
 #include "DirectXCommon.h"
 #include "Audio.h"
-#include "GameScene.h"
+#include "Keyboard.h"
+#include "Camera.h"
+#include "Object3d.h"
+#include "SceneManager.h"
 #include "Controller.h"
 #include "Light.h"
 #include "Mouse.h"
+#include "AbstructSceneFactory.h"
+#include "SafeDelete.h"
 
 class Framework
 {
@@ -30,7 +35,7 @@ public: // メンバ関数
 	// 実行
 	void Run();
 
-private: // メンバ変数
+protected: // メンバ変数
 	bool endRequest_ = false;
 	//ポインタ置き場
 	WinApp* win = nullptr;
@@ -39,9 +44,10 @@ private: // メンバ変数
 	Mouse* mouse = nullptr;
 	Controller* controller = nullptr;
 	Audio* audio = nullptr;
-	GameScene* gameScene = nullptr;
 	Camera* camera = nullptr;
 	Image2d* image2d = nullptr;
 	Light* light = nullptr;
+	SceneManager* sceneManager = nullptr;
+	AbstructSceneFactory* sceneFactory_ = nullptr;
 };
 

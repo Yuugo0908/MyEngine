@@ -38,10 +38,6 @@ void Framework::Initialize()
 	{
 		assert(0);
 	}
-
-	// ゲームシーンの初期化
-	gameScene = new GameScene();
-	gameScene->Initialize();
 }
 
 void Framework::Finalize()
@@ -49,8 +45,6 @@ void Framework::Finalize()
 	// 終了時にカーソル移動の制限を解除
 	ClipCursor(NULL);
 	//解放
-	gameScene->Finalize();
-	safe_delete(gameScene);
 	safe_delete(audio);
 	safe_delete(image2d);
 	safe_delete(light);
@@ -77,32 +71,18 @@ void Framework::Update()
 		controller->Update();
 		mouse->Update();
 		// ゲームシーンの毎フレーム処理
-		gameScene->Update();
+		SceneManager::GetInstance()->Update();
 	}
 }
 
 void Framework::Draw()
 {
-	//// 背景画像描画前処理
-	//Image2d::PreDraw(dxCommon->GetCommandList());
-	//// 背景画像描画
-	//image2d->Draw();
-	//// 画像描画後処理
-	//Image2d::PostDraw();
-
 	// 描画開始
 	dxCommon->PreDraw();
 	// ゲームシーンの描画
-	gameScene->Draw();
+	SceneManager::GetInstance()->Draw();
 	// 描画終了
 	dxCommon->PostDraw();
-
-	////レンダーテクスチャへの描画開始
-	//multiTex->PreDraw(dxCommon->GetCommandList());
-	//// ポストエフェクトの描画
-	//multiTex->Draw(dxCommon->GetCommandList());
-	////レンダーテクスチャへの描画終了
-	//multiTex->PostDraw(dxCommon->GetCommandList());
 }
 
 void Framework::Run()

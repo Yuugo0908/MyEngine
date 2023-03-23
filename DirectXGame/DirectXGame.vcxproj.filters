@@ -156,7 +156,7 @@
     <ClCompile Include="Code\scene\TitleScene.cpp">
       <Filter>ソースファイル\scene</Filter>
     </ClCompile>
-    <ClCompile Include="Code\scene\EndScene.cpp">
+    <ClCompile Include="Code\scene\GameClearScene.cpp">
       <Filter>ソースファイル\scene</Filter>
     </ClCompile>
     <ClCompile Include="Code\scene\GameScene.cpp">
@@ -170,6 +170,15 @@
     </ClCompile>
     <ClCompile Include="Code\win\Framework.cpp">
       <Filter>ソースファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\scene\SceneManager.cpp">
+      <Filter>ソースファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\scene\GameOverScene.cpp">
+      <Filter>ソースファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\scene\SceneFactory.cpp">
+      <Filter>ソースファイル\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -248,7 +257,7 @@
     <ClInclude Include="Code\json\LevelLoader.h">
       <Filter>ヘッダーファイル\json</Filter>
     </ClInclude>
-    <ClInclude Include="Code\scene\EndScene.h">
+    <ClInclude Include="Code\scene\GameClearScene.h">
       <Filter>ヘッダーファイル\scene</Filter>
     </ClInclude>
     <ClInclude Include="Code\scene\TitleScene.h">
@@ -265,6 +274,21 @@
     </ClInclude>
     <ClInclude Include="Code\win\Framework.h">
       <Filter>ヘッダーファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\scene\BaseScene.h">
+      <Filter>ヘッダーファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\scene\SceneManager.h">
+      <Filter>ヘッダーファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\scene\GameOverScene.h">
+      <Filter>ヘッダーファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\scene\AbstructSceneFactory.h">
+      <Filter>ヘッダーファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\scene\SceneFactory.h">
+      <Filter>ヘッダーファイル\scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -22,27 +22,30 @@
 #include "Easing.h"
 #include "LevelLoader.h"
 #include "Particle.h"
+#include "BaseScene.h"
 
 #include <SafeDelete.h>
 #include <stdlib.h>
 #include <time.h>
 #include <list>
 
-class GameScene {
+class GameScene : public BaseScene
+{
 private: // 静的メンバ変数
 	static const int debugTextTexNumber = 0;
 
 public: // メンバ関数
 	// 初期化
-	void Initialize();
+	void Initialize() override;
 	// 終了
-	void Finalize();
+	void Finalize() override;
 	// 毎フレーム処理
-	void Update();
+	void Update() override;
+	// 描画
+	void Draw() override;
+
 	//pos初期化
 	void reset();
-	// 描画
-	void Draw();
 	// Imguiの設定
 	void SetImgui();
 	// ライトの更新
@@ -96,7 +99,7 @@ private: // メンバ変数
 
 	enum Image2dNum
 	{
-		titleNum = 1, resultNum, GameOverNum, HPTextNum, HPBarNum, HPGaugeNum, backNum, expNum, fadeNum,
+		HPTextNum, HPBarNum, HPGaugeNum, fadeNum,
 	};
 
 	// jsonオブジェクト
@@ -111,16 +114,11 @@ private: // メンバ変数
 	float poleLength = 15.0f;
 
 	// 画像
-	Image2d* title = nullptr;
-	Image2d* result = nullptr;
-	Image2d* GameOver = nullptr;
 	Image2d* HPText = nullptr;
 	Image2d* PlayerHPBar = nullptr;
 	Image2d* PlayerHPGauge = nullptr;
-	Image2d* backGround = nullptr;
 	Image2d* fadeTex = nullptr;
-	float alpha = 0.0f;
-	Image2d* explanation = nullptr;
+	float alpha = 1.0f;
 
 	// パーティクル
 	Particle* box_effect = nullptr;
@@ -154,10 +152,9 @@ private: // メンバ変数
 	const float trackLimit = -30.0f;
 
 	// シーン管理用
-	int nowScene = title_;
-	bool fadeIn = false;
-	bool fadeOut = false;
-	bool expFlag = false;
+	bool fadeFlag = false;
+	bool gameClearFlag = false;
+	bool gameOverFlag = false;
 
 	// シェイク用
 	bool shakeFlag = false;
