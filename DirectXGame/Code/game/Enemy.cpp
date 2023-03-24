@@ -3,7 +3,7 @@
 Model* Enemy::bulletModel = nullptr;
 Model* Enemy::enemyModel = nullptr;
 
-bool Enemy::StaticInit()
+bool Enemy::ModelInit()
 {
 	bulletModel = bulletModel->CreateFromObject("bullet");
 	enemyModel = enemyModel->CreateFromObject("enemy");

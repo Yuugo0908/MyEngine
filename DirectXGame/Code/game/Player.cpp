@@ -35,6 +35,18 @@ void Player::Update(bool rFlag, bool moveFlag)
 	// カメラが向いている方向にプレイヤーも向く
 	playerObj->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
 
+	// ダメージを受けた後の処理
+	if (damageInterval > 0)
+	{
+		damageInterval--;
+		float alpha = 0.5f;
+		playerObj->SetColor({ 1.0f, 0.0f, 0.0f, alpha });
+	}
+	else
+	{
+		playerObj->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+	}
+
 	if (moveFlag)
 	{
 		if (!rFlag)
@@ -160,6 +172,16 @@ void Player::Jump()
 			pDown = 0.0f;
 		}
 	}
+}
+
+bool Player::Damage(const std::unique_ptr<Object3d>& object)
+{
+	if (damageInterval == 0 && Collision::CollisionObject(object, playerObj))
+	{
+		damageInterval = 120;
+		return true;
+	}
+	return false;
 }
 
 void Player::Reset()

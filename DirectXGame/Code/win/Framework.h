@@ -13,6 +13,8 @@
 
 class Framework
 {
+private: // Ã“Iƒƒ“ƒo•Ï”
+	static const int debugTextTexNumber = 0;
 public: // ƒƒ“ƒoŠÖ”
 
 	virtual ~Framework() = default;

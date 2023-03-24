@@ -1,23 +1,8 @@
 #include "TitleScene.h"
 #include <cassert>
-#include <SceneManager.h>
+#include "SceneManager.h"
 
 void TitleScene::Initialize() {
-
-	// オーディオの初期化
-	if (!audio->Initialize())
-	{
-		assert(0);
-	}
-
-	// デバッグテキスト用テクスチャ読み込み
-	if (!Image2d::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png"))
-	{
-		assert(0);
-	}
-
-	// デバッグテキスト初期化
-	DebugText::GetInstance()->Initialize(debugTextTexNumber);
 
 	// タイトル画像読み込み
 	if (!Image2d::LoadTexture(titleNum, L"Resources/title.png"))
@@ -55,7 +40,9 @@ void TitleScene::Initialize() {
 
 void TitleScene::Finalize()
 {
-
+	safe_delete(title);
+	safe_delete(fadeTex);
+	safe_delete(backGround);
 }
 
 void TitleScene::Update()
@@ -131,18 +118,4 @@ void TitleScene::Draw()
 	// 画像描画後処理
 	Image2d::PostDraw();
 #pragma endregion 前景画像描画
-}
-
-void TitleScene::LightUpdate()
-{
-	//光線方向初期値
-	static XMVECTOR lightDir = { 5, -5, 5, 0 };
-
-	light->SetLightDir(lightDir);
-	light->Update();
-}
-
-void TitleScene::CameraUpdate()
-{
-
 }

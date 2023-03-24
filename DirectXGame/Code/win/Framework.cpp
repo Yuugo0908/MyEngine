@@ -17,6 +17,10 @@ void Framework::Initialize()
 	mouse = Mouse::GetInstance();
 	mouse->Initialize(win);
 
+	// オーディオの初期化
+	audio = Audio::GetInstance();
+	audio->Initialize();
+
 	// カメラ初期化
 	camera = Camera::GetInstance();
 	camera->Initialize(WinApp::window_width, WinApp::window_height);
@@ -38,6 +42,16 @@ void Framework::Initialize()
 	{
 		assert(0);
 	}
+
+
+	// デバッグテキスト用テクスチャ読み込み
+	if (!Image2d::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png"))
+	{
+		assert(0);
+	}
+
+	// デバッグテキスト初期化
+	DebugText::GetInstance()->Initialize(debugTextTexNumber);
 }
 
 void Framework::Finalize()
@@ -45,9 +59,9 @@ void Framework::Finalize()
 	// 終了時にカーソル移動の制限を解除
 	ClipCursor(NULL);
 	//解放
-	safe_delete(audio);
 	safe_delete(image2d);
 	safe_delete(light);
+	safe_delete(sceneFactory_);
 
 	// ゲームウィンドウの破棄
 	win->TerminateGameWindow();
@@ -56,10 +70,17 @@ void Framework::Finalize()
 
 void Framework::Update()
 {
+	// メッセージ処理
+	if (win->ProcessMessage())
+	{
+		// ゲームループを抜ける
+		endRequest_ = true;
+		return;
+	}
+
 	if (GetActiveWindow())
 	{
-		// メッセージ処理
-		if (win->ProcessMessage() || keyboard->PushKey(DIK_ESCAPE))
+		if (keyboard->PushKey(DIK_ESCAPE))
 		{
 			// ゲームループを抜ける
 			endRequest_ = true;
@@ -72,6 +93,7 @@ void Framework::Update()
 		mouse->Update();
 		// ゲームシーンの毎フレーム処理
 		SceneManager::GetInstance()->Update();
+
 	}
 }
 

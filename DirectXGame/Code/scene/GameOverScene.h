@@ -7,18 +7,14 @@
 #include "Image2d.h"
 #include "DebugText.h"
 #include "Object3d.h"
-
 #include "Camera.h"
 #include "Audio.h"
 #include "Light.h"
 #include "BaseScene.h"
+#include "SafeDelete.h"
 
-#include <SafeDelete.h>
 class GameOverScene : public BaseScene
 {
-private: // 静的メンバ変数
-	static const int debugTextTexNumber = 0;
-
 public: // メンバ関数
 	// 初期化
 	void Initialize() override;
@@ -38,7 +34,7 @@ private: // メンバ変数
 
 	enum Image2dNum
 	{
-		GameOverNum, backNum, fadeNum,
+		GameOverNum = 1, backNum, fadeNum,
 	};
 
 	// 画像

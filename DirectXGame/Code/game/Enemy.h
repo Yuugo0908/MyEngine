@@ -19,7 +19,7 @@ public:
 		stay,
 	};
 
-	static bool StaticInit();
+	bool ModelInit();
 
 	bool Initialize(Player* player);
 

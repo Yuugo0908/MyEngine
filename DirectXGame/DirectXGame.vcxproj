@@ -104,7 +104,6 @@
     <ClCompile Include="Code\game\Collision.cpp" />
     <ClCompile Include="Code\game\Easing.cpp" />
     <ClCompile Include="Code\game\Enemy.cpp" />
-    <ClCompile Include="Code\game\Item.cpp" />
     <ClCompile Include="Code\game\Light.cpp" />
     <ClCompile Include="Code\game\Player.cpp" />
     <ClCompile Include="Code\game\Rope.cpp" />
@@ -140,7 +139,6 @@
     <ClInclude Include="Code\game\Collision.h" />
     <ClInclude Include="Code\game\Easing.h" />
     <ClInclude Include="Code\game\Enemy.h" />
-    <ClInclude Include="Code\game\Item.h" />
     <ClInclude Include="Code\game\Light.h" />
     <ClInclude Include="Code\game\Player.h" />
     <ClInclude Include="Code\game\Rope.h" />

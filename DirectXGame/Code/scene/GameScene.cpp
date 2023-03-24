@@ -1,7 +1,7 @@
 ﻿#include "GameScene.h"
 #include <imgui.h>
 #include <cassert>
-#include <SceneManager.h>
+#include "SceneManager.h"
 
 void GameScene::Initialize() {
 	rope = new Rope;
@@ -10,21 +10,6 @@ void GameScene::Initialize() {
 
 	// 3Dオブジェクトにカメラをセット
 	Object3d::SetCamera(camera);
-
-	// オーディオの初期化
-	if (!audio->Initialize())
-	{
-		assert(0);
-	}
-
-	// デバッグテキスト用テクスチャ読み込み
-	if (!Image2d::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png"))
-	{
-		assert(0);
-	}
-
-	// デバッグテキスト初期化
-	DebugText::GetInstance()->Initialize(debugTextTexNumber);
 
 	if (!Image2d::LoadTexture(HPTextNum, L"Resources/HPText.png"))
 	{
@@ -58,7 +43,7 @@ void GameScene::Initialize() {
 	// パーティクル生成
 	box_effect = Particle::Create(L"Resources/box_effect.png");
 
-	Enemy::StaticInit();
+	enemy->ModelInit();
 	rope->Initialize();
 
 	// ライトの生成
@@ -78,6 +63,10 @@ void GameScene::Finalize()
 	safe_delete(rope);
 	safe_delete(light);
 	safe_delete(levelData);
+	safe_delete(HPText);
+	safe_delete(PlayerHPBar);
+	safe_delete(PlayerHPGauge);
+	safe_delete(fadeTex);
 }
 
 void GameScene::jsonObjectInit(const std::string sceneName)
@@ -470,7 +459,7 @@ void GameScene::jsonObjectUpdate()
 
 				if (length <= 15.0f)
 				{
-					if (Collision::GetInstance()->CollisionRayBox(pPos, ePos, boxPos, boxScale))
+					if (RayCollision(pPos, ePos, boxPos, boxScale))
 					{
 						enemy->SetAttackFlag(false);
 						posSave = {};
@@ -526,7 +515,7 @@ void GameScene::jsonObjectUpdate()
 			XMFLOAT3 poleScale = object->GetCollisionScale();
 			float length = GetLength(pPos, polePos);
 
-			if (length < 10.0f && length < minLength)
+			if (length < 15.0f && length < minLength)
 			{
 				minLength = length;
 				posSave = polePos;
@@ -565,35 +554,35 @@ void GameScene::CollisionUpdate()
 				catchPos = enemy->GetObj()->GetPosition();
 			}
 
-			if (enemy->EnemyCollision(player->GetObj()))
+			if (rFlag && enemy->EnemyCollision(player->GetObj()))
 			{
 				shakeFlag = true;
 				moveFlag = true;
 				rope->SetmoveFlag(moveFlag);
+				// パーティクル生成
+				CreateParticles(
+					enemy->GetObj()->GetPosition(),
+					2.0f, 5.0f,
+					{ 1.0f, 0.0f, 0.0f, 1.0f },
+					{ 0.0f, 1.0f, 0.0f, 1.0f },
+					5
+				);
+				rope->SetrFlag(false);
+				attackFlag = false;
+				catchPos = {};
+				avoidTime = 0.0f;
+				enemyHp -= (360.0f / enemyCount);
+				controller->Vibration();
+				enemys.remove(enemy);
+				break;
+			}
 
-				if (rFlag)
-				{
-					// パーティクル生成
-					CreateParticles(
-						enemy->GetObj()->GetPosition(),
-						2.0f, 5.0f,
-						{ 1.0f, 0.0f, 0.0f, 1.0f },
-						{ 0.0f, 1.0f, 0.0f, 1.0f },
-						5
-					);
-					rope->SetrFlag(false);
-					attackFlag = false;
-					catchPos = {};
-					avoidTime = 0.0f;
-					enemyHp -= (360.0f / enemyCount);
-					controller->Vibration();
-					enemys.remove(enemy);
-					break;
-				}
-				else
-				{
-					playerHp -= 18;
-				}
+			if (player->Damage(enemy->GetObj()))
+			{
+				shakeFlag = true;
+				moveFlag = true;
+				rope->SetmoveFlag(moveFlag);
+				playerHp -= 36;
 			}
 
 			if (enemy->BulletCollision())

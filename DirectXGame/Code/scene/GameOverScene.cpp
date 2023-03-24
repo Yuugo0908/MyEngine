@@ -1,23 +1,8 @@
 #include "GameOverScene.h"
-#include <SceneManager.h>
+#include "SceneManager.h"
 
 void GameOverScene::Initialize()
 {
-	// オーディオの初期化
-	if (!audio->Initialize())
-	{
-		assert(0);
-	}
-
-	// デバッグテキスト用テクスチャ読み込み
-	if (!Image2d::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png"))
-	{
-		assert(0);
-	}
-
-	// デバッグテキスト初期化
-	DebugText::GetInstance()->Initialize(debugTextTexNumber);
-
 	if (!Image2d::LoadTexture(GameOverNum, L"Resources/GameOver.png"))
 	{
 		assert(0);
@@ -44,7 +29,9 @@ void GameOverScene::Initialize()
 
 void GameOverScene::Finalize()
 {
-
+	safe_delete(GameOver);
+	safe_delete(fadeTex);
+	safe_delete(backGround);
 }
 
 void GameOverScene::Update()

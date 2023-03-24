@@ -1,23 +1,8 @@
 #include "GameClearScene.h"
-#include <SceneManager.h>
+#include "SceneManager.h"
 
 void GameClearScene::Initialize()
 {
-	// オーディオの初期化
-	if (!audio->Initialize())
-	{
-		assert(0);
-	}
-
-	// デバッグテキスト用テクスチャ読み込み
-	if (!Image2d::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png"))
-	{
-		assert(0);
-	}
-
-	// デバッグテキスト初期化
-	DebugText::GetInstance()->Initialize(debugTextTexNumber);
-
 	// ゲームクリア画像読み込み
 	if (!Image2d::LoadTexture(GameClearNum, L"Resources/GameClear.png"))
 	{
@@ -46,6 +31,8 @@ void GameClearScene::Initialize()
 void GameClearScene::Finalize()
 {
 	safe_delete(GameClear);
+	safe_delete(fadeTex);
+	safe_delete(backGround);
 }
 
 void GameClearScene::Update()

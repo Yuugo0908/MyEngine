@@ -23,6 +23,8 @@ public: // メンバ関数
 
 	void Jump();
 
+	bool Damage(const std::unique_ptr<Object3d>& object);
+
 	void Reset();
 
 	// マップチップ当たり判定
@@ -71,6 +73,7 @@ private: // メンバ変数
 	float pDown = 0.0f;
 	float pGra = 0.1f;//重力
 	float rate = 1.0f; // 斜め移動時の制限
+	int damageInterval = 0; // 攻撃を受けた際のインターバル
 
 	// 突進用
 	bool avoidFlag = false; // 回避開始フラグ

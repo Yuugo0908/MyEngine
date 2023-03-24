@@ -3,13 +3,6 @@
 using namespace DirectX;
 using DirectX::operator+;
 
-Collision* Collision::GetInstance()
-{
-	static Collision instance;
-
-	return &instance;
-}
-
 float Collision::GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b)
 {
 	XMFLOAT3 len = { pos_a.x - pos_b.x, pos_a.y - pos_b.y, pos_a.z - pos_b.z };

@@ -9,31 +9,26 @@
 #include "Object3d.h"
 #include "Model.h"
 #include "Operator.h"
-
 #include "Camera.h"
 #include "Audio.h"
 #include "Rope.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "Bullet.h"
-#include "Item.h"
 #include "Collision.h"
 #include "Light.h"
 #include "Easing.h"
 #include "LevelLoader.h"
 #include "Particle.h"
 #include "BaseScene.h"
+#include "SafeDelete.h"
 
-#include <SafeDelete.h>
 #include <stdlib.h>
 #include <time.h>
 #include <list>
 
 class GameScene : public BaseScene
 {
-private: // 静的メンバ変数
-	static const int debugTextTexNumber = 0;
-
 public: // メンバ関数
 	// 初期化
 	void Initialize() override;
@@ -83,8 +78,6 @@ private: // メンバ変数
 	Enemy* enemy = nullptr;
 	// 複数生成用リスト
 	std::list<std::unique_ptr<Enemy>> enemys;
-	Bullet* bullet = nullptr;
-	Item* item = Item::GetInstance();
 	LevelData* levelData = nullptr;
 
 	enum Scene
@@ -99,7 +92,7 @@ private: // メンバ変数
 
 	enum Image2dNum
 	{
-		HPTextNum, HPBarNum, HPGaugeNum, fadeNum,
+		HPTextNum = 1, HPBarNum, HPGaugeNum, fadeNum,
 	};
 
 	// jsonオブジェクト
