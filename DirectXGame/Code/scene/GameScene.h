@@ -49,8 +49,6 @@ public: // メンバ関数
 	void CameraUpdate();
 	// 当たり判定
 	void CollisionUpdate();
-	// 遮蔽物があるかの判別
-	bool RayCollision(const XMFLOAT3 startPos, const XMFLOAT3 endPos, const XMFLOAT3 boxPos, const XMFLOAT3 boxScale);
 
 	// jsonオブジェクトの初期化
 	void jsonObjectInit(const std::string sceneName);
@@ -151,8 +149,8 @@ private: // メンバ変数
 
 	// シェイク用
 	bool shakeFlag = false;
-	bool attackFlag = false; // 突進開始フラグ
-	float avoidTime = 0.0f;
+	bool rushFlag = false; // 突進開始フラグ
+	float elapsedTime = 0.0f;
 
 	// コントローラー
 	// 振動用変数
@@ -160,6 +158,8 @@ private: // メンバ変数
 	int vSpeedR = 0;
 
 	// 距離確認用
-	XMFLOAT3 posSave = {};
-	float minLength = 15.0f;
+	XMFLOAT3 posPoleSave = {};
+	XMFLOAT3 posEnemySave = {};
+	float minEnemyLength = 15.0f;
+	float minPoleLength = 15.0f;
 };

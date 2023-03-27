@@ -57,6 +57,7 @@ public:
 	void SetAlive(bool eAlive) { this->eAlive = eAlive; }
 
 	void SetAttackFlag(bool attackFlag) { this->attackFlag = attackFlag; }
+	const bool& GetAttackFlag() { return attackFlag; }
 	// ’…’n
 	void SetOnGround(bool onGround) { this->onGround = onGround; }
 

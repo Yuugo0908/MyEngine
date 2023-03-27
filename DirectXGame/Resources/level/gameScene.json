@@ -3,28 +3,6 @@
     "objects": [
         {
             "type": "MESH",
-            "name": "skydome",
-            "transform": {
-                "translation": [
-                    0.0,
-                    -400.0,
-                    -0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    5.0,
-                    5.0,
-                    5.0
-                ]
-            },
-            "file_name": "skydome"
-        },
-        {
-            "type": "MESH",
             "name": "box",
             "transform": {
                 "translation": [

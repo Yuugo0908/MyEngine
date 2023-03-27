@@ -180,9 +180,9 @@ void GameScene::Update()
 	player->Update(rFlag, moveFlag);
 	pPos = player->GetObj()->GetPosition();
 	pScale = player->GetObj()->GetScale();
-	if (attackFlag)
+	if (rushFlag)
 	{
-		player->Rush(catchPos, attackFlag, avoidTime);
+		player->Rush(catchPos, rushFlag, elapsedTime);
 	}
 	rope->Update(pPos);
 
@@ -206,10 +206,29 @@ void GameScene::Update()
 
 	if (throwCount == 30)
 	{
+		XMFLOAT3 posSave = {};
+
+		// ポールと敵の距離を比較して短い方を代入
+		float minLength = (std::min)(minEnemyLength, minPoleLength);
+
+		// 距離に応じて代入する座標を変更(敵を優先する)
+		if (minLength == minEnemyLength)
+		{
+			posSave = posEnemySave;
+		}
+		else
+		{
+			posSave = posPoleSave;
+		}
+
 		rope->Throw(pPos, posSave, minLength);
-		posSave = {};
-		minLength = 15.0f;
+
+		posPoleSave = {};
+		posEnemySave = {};
+		minPoleLength = 15.0f;
+		minEnemyLength = 15.0f;
 	}
+
 	player->GetObj()->SetPosition(pPos);
 
 	if (enemyHp <= 0)
@@ -426,6 +445,49 @@ void GameScene::jsonObjectUpdate()
 {
 	for (auto& object : jsonObject)
 	{
+		bool enemyAttack = false;
+		if (object->GetType() == box_)
+		{
+			object->Update();
+			XMFLOAT3 boxPos = object->GetPosition();
+			XMFLOAT3 boxScale = object->GetCollisionScale();
+			for (std::unique_ptr<Enemy>& enemy : enemys)
+			{
+				pPos = player->GetObj()->GetPosition();
+				ePos = enemy->GetObj()->GetPosition();
+				float length = GetLength(pPos, ePos);
+
+				if (length < minEnemyLength)
+				{
+					minEnemyLength = length;
+					posEnemySave = ePos;
+				}
+
+				if (minEnemyLength < 15.0f)
+				{
+					if (Collision::CollisionRayBox(pPos, ePos, boxPos, boxScale))
+					{
+						enemy->SetAttackFlag(false);
+						enemyAttack = false;
+						posEnemySave = {};
+						minEnemyLength = 15.0f;
+					}
+					else
+					{
+						enemy->SetAttackFlag(true);
+						enemyAttack = true;
+					}
+				}
+			}
+		}
+		if (enemyAttack == false)
+		{
+			break;
+		}
+	}
+
+	for (auto& object : jsonObject)
+	{
 		object->Update();
 
 		if (object->GetType() == box_)
@@ -438,40 +500,15 @@ void GameScene::jsonObjectUpdate()
 			if (rope->Collision(object, pPos))
 			{
 				rope->SetrFlag(false);
-				attackFlag = false;
+				rushFlag = false;
 				catchPos = {};
-				avoidTime = 0.0f;
+				elapsedTime = 0.0f;
 			}
 
 			for (std::unique_ptr<Enemy>& enemy : enemys)
 			{
 				enemy->MapCollide(boxPos, boxScale);
-				pPos = player->GetObj()->GetPosition();
-				ePos = enemy->GetObj()->GetPosition();
-				eScale = enemy->GetObj()->GetScale();
-				float length = GetLength(pPos, ePos);
-
-				if (length < minLength)
-				{
-					minLength = length;
-					posSave = ePos;
-				}
-
-				if (length <= 15.0f)
-				{
-					if (RayCollision(pPos, ePos, boxPos, boxScale))
-					{
-						enemy->SetAttackFlag(false);
-						posSave = {};
-						minLength = 15.0f;
-					}
-					else
-					{
-						enemy->SetAttackFlag(true);
-					}
-				}
 			}
-
 		}
 
 		else if (object->GetType() == wall_)
@@ -484,9 +521,9 @@ void GameScene::jsonObjectUpdate()
 			if (rope->Collision(object, pPos))
 			{
 				rope->SetrFlag(false);
-				attackFlag = false;
+				rushFlag = false;
 				catchPos = {};
-				avoidTime = 0.0f;
+				elapsedTime = 0.0f;
 			}
 
 			for (std::unique_ptr<Enemy>& enemy : enemys)
@@ -515,24 +552,26 @@ void GameScene::jsonObjectUpdate()
 			XMFLOAT3 poleScale = object->GetCollisionScale();
 			float length = GetLength(pPos, polePos);
 
-			if (length < 15.0f && length < minLength)
+			if (length < minPoleLength)
 			{
-				minLength = length;
-				posSave = polePos;
+				minPoleLength = length;
+				posPoleSave = polePos;
 			}
 
 			if (rope->Collision(object, pPos))
 			{
-				attackFlag = true;
+				rushFlag = true;
 				catchPos = object->GetPosition();
+				posPoleSave = {};
+				minPoleLength = 15.0f;
 			}
 
-			if (attackFlag && player->PoleCollide(polePos, poleScale))
+			if (rushFlag && player->PoleCollide(polePos, poleScale))
 			{
 				rope->SetrFlag(false);
-				attackFlag = false;
+				rushFlag = false;
 				catchPos = {};
-				avoidTime = 0.0f; 
+				elapsedTime = 0.0f; 
 				throwCount = 0;
 			}
 		}
@@ -550,7 +589,7 @@ void GameScene::CollisionUpdate()
 		{
 			if (rope->Collision(enemy->GetObj(), pPos))
 			{
-				attackFlag = true;
+				rushFlag = true;
 				catchPos = enemy->GetObj()->GetPosition();
 			}
 
@@ -568,9 +607,9 @@ void GameScene::CollisionUpdate()
 					5
 				);
 				rope->SetrFlag(false);
-				attackFlag = false;
+				rushFlag = false;
 				catchPos = {};
-				avoidTime = 0.0f;
+				elapsedTime = 0.0f;
 				enemyHp -= (360.0f / enemyCount);
 				controller->Vibration();
 				enemys.remove(enemy);
@@ -597,84 +636,4 @@ void GameScene::CollisionUpdate()
 
 		enemy->Update();
 	}
-}
-
-bool GameScene::RayCollision(const XMFLOAT3 startPos, const XMFLOAT3 endPos, const XMFLOAT3 boxPos, const XMFLOAT3 boxScale)
-{
-	// ワールド空間での光線の基点
-	XMFLOAT3 layStart = startPos;
-	// ワールド空間での光線の方向
-	XMVECTOR playerPos = { startPos.x, startPos.y, startPos.z, 0 };
-	XMVECTOR enemyPos = { endPos.x, endPos.y, endPos.z, 0 };
-	XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, enemyPos);
-	XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
-	XMFLOAT3 layVec = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
-
-	bool crossFlag = true;
-
-	float t_min = -FLT_MAX;
-	float t_max = FLT_MAX;
-	float max[3] = { boxPos.x + boxScale.x, boxPos.y + boxScale.y, boxPos.z + boxScale.z };
-	float min[3] = { boxPos.x - boxScale.x, boxPos.y - boxScale.y, boxPos.z - boxScale.z };
-	float p[3] = { layStart.x, layStart.y, layStart.z };
-	float d[3] = { layVec.x, layVec.y, layVec.z };
-
-	for (int i = 0; i < 3; i++)
-	{
-		if (abs(d[i]) < FLT_EPSILON)
-		{
-			if (p[i] < min[i] || p[i] > max[i])
-			{
-				crossFlag = false; // 交差していない
-				continue;
-			}
-		}
-		else
-		{
-			// スラブとの距離を算出
-			// t1が近スラブ、t2が遠スラブとの距離
-			float odd = 1.0f / d[i];
-			float t1 = (min[i] - p[i]) * odd;
-			float t2 = (max[i] - p[i]) * odd;
-
-			if (t1 > t2)
-			{
-				float tmp = t1;
-				t1 = t2;
-				t2 = tmp;
-			}
-
-			if (t1 > t_min) t_min = t1;
-			if (t2 < t_max) t_max = t2;
-
-			// スラブ交差チェック
-			if (t_min >= t_max)
-			{
-				crossFlag = false;
-				continue;
-			}
-		}
-	}
-
-	if (!crossFlag)
-	{
-		return false;
-	}
-	else
-	{
-		XMFLOAT3 colPosMin = layStart + (layVec * t_min);
-		XMFLOAT3 colPosMax = layStart + (layVec * t_max);
-
-		if (GetLength(startPos, colPosMin) >= GetLength(startPos, colPosMax) && GetLength(endPos, colPosMin) <= GetLength(endPos, colPosMax))
-		{
-			CreateParticles(colPosMin, 0.0f, 5.0f, { 1.0f, 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }, 1);
-			CreateParticles(colPosMax, 0.0f, 5.0f, { 1.0f, 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }, 1);
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	return false;
 }
