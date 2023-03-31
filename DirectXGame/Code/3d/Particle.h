@@ -114,6 +114,13 @@ public: // メンバ関数
 	/// <param name="end_scale">終了時スケール</param>
 	void Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale, XMFLOAT4 s_color, XMFLOAT4 e_color);
 
+
+	// パーティクルの生成
+	void CreateParticles(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count);
+
+	// ステージのエフェクト
+	void StageEffect(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count);
+
 	/// <summary>
 	/// デスクリプタヒープの初期化
 	/// </summary>

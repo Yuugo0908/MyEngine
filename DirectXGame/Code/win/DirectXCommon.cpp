@@ -147,7 +147,7 @@ void DirectXCommon::ClearRenderTarget()
 	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvH = CD3DX12_CPU_DESCRIPTOR_HANDLE(rtvHeaps->GetCPUDescriptorHandleForHeapStart(), bbIndex, device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
 
 	// ‘S‰æ–ÊƒNƒŠƒA        Red   Green Blue  Alpha
-	float clearColor[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+	float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	commandList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
 }
 

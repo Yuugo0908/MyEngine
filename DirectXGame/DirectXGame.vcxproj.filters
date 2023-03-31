@@ -177,6 +177,9 @@
     <ClCompile Include="Code\scene\SceneFactory.cpp">
       <Filter>ソースファイル\scene</Filter>
     </ClCompile>
+    <ClCompile Include="Code\scene\TutorialScene.cpp">
+      <Filter>ソースファイル\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\win\SafeDelete.h">
@@ -282,6 +285,9 @@
       <Filter>ヘッダーファイル\scene</Filter>
     </ClInclude>
     <ClInclude Include="Code\scene\SceneFactory.h">
+      <Filter>ヘッダーファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\scene\TutorialScene.h">
       <Filter>ヘッダーファイル\scene</Filter>
     </ClInclude>
   </ItemGroup>

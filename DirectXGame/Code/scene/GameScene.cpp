@@ -42,6 +42,7 @@ void GameScene::Initialize() {
 
 	// パーティクル生成
 	box_effect = Particle::Create(L"Resources/box_effect.png");
+	circle_effect = Particle::Create(L"Resources/circle_effect.png");
 
 	enemy->ModelInit();
 	rope->Initialize();
@@ -82,11 +83,15 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 			// 座標
 			XMFLOAT3 pos;
 			XMStoreFloat3(&pos, objectData.trans);
+			// 大きさ
+			XMFLOAT3 scale;
+			XMStoreFloat3(&scale, objectData.scale);
+			// 当たり判定
 			XMFLOAT3 size;
 			XMStoreFloat3(&size, objectData.size);
 
 			// プレイヤーを生成
-			player->Initialize(pos);
+			player->Initialize(pos, scale);
 			pPos = player->GetObj()->GetPosition();
 			player->GetObj()->SetCollisionScale(size);
 			// カメラの設定
@@ -101,6 +106,10 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 			// 座標
 			XMFLOAT3 pos;
 			XMStoreFloat3(&pos, objectData.trans);
+			// 大きさ
+			XMFLOAT3 scale;
+			XMStoreFloat3(&scale, objectData.scale);
+			// 当たり判定
 			XMFLOAT3 size;
 			XMStoreFloat3(&size, objectData.size);
 
@@ -108,6 +117,7 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 			std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
 			newEnemy->Initialize(player);
 			newEnemy->GetObj()->SetPosition(pos);
+			newEnemy->GetObj()->SetScale(scale);
 			newEnemy->GetObj()->SetCollisionScale(size);
 			enemys.push_back(std::move(newEnemy));
 			enemyCount++;
@@ -192,6 +202,7 @@ void GameScene::Update()
 	LightUpdate();
 	CameraUpdate();
 	box_effect->Update();
+	circle_effect->Update();
 
 	// フラグの取得
 	rFlag = rope->GetrFlag();
@@ -305,8 +316,8 @@ void GameScene::reset()
 	}
 }
 
-void GameScene::Draw() {
-
+void GameScene::Draw()
+{
 	//SetImgui();
 
 #pragma region 背景画像描画
@@ -340,6 +351,7 @@ void GameScene::Draw() {
 
 	// パーティクルの描画
 	box_effect->Draw(DirectXCommon::GetInstance()->GetCommandList());
+	circle_effect->Draw(DirectXCommon::GetInstance()->GetCommandList());
 
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
@@ -378,30 +390,6 @@ void GameScene::SetImgui()
 	ImGui::Text("playerPosZ : %6.2f", pPos.z);
 
 	ImGui::End();
-}
-
-void GameScene::CreateParticles(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count)
-{
-	for (int i = 0; i < count; i++) {
-		// X,Y,Z全て[-5.0f,+5.0f]でランダムに分布
-		XMFLOAT3 pos{};
-		pos.x = setPos.x;
-		pos.y = setPos.y;
-		pos.z = setPos.z;
-
-		const float rnd_vel = 0.1f;
-		XMFLOAT3 vel{};
-		vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-		vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-
-		XMFLOAT3 acc{};
-		const float rnd_acc = 0.001f;
-		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
-
-		// 追加
-		box_effect->Add(60, pos, vel, acc, startScale, endScale, startColor, endColor);
-	}
 }
 
 void GameScene::LightUpdate()
@@ -443,49 +431,6 @@ void GameScene::CameraUpdate()
 
 void GameScene::jsonObjectUpdate()
 {
-	for (auto& object : jsonObject)
-	{
-		bool enemyAttack = false;
-		if (object->GetType() == box_)
-		{
-			object->Update();
-			XMFLOAT3 boxPos = object->GetPosition();
-			XMFLOAT3 boxScale = object->GetCollisionScale();
-			for (std::unique_ptr<Enemy>& enemy : enemys)
-			{
-				pPos = player->GetObj()->GetPosition();
-				ePos = enemy->GetObj()->GetPosition();
-				float length = GetLength(pPos, ePos);
-
-				if (length < minEnemyLength)
-				{
-					minEnemyLength = length;
-					posEnemySave = ePos;
-				}
-
-				if (minEnemyLength < 15.0f)
-				{
-					if (Collision::CollisionRayBox(pPos, ePos, boxPos, boxScale))
-					{
-						enemy->SetAttackFlag(false);
-						enemyAttack = false;
-						posEnemySave = {};
-						minEnemyLength = 15.0f;
-					}
-					else
-					{
-						enemy->SetAttackFlag(true);
-						enemyAttack = true;
-					}
-				}
-			}
-		}
-		if (enemyAttack == false)
-		{
-			break;
-		}
-	}
-
 	for (auto& object : jsonObject)
 	{
 		object->Update();
@@ -563,7 +508,7 @@ void GameScene::jsonObjectUpdate()
 				rushFlag = true;
 				catchPos = object->GetPosition();
 				posPoleSave = {};
-				minPoleLength = 15.0f;
+				minPoleLength = 10.0f;
 			}
 
 			if (rushFlag && player->PoleCollide(polePos, poleScale))
@@ -599,7 +544,7 @@ void GameScene::CollisionUpdate()
 				moveFlag = true;
 				rope->SetmoveFlag(moveFlag);
 				// パーティクル生成
-				CreateParticles(
+				box_effect->CreateParticles(
 					enemy->GetObj()->GetPosition(),
 					2.0f, 5.0f,
 					{ 1.0f, 0.0f, 0.0f, 1.0f },
@@ -615,25 +560,72 @@ void GameScene::CollisionUpdate()
 				enemys.remove(enemy);
 				break;
 			}
-
-			if (player->Damage(enemy->GetObj()))
+			else if (!rFlag && player->Damage(enemy->GetObj()))
 			{
 				shakeFlag = true;
 				moveFlag = true;
 				rope->SetmoveFlag(moveFlag);
 				playerHp -= 36;
+
+				// パーティクル生成
+				circle_effect->CreateParticles(
+					player->GetObj()->GetPosition(),
+					1.0f, 2.0f,
+					{ 0.0f, 1.0f, 0.0f, 1.0f },
+					{ 1.0f, 0.0f, 0.0f, 1.0f },
+					3
+				);
 			}
 
-			if (enemy->BulletCollision())
+			if (!avoidFlag && enemy->BulletCollision())
 			{
 				if (!rFlag)
 				{
 					shakeFlag = true;
-					playerHp -= 18;
+					playerHp -= 36;
+					
+					// パーティクル生成
+					circle_effect->CreateParticles(
+						player->GetObj()->GetPosition(),
+						1.0f, 2.0f,
+						{ 0.0f, 1.0f, 0.0f, 1.0f },
+						{ 1.0f, 0.0f, 0.0f, 1.0f },
+						3
+					);
+				}
+			}
+
+			for (auto& object : jsonObject)
+			{
+				if (object->GetType() == box_)
+				{
+					object->Update();
+					XMFLOAT3 boxPos = object->GetPosition();
+					XMFLOAT3 boxScale = object->GetCollisionScale();
+
+					// 障害物を検知していたら攻撃してこない
+					if (enemy->ObstacleDetection(pPos, boxPos, boxScale))
+					{
+						minEnemyLength = 15.0f;
+						posEnemySave = {};
+						break;
+					}
+					else
+					{
+						pPos = player->GetObj()->GetPosition();
+						ePos = enemy->GetObj()->GetPosition();
+
+						float length = GetLength(pPos, ePos);
+
+						if (length < minEnemyLength)
+						{
+							minEnemyLength = length;
+							posEnemySave = ePos;
+						}
+					}
 				}
 			}
 		}
-
 		enemy->Update();
 	}
 }

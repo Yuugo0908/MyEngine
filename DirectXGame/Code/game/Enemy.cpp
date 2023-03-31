@@ -42,26 +42,17 @@ void Enemy::Update()
 {
 	if (!eAlive)
 	{
-		if (eAliveCount <= 60)
-		{
-			eAliveCount++;
-			return;
-
-		}
-		else
-		{
-			Spawn();
-			eAlive = true;
-			phase = Enemy::Phase::stay;
-			attackCount = -150;
-			return;
-		}
+		Spawn();
+		eAlive = true;
+		phase = Enemy::Phase::stay;
+		return;
 	}
 
 	if (attackCount <= 30)
 	{
 		attackCount++;
 	}
+
 	if (ePos.y <= -30.0f)
 	{
 		Spawn();
@@ -123,7 +114,7 @@ void Enemy::Update()
 
 void Enemy::Attack()
 {
-	if (eAlive && attackCount >= 30)
+	if (eAlive && attackCount >= 10)
 	{
 		BulletCreate();
 		attackCount = 0;
@@ -147,7 +138,6 @@ void Enemy::Move()
 
 void Enemy::Stay()
 {
-
 	enemyObj->Update();
 }
 
@@ -185,7 +175,7 @@ void Enemy::Spawn()
 
 	enemyObj->SetPosition(ePos);
 	enemyObj->SetScale(eScale);
-	enemyObj->SetColor({ 0.0f, 1.0f, 0.0f, 1.0f });
+	enemyObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	enemyObj->Update();
 }
 
@@ -193,6 +183,26 @@ void Enemy::Reset()
 {
 	eAlive = false;
 	bullets.erase(bullets.begin(), bullets.end());
+}
+
+bool Enemy::ObstacleDetection(XMFLOAT3 pPos, XMFLOAT3 boxPos, XMFLOAT3 boxScale)
+{
+	float length = GetLength(pPos, ePos);
+
+	if (length < 15.0f)
+	{
+		if (Collision::CollisionRayBox(pPos, ePos, boxPos, boxScale))
+		{
+			attackFlag = false;
+			return true;
+		}
+		else
+		{
+			attackFlag = true;
+			return false;
+		}
+	}
+	return false;
 }
 
 bool Enemy::EnemyCollision(const std::unique_ptr<Object3d>& object)
@@ -219,6 +229,7 @@ bool Enemy::BulletCollision()
 			bullets.remove(bullet);
 			return false;
 		}
+
 		if (Collision::CollisionObject(bullet->GetObj(), player->GetObj()))
 		{
 			bullets.remove(bullet);

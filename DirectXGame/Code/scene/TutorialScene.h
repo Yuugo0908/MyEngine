@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 #include "DirectXCommon.h"
 #include "Keyboard.h"
@@ -27,33 +27,35 @@
 #include <time.h>
 #include <list>
 
-class GameScene : public BaseScene
+class TutorialScene : public BaseScene
 {
-public: // ãƒ¡ãƒ³ãƒé–¢æ•°
-	// åˆæœŸåŒ–
+public: // ƒƒ“ƒoŠÖ”
+// ‰Šú‰»
 	void Initialize() override;
-	// çµ‚äº†
+	// I—¹
 	void Finalize() override;
-	// æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å‡¦ç†
+	// –ˆƒtƒŒ[ƒ€ˆ—
 	void Update() override;
-	// æç”»
+	// •`‰æ
 	void Draw() override;
 
-	//posåˆæœŸåŒ–
+	//pos‰Šú‰»
 	void reset();
-	// Imguiã®è¨­å®š
+	// Imgui‚Ìİ’è
 	void SetImgui();
-	// ãƒ©ã‚¤ãƒˆã®æ›´æ–°
+	// ƒ‰ƒCƒg‚ÌXV
 	void LightUpdate();
-	// ã‚«ãƒ¡ãƒ©ã®æ›´æ–°
+	// ƒJƒƒ‰‚ÌXV
 	void CameraUpdate();
-	// å½“ãŸã‚Šåˆ¤å®š
+	// “–‚½‚è”»’è
 	void CollisionUpdate();
 
-	// jsonã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®åˆæœŸåŒ–
+	// jsonƒIƒuƒWƒFƒNƒg‚Ì‰Šú‰»
 	void jsonObjectInit(const std::string sceneName);
-	// jsonã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æ›´æ–°
+	// jsonƒIƒuƒWƒFƒNƒg‚ÌXV
 	void jsonObjectUpdate();
+
+	void CreateParticles(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count);
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
@@ -61,7 +63,7 @@ public: // ãƒ¡ãƒ³ãƒé–¢æ•°
 		return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
 	}
 
-private: // ãƒ¡ãƒ³ãƒå¤‰æ•°
+private: // ƒƒ“ƒo•Ï”
 	Keyboard* keyboard = Keyboard::GetInstance();
 	Controller* controller = Controller::GetInstance();
 	Mouse* mouse = Mouse::GetInstance();
@@ -72,7 +74,7 @@ private: // ãƒ¡ãƒ³ãƒå¤‰æ•°
 	Rope* rope = nullptr;
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
-	// è¤‡æ•°ç”Ÿæˆç”¨ãƒªã‚¹ãƒˆ
+	// •¡”¶¬—pƒŠƒXƒg
 	std::list<std::unique_ptr<Enemy>> enemys;
 	LevelData* levelData = nullptr;
 
@@ -91,36 +93,37 @@ private: // ãƒ¡ãƒ³ãƒå¤‰æ•°
 		HPTextNum = 1, HPBarNum, HPGaugeNum, fadeNum,
 	};
 
-	// jsonã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+	// jsonƒIƒuƒWƒFƒNƒg
 	std::vector<std::unique_ptr<Object3d>> jsonObject{};
 	int objectType = 0;
 	bool layHit = false;
+	XMFLOAT3 boxPos = {};
+	XMFLOAT3 boxScale = {};
 
 	XMFLOAT3 polePos = {};
 	XMFLOAT3 poleScale = {};
 	float poleLength = 15.0f;
 
-	// ç”»åƒ
+	// ‰æ‘œ
 	Image2d* HPText = nullptr;
 	Image2d* PlayerHPBar = nullptr;
 	Image2d* PlayerHPGauge = nullptr;
 	Image2d* fadeTex = nullptr;
 	float alpha = 1.0f;
 
-	// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«
+	// ƒp[ƒeƒBƒNƒ‹
 	Particle* box_effect = nullptr;
-	Particle* circle_effect = nullptr;
 
-	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
-	XMFLOAT3 pPos = {};//åº§æ¨™
+	// ƒvƒŒƒCƒ„[
+	XMFLOAT3 pPos = {};//À•W
 	XMFLOAT3 pPosOld = {};
 	XMFLOAT3 pScale = {};
-	bool onGround = false;//è‡ªç”±è½ä¸‹ã®ãƒ•ãƒ©ã‚°
-	bool moveFlag = false;//ç§»å‹•ç®¡ç†ãƒ•ãƒ©ã‚°
-	bool avoidFlag = false;//å›é¿ç®¡ç†ãƒ•ãƒ©ã‚°
+	bool onGround = false;//©—R—‰º‚Ìƒtƒ‰ƒO
+	bool moveFlag = false;//ˆÚ“®ŠÇ—ƒtƒ‰ƒO
+	bool avoidFlag = false;//‰ñ”ğŠÇ—ƒtƒ‰ƒO
 	float playerHp = 360;
 
-	// ã‚¨ãƒãƒŸãƒ¼
+	// ƒGƒlƒ~[
 	int enemyCount = 0;
 	float enemyHp = 360;
 	bool eAlive = false;
@@ -128,35 +131,36 @@ private: // ãƒ¡ãƒ³ãƒå¤‰æ•°
 	XMFLOAT3 ePosOld = {};
 	XMFLOAT3 eScale = {};
 
-	// ãƒ­ãƒ¼ãƒ—
+	// ƒ[ƒv
 	bool rFlag = false;
 	int throwCount = 0;
 	XMFLOAT3 catchPos = {};
 
-	// ã‚«ãƒ¡ãƒ©
+	// ƒJƒƒ‰
 	XMFLOAT3 cPos = {};
 	XMFLOAT3 cTarget = {};
 	XMVECTOR cameraLength = {};
 	const float trackLimit = -30.0f;
 
-	// ã‚·ãƒ¼ãƒ³ç®¡ç†ç”¨
+	// ƒV[ƒ“ŠÇ——p
 	bool fadeFlag = false;
 	bool gameClearFlag = false;
 	bool gameOverFlag = false;
 
-	// ã‚·ã‚§ã‚¤ã‚¯ç”¨
+	// ƒVƒFƒCƒN—p
 	bool shakeFlag = false;
-	bool rushFlag = false; // çªé€²é–‹å§‹ãƒ•ãƒ©ã‚°
+	bool rushFlag = false; // “ËiŠJnƒtƒ‰ƒO
 	float elapsedTime = 0.0f;
 
-	// ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼
-	// æŒ¯å‹•ç”¨å¤‰æ•°
+	// ƒRƒ“ƒgƒ[ƒ‰[
+	// U“®—p•Ï”
 	int vSpeedL = 0;
 	int vSpeedR = 0;
 
-	// è·é›¢ç¢ºèªç”¨
+	// ‹——£Šm”F—p
 	XMFLOAT3 posPoleSave = {};
 	XMFLOAT3 posEnemySave = {};
 	float minEnemyLength = 15.0f;
-	float minPoleLength = 10.0f;
+	float minPoleLength = 15.0f;
 };
+

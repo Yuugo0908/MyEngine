@@ -121,6 +121,7 @@
     <ClCompile Include="Code\scene\SceneFactory.cpp" />
     <ClCompile Include="Code\scene\SceneManager.cpp" />
     <ClCompile Include="Code\scene\TitleScene.cpp" />
+    <ClCompile Include="Code\scene\TutorialScene.cpp" />
     <ClCompile Include="Code\win\DirectXCommon.cpp" />
     <ClCompile Include="Code\win\Framework.cpp" />
     <ClCompile Include="Code\win\main.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="Code\scene\SceneFactory.h" />
     <ClInclude Include="Code\scene\SceneManager.h" />
     <ClInclude Include="Code\scene\TitleScene.h" />
+    <ClInclude Include="Code\scene\TutorialScene.h" />
     <ClInclude Include="Code\win\DirectXCommon.h" />
     <ClInclude Include="Code\win\Framework.h" />
     <ClInclude Include="Code\win\MyGame.h" />

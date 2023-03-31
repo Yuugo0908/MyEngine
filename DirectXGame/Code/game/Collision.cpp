@@ -203,7 +203,6 @@ bool Collision::CollisionRayBox(const XMFLOAT3 startPos, const XMFLOAT3 endPos, 
 
 		if (GetLength(startPos, colPosMin) > GetLength(startPos, colPosMax) && GetLength(endPos, colPosMin) < GetLength(endPos, colPosMax))
 		{
-			//DebugText::GetInstance()->Print()
 			return true;
 		}
 		else

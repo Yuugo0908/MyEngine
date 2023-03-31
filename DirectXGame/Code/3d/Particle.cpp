@@ -60,9 +60,8 @@ void Particle::Update()
 	particles.remove_if([](ParticleData& x) { return x.frame >= x.num_frame; });
 
 	// 全パーティクル更新
-	for (std::forward_list<ParticleData>::iterator it = particles.begin();
-		it != particles.end();
-		it++) {
+	for (std::forward_list<ParticleData>::iterator it = particles.begin(); it != particles.end(); it++)
+	{
 
 		// 経過フレーム数をカウント
 		it->frame++;
@@ -81,7 +80,7 @@ void Particle::Update()
 		// スケールの線形補間
 		it->scale = it->s_scale + (it->e_scale - it->s_scale) / f;
 
-		// スケールの線形補間
+		// 回転の線形補間
 		it->rotation = it->s_rotation + (it->e_rotation - it->s_rotation) / f;
 	}	
 
@@ -126,12 +125,14 @@ void Particle::Update()
 void Particle::Draw(ID3D12GraphicsCommandList * cmdList)
 {
 	UINT drawNum = (UINT)std::distance(particles.begin(), particles.end());
-	if (drawNum > vertexCount) {
+	if (drawNum > vertexCount)
+	{
 		drawNum = vertexCount;
 	}
 
 	// パーティクルが1つもない場合
-	if (drawNum == 0) {
+	if (drawNum == 0)
+	{
 		return;
 	}
 
@@ -174,6 +175,58 @@ void Particle::Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 acce
 	p.num_frame = life;
 	p.s_color = start_color;
 	p.e_color = end_color;
+}
+
+void Particle::CreateParticles(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count)
+{
+	for (int i = 0; i < count; i++)
+	{
+		// X,Y,Z全て[-5.0f,+5.0f]でランダムに分布
+		XMFLOAT3 pos{};
+		pos.x = setPos.x;
+		pos.y = setPos.y;
+		pos.z = setPos.z;
+
+		const float rnd_vel = 0.1f;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+
+		XMFLOAT3 acc{};
+		const float rnd_acc = 0.001f;
+		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
+
+		// 追加
+		Add(60, pos, vel, acc, startScale, endScale, startColor, endColor);
+	}
+}
+
+void Particle::StageEffect(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count)
+{
+	for (int i = 0; i < count; i++)
+	{
+		// X,Y,Z全て[-setPos,+setPos]でランダムに分布
+		XMFLOAT3 pos{};
+		//pos.x = (float)rand() / RAND_MAX * setPos.x - setPos.x / 2.0f;
+		pos.x = setPos.x;
+		pos.y = (float)rand() / RAND_MAX * setPos.y - setPos.y / 2.0f;
+		pos.z = setPos.z;
+
+		const float rnd_vel = 0.1f;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+
+		XMFLOAT3 acc{};
+		const float rnd_acc = 0.005f;
+		acc.z = -(float)rand() / RAND_MAX * rnd_acc;
+
+
+		// 追加
+		Add(60, pos, vel, acc, startScale, endScale, startColor, endColor);
+	}
 }
 
 void Particle::InitializeDescriptorHeap()

@@ -52,4 +52,6 @@ private: // ƒƒ“ƒo•Ï”
 	bool fadeIn = false;
 	bool fadeOut = false;
 	bool expFlag = false;
+
+	bool tutorialFlag = false;
 };

@@ -43,6 +43,8 @@ public:
 
 	void Reset();
 
+	bool ObstacleDetection(XMFLOAT3 pPos, XMFLOAT3 boxPos, XMFLOAT3 boxScale);
+
 	bool EnemyCollision(const std::unique_ptr<Object3d>& object);
 
 	bool BulletCollision();

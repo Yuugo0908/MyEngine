@@ -1,6 +1,6 @@
 #include "Player.h"
 
-bool Player::Initialize(const XMFLOAT3 pos)
+bool Player::Initialize(const XMFLOAT3 pos, const XMFLOAT3 scale)
 {
 	keyboard = Keyboard::GetInstance();
 	mouse = Mouse::GetInstance();
@@ -12,7 +12,7 @@ bool Player::Initialize(const XMFLOAT3 pos)
 	playerObj->SetModel(playerModel);
 
 	pPos = pos;
-	pScale = { 0.8f, 0.8f, 0.8f };
+	pScale = scale;
 
 	playerObj->SetPosition(pPos);
 	playerObj->SetScale(pScale);
@@ -40,7 +40,7 @@ void Player::Update(bool rFlag, bool moveFlag)
 	{
 		damageInterval--;
 		float alpha = 0.5f;
-		playerObj->SetColor({ 1.0f, 0.0f, 0.0f, alpha });
+		playerObj->SetColor({ 1.0f, 0.0f, 0.4f, alpha });
 	}
 	else
 	{

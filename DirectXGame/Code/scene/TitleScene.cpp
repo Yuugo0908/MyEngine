@@ -74,7 +74,15 @@ void TitleScene::Update()
 			fadeOut = true;
 			explanation->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 			backGround->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
-			SceneManager::GetInstance()->ChangeScene("Game");
+			//if (tutorialFlag == false)
+			//{
+			//	tutorialFlag = true;
+			//	SceneManager::GetInstance()->ChangeScene("Tutorial");
+			//}
+			//else
+			{
+				SceneManager::GetInstance()->ChangeScene("Game");
+			}
 		}
 	}
 }

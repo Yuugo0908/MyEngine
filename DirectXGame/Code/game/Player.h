@@ -11,7 +11,7 @@ class Player
 {
 public: // ƒƒ“ƒoŠÖ”
 
-	bool Initialize(const XMFLOAT3 pos);
+	bool Initialize(const XMFLOAT3 pos, const XMFLOAT3 scale);
 
 	void Update(bool rFlag, bool moveFlag);
 
