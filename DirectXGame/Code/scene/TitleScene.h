@@ -23,12 +23,6 @@ public: // ƒƒ“ƒoŠÖ”
 	// •`‰æ
 	void Draw() override;
 
-	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
-	{
-		XMFLOAT3 len = { posA.x - posB.x, posA.y - posB.y, posA.z - posB.z };
-		return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
-	}
-
 private: // ƒƒ“ƒo•Ï”
 
 	Keyboard* keyboard = Keyboard::GetInstance();

@@ -170,11 +170,10 @@ void Camera::Update()
 
 		// ベクトルを回転
 		vTargetEye = XMVector3Transform(vTargetEye, matRot);
-		//vUp = XMVector3Transform(vUp, matRot);
 
 		// 注視点からずらした位置に視点座標を決定
 		const XMFLOAT3& target = GetTarget();
-		SetEye({ target.x + vTargetEye.m128_f32[0], target.y + vTargetEye.m128_f32[1] + distance - 5.0f, target.z + vTargetEye.m128_f32[2] });
+		SetEye({ target.x + vTargetEye.m128_f32[0], target.y + 10.0f + vTargetEye.m128_f32[1], target.z + vTargetEye.m128_f32[2] });
 		SetUp({ vUp.m128_f32[0], vUp.m128_f32[1], vUp.m128_f32[2] });
 	}
 
@@ -356,9 +355,9 @@ void Camera::Reset()
 	mouseMove = {0, 0, 0};
 
 	dirty = false;
-	angleY = 0;
-	speed = 7.0f;
+	angleY = 0.0f;
 	dy = 0.0f;
+	speed = 7.0f;
 
 	// ビュー行列
 	matView = DirectX::XMMatrixIdentity();

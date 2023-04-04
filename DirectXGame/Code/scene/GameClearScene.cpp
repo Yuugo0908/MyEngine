@@ -37,6 +37,7 @@ void GameClearScene::Finalize()
 
 void GameClearScene::Update()
 {
+	ClipCursor(NULL);
 	if (fadeFlag == false && alpha > 0.0f)
 	{
 		alpha -= 0.02f;

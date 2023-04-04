@@ -12,7 +12,6 @@ void TitleScene::Initialize() {
 	title = Image2d::Create(titleNum, { 0.0f,0.0f });
 	title->SetSize({ 1280.0f,720.0f });
 
-
 	if (!Image2d::LoadTexture(fadeNum, L"Resources/fade.png"))
 	{
 		assert(0);
@@ -42,6 +41,7 @@ void TitleScene::Finalize()
 {
 	safe_delete(title);
 	safe_delete(fadeTex);
+	safe_delete(explanation);
 	safe_delete(backGround);
 }
 
@@ -49,7 +49,6 @@ void TitleScene::Update()
 {
 	if (!fadeIn && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
 	{
-		backGround->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 		// 操作説明はプレイ中、一度だけ表示する
 		if (!expFlag)
 		{
@@ -74,14 +73,8 @@ void TitleScene::Update()
 			fadeOut = true;
 			explanation->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 			backGround->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
-			//if (tutorialFlag == false)
-			//{
-			//	tutorialFlag = true;
-			//	SceneManager::GetInstance()->ChangeScene("Tutorial");
-			//}
-			//else
 			{
-				SceneManager::GetInstance()->ChangeScene("Game");
+				SceneManager::GetInstance()->ChangeScene("Tutorial");
 			}
 		}
 	}

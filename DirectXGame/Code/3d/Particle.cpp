@@ -229,6 +229,21 @@ void Particle::StageEffect(XMFLOAT3 setPos, float startScale, float endScale, XM
 	}
 }
 
+void Particle::TargetEffect(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int& count)
+{
+	if (count >= 20)
+	{
+		XMFLOAT3 pos{};
+		pos.x = setPos.x;
+		pos.y = setPos.y;
+		pos.z = setPos.z;
+
+		// 追加
+		Add(20, pos, {}, {}, startScale, endScale, startColor, endColor);
+		count = 0;
+	}
+}
+
 void Particle::InitializeDescriptorHeap()
 {
 	HRESULT result = S_FALSE;

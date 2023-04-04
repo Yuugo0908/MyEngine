@@ -3,8 +3,7 @@
 #include <cassert>
 #include "SceneManager.h"
 
-void TutorialScene::Initialize()
-{
+void TutorialScene::Initialize() {
 	rope = new Rope;
 	player = new Player;
 	enemy = new Enemy;
@@ -42,7 +41,9 @@ void TutorialScene::Initialize()
 	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 
 	// パーティクル生成
-	box_effect = Particle::Create(L"Resources/box_effect.png");
+	effectBox = Particle::Create(L"Resources/effectBox.png");
+	effectCircle = Particle::Create(L"Resources/effectCircle.png");
+	effectTarget = Particle::Create(L"Resources/effectTarget.png");
 
 	enemy->ModelInit();
 	rope->Initialize();
@@ -54,11 +55,19 @@ void TutorialScene::Initialize()
 	// 3Dオブジェクトにライトをセット
 	Object3d::SetLight(light);
 
-	jsonObjectInit("gameScene");
+	//audio->PlayWave("Resources/BGM/bgm.wav", 255, 0.08f);
+	jsonObjectInit("tutorial");
+
+	// マウスカーソルを非表示
+	ShowCursor(false);
 }
 
 void TutorialScene::Finalize()
 {
+	//audio->Stop();
+	
+	// マウスカーソルを表示
+	ShowCursor(true);
 	safe_delete(player);
 	safe_delete(enemy);
 	safe_delete(rope);
@@ -68,10 +77,16 @@ void TutorialScene::Finalize()
 	safe_delete(PlayerHPBar);
 	safe_delete(PlayerHPGauge);
 	safe_delete(fadeTex);
+	safe_delete(effectBox);
+	safe_delete(effectCircle);
+	safe_delete(effectTarget);
 }
 
 void TutorialScene::Update()
 {
+	// マウスを非表示、移動範囲の制限
+	mouse->CursorLimit();
+
 	// タイトルから移行後の更新
 	//	プレイヤーの座標、半径の設定
 	player->Update(rFlag, moveFlag);
@@ -88,7 +103,9 @@ void TutorialScene::Update()
 	CollisionUpdate();
 	LightUpdate();
 	CameraUpdate();
-	box_effect->Update();
+	effectBox->Update();
+	effectCircle->Update();
+	effectTarget->Update();
 
 	// フラグの取得
 	rFlag = rope->GetrFlag();
@@ -96,19 +113,18 @@ void TutorialScene::Update()
 	avoidFlag = player->GetAvoidFlag();
 	onGround = player->GetOnGround();
 
-	if (throwCount < 30)
+	if (throwCount < 60)
 	{
 		throwCount++;
 	}
 
-	if (throwCount == 30)
+	// ポールと敵の距離を比較して短い方を代入
+	float minLength = (std::min)(minEnemyLength, minPoleLength);
+
+	// 距離に応じて代入する座標を変更(敵を優先する)
+
+	if (minLength < 15.0f)
 	{
-		XMFLOAT3 posSave = {};
-
-		// ポールと敵の距離を比較して短い方を代入
-		float minLength = (std::min)(minEnemyLength, minPoleLength);
-
-		// 距離に応じて代入する座標を変更(敵を優先する)
 		if (minLength == minEnemyLength)
 		{
 			posSave = posEnemySave;
@@ -118,13 +134,20 @@ void TutorialScene::Update()
 			posSave = posPoleSave;
 		}
 
-		rope->Throw(pPos, posSave, minLength);
-
-		posPoleSave = {};
-		posEnemySave = {};
-		minPoleLength = 15.0f;
-		minEnemyLength = 15.0f;
+		effectTarget->TargetEffect(
+			posSave, 3.0f, 1.0f,
+			{ 1.0f, 0.0f, 0.0f, 1.0f },
+			{ 1.0f, 1.0f, 1.0f, 1.0f },
+			throwCount
+		);
 	}
+
+	rope->Throw(pPos, posSave, minLength);
+
+	posPoleSave = {};
+	posEnemySave = {};
+	minPoleLength = 15.0f;
+	minEnemyLength = 15.0f;
 
 	player->GetObj()->SetPosition(pPos);
 
@@ -136,7 +159,7 @@ void TutorialScene::Update()
 	else if (playerHp <= 0)
 	{
 		fadeFlag = true;
-		gameOverFlag = true;
+		reStartFlag = true;
 	}
 
 	if (fadeFlag == false && alpha > 0.0f)
@@ -188,7 +211,9 @@ void TutorialScene::Draw()
 	}
 
 	// パーティクルの描画
-	box_effect->Draw(DirectXCommon::GetInstance()->GetCommandList());
+	effectBox->Draw(DirectXCommon::GetInstance()->GetCommandList());
+	effectCircle->Draw(DirectXCommon::GetInstance()->GetCommandList());
+	effectTarget->Draw(DirectXCommon::GetInstance()->GetCommandList());
 
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
@@ -254,11 +279,11 @@ void TutorialScene::reset()
 
 	if (gameClearFlag)
 	{
-		SceneManager::GetInstance()->ChangeScene("GameClear");
+		SceneManager::GetInstance()->ChangeScene("Game");
 	}
-	else if (gameOverFlag)
+	else if (reStartFlag)
 	{
-		SceneManager::GetInstance()->ChangeScene("GameOver");
+		SceneManager::GetInstance()->ChangeScene("Tutorial");
 	}
 }
 
@@ -335,7 +360,7 @@ void TutorialScene::CollisionUpdate()
 				moveFlag = true;
 				rope->SetmoveFlag(moveFlag);
 				// パーティクル生成
-				CreateParticles(
+				effectBox->CreateParticles(
 					enemy->GetObj()->GetPosition(),
 					2.0f, 5.0f,
 					{ 1.0f, 0.0f, 0.0f, 1.0f },
@@ -351,25 +376,72 @@ void TutorialScene::CollisionUpdate()
 				enemys.remove(enemy);
 				break;
 			}
+			else if (!rFlag && player->Damage(enemy->GetObj()))
+			{
+				shakeFlag = true;
+				moveFlag = true;
+				rope->SetmoveFlag(moveFlag);
+				playerHp -= 36;
 
-			//if (player->Damage(enemy->GetObj()))
-			//{
-			//	shakeFlag = true;
-			//	moveFlag = true;
-			//	rope->SetmoveFlag(moveFlag);
-			//	playerHp -= 36;
-			//}
+				// パーティクル生成
+				effectCircle->CreateParticles(
+					player->GetObj()->GetPosition(),
+					1.0f, 2.0f,
+					{ 0.0f, 1.0f, 0.0f, 1.0f },
+					{ 1.0f, 0.0f, 0.0f, 1.0f },
+					3
+				);
+			}
 
-			if (enemy->BulletCollision())
+			if (!avoidFlag && enemy->BulletCollision())
 			{
 				if (!rFlag)
 				{
 					shakeFlag = true;
-					playerHp -= 18;
+					playerHp -= 36;
+
+					// パーティクル生成
+					effectCircle->CreateParticles(
+						player->GetObj()->GetPosition(),
+						1.0f, 2.0f,
+						{ 0.0f, 1.0f, 0.0f, 1.0f },
+						{ 1.0f, 0.0f, 0.0f, 1.0f },
+						3
+					);
+				}
+			}
+
+			for (auto& object : jsonObject)
+			{
+				if (object->GetType() == box_ || object->GetType() == wall_)
+				{
+					object->Update();
+					XMFLOAT3 boxPos = object->GetPosition();
+					XMFLOAT3 boxScale = object->GetCollisionScale();
+
+					// 障害物を検知していたら攻撃してこない
+					if (enemy->ObstacleDetection(pPos, boxPos, boxScale))
+					{
+						minEnemyLength = 15.0f;
+						posEnemySave = {};
+						break;
+					}
+					else
+					{
+						pPos = player->GetObj()->GetPosition();
+						ePos = enemy->GetObj()->GetPosition();
+
+						float length = GetLength(pPos, ePos);
+
+						if (length < minEnemyLength)
+						{
+							minEnemyLength = length;
+							posEnemySave = ePos;
+						}
+					}
 				}
 			}
 		}
-
 		enemy->Update();
 	}
 }
@@ -387,13 +459,21 @@ void TutorialScene::jsonObjectInit(const std::string sceneName)
 			// 座標
 			XMFLOAT3 pos;
 			XMStoreFloat3(&pos, objectData.trans);
+			// 大きさ
+			XMFLOAT3 scale;
+			XMStoreFloat3(&scale, objectData.scale);
+			// 当たり判定
 			XMFLOAT3 size;
 			XMStoreFloat3(&size, objectData.size);
 
 			// プレイヤーを生成
-			player->Initialize(pos, {2.0f, 2.0f, 2.0f});
+			player->Initialize(pos, scale);
 			pPos = player->GetObj()->GetPosition();
 			player->GetObj()->SetCollisionScale(size);
+
+			// リスポーンする座標を設定
+			reSpawnPos = pos;
+
 			// カメラの設定
 			camera->Reset();
 			camera->SetTarget(pPos);
@@ -406,6 +486,10 @@ void TutorialScene::jsonObjectInit(const std::string sceneName)
 			// 座標
 			XMFLOAT3 pos;
 			XMStoreFloat3(&pos, objectData.trans);
+			// 大きさ
+			XMFLOAT3 scale;
+			XMStoreFloat3(&scale, objectData.scale);
+			// 当たり判定
 			XMFLOAT3 size;
 			XMStoreFloat3(&size, objectData.size);
 
@@ -413,6 +497,7 @@ void TutorialScene::jsonObjectInit(const std::string sceneName)
 			std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
 			newEnemy->Initialize(player);
 			newEnemy->GetObj()->SetPosition(pos);
+			newEnemy->GetObj()->SetScale(scale);
 			newEnemy->GetObj()->SetCollisionScale(size);
 			enemys.push_back(std::move(newEnemy));
 			enemyCount++;
@@ -425,7 +510,8 @@ void TutorialScene::jsonObjectInit(const std::string sceneName)
 		// ファイル名から登録済みモデルを検索
 		Model* model = nullptr;
 		decltype(levelData->models)::iterator it = levelData->models.find(objectData.fileName);
-		if (it != levelData->models.end()) {
+		if (it != levelData->models.end())
+		{
 			model = it->second;
 		}
 
@@ -480,49 +566,6 @@ void TutorialScene::jsonObjectInit(const std::string sceneName)
 
 void TutorialScene::jsonObjectUpdate()
 {
-	for (auto& object : jsonObject)
-	{
-		bool enemyAttack = false;
-		if (object->GetType() == box_)
-		{
-			object->Update();
-			XMFLOAT3 boxPos = object->GetPosition();
-			XMFLOAT3 boxScale = object->GetCollisionScale();
-			for (std::unique_ptr<Enemy>& enemy : enemys)
-			{
-				pPos = player->GetObj()->GetPosition();
-				ePos = enemy->GetObj()->GetPosition();
-				float length = GetLength(pPos, ePos);
-
-				if (length < minEnemyLength)
-				{
-					minEnemyLength = length;
-					posEnemySave = ePos;
-				}
-
-				if (minEnemyLength < 15.0f)
-				{
-					if (Collision::CollisionRayBox(pPos, ePos, boxPos, boxScale))
-					{
-						enemy->SetAttackFlag(false);
-						enemyAttack = false;
-						posEnemySave = {};
-						minEnemyLength = 15.0f;
-					}
-					else
-					{
-						enemy->SetAttackFlag(true);
-						enemyAttack = true;
-					}
-				}
-			}
-		}
-		if (enemyAttack == false)
-		{
-			break;
-		}
-	}
-
 	for (auto& object : jsonObject)
 	{
 		object->Update();
@@ -600,7 +643,7 @@ void TutorialScene::jsonObjectUpdate()
 				rushFlag = true;
 				catchPos = object->GetPosition();
 				posPoleSave = {};
-				minPoleLength = 15.0f;
+				minPoleLength = 10.0f;
 			}
 
 			if (rushFlag && player->PoleCollide(polePos, poleScale))
@@ -612,30 +655,5 @@ void TutorialScene::jsonObjectUpdate()
 				throwCount = 0;
 			}
 		}
-	}
-}
-
-void TutorialScene::CreateParticles(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count)
-{
-	for (int i = 0; i < count; i++)
-	{
-		// X,Y,Z全て[-5.0f,+5.0f]でランダムに分布
-		XMFLOAT3 pos{};
-		pos.x = setPos.x;
-		pos.y = setPos.y;
-		pos.z = setPos.z;
-
-		const float rnd_vel = 0.1f;
-		XMFLOAT3 vel{};
-		vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-		vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-
-		XMFLOAT3 acc{};
-		const float rnd_acc = 0.001f;
-		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
-
-		// 追加
-		box_effect->Add(60, pos, vel, acc, startScale, endScale, startColor, endColor);
 	}
 }

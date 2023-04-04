@@ -29,6 +29,9 @@ public: // メンバ関数
 	// 更新
 	void Update();
 
+	// マウスの移動制限
+	void CursorLimit();
+
 	// キーの左クリックをチェック
 	bool PushMouseLeft();
 

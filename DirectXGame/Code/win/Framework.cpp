@@ -45,19 +45,17 @@ void Framework::Initialize()
 
 
 	// デバッグテキスト用テクスチャ読み込み
-	if (!Image2d::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png"))
+	if (!Image2d::LoadTexture(debugTextNum, L"Resources/debugfont.png"))
 	{
 		assert(0);
 	}
 
 	// デバッグテキスト初期化
-	DebugText::GetInstance()->Initialize(debugTextTexNumber);
+	DebugText::GetInstance()->Initialize(debugTextNum);
 }
 
 void Framework::Finalize()
 {
-	// 終了時にカーソル移動の制限を解除
-	ClipCursor(NULL);
 	//解放
 	safe_delete(image2d);
 	safe_delete(light);
@@ -78,7 +76,8 @@ void Framework::Update()
 		return;
 	}
 
-	if (GetActiveWindow())
+	// アクティブ状態ならカーソル移動を制限
+	if (win->GetHwnd() == GetForegroundWindow())
 	{
 		if (keyboard->PushKey(DIK_ESCAPE))
 		{
@@ -93,7 +92,10 @@ void Framework::Update()
 		mouse->Update();
 		// ゲームシーンの毎フレーム処理
 		SceneManager::GetInstance()->Update();
-
+	}
+	else
+	{
+		ClipCursor(NULL);
 	}
 }
 

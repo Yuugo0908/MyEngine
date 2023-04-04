@@ -2,10 +2,6 @@
 
 bool Player::Initialize(const XMFLOAT3 pos, const XMFLOAT3 scale)
 {
-	keyboard = Keyboard::GetInstance();
-	mouse = Mouse::GetInstance();
-	controller = Controller::GetInstance();
-
 	// モデルの生成
 	playerModel = playerModel->CreateFromObject("player");
 	playerObj = Object3d::Create();
@@ -30,8 +26,6 @@ void Player::Update(bool rFlag, bool moveFlag)
 	cameraTrack = cameraTrack * pSpeed;
 
 	pPosOld = playerObj->GetPosition();
-	playerObj->SetPosition(pPos);
-	playerObj->SetScale(pScale);
 	// カメラが向いている方向にプレイヤーも向く
 	playerObj->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
 
@@ -96,6 +90,8 @@ void Player::Update(bool rFlag, bool moveFlag)
 		}
 	}
 
+	playerObj->SetPosition(pPos);
+	playerObj->SetScale(pScale);
 	playerObj->Update();
 }
 
@@ -156,10 +152,14 @@ void Player::Jump()
 	{
 		pVel -= pGra;
 		pPos.y += pVel;
+		pPos.x += inertiaSave.x * 0.4f;
+		pPos.z += inertiaSave.z * 0.4f;
+
 		if (onGround)
 		{
 			jumpFlag = false;
 			pVel = 0.0f;
+			inertiaSave = {};
 		}
 	}
 	// 重力
@@ -172,6 +172,11 @@ void Player::Jump()
 			pDown = 0.0f;
 		}
 	}
+}
+
+void Player::Inertia()
+{
+	inertiaSave = pPos - pPosOld;
 }
 
 bool Player::Damage(const std::unique_ptr<Object3d>& object)
@@ -337,7 +342,6 @@ bool Player::PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale)
 	float maxBoxZ = polePos.z + poleScale.z;
 	float minBoxZ = polePos.z - poleScale.z;
 
-	pPosOld = playerObj->GetPosition();
 	playerObj->SetPosition(pPos);
 
 	if ((pPos.x <= maxBoxX && pPos.x >= minBoxX) &&
@@ -346,61 +350,46 @@ bool Player::PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale)
 		if (maxBoxY + pScale.y > pPos.y && polePos.y < pPosOld.y)
 		{
 			hitFlag = true;
-			onGround = false;
-			jumpFlag = true;
-			// 上昇率の更新
-			pVel = 1.25f;
 		}
 		else if (minBoxY - pScale.y < pPos.y && polePos.y > pPosOld.y)
 		{
 			hitFlag = true;
-			onGround = false;
-			jumpFlag = true;
-			// 上昇率の更新
-			pVel = 1.25f;
 		}
 	}
 
-	if ((pPos.x <= maxBoxX && pPos.x >= minBoxX) &&
+	else if ((pPos.x <= maxBoxX && pPos.x >= minBoxX) &&
 		(pPos.y <= maxBoxY && pPos.y >= minBoxY))
 	{
 		if (maxBoxZ + pScale.z > pPos.z && polePos.z < pPosOld.z)
 		{
 			hitFlag = true;
-			onGround = false;
-			jumpFlag = true;
-			// 上昇率の更新
-			pVel = 1.25f;
 		}
 		else if (minBoxZ - pScale.z < pPos.z && polePos.z > pPosOld.z)
 		{
 			hitFlag = true;
-			onGround = false;
-			jumpFlag = true;
-			// 上昇率の更新
-			pVel = 1.25f;
 		}
 	}
 
-	if ((pPos.z <= maxBoxZ && pPos.z >= minBoxZ) &&
+	else if ((pPos.z <= maxBoxZ && pPos.z >= minBoxZ) &&
 		(pPos.y <= maxBoxY && pPos.y >= minBoxY))
 	{
 		if (maxBoxX + pScale.x > pPos.x && polePos.x < pPosOld.x)
 		{
 			hitFlag = true;
-			onGround = false;
-			jumpFlag = true;
-			// 上昇率の更新
-			pVel = 1.25f;
 		}
 		else if (minBoxX - pScale.x < pPos.x && polePos.x > pPosOld.x)
 		{
 			hitFlag = true;
-			onGround = false;
-			jumpFlag = true;
-			// 上昇率の更新
-			pVel = 1.25f;
 		}
+	}
+
+	if (hitFlag)
+	{
+		inertiaSave = pPos - pPosOld;
+		onGround = false;
+		jumpFlag = true;
+		// 上昇率の更新
+		pVel = 1.25f;
 	}
 
 	playerObj->SetPosition(pPos);

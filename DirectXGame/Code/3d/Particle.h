@@ -120,6 +120,8 @@ public: // メンバ関数
 
 	// ステージのエフェクト
 	void StageEffect(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count);
+	// ターゲットのエフェクト
+	void TargetEffect(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int& count);
 
 	/// <summary>
 	/// デスクリプタヒープの初期化

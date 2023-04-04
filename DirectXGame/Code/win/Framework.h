@@ -13,8 +13,6 @@
 
 class Framework
 {
-private: // 静的メンバ変数
-	static const int debugTextTexNumber = 0;
 public: // メンバ関数
 
 	virtual ~Framework() = default;
@@ -51,5 +49,7 @@ protected: // メンバ変数
 	Light* light = nullptr;
 	SceneManager* sceneManager = nullptr;
 	AbstructSceneFactory* sceneFactory_ = nullptr;
+
+	const int debugTextNum = 0;
 };
 

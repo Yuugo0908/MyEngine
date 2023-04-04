@@ -23,6 +23,8 @@ public: // メンバ関数
 
 	void Jump();
 
+	void Inertia();
+
 	bool Damage(const std::unique_ptr<Object3d>& object);
 
 	void Reset();
@@ -48,9 +50,9 @@ public: // メンバ関数
 
 private: // メンバ変数
 
-	Controller* controller = nullptr;
-	Keyboard* keyboard = nullptr;
-	Mouse* mouse = nullptr;
+	Keyboard* keyboard = Keyboard::GetInstance();
+	Mouse* mouse = Mouse::GetInstance();
+	Controller* controller = Controller::GetInstance();
 	Camera* camera = Camera::GetInstance();
 
 	// モデル
@@ -62,6 +64,7 @@ private: // メンバ変数
 	XMFLOAT3 pPosOld = {};
 	XMFLOAT3 pScale = {};//大きさ
 	XMFLOAT3 pRot = {};//回転
+	XMFLOAT3 inertiaSave = {}; // 慣性
 
 	float pSpeed = 0.35f;
 	bool onGround = false;//自由落下のフラグ

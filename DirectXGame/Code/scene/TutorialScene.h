@@ -55,8 +55,6 @@ public: // メンバ関数
 	// jsonオブジェクトの更新
 	void jsonObjectUpdate();
 
-	void CreateParticles(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count);
-
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
 		XMFLOAT3 len = { posA.x - posB.x, posA.y - posB.y, posA.z - posB.z };
@@ -112,12 +110,15 @@ private: // メンバ変数
 	float alpha = 1.0f;
 
 	// パーティクル
-	Particle* box_effect = nullptr;
+	Particle* effectBox = nullptr;
+	Particle* effectCircle = nullptr;
+	Particle* effectTarget = nullptr;
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
 	XMFLOAT3 pPosOld = {};
 	XMFLOAT3 pScale = {};
+	XMFLOAT3 reSpawnPos = {};
 	bool onGround = false;//自由落下のフラグ
 	bool moveFlag = false;//移動管理フラグ
 	bool avoidFlag = false;//回避管理フラグ
@@ -145,7 +146,7 @@ private: // メンバ変数
 	// シーン管理用
 	bool fadeFlag = false;
 	bool gameClearFlag = false;
-	bool gameOverFlag = false;
+	bool reStartFlag = false;
 
 	// シェイク用
 	bool shakeFlag = false;
@@ -158,6 +159,7 @@ private: // メンバ変数
 	int vSpeedR = 0;
 
 	// 距離確認用
+	XMFLOAT3 posSave = {};
 	XMFLOAT3 posPoleSave = {};
 	XMFLOAT3 posEnemySave = {};
 	float minEnemyLength = 15.0f;

@@ -28,9 +28,9 @@
             "name": "box",
             "transform": {
                 "translation": [
-                    116.0,
+                    -3.0,
                     20.0,
-                    -164.0
+                    -69.0
                 ],
                 "rotation": [
                     0.0,
@@ -63,9 +63,9 @@
             "name": "box.001",
             "transform": {
                 "translation": [
-                    137.53451538085938,
+                    12.0,
                     3.0,
-                    -135.88014221191406
+                    -51.0
                 ],
                 "rotation": [
                     0.0,
@@ -75,7 +75,7 @@
                 "scaling": [
                     5.0,
                     3.0,
-                    5.0
+                    8.0
                 ]
             },
             "file_name": "box",
@@ -89,7 +89,7 @@
                 "size": [
                     5.0,
                     3.0,
-                    5.0
+                    8.0
                 ]
             }
         },
@@ -98,9 +98,9 @@
             "name": "enemy.001",
             "transform": {
                 "translation": [
-                    150.17176818847656,
+                    31.111398696899414,
                     3.0,
-                    -147.05947875976562
+                    -52.05299758911133
                 ],
                 "rotation": [
                     0.0,
@@ -133,9 +133,9 @@
             "name": "enemy",
             "transform": {
                 "translation": [
-                    106.75989532470703,
+                    -11.0,
                     3.0,
-                    -61.902679443359375
+                    33.0
                 ],
                 "rotation": [
                     0.0,
@@ -168,9 +168,9 @@
             "name": "player",
             "transform": {
                 "translation": [
-                    141.61172485351562,
-                    5.0,
-                    -171.18394470214844
+                    21.0,
+                    3.0,
+                    -73.0
                 ],
                 "rotation": [
                     0.0,
@@ -203,9 +203,9 @@
             "name": "stage.001",
             "transform": {
                 "translation": [
-                    112.0,
+                    -7.0,
                     0.0,
-                    -140.0
+                    -45.0
                 ],
                 "rotation": [
                     0.0,
@@ -238,9 +238,9 @@
             "name": "stage.003",
             "transform": {
                 "translation": [
-                    140.0,
+                    21.0,
                     0.0,
-                    -140.0
+                    -45.0
                 ],
                 "rotation": [
                     0.0,
@@ -273,9 +273,9 @@
             "name": "stage.004",
             "transform": {
                 "translation": [
-                    140.0,
+                    21.0,
                     0.0,
-                    -168.0
+                    -73.0
                 ],
                 "rotation": [
                     0.0,
@@ -308,9 +308,9 @@
             "name": "stage.005",
             "transform": {
                 "translation": [
-                    118.0,
                     0.0,
-                    -56.0
+                    0.0,
+                    39.0
                 ],
                 "rotation": [
                     0.0,
@@ -343,9 +343,9 @@
             "name": "enemy.002",
             "transform": {
                 "translation": [
-                    118.84318542480469,
+                    1.7831908464431763,
                     3.0,
-                    -87.36033630371094
+                    5.0153937339782715
                 ],
                 "rotation": [
                     0.0,
@@ -378,9 +378,9 @@
             "name": "enemy.003",
             "transform": {
                 "translation": [
-                    121.36041259765625,
+                    2.300043821334839,
                     3.0,
-                    -146.66062927246094
+                    -47.07713317871094
                 ],
                 "rotation": [
                     0.0,
@@ -413,9 +413,9 @@
             "name": "enemy.004",
             "transform": {
                 "translation": [
-                    110.13054656982422,
+                    -3.642852306365967,
                     3.0,
-                    -102.49615478515625
+                    -10.449386596679688
                 ],
                 "rotation": [
                     0.0,
@@ -448,9 +448,9 @@
             "name": "stage.002",
             "transform": {
                 "translation": [
-                    118.0,
                     0.0,
-                    -84.0
+                    0.0,
+                    11.0
                 ],
                 "rotation": [
                     0.0,
@@ -483,9 +483,9 @@
             "name": "stage.006",
             "transform": {
                 "translation": [
-                    118.0,
                     0.0,
-                    -112.0
+                    0.0,
+                    -17.0
                 ],
                 "rotation": [
                     0.0,
@@ -518,9 +518,9 @@
             "name": "box.002",
             "transform": {
                 "translation": [
-                    126.53106689453125,
+                    7.0,
                     5.0,
-                    -108.10619354248047
+                    -14.0
                 ],
                 "rotation": [
                     0.0,
@@ -553,9 +553,9 @@
             "name": "box.003",
             "transform": {
                 "translation": [
-                    111.33929443359375,
+                    -8.0,
                     5.0,
-                    -69.30046844482422
+                    16.0
                 ],
                 "rotation": [
                     0.0,
@@ -588,9 +588,9 @@
             "name": "stage.007",
             "transform": {
                 "translation": [
-                    78.0,
-                    8.0,
-                    -44.0
+                    -40.0,
+                    7.0,
+                    53.0
                 ],
                 "rotation": [
                     0.0,
@@ -623,9 +623,9 @@
             "name": "enemy.005",
             "transform": {
                 "translation": [
-                    70.0,
-                    13.0,
-                    -35.0
+                    -33.0,
+                    12.0,
+                    63.0
                 ],
                 "rotation": [
                     0.0,
@@ -655,12 +655,12 @@
         },
         {
             "type": "MESH",
-            "name": "wall",
+            "name": "wall.001",
             "transform": {
                 "translation": [
-                    98.0,
+                    -20.0,
                     5.0,
-                    -45.0
+                    40.0
                 ],
                 "rotation": [
                     0.0,
@@ -690,12 +690,12 @@
         },
         {
             "type": "MESH",
-            "name": "wall.001",
+            "name": "wall",
             "transform": {
                 "translation": [
-                    98.0,
+                    -20.0,
                     5.0,
-                    -55.0
+                    50.0
                 ],
                 "rotation": [
                     0.0,
@@ -719,6 +719,216 @@
                 "size": [
                     6.0,
                     5.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "enemy.006",
+            "transform": {
+                "translation": [
+                    -41.0,
+                    12.0,
+                    46.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "enemy",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "box.004",
+            "transform": {
+                "translation": [
+                    24.0,
+                    20.0,
+                    -21.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    10.0,
+                    20.0,
+                    10.0
+                ]
+            },
+            "file_name": "box",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    10.0,
+                    20.0,
+                    10.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "box.005",
+            "transform": {
+                "translation": [
+                    -24.0,
+                    20.0,
+                    29.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    10.0,
+                    20.0,
+                    10.0
+                ]
+            },
+            "file_name": "box",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    10.0,
+                    20.0,
+                    10.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "enemy.007",
+            "transform": {
+                "translation": [
+                    -50.0,
+                    12.0,
+                    60.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "enemy",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "pole",
+            "transform": {
+                "translation": [
+                    -21.0,
+                    6.0,
+                    45.0
+                ],
+                "rotation": [
+                    0.0,
+                    -90.00000762939453,
+                    0.0
+                ],
+                "scaling": [
+                    2.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    4.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "enemy.008",
+            "transform": {
+                "translation": [
+                    -1.391227126121521,
+                    3.0,
+                    39.757789611816406
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "enemy",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
                     1.0
                 ]
             }

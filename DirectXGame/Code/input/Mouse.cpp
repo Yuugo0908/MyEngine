@@ -53,42 +53,32 @@ bool Mouse::Initialize(WinApp* win_app)
 void Mouse::Update()
 {
 	HRESULT result;
+	// マウス動作開始
+	result = devMouse->Acquire();
 
-	// マウス
-	{
-		// マウス動作開始
-		result = devMouse->Acquire();
+	// 前回の入力を保存
+	mouseStatePre = mouseState;
 
-		// 前回の入力を保存
-		mouseStatePre = mouseState;
+	// マウスの入力
+	result = devMouse->GetDeviceState(sizeof(mouseState), &mouseState);
+}
 
-		// マウスの入力
-		result = devMouse->GetDeviceState(sizeof(mouseState), &mouseState);
-		hwnd = winApp->GetHwnd();
-		GetClientRect(hwnd, &rcClient);
+void Mouse::CursorLimit()
+{
+	hwnd = winApp->GetHwnd();
+	GetClientRect(hwnd, &rcClient);
 
-		ptClientUL.x = rcClient.left + 100;
-		ptClientUL.y = rcClient.top + 100;
-		ptClientLR.x = rcClient.right - 100;
-		ptClientLR.y = rcClient.bottom - 100;
-		ClientToScreen(hwnd, &ptClientUL);
-		ClientToScreen(hwnd, &ptClientLR);
+	ptClientUL.x = rcClient.left + 100;
+	ptClientUL.y = rcClient.top + 100;
+	ptClientLR.x = rcClient.right - 100;
+	ptClientLR.y = rcClient.bottom - 100;
+	ClientToScreen(hwnd, &ptClientUL);
+	ClientToScreen(hwnd, &ptClientLR);
 
-		SetRect(&rcClient, ptClientUL.x, ptClientUL.y,
-			ptClientLR.x, ptClientLR.y);
+	SetRect(&rcClient, ptClientUL.x, ptClientUL.y,
+		ptClientLR.x, ptClientLR.y);
 
-		// アクティブ状態ならカーソル移動を制限
-		if (GetActiveWindow())
-		{
-			ClipCursor(&rcClient);
-			ShowCursor(false);
-		}
-		else
-		{
-			ClipCursor(NULL);
-			ShowCursor(true);
-		}
-	}
+	ClipCursor(&rcClient);
 }
 
 bool Mouse::PushMouseLeft()

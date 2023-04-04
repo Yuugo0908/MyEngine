@@ -65,7 +65,6 @@ private: // メンバ変数
 	Keyboard* keyboard = Keyboard::GetInstance();
 	Controller* controller = Controller::GetInstance();
 	Mouse* mouse = Mouse::GetInstance();
-	Audio* audio = Audio::GetInstance();
 	Camera* camera = Camera::GetInstance();
 	Light* light = nullptr;
 
@@ -93,12 +92,6 @@ private: // メンバ変数
 
 	// jsonオブジェクト
 	std::vector<std::unique_ptr<Object3d>> jsonObject{};
-	int objectType = 0;
-	bool layHit = false;
-
-	XMFLOAT3 polePos = {};
-	XMFLOAT3 poleScale = {};
-	float poleLength = 15.0f;
 
 	// 画像
 	Image2d* HPText = nullptr;
@@ -107,9 +100,13 @@ private: // メンバ変数
 	Image2d* fadeTex = nullptr;
 	float alpha = 1.0f;
 
+	// 音声
+	Audio* Bgm = Audio::GetInstance();
+
 	// パーティクル
-	Particle* box_effect = nullptr;
-	Particle* circle_effect = nullptr;
+	Particle* effectBox = nullptr;
+	Particle* effectCircle = nullptr;
+	Particle* effectTarget = nullptr;
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
@@ -155,6 +152,7 @@ private: // メンバ変数
 	int vSpeedR = 0;
 
 	// 距離確認用
+	XMFLOAT3 posSave = {};
 	XMFLOAT3 posPoleSave = {};
 	XMFLOAT3 posEnemySave = {};
 	float minEnemyLength = 15.0f;
