@@ -122,7 +122,7 @@ void Camera::Update()
 
 	// マウスの左ボタンが押されていたらカメラを回転させない
 	dy = mouseMove.MouseX * scaleY;
-	angleY = -dy * XM_PI * 0.75f;
+	angleY = -dy * XM_PI * 0.15f;
 	dirty = true;
 
 	// ホイール入力で距離を変更

@@ -2,18 +2,10 @@
 
 bool Rope::Initialize()
 {
-	if (ropeModel == NULL)
-	{
-		controller = Controller::GetInstance();
-		mouse = Mouse::GetInstance();
-
-		easing = new Easing;
-
-		// モデルの生成
-		ropeModel = ropeModel->CreateFromObject("rope");
-		ropeObj = Object3d::Create();
-		ropeObj->SetModel(ropeModel);
-	}
+	// モデルの生成
+	ropeModel = ropeModel->CreateFromObject("rope");
+	ropeObj = Object3d::Create();
+	ropeObj->SetModel(ropeModel);
 
 	rFlag = false; // 接触フラグ
 	rThrowFlag = false; // ロープを飛ばす
@@ -28,11 +20,6 @@ bool Rope::Initialize()
 	return true;
 }
 
-void Rope::Draw()
-{
-	ropeObj->Draw();
-}
-
 void Rope::Update(XMFLOAT3& pPos)
 {
 	startPos = pPos;
@@ -43,15 +30,15 @@ void Rope::Update(XMFLOAT3& pPos)
 		rScale = manageRopeScale;
 		ropeObj->SetPosition(rPos);
 		ropeObj->SetScale(rScale);
-		pEaseFlag = false;
-		eEaseFlag = false;
 
 		if (!rThrowFlag && !rBackFlag && (controller->GetPadState(Controller::State::X, Controller::Type::TRIGGER) || mouse->TriggerMouseLeft()))
 		{
-			rPos = startPos;
-			moveFlag = false;
 			rThrowFlag = true;
 			avoidTime = 0.0f;
+		}
+		else if(!rThrowFlag)
+		{
+			moveFlag = true;
 		}
 
 		ropeObj->Update();
@@ -73,22 +60,24 @@ void Rope::Update(XMFLOAT3& pPos)
 	ropeObj->Update();
 }
 
-void Rope::Throw(XMFLOAT3 pPos, const XMFLOAT3 targetPos, const float targetLength)
+void Rope::Throw(XMFLOAT3& pPos, const XMFLOAT3 targetPos, const float targetLength)
 {
 	// フラグがtrueじゃない場合は初期化してリターンする
 	if (!rThrowFlag && !rBackFlag)
 	{
 		manageRopePos = {};
 		manageRopeScale = {};
-		moveFlag = true;
+		rRotFlag = false;
+		cSpeed = Camera::GetInstance()->CameraTrack(pPos);
+		cRot = Camera::GetInstance()->CameraRot(pPos);
 		return;
 	}
-
-	if (!rRotFlag && targetLength < 15.0f)
+	else if (!rRotFlag && targetLength < 15.0f && tLength <= 0.0f)
 	{
 		tPos = targetPos;
 		tLength = targetLength;
 		rRotFlag = true;
+		moveFlag = false;
 	}
 
 	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
@@ -98,9 +87,6 @@ void Rope::Throw(XMFLOAT3 pPos, const XMFLOAT3 targetPos, const float targetLeng
 	XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
 
 	XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
-
-	cSpeed = Camera::GetInstance()->CameraTrack(pPos);
-	cRot = Camera::GetInstance()->CameraRot(pPos);
 
 	if (rThrowFlag)
 	{
@@ -119,6 +105,7 @@ void Rope::Throw(XMFLOAT3 pPos, const XMFLOAT3 targetPos, const float targetLeng
 		}
 		else
 		{
+			tLength = 15.0f;
 			rRot = { 0, XMConvertToDegrees(cRot), 0 };
 			ropeObj->SetRotation(rRot);
 			manageRopePos.x += cSpeed.x;
@@ -164,7 +151,6 @@ void Rope::Throw(XMFLOAT3 pPos, const XMFLOAT3 targetPos, const float targetLeng
 		manageRopeScale.y -= 0.02f;
 		manageRopeScale.z -= 0.6f;
 
-
 		avoidTime += 0.1f;
 
 		if (avoidTime >= 1.0f)
@@ -173,11 +159,12 @@ void Rope::Throw(XMFLOAT3 pPos, const XMFLOAT3 targetPos, const float targetLeng
 			rThrowFlag = false;
 			rBackFlag = false;
 			rRotFlag = false;
-			moveFlag = true;
 			manageRopePos = {};
 			manageRopeScale = {};
 			cSpeed = {};
 			cRot = 0.0f;
+			tPos = {};
+			tLength = 0.0f;
 		}
 	}
 }
@@ -277,8 +264,6 @@ void Rope::Reset()
 	// 突進用
 	startPos = {}; // 開始位置
 	endPos = {}; // 終点位置
-	pEaseFlag = false;
-	eEaseFlag = false;
 
 	// 移動管理フラグ
 	moveFlag = false; // 自機が移動しているか

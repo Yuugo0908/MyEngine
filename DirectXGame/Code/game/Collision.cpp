@@ -140,9 +140,9 @@ bool Collision::CollisionRayBox(const XMFLOAT3 startPos, const XMFLOAT3 endPos, 
 	// ワールド空間での光線の基点
 	XMFLOAT3 layStart = startPos;
 	// ワールド空間での光線の方向
-	XMVECTOR playerPos = { startPos.x, startPos.y, startPos.z, 0 };
-	XMVECTOR enemyPos = { endPos.x, endPos.y, endPos.z, 0 };
-	XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, enemyPos);
+	XMVECTOR sPos = { startPos.x, startPos.y, startPos.z, 0 };
+	XMVECTOR ePos = { endPos.x, endPos.y, endPos.z, 0 };
+	XMVECTOR subPlayerEnemy = XMVectorSubtract(sPos, ePos);
 	XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
 	XMFLOAT3 layVec = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
 

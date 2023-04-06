@@ -47,6 +47,10 @@ void GameOverScene::Update()
 		{
 			SceneManager::GetInstance()->ChangeScene("Title");
 		}
+		else if(keyboard->TriggerKey(DIK_R))
+		{
+			SceneManager::GetInstance()->ChangeScene("Game");
+		}
 	}
 	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
 }

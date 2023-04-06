@@ -11,11 +11,9 @@ public: // メンバ関数
 
 	bool Initialize();
 
-	void Draw();
-
 	void Update(XMFLOAT3& pPos);
 
-	void Throw(XMFLOAT3 pPos, const XMFLOAT3 ePos, const float length);
+	void Throw(XMFLOAT3& pPos, const XMFLOAT3 ePos, const float length);
 
 	bool Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos);
 
@@ -37,20 +35,15 @@ public: // メンバ関数
 	const bool& GetrFlag() { return rFlag; }
 	void SetrFlag(bool rFlag) { this->rFlag = rFlag; }
 	// ロープを飛ばしているか
-	void SetThrowFlag(bool throwFlag) { }
-
-
-	const XMFLOAT3& GetPos() { return rPos; }
-	const XMFLOAT3& GetScale() { return rScale; }
-
+	const bool& GetThrowFlag() { return rThrowFlag; }
+	void SetThrowFlag(bool throwFlag) { rThrowFlag = throwFlag; }
 	
 	const std::unique_ptr<Object3d>& GetObj() { return ropeObj; }
 
 private: // メンバ変数
 
-	Controller* controller = nullptr;
-	Mouse* mouse = nullptr;
-	Easing* easing = nullptr;
+	Controller* controller = Controller::GetInstance();
+	Mouse* mouse = Mouse::GetInstance();
 
 	//ロープモデル
 	Model* ropeModel = nullptr;
@@ -76,7 +69,7 @@ private: // メンバ変数
 	float cRot = 0.0f;
 
 	XMFLOAT3 tPos = {};
-	float tLength = 20.0f;
+	float tLength = 0.0f;
 
 	// 突進用
 	XMFLOAT3 startPos = {}; // 開始位置

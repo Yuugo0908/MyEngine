@@ -177,7 +177,7 @@ void Particle::Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 acce
 	p.e_color = end_color;
 }
 
-void Particle::CreateParticles(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count)
+void Particle::CreateParticles(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count, int life, bool velFlag, bool accFlag)
 {
 	for (int i = 0; i < count; i++)
 	{
@@ -187,18 +187,24 @@ void Particle::CreateParticles(XMFLOAT3 setPos, float startScale, float endScale
 		pos.y = setPos.y;
 		pos.z = setPos.z;
 
-		const float rnd_vel = 0.1f;
 		XMFLOAT3 vel{};
-		vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-		vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		if (velFlag)
+		{
+			const float rnd_vel = 0.1f;
+			vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+			vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+			vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		}
 
 		XMFLOAT3 acc{};
-		const float rnd_acc = 0.001f;
-		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
+		if (accFlag)
+		{
+			const float rnd_acc = 0.001f;
+			acc.y = -(float)rand() / RAND_MAX * rnd_acc;
+		}
 
 		// 追加
-		Add(60, pos, vel, acc, startScale, endScale, startColor, endColor);
+		Add(life, pos, vel, acc, startScale, endScale, startColor, endColor);
 	}
 }
 
@@ -213,16 +219,13 @@ void Particle::StageEffect(XMFLOAT3 setPos, float startScale, float endScale, XM
 		pos.y = (float)rand() / RAND_MAX * setPos.y - setPos.y / 2.0f;
 		pos.z = setPos.z;
 
-		const float rnd_vel = 0.1f;
+		const float rnd_vel = 1.0f;
 		XMFLOAT3 vel{};
-		vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-		vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.z = -(float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
 
 		XMFLOAT3 acc{};
-		const float rnd_acc = 0.005f;
+		const float rnd_acc = 0.1f;
 		acc.z = -(float)rand() / RAND_MAX * rnd_acc;
-
 
 		// 追加
 		Add(60, pos, vel, acc, startScale, endScale, startColor, endColor);
@@ -231,15 +234,10 @@ void Particle::StageEffect(XMFLOAT3 setPos, float startScale, float endScale, XM
 
 void Particle::TargetEffect(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int& count)
 {
-	if (count >= 20)
+	if (count >= 10)
 	{
-		XMFLOAT3 pos{};
-		pos.x = setPos.x;
-		pos.y = setPos.y;
-		pos.z = setPos.z;
-
 		// 追加
-		Add(20, pos, {}, {}, startScale, endScale, startColor, endColor);
+		Add(20, setPos, {}, {}, startScale, endScale, startColor, endColor);
 		count = 0;
 	}
 }

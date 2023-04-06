@@ -78,6 +78,7 @@ void Player::Update(bool rFlag, bool moveFlag)
 			pPos.x -= cameraTrack.z;
 			pPos.z += cameraTrack.x;
 		}
+
 		if (controller->GetPadState(Controller::State::LEFT_U_STICK, Controller::Type::NONE) || keyboard->PushKey(DIK_W))
 		{
 			pPos.x += cameraTrack.x;
@@ -124,7 +125,7 @@ void Player::Avoid()
 	{
 		avoidFlag = true;
 		// 加速力の更新
-		pAcc = 2.2f;
+		pAcc = 3.0f;
 	}
 
 	if (!avoidFlag)
@@ -152,8 +153,8 @@ void Player::Jump()
 	{
 		pVel -= pGra;
 		pPos.y += pVel;
-		pPos.x += inertiaSave.x * 0.4f;
-		pPos.z += inertiaSave.z * 0.4f;
+		pPos.x += inertiaSave.x * 0.3f;
+		pPos.z += inertiaSave.z * 0.3f;
 
 		if (onGround)
 		{
@@ -203,7 +204,6 @@ void Player::Reset()
 	pSpeed = 0.35f;
 	onGround = false;//自由落下のフラグ
 	jumpFlag = false;
-	moveFlag = false;//移動管理フラグ
 	pMove = 0.0f;//移動量
 	pAcc = 0.2f;//加速
 	pVel = 0.2f;//速度
@@ -296,7 +296,7 @@ bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 	return hitFlag;
 }
 
-bool Player::StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale)
+bool Player::StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale, bool& reverseFlag)
 {
 	//フラグ
 	bool hitFlag = false;
@@ -320,6 +320,16 @@ bool Player::StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale)
 				pPos.y = pPosOld.y;
 			}
 			onGround = true;
+		}
+
+		else if (minY - pScale.y < pPos.y && stagePos.y > pPosOld.y)
+		{
+			hitFlag = true;
+			if (stagePos.y - pScale.y <= pPos.y)
+			{
+				pPos.y = pPosOld.y;
+			}
+			reverseFlag = true;
 		}
 	}
 

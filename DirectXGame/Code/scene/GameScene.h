@@ -49,6 +49,8 @@ public: // メンバ関数
 	void CameraUpdate();
 	// 当たり判定
 	void CollisionUpdate();
+	// ロープの更新
+	void RopeUpdate();
 
 	// jsonオブジェクトの初期化
 	void jsonObjectInit(const std::string sceneName);
@@ -106,7 +108,9 @@ private: // メンバ変数
 	// パーティクル
 	Particle* effectBox = nullptr;
 	Particle* effectCircle = nullptr;
+	Particle* effectCircle2 = nullptr;
 	Particle* effectTarget = nullptr;
+	Particle* effectAvoid = nullptr;
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
@@ -151,10 +155,23 @@ private: // メンバ変数
 	int vSpeedL = 0;
 	int vSpeedR = 0;
 
-	// 距離確認用
+
+	// 座標保存用
 	XMFLOAT3 posSave = {};
+	XMFLOAT3 oldPosSave = {1000.0f, 1000.0f, 1000.0f};
+	bool targetFlag = false;
+
+	// ポールの座標と距離
 	XMFLOAT3 posPoleSave = {};
+	float minPoleLength = 15.0f;
+
+	// エネミーの座標と距離
 	XMFLOAT3 posEnemySave = {};
 	float minEnemyLength = 15.0f;
-	float minPoleLength = 10.0f;
+
+	// ボックスとの距離
+	float minBoxLength = 15.0f;
+	
+	// 壁との距離
+	float minWallLength = 15.0f;
 };

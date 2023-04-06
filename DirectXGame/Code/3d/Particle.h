@@ -116,7 +116,7 @@ public: // メンバ関数
 
 
 	// パーティクルの生成
-	void CreateParticles(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count);
+	void CreateParticles(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count, int life, bool velFlag, bool accFlag);
 
 	// ステージのエフェクト
 	void StageEffect(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count);

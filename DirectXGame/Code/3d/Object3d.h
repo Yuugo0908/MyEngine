@@ -93,6 +93,10 @@ public: // メンバ関数
 	void SetType(int type) { this->type = type; }
 	// オブジェクトタイプの取得
 	const int& GetType() { return type; }
+	// 描画フラグの設定
+	void SetDrawFlag(bool dFlag) { drawFlag = dFlag; }
+	// 描画フラグの取得
+	const bool& GetDrawFlag() { return drawFlag; }
 
 	// レベルエディタ用 当たり判定スケール設定
 	void SetCollisionScale(XMFLOAT3 collisionScale) { this->collisionScale = collisionScale; }
@@ -118,4 +122,6 @@ private: // メンバ変数
 	int type = 0;
 	// コリジョンスケール
 	XMFLOAT3 collisionScale = {};
+	// 描画フラグ
+	bool drawFlag = true;
 };

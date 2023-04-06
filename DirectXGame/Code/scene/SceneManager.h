@@ -9,8 +9,6 @@ public:
 	~SceneManager();
 
 	static SceneManager* GetInstance();
-	// 次のシーン
-	void SetNextScene(BaseScene* nextScene) { nextScene_ = nextScene; }
 	// 更新
 	void Update();
 	//描画

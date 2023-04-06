@@ -6,6 +6,8 @@
 #include "Easing.h"
 #include "Operator.h"
 #include "Camera.h"
+#include "Particle.h"
+#include "DirectXCommon.h"
 
 class Player
 {
@@ -14,8 +16,6 @@ public: // メンバ関数
 	bool Initialize(const XMFLOAT3 pos, const XMFLOAT3 scale);
 
 	void Update(bool rFlag, bool moveFlag);
-
-	void Draw() { playerObj->Draw(); }
 
 	void Rush(XMFLOAT3 targetPos, bool& flag, float& avoidTime);
 
@@ -29,10 +29,10 @@ public: // メンバ関数
 
 	void Reset();
 
-	// マップチップ当たり判定
+	// マップ当たり判定
 	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale);
 
-	bool StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale);
+	bool StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale, bool& reverseFlag);
 
 	bool PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale);
 
@@ -65,11 +65,11 @@ private: // メンバ変数
 	XMFLOAT3 pScale = {};//大きさ
 	XMFLOAT3 pRot = {};//回転
 	XMFLOAT3 inertiaSave = {}; // 慣性
+	XMFLOAT3 oldPolePos = { 1000.0f, 1000.0f, 1000.0f };
 
 	float pSpeed = 0.35f;
 	bool onGround = false;//自由落下のフラグ
 	bool jumpFlag = false;
-	bool moveFlag = false;//移動管理フラグ
 	float pMove = 0.0f;//移動量
 	float pAcc = 0.2f;//加速
 	float pVel = 0.2f;//速度
@@ -85,5 +85,7 @@ private: // メンバ変数
 	// カメラ距離取得用
 	XMFLOAT3 cameraTrack = {};
 	float cameraRot = 0.0f;
+
+	int count = 0;
 };
 
