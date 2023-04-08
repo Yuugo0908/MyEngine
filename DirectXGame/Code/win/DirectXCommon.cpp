@@ -65,7 +65,8 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	}
 
 	// imgui‰Šú‰»
-	if (!InitImgui()) {
+	if (!InitImgui())
+	{
 		assert(0);
 	}
 }

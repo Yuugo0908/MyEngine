@@ -205,7 +205,8 @@ void PostEffect::CreateVB()
 	assert(SUCCEEDED(result));
 
 	// 頂点データ
-	VertexPosUv vertices[vertNum] = {
+	VertexPosUv vertices[vertNum] =
+	{
 		{{-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f}},
 		{{-1.0f, +1.0f, 0.0f}, {0.0f, 0.0f}},
 		{{+1.0f, -1.0f, 0.0f}, {1.0f, 1.0f}},
@@ -215,7 +216,8 @@ void PostEffect::CreateVB()
 	// 頂点バッファへのデータ転送
 	VertexPosUv* vertMap = nullptr;
 	result = vertBuffer->Map(0, nullptr, (void**)&vertMap);
-	if (SUCCEEDED(result)) {
+	if (SUCCEEDED(result))
+	{
 		memcpy(vertMap, vertices, sizeof(vertices));
 		vertBuffer->Unmap(0, nullptr);
 	}

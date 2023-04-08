@@ -55,7 +55,7 @@ void Camera::SetUp(XMFLOAT3 up)
 	viewDirty = true;
 }
 
-void Camera::CameraMoveVector(XMFLOAT3 move)
+void Camera::CameraMove(const XMFLOAT3& move)
 {
 	XMFLOAT3 eye_moved = GetEye();
 	XMFLOAT3 target_moved = GetTarget();
@@ -90,7 +90,7 @@ void Camera::CameraMoveVector(const XMVECTOR& move)
 	SetTarget(target_moved);
 }
 
-void Camera::CameraMoveEyeVector(XMFLOAT3 move)
+void Camera::CameraMoveEye(const XMFLOAT3& move)
 {
 	XMFLOAT3 eye_moved = GetEye();
 
@@ -116,22 +116,36 @@ void Camera::CameraMoveEyeVector(const XMVECTOR& move)
 void Camera::Update()
 {
 	// マウスの入力を取得
-	mouseMove = mouse->GetMouseMove();
 	distance = max(distance, 10.0f);
 	distance = min(distance, 20.0f);
 
-	// マウスの左ボタンが押されていたらカメラを回転させない
-	dy = mouseMove.MouseX * scaleY;
-	angleY = -dy * XM_PI * 0.15f;
-	dirty = true;
+	dx = 0.0f;
+	angleX = 0.0f;
+	dy = 0.0f;
+	angleY = 0.0f;
 
-	// ホイール入力で距離を変更
-	if (mouseMove.MouseZ != 0) {
-		distance -= mouseMove.MouseZ / 120.0f;
+	// マウスの左ボタンが押されていたらカメラを回転させない
+	if (mouse->GetMouseMove().MouseX != 0)
+	{
+		dy = mouse->GetMouseMove().MouseX * scaleY;
+		angleY = -dy * XM_PI * 0.15f;
+		dirty = true;
+	}
+	if (mouse->GetMouseMove().MouseY != 0)
+	{
+		dx = mouse->GetMouseMove().MouseY * scaleY;
+		angleX = -dx * XM_PI * 0.15f;
 		dirty = true;
 	}
 
-	// 右スティック左右操作でカメラを回転
+	// ホイール入力で距離を変更
+	if (mouse->GetMouseMove().MouseZ != 0)
+	{
+		distance -= mouse->GetMouseMove().MouseZ / 120.0f;
+		dirty = true;
+	}
+
+	// 右スティック操作でカメラを回転
 	if (controller->GetPadState(Controller::State::RIGHT_L_STICK, Controller::Type::NONE))
 	{
 		dy = speed * scaleY;
@@ -142,6 +156,18 @@ void Camera::Update()
 	{
 		dy = -speed * scaleY;
 		angleY = dy * XM_PI;
+		dirty = true;
+	}
+	else if (controller->GetPadState(Controller::State::RIGHT_U_STICK, Controller::Type::NONE))
+	{
+		dx = speed * scaleX;
+		angleX = dx * XM_PI;
+		dirty = true;
+	}
+	else if (controller->GetPadState(Controller::State::RIGHT_D_STICK, Controller::Type::NONE))
+	{
+		dx = -speed * scaleX;
+		angleX = dx * XM_PI;
 		dirty = true;
 	}
 
@@ -157,9 +183,11 @@ void Camera::Update()
 		dirty = true;
 	}
 
-	if (dirty || viewDirty) {
+	if (dirty || viewDirty)
+	{
 		// 追加回転分の回転行列を生成
 		XMMATRIX matRotNew = XMMatrixIdentity();
+		matRotNew *= XMMatrixRotationX(-angleX);
 		matRotNew *= XMMatrixRotationY(-angleY);
 		// 累積の回転行列を合成
 		matRot = matRotNew * matRot;
@@ -173,20 +201,23 @@ void Camera::Update()
 
 		// 注視点からずらした位置に視点座標を決定
 		const XMFLOAT3& target = GetTarget();
-		SetEye({ target.x + vTargetEye.m128_f32[0], target.y + 10.0f + vTargetEye.m128_f32[1], target.z + vTargetEye.m128_f32[2] });
+		SetEye({ target.x + vTargetEye.m128_f32[0], target.y + vTargetEye.m128_f32[1], target.z + vTargetEye.m128_f32[2] });
 		SetUp({ vUp.m128_f32[0], vUp.m128_f32[1], vUp.m128_f32[2] });
 	}
 
-	if (viewDirty || projectionDirty) {
+	if (viewDirty || projectionDirty)
+	{
 		// 再計算必要なら
-		if (viewDirty) {
+		if (viewDirty)
+		{
 			// ビュー行列更新
 			UpdateViewMatrix();
 			viewDirty = false;
 		}
 
 		// 再計算必要なら
-		if (projectionDirty) {
+		if (projectionDirty)
+		{
 			// ビュー行列更新
 			UpdateProjectionMatrix();
 			projectionDirty = false;
@@ -246,10 +277,12 @@ void Camera::UpdateViewMatrix()
 	XMVECTOR tX = XMVector3Dot(cameraAxisX, reverseEyePosition);	// X成分
 	XMVECTOR tY = XMVector3Dot(cameraAxisY, reverseEyePosition);	// Y成分
 	XMVECTOR tZ = XMVector3Dot(cameraAxisZ, reverseEyePosition);	// Z成分
+
 	// 一つのベクトルにまとめる
 	XMVECTOR translation = XMVectorSet(tX.m128_f32[0], tY.m128_f32[1], tZ.m128_f32[2], 1.0f);
 	// ビュー行列に平行移動成分を設定
 	matView.r[3] = translation;
+
 
 #pragma region 全方向ビルボード行列の計算
 	// ビルボード行列
@@ -257,7 +290,7 @@ void Camera::UpdateViewMatrix()
 	matBillboard.r[1] = cameraAxisY;
 	matBillboard.r[2] = cameraAxisZ;
 	matBillboard.r[3] = XMVectorSet(0, 0, 0, 1);
-#pragma region
+#pragma endregion
 
 #pragma region Y軸回りビルボード行列の計算
 	// カメラX軸、Y軸、Z軸
@@ -310,7 +343,6 @@ void Camera::CameraShake(bool& flag)
 
 	SetEye(eye);
 	SetTarget(target);
-	Update();
 }
 
 XMFLOAT3 Camera::CameraTrack(XMFLOAT3 pPos)
@@ -352,12 +384,12 @@ void Camera::Reset()
 	projectionDirty = false;
 	shakeCount = 0;
 	moveCount = 30;
-	mouseMove = {0, 0, 0};
 
 	dirty = false;
-	angleY = 0.0f;
+	dx = 0.0f;
 	dy = 0.0f;
-	speed = 7.0f;
+	angleX = 0.0f;
+	angleY = 0.0f;
 
 	// ビュー行列
 	matView = DirectX::XMMatrixIdentity();

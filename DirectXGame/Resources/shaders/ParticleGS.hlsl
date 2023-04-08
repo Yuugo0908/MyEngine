@@ -32,7 +32,8 @@ void main(
 
 	float4 offset = float4(0, 0, 0, 0);
 
-	for (uint i = 0; i < vnum; i++) {
+	for (uint i = 0; i < vnum; i++)
+	{
 		// 中心からのオフセットをスケーリング
 		offset = offset_array[i] * input[0].scale;
 		// 中心からのオフセットをビルボード回転（モデル座標）

@@ -122,23 +122,35 @@ private: // メンバ変数
 	float playerHp = 360;
 
 	// エネミー
-	int enemyCount = 0;
-	float enemyHp = 360;
-	bool eAlive = false;
 	XMFLOAT3 ePos = {};
 	XMFLOAT3 ePosOld = {};
 	XMFLOAT3 eScale = {};
+	int enemyCount = 0;
+	float enemyHp = 360;
+	bool eAlive = false;
 
 	// ロープ
+	XMFLOAT3 catchPos = {};
 	bool rFlag = false;
 	int throwCount = 0;
-	XMFLOAT3 catchPos = {};
 
 	// カメラ
 	XMFLOAT3 cPos = {};
 	XMFLOAT3 cTarget = {};
 	XMVECTOR cameraLength = {};
 	const float trackLimit = -30.0f;
+
+	Mouse::MouseMove mouseMove;
+	//対象とカメラの距離
+	float distance = 15.0f;
+	// スケーリング
+	float scaleX = 1.0f;
+	float scaleY = 1.0f;
+	float dx = 0.0f;
+	float dy = 0.0f;
+	float angleX = 0.0f;
+	float angleY = 0.0f;
+	float speed = 7.0f;
 
 	// シーン管理用
 	bool fadeFlag = false;
@@ -154,7 +166,6 @@ private: // メンバ変数
 	// 振動用変数
 	int vSpeedL = 0;
 	int vSpeedR = 0;
-
 
 	// 座標保存用
 	XMFLOAT3 posSave = {};

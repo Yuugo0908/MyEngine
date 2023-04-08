@@ -25,7 +25,6 @@ void Framework::Initialize()
 	camera = Camera::GetInstance();
 	camera->Initialize(WinApp::window_width, WinApp::window_height);
 
-
 	// 画像静的初期化
 	if (!Image2d::StaticInitialize(dxCommon->GetDevice()))
 	{
@@ -60,6 +59,7 @@ void Framework::Finalize()
 	safe_delete(image2d);
 	safe_delete(light);
 	safe_delete(sceneFactory_);
+	firstBootFlag = false;
 
 	// ゲームウィンドウの破棄
 	win->TerminateGameWindow();
@@ -69,34 +69,26 @@ void Framework::Finalize()
 void Framework::Update()
 {
 	// メッセージ処理
-	if (win->ProcessMessage())
+	if (win->ProcessMessage() || keyboard->TriggerKey(DIK_ESCAPE))
 	{
 		// ゲームループを抜ける
 		endRequest_ = true;
 		return;
 	}
 
-	// アクティブ状態ならカーソル移動を制限
-	if (win->GetHwnd() == GetForegroundWindow())
-	{
-		if (keyboard->PushKey(DIK_ESCAPE))
-		{
-			// ゲームループを抜ける
-			endRequest_ = true;
-			return;
-		}
-
-		// 入力関連の毎フレーム処理
-		keyboard->Update();
-		controller->Update();
-		mouse->Update();
-		// ゲームシーンの毎フレーム処理
-		SceneManager::GetInstance()->Update();
-	}
-	else
+	// 非アクティブ状態なら更新しない(初回起動は除く)
+	if (firstBootFlag && win->GetHwnd() != GetForegroundWindow())
 	{
 		ClipCursor(NULL);
+		return;
 	}
+
+	// 入力関連の毎フレーム処理
+	keyboard->Update();
+	controller->Update();
+	mouse->Update();
+	// ゲームシーンの毎フレーム処理
+	SceneManager::GetInstance()->Update();
 }
 
 void Framework::Draw()
@@ -125,6 +117,7 @@ void Framework::Run()
 		}
 
 		Draw();
+		firstBootFlag = true;
 	}
 
 	Finalize();

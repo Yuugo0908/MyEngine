@@ -139,6 +139,15 @@ private: // メンバ変数
 	XMFLOAT3 cTarget = {};
 	XMVECTOR cameraLength = {};
 	const float trackLimit = -30.0f;
+	bool dirty = false;
+	float dx = 0.0f;
+	float dy = 0.0f;
+	float angleX = 0.0f;
+	float angleY = 0.0f;
+	float speed = 7.0f;
+	float distance = 15.0f;
+	float scaleX = 1.0f;
+	float scaleY = 1.0f;
 
 	// シーン管理用
 	bool fadeFlag = false;

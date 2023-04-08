@@ -9,7 +9,8 @@ class Mouse
 {
 public:
 	// マウスの座標
-	struct MouseMove {
+	struct MouseMove
+	{
 		long MouseX;
 		long MouseY;
 		long MouseZ;

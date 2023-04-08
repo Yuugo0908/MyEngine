@@ -3,7 +3,8 @@
 #include <cassert>
 #include "SceneManager.h"
 
-void TutorialScene::Initialize() {
+void TutorialScene::Initialize()
+{
 	rope = new Rope;
 	player = new Player;
 	enemy = new Enemy;
@@ -185,14 +186,7 @@ void TutorialScene::Draw()
 
 	for (auto& object : jsonObject)
 	{
-		if (object->GetType() != stage_)
-		{
-			if (object->GetDrawFlag())
-			{
-				object->Draw();
-			}
-		}
-		else
+		if (object->GetDrawFlag())
 		{
 			object->Draw();
 		}
@@ -302,13 +296,27 @@ void TutorialScene::LightUpdate()
 
 void TutorialScene::CameraUpdate()
 {
-	if (pPos.y >= trackLimit)
+	cPos = camera->GetEye();
+	cTarget = camera->GetTarget();
+
+	if (gameClearFlag)
 	{
 		camera->SetTarget(pPos);
+		if (pPos.y <= trackLimit)
+		{
+			player->ReSpawn();
+		}
 	}
 	else
 	{
-		playerHp = 0;
+		if (pPos.y >= trackLimit)
+		{
+			camera->SetTarget(pPos);
+		}
+		else
+		{
+			playerHp = 0;
+		}
 	}
 
 	cameraLength = { cPos.x - pPos.x, cPos.y - pPos.y, cPos.z - pPos.z, 1.0f };
@@ -320,8 +328,6 @@ void TutorialScene::CameraUpdate()
 		camera->CameraShake(shakeFlag);
 	}
 
-	cPos = camera->GetEye();
-	cTarget = camera->GetTarget();
 	camera->Update();
 }
 

@@ -56,8 +56,8 @@ public: // 静的メンバ関数
 	}
 
 	// ベクトルによる移動
-	void CameraMoveVector(XMFLOAT3 move);
-	void CameraMoveEyeVector(XMFLOAT3 move);
+	void CameraMove(const XMFLOAT3& move);
+	void CameraMoveEye(const XMFLOAT3& move);
 	void CameraMoveVector(const XMVECTOR& move);
 	void CameraMoveEyeVector(const XMVECTOR& move);
 
@@ -92,13 +92,21 @@ private: // メンバ変数
 	XMMATRIX matViewProjection = DirectX::XMMatrixIdentity();
 	// 回転行列
 	XMMATRIX matRot = DirectX::XMMatrixIdentity();
+
+	bool dirty = false;
+	float dx = 0.0f;
+	float dy = 0.0f;
+	float angleX = 0.0f;
+	float angleY = 0.0f;
+	float speed = 7.0f;
 	//対象とカメラの距離
 	float distance = 15.0f;
 	// スケーリング
 	float scaleX = 1.0f;
 	float scaleY = 1.0f;
+
 	// 視点座標
-	XMFLOAT3 eye = { 0, 0, distance };
+	XMFLOAT3 eye = { 0, 10.0f, distance };
 	// 注視点座標
 	XMFLOAT3 target = { 0, 0, 0 };
 	// 上方向ベクトル
@@ -121,10 +129,4 @@ private: // メンバ変数
 	XMVECTOR vTargetEye = {};
 	XMVECTOR vUp = {};
 
-	Mouse::MouseMove mouseMove;
-
-	bool dirty = false;
-	float dy = 0.0f;
-	float angleY = 0.0f;
-	float speed = 7.0f;
 };

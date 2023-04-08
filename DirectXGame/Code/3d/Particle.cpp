@@ -14,7 +14,8 @@ Particle * Particle::Create(const wchar_t* fileName)
 {
 	// 3Dオブジェクトのインスタンスを生成
 	Particle* partMan = new Particle;
-	if (partMan == nullptr) {
+	if (partMan == nullptr)
+	{
 		return nullptr;
 	}
 
@@ -47,7 +48,8 @@ void Particle::Initialize(const wchar_t* fileName)
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&constBuff));
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 }
@@ -88,7 +90,8 @@ void Particle::Update()
 	int vertCount = 0;
 	VertexPos* vertMap = nullptr;
 	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
-	if (SUCCEEDED(result)) {
+	if (SUCCEEDED(result))
+	{
 		// パーティクルの情報を1つずつ反映
 		for (std::forward_list<ParticleData>::iterator it = particles.begin(); it != particles.end(); it++)
 		{
@@ -252,7 +255,8 @@ void Particle::InitializeDescriptorHeap()
 	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;//シェーダから見えるように
 	descHeapDesc.NumDescriptors = 1; // シェーダーリソースビュー1つ
 	result = DirectXCommon::GetInstance()->GetDevice()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descHeap));//生成
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 
@@ -277,7 +281,8 @@ void Particle::InitializeGraphicsPipeline()
 		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
 		0,
 		&vsBlob, &errorBlob);
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		// errorBlobからエラー内容をstring型にコピー
 		std::string errstr;
 		errstr.resize(errorBlob->GetBufferSize());
@@ -300,7 +305,8 @@ void Particle::InitializeGraphicsPipeline()
 		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
 		0,
 		&psBlob, &errorBlob);
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		// errorBlobからエラー内容をstring型にコピー
 		std::string errstr;
 		errstr.resize(errorBlob->GetBufferSize());
@@ -323,7 +329,8 @@ void Particle::InitializeGraphicsPipeline()
 		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
 		0,
 		&gsBlob, &errorBlob);
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		// errorBlobからエラー内容をstring型にコピー
 		std::string errstr;
 		errstr.resize(errorBlob->GetBufferSize());
@@ -338,7 +345,8 @@ void Particle::InitializeGraphicsPipeline()
 	}
 
 	// 頂点レイアウト
-	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
+	D3D12_INPUT_ELEMENT_DESC inputLayout[] =
+	{
 		{ // xy座標(1行で書いたほうが見やすい)
 			"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
 			D3D12_APPEND_ALIGNED_ELEMENT,
@@ -423,7 +431,8 @@ void Particle::InitializeGraphicsPipeline()
 	result = D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
 	// ルートシグネチャの生成
 	result = DirectXCommon::GetInstance()->GetDevice()->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 
@@ -432,7 +441,8 @@ void Particle::InitializeGraphicsPipeline()
 	// グラフィックスパイプラインの生成
 	result = DirectXCommon::GetInstance()->GetDevice()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate));
 
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 }
@@ -448,7 +458,8 @@ void Particle::LoadTexture(const wchar_t* fileName)
 	result = LoadFromWICFile(
 		fileName, WIC_FLAGS_NONE,
 		&metadata, scratchImg);
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 
@@ -471,7 +482,8 @@ void Particle::LoadTexture(const wchar_t* fileName)
 		D3D12_RESOURCE_STATE_GENERIC_READ, // テクスチャ用指定
 		nullptr,
 		IID_PPV_ARGS(&texbuff));
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 
@@ -483,7 +495,8 @@ void Particle::LoadTexture(const wchar_t* fileName)
 		(UINT)img->rowPitch,  // 1ラインサイズ
 		(UINT)img->slicePitch // 1枚サイズ
 	);
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 
@@ -517,7 +530,8 @@ void Particle::CreateModel()
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&vertBuff));
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 		return;
 	}

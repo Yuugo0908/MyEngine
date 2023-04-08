@@ -21,28 +21,32 @@ bool Mouse::Initialize(WinApp* win_app)
 
 	// DirectInputオブジェクトの生成	
 	result = DirectInput8Create(win_app->GetInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dinput, nullptr);
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 		return false;
 	}
 
 	// マウスデバイスの生成	
 	result = dinput->CreateDevice(GUID_SysMouse, &devMouse, NULL);
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 		return false;
 	}
 
 	// 入力データ形式のセット
 	result = devMouse->SetDataFormat(&c_dfDIMouse2); // 標準形式
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 		return false;
 	}
 
 	// 排他制御レベルのセット
 	result = devMouse->SetCooperativeLevel(win_app->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 		return false;
 	}
@@ -84,7 +88,8 @@ void Mouse::CursorLimit()
 bool Mouse::PushMouseLeft()
 {
 	// 0でなければ押している
-	if (mouseState.rgbButtons[0]) {
+	if (mouseState.rgbButtons[0])
+	{
 		return true;
 	}
 
@@ -95,7 +100,8 @@ bool Mouse::PushMouseLeft()
 bool Mouse::PushMouseMiddle()
 {
 	// 0でなければ押している
-	if (mouseState.rgbButtons[2]) {
+	if (mouseState.rgbButtons[2])
+	{
 		return true;
 	}
 
@@ -106,7 +112,8 @@ bool Mouse::PushMouseMiddle()
 bool Mouse::PushMouseRight()
 {
 	// 0でなければ押している
-	if (mouseState.rgbButtons[1]) {
+	if (mouseState.rgbButtons[1])
+	{
 		return true;
 	}
 
@@ -117,7 +124,8 @@ bool Mouse::PushMouseRight()
 bool Mouse::TriggerMouseLeft()
 {
 	// 前回が0で、今回が0でなければトリガー
-	if (!mouseStatePre.rgbButtons[0] && mouseState.rgbButtons[0]) {
+	if (!mouseStatePre.rgbButtons[0] && mouseState.rgbButtons[0])
+	{
 		return true;
 	}
 
@@ -128,7 +136,8 @@ bool Mouse::TriggerMouseLeft()
 bool Mouse::TriggerMouseMiddle()
 {
 	// 前回が0で、今回が0でなければトリガー
-	if (!mouseStatePre.rgbButtons[2] && mouseState.rgbButtons[2]) {
+	if (!mouseStatePre.rgbButtons[2] && mouseState.rgbButtons[2])
+	{
 		return true;
 	}
 
@@ -139,7 +148,8 @@ bool Mouse::TriggerMouseMiddle()
 bool Mouse::TriggerMouseRight()
 {
 	// 前回が0で、今回が0でなければトリガー
-	if (!mouseStatePre.rgbButtons[1] && mouseState.rgbButtons[1]) {
+	if (!mouseStatePre.rgbButtons[1] && mouseState.rgbButtons[1])
+	{
 		return true;
 	}
 

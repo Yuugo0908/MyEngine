@@ -65,13 +65,15 @@ void LevelLoader::Recursive(nlohmann::json& object, LevelData* levelData)
 	std::string type = object["type"].get<std::string>();
 
 	// MESH
-	if (type.compare("MESH") == 0) {
+	if (type.compare("MESH") == 0)
+	{
 		// 要素追加
 		levelData->objects.emplace_back(LevelData::ObjectData{});
 		// 今追加した要素の参照を得る
 		LevelData::ObjectData& objectData = levelData->objects.back();
 
-		if (object.contains("file_name")) {
+		if (object.contains("file_name"))
+		{
 			// ファイル名
 			objectData.fileName = object["file_name"];
 		}

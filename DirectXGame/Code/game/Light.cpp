@@ -52,7 +52,8 @@ void Light::TransferConstBuffer()
 	//定数バッファへデータ転送
 	ConstBufferData* constMap = nullptr;
 	result = constBuffer->Map(0, nullptr, (void**)&constMap);
-	if (SUCCEEDED(result)) {
+	if (SUCCEEDED(result))
+	{
 		constMap->lightVec = -lightdir;
 		constMap->lightColor = lightColor;
 		constBuffer->Unmap(0, nullptr);
@@ -75,7 +76,8 @@ void Light::SetLightColor(const XMFLOAT3& lightcolor)
 void Light::Update()
 {
 	//値の更新があった時だけ定数バッファに転送する
-	if (dirty) {
+	if (dirty)
+	{
 		TransferConstBuffer();
 		dirty = false;
 	}

@@ -51,5 +51,6 @@ protected: // ƒƒ“ƒo•Ï”
 	AbstructSceneFactory* sceneFactory_ = nullptr;
 
 	const int debugTextNum = 0;
+	bool firstBootFlag = false;
 };
 

@@ -3,7 +3,8 @@
 #include <cassert>
 #include "SceneManager.h"
 
-void GameScene::Initialize() {
+void GameScene::Initialize()
+{
 	rope = new Rope;
 	player = new Player;
 	enemy = new Enemy;
@@ -90,9 +91,11 @@ void GameScene::Update()
 {
 	// マウスの移動範囲の制限
 	mouse->CursorLimit();
+	// フラグの取得
+	rFlag = rope->GetrFlag();
+	moveFlag = rope->GetmoveFlag();
+	avoidFlag = player->GetAvoidFlag();
 
-	// タイトルから移行後の更新
-	//	プレイヤーの座標、半径の設定
 	if (rushFlag)
 	{
 		player->Rush(catchPos, rushFlag, elapsedTime);
@@ -112,11 +115,6 @@ void GameScene::Update()
 	effectCircle->Update();
 	effectCircle2->Update();
 	effectTarget->Update();
-
-	// フラグの取得
-	rFlag = rope->GetrFlag();
-	moveFlag = rope->GetmoveFlag();
-	avoidFlag = player->GetAvoidFlag();
 
 	if (avoidFlag)
 	{
@@ -185,14 +183,7 @@ void GameScene::Draw()
 
 	for (auto& object : jsonObject)
 	{
-		if (object->GetType() != stage_)
-		{
-			if (object->GetDrawFlag())
-			{
-				object->Draw();
-			}
-		}
-		else
+		if (object->GetDrawFlag())
 		{
 			object->Draw();
 		}
@@ -240,32 +231,6 @@ void GameScene::reset()
 	rope->Reset();
 	jsonObject.erase(jsonObject.begin(), jsonObject.end());
 
-	// プレイヤー
-	pPos = { 0.0f, 10.0f, 0.0f };//座標
-	pPosOld = { 0.0f, 10.0f, 0.0f };
-	pScale = {};
-	moveFlag = false;//移動管理フラグ
-	avoidFlag = false;//回避管理フラグ
-	playerHp = 360;
-
-	// エネミー
-	enemyHp = 360;
-	ePos = {};
-	ePosOld = {};
-	eScale = {};
-	enemyCount = 0;
-
-	// ロープ
-	rFlag = false;
-
-	// カメラ
-	cPos = {};
-	cTarget = {};
-	cameraLength = {};
-
-	// シェイク用
-	shakeFlag = false;
-
 	if (gameClearFlag)
 	{
 		SceneManager::GetInstance()->ChangeScene("GameClear");
@@ -284,9 +249,6 @@ void GameScene::SetImgui()
 	ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
 
 	ImGui::Separator();
-	ImGui::Text("playerPosX : %6.2f", pPos.x);
-	ImGui::Text("playerPosY : %6.2f", pPos.y);
-	ImGui::Text("playerPosZ : %6.2f", pPos.z);
 
 	ImGui::End();
 }
@@ -302,13 +264,27 @@ void GameScene::LightUpdate()
 
 void GameScene::CameraUpdate()
 {
-	if (pPos.y >= trackLimit)
+	cPos = camera->GetEye();
+	cTarget = camera->GetTarget();
+
+	if (gameClearFlag)
 	{
 		camera->SetTarget(pPos);
+		if (pPos.y <= trackLimit)
+		{
+			player->ReSpawn();
+		}
 	}
 	else
 	{
-		playerHp = 0;
+		if (pPos.y >= trackLimit)
+		{
+			camera->SetTarget(pPos);
+		}
+		else
+		{
+			playerHp = 0;
+		}
 	}
 
 	cameraLength = { cPos.x - pPos.x, cPos.y - pPos.y, cPos.z - pPos.z, 1.0f };
@@ -320,8 +296,6 @@ void GameScene::CameraUpdate()
 		camera->CameraShake(shakeFlag);
 	}
 
-	cPos = camera->GetEye();
-	cTarget = camera->GetTarget();
 	camera->Update();
 }
 
@@ -342,8 +316,11 @@ void GameScene::CollisionUpdate()
 
 			if (rFlag && enemy->EnemyCollision(player->GetObj()))
 			{
+				// カメラシェイクの発生
 				shakeFlag = true;
+
 				rope->SetmoveFlag(true);
+
 				// パーティクル生成
 				effectBox->CreateParticles(
 					enemy->GetObj()->GetPosition(),
@@ -419,15 +396,16 @@ void GameScene::CollisionUpdate()
 					}
 					else
 					{
+						// プレイヤーと敵の座標と距離を取得
 						pPos = player->GetObj()->GetPosition();
 						ePos = enemy->GetObj()->GetPosition();
-
 						float length = GetLength(pPos, ePos);
 
+						// ロープが届く距離にいた場合、その敵の座標と距離を保存
 						if (length < minEnemyLength)
 						{
-							minEnemyLength = length;
 							posEnemySave = ePos;
+							minEnemyLength = length;
 						}
 					}
 				}
@@ -538,8 +516,8 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 
 			// プレイヤーを生成
 			player->Initialize(pos, scale);
-			pPos = player->GetObj()->GetPosition();
 			player->GetObj()->SetCollisionScale(size);
+			pPos = player->GetObj()->GetPosition();
 			// カメラの設定
 			camera->Reset();
 			camera->SetTarget(pPos);
@@ -636,6 +614,7 @@ void GameScene::jsonObjectUpdate()
 	{
 		XMFLOAT3 pos = object->GetPosition();
 		XMFLOAT3 scale = object->GetCollisionScale();
+		// プレイヤーとカメラの間にオブジェクトがあった時、オブジェクトを描画しない
 		if (Collision::CollisionRayBox(cPos, pPos, pos, scale))
 		{
 			object->SetDrawFlag(false);
@@ -644,8 +623,6 @@ void GameScene::jsonObjectUpdate()
 		{
 			object->SetDrawFlag(true);
 		}
-
-		object->Update();
 
 		if (object->GetType() == box_)
 		{
@@ -666,14 +643,6 @@ void GameScene::jsonObjectUpdate()
 			XMFLOAT3 wallScale = object->GetCollisionScale();
 			player->MapCollide(wallPos, wallScale);
 			pPos = player->GetObj()->GetPosition();
-
-			if (rope->Collision(object, pPos))
-			{
-				rope->SetrFlag(false);
-				rushFlag = false;
-				catchPos = {};
-				elapsedTime = 0.0f;
-			}
 
 			for (std::unique_ptr<Enemy>& enemy : enemys)
 			{
@@ -731,5 +700,7 @@ void GameScene::jsonObjectUpdate()
 				oldPosSave = posPoleSave;
 			}
 		}
+
+		object->Update();
 	}
 }

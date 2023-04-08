@@ -9,6 +9,7 @@ bool Player::Initialize(const XMFLOAT3 pos, const XMFLOAT3 scale)
 
 	pPos = pos;
 	pScale = scale;
+	reSpawnPos = pos;
 
 	playerObj->SetPosition(pPos);
 	playerObj->SetScale(pScale);
@@ -175,11 +176,6 @@ void Player::Jump()
 	}
 }
 
-void Player::Inertia()
-{
-	inertiaSave = pPos - pPosOld;
-}
-
 bool Player::Damage(const std::unique_ptr<Object3d>& object)
 {
 	if (damageInterval == 0 && Collision::CollisionObject(object, playerObj))
@@ -218,6 +214,14 @@ void Player::Reset()
 	// ƒJƒƒ‰‹——£Žæ“¾—p
 	cameraTrack = {};
 	cameraRot = 0.0f;
+}
+
+void Player::ReSpawn()
+{
+	pPos = reSpawnPos;
+	playerObj->SetPosition(pPos);
+	playerObj->SetScale(pScale);
+	playerObj->Update();
 }
 
 bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)

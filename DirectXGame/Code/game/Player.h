@@ -23,11 +23,11 @@ public: // メンバ関数
 
 	void Jump();
 
-	void Inertia();
-
 	bool Damage(const std::unique_ptr<Object3d>& object);
 
 	void Reset();
+
+	void ReSpawn();
 
 	// マップ当たり判定
 	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale);
@@ -65,7 +65,7 @@ private: // メンバ変数
 	XMFLOAT3 pScale = {};//大きさ
 	XMFLOAT3 pRot = {};//回転
 	XMFLOAT3 inertiaSave = {}; // 慣性
-	XMFLOAT3 oldPolePos = { 1000.0f, 1000.0f, 1000.0f };
+	XMFLOAT3 reSpawnPos = {};
 
 	float pSpeed = 0.35f;
 	bool onGround = false;//自由落下のフラグ
@@ -85,7 +85,5 @@ private: // メンバ変数
 	// カメラ距離取得用
 	XMFLOAT3 cameraTrack = {};
 	float cameraRot = 0.0f;
-
-	int count = 0;
 };
 
