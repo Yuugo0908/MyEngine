@@ -287,9 +287,6 @@ void GameScene::CameraUpdate()
 		}
 	}
 
-	cameraLength = { cPos.x - pPos.x, cPos.y - pPos.y, cPos.z - pPos.z, 1.0f };
-	cameraLength = XMVector3Normalize(cameraLength);
-
 	//カメラ更新
 	if (shakeFlag == true)
 	{
@@ -486,6 +483,14 @@ void GameScene::RopeUpdate()
 	if (minLength < 15.0f)
 	{
 		rope->Throw(pPos, posSave, minLength);
+		// ロープを飛ばす方向にプレイヤーも向く
+		player->TrackRot(pPos, posSave);
+	}
+	else
+	{
+		float cameraRot = camera->CameraRot(pPos);
+		// カメラが向いている方向にプレイヤーも向く
+		player->GetObj()->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
 	}
 
 	posPoleSave = {};

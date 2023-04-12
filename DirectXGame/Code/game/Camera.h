@@ -72,10 +72,14 @@ public: // 静的メンバ関数
 	// カメラの追尾
 	XMFLOAT3 CameraTrack(XMFLOAT3 pPos);
 	float CameraRot(XMFLOAT3 pPos);
-
+	// 距離を求める
+	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
+	{
+		XMFLOAT3 len = { posA.x - posB.x, posA.y - posB.y, posA.z - posB.z };
+		return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
+	}
+	// 変数のリセット
 	void Reset();
-
-
 private: // メンバ変数
 	// 入力クラスのポインタ
 	Mouse* mouse = Mouse::GetInstance();
@@ -93,20 +97,26 @@ private: // メンバ変数
 	// 回転行列
 	XMMATRIX matRot = DirectX::XMMatrixIdentity();
 
+	// カメラの変化フラグ
 	bool dirty = false;
-	float dx = 0.0f;
-	float dy = 0.0f;
+	// 回転
 	float angleX = 0.0f;
 	float angleY = 0.0f;
-	float speed = 7.0f;
 	//対象とカメラの距離
-	float distance = 15.0f;
-	// スケーリング
-	float scaleX = 1.0f;
-	float scaleY = 1.0f;
+	float distance = 0.0f;
+	const float distanceMin = 10.0f;
+	const float distanceMax = 20.0f;
+	// 感度
+	float mouseSensitivity = 0.01f;
+	float controllerSensitivity = 0.075f;
 
+	// 視点座標保存用
+	XMFLOAT3 saveEye = {};
 	// 視点座標
-	XMFLOAT3 eye = { 0, 10.0f, distance };
+	XMFLOAT3 eye = { 0, 5.0f, -15.0f };
+	// 視点のY座標の最小と最大
+	const float eyeMin = 0.0f;
+	const float eyeMax = 20.0f;
 	// 注視点座標
 	XMFLOAT3 target = { 0, 0, 0 };
 	// 上方向ベクトル

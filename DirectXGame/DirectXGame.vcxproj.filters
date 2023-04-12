@@ -102,9 +102,6 @@
     <ClCompile Include="Code\game\Light.cpp">
       <Filter>ソースファイル\game</Filter>
     </ClCompile>
-    <ClCompile Include="Code\operator\Operator.cpp">
-      <Filter>ソースファイル\math</Filter>
-    </ClCompile>
     <ClCompile Include="Code\game\Player.cpp">
       <Filter>ソースファイル\game</Filter>
     </ClCompile>
@@ -180,6 +177,9 @@
     <ClCompile Include="Code\scene\TutorialScene.cpp">
       <Filter>ソースファイル\scene</Filter>
     </ClCompile>
+    <ClCompile Include="Code\math\Operator.cpp">
+      <Filter>ソースファイル\math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\win\SafeDelete.h">
@@ -239,9 +239,6 @@
     <ClInclude Include="Code\postEffect\PostEffect.h">
       <Filter>ヘッダーファイル\postEffect</Filter>
     </ClInclude>
-    <ClInclude Include="Code\operator\Operator.h">
-      <Filter>ヘッダーファイル\math</Filter>
-    </ClInclude>
     <ClInclude Include="Code\win\WinApp.h">
       <Filter>ヘッダーファイル\win</Filter>
     </ClInclude>
@@ -289,6 +286,9 @@
     </ClInclude>
     <ClInclude Include="Code\scene\TutorialScene.h">
       <Filter>ヘッダーファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\math\Operator.h">
+      <Filter>ヘッダーファイル\math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

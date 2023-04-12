@@ -41,6 +41,8 @@ public:
 
 	void Spawn();
 
+	void TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos);
+
 	void Reset();
 
 	bool ObstacleDetection(XMFLOAT3 pPos, XMFLOAT3 boxPos, XMFLOAT3 boxScale);
@@ -83,6 +85,7 @@ private:
 	XMFLOAT3 ePos = {};
 	XMFLOAT3 eOldPos = {};
 	XMFLOAT3 eScale = {};
+	XMFLOAT3 eRot = {};
 	XMFLOAT3 spawnPos = {};
 	XMFLOAT3 randPos = {}; // ランダムなスポーン位置
 

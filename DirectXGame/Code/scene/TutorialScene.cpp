@@ -158,7 +158,7 @@ void TutorialScene::Update()
 
 void TutorialScene::Draw()
 {
-	//SetImgui();
+	SetImgui();
 
 #pragma region 背景画像描画
 	// 背景画像描画前処理
@@ -234,32 +234,6 @@ void TutorialScene::reset()
 	rope->Reset();
 	jsonObject.erase(jsonObject.begin(), jsonObject.end());
 
-	// プレイヤー
-	pPos = { 0.0f, 10.0f, 0.0f };//座標
-	pPosOld = { 0.0f, 10.0f, 0.0f };
-	pScale = {};
-	moveFlag = false;//移動管理フラグ
-	avoidFlag = false;//回避管理フラグ
-	playerHp = 360;
-
-	// エネミー
-	enemyHp = 360;
-	ePos = {};
-	ePosOld = {};
-	eScale = {};
-	enemyCount = 0;
-
-	// ロープ
-	rFlag = false;
-
-	// カメラ
-	cPos = {};
-	cTarget = {};
-	cameraLength = {};
-
-	// シェイク用
-	shakeFlag = false;
-
 	if (gameClearFlag)
 	{
 		SceneManager::GetInstance()->ChangeScene("Game");
@@ -281,6 +255,10 @@ void TutorialScene::SetImgui()
 	ImGui::Text("playerPosX : %6.2f", pPos.x);
 	ImGui::Text("playerPosY : %6.2f", pPos.y);
 	ImGui::Text("playerPosZ : %6.2f", pPos.z);
+	ImGui::Separator();
+	ImGui::Text("cameraPosX : %6.2f", cPos.x);
+	ImGui::Text("cameraPosY : %6.2f", cPos.y);
+	ImGui::Text("cameraPosZ : %6.2f", cPos.z);
 
 	ImGui::End();
 }
@@ -318,9 +296,6 @@ void TutorialScene::CameraUpdate()
 			playerHp = 0;
 		}
 	}
-
-	cameraLength = { cPos.x - pPos.x, cPos.y - pPos.y, cPos.z - pPos.z, 1.0f };
-	cameraLength = XMVector3Normalize(cameraLength);
 
 	//カメラ更新
 	if (shakeFlag == true)
@@ -514,6 +489,14 @@ void TutorialScene::RopeUpdate()
 	if (minLength < 15.0f)
 	{
 		rope->Throw(pPos, posSave, minLength);
+		// ロープを飛ばした方向にプレイヤーも向く
+		player->TrackRot(pPos, posSave);
+	}
+	else
+	{
+		float cameraRot = camera->CameraRot(pPos);
+		// カメラが向いている方向にプレイヤーも向く
+		player->GetObj()->SetRotation({0, XMConvertToDegrees(cameraRot), 0});
 	}
 
 	posPoleSave = {};

@@ -119,6 +119,7 @@ void Enemy::Attack()
 		BulletCreate();
 		attackCount = 0;
 	}
+	TrackRot(ePos, pPos);
 }
 
 void Enemy::Move()
@@ -133,11 +134,13 @@ void Enemy::Move()
 
 	ePos.x += subPE.x / 5;
 	ePos.z += subPE.z / 5;
+	TrackRot(ePos, pPos);
 	enemyObj->Update();
 }
 
 void Enemy::Stay()
 {
+	enemyObj->SetRotation({});
 	enemyObj->Update();
 }
 
@@ -177,6 +180,18 @@ void Enemy::Spawn()
 	enemyObj->SetScale(eScale);
 	enemyObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	enemyObj->Update();
+}
+
+void Enemy::TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos)
+{
+	XMVECTOR sPos = { startPos.x, startPos.y, startPos.z, 0 };
+	XMVECTOR ePos = { endPos.x, endPos.y, endPos.z, 0 };
+
+	XMVECTOR subPos = XMVectorSubtract(sPos, ePos);
+
+	float angle = (float)atan2(subPos.m128_f32[0], subPos.m128_f32[2]);
+
+	enemyObj->SetRotation({ 0, XMConvertToDegrees(angle), 0 });
 }
 
 void Enemy::Reset()

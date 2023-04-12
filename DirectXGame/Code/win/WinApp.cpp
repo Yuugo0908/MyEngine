@@ -5,7 +5,7 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-const wchar_t WinApp::windowClassName[] = L"DirectXGame";
+const wchar_t WinApp::windowClassName[] = L"VoxelSpider";
 
 LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -42,14 +42,21 @@ void WinApp::CreateGameWindow()
 	RECT wrc = { 0, 0, window_width, window_height };
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false); // 自動でサイズ補正
 
+	HWND hDwnd = GetDesktopWindow();
+	RECT desktop_rect;
+	GetWindowRect(hDwnd, &desktop_rect);
+
+	int desktop_width = (desktop_rect.right - (wrc.right - wrc.left)) / 2;
+	int desktop_height = (desktop_rect.bottom - (wrc.bottom - wrc.top)) / 3;
+
 	// ウィンドウオブジェクトの生成
 	hwnd = CreateWindow
 	(
 		wndClass.lpszClassName, // クラス名
 		windowClassName, // タイトルバーの文字
 		WS_OVERLAPPEDWINDOW, // タイトルバーと境界線があるウィンドウ
-		280, // 表示X座標（OSに任せる）
-		100, // 表示Y座標（OSに任せる）
+		desktop_width, // 表示X座標（画面中央にセット）
+		desktop_height, // 表示Y座標（画面中央から上よりにセット）
 		wrc.right - wrc.left, // ウィンドウ横幅
 		wrc.bottom - wrc.top, // ウィンドウ縦幅
 		nullptr, // 親ウィンドウハンドル

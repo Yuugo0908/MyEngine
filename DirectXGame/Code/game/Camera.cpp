@@ -17,9 +17,7 @@ Camera* Camera::GetInstance()
 
 bool Camera::Initialize(const int window_width, const int window_height)
 {
-	// 画面サイズに対する相対的なスケールに調整
-	scaleX = 1.0f / (float)window_width;
-	scaleY = 1.0f / (float)window_height;
+	// アスペクト比
 	aspectRatio = (float)window_width / window_height;
 
 	// カメラの最初の向きを変更するならここで変更
@@ -115,86 +113,115 @@ void Camera::CameraMoveEyeVector(const XMVECTOR& move)
 
 void Camera::Update()
 {
-	// マウスの入力を取得
-	distance = max(distance, 10.0f);
-	distance = min(distance, 20.0f);
-
-	dx = 0.0f;
 	angleX = 0.0f;
-	dy = 0.0f;
 	angleY = 0.0f;
+	dirty = false;
 
-	// マウスの左ボタンが押されていたらカメラを回転させない
+	XMFLOAT3 cameraTrack = CameraTrack(target);
+	distance = GetLength(eye, target);
+
+	if (saveEye.y > eyeMax)
+	{
+		saveEye.y = eyeMax;
+	}
+	if (saveEye.y < eyeMin)
+	{
+		saveEye.y = eyeMin;
+	}
+
+	// ホイール入力でカメラの距離を変更
+	if (mouse->GetMouseMove().MouseZ > 0)
+	{
+		if (distance > 10.0f)
+		{
+			saveEye.x += cameraTrack.x;
+			saveEye.y += cameraTrack.y;
+			saveEye.z += cameraTrack.z;
+		}
+		dirty = true;
+	}
+	else if (mouse->GetMouseMove().MouseZ < 0)
+	{
+		if (distance < 20.0f)
+		{
+			saveEye.x -= cameraTrack.x;
+			saveEye.y -= cameraTrack.y;
+			saveEye.z -= cameraTrack.z;
+		}
+		dirty = true;
+	}
+
+	// マウスのカーソル移動でカメラの回転
 	if (mouse->GetMouseMove().MouseX != 0)
 	{
-		dy = mouse->GetMouseMove().MouseX * scaleY;
-		angleY = -dy * XM_PI * 0.15f;
+		angleY = mouse->GetMouseMove().MouseX * mouseSensitivity;
 		dirty = true;
 	}
+
 	if (mouse->GetMouseMove().MouseY != 0)
 	{
-		dx = mouse->GetMouseMove().MouseY * scaleY;
-		angleX = -dx * XM_PI * 0.15f;
+		saveEye.y += mouse->GetMouseMove().MouseY * mouseSensitivity;
 		dirty = true;
 	}
 
-	// ホイール入力で距離を変更
-	if (mouse->GetMouseMove().MouseZ != 0)
-	{
-		distance -= mouse->GetMouseMove().MouseZ / 120.0f;
-		dirty = true;
-	}
-
-	// 右スティック操作でカメラを回転
-	if (controller->GetPadState(Controller::State::RIGHT_L_STICK, Controller::Type::NONE))
-	{
-		dy = speed * scaleY;
-		angleY = dy * XM_PI;
-		dirty = true;
-	}
-	else if(controller->GetPadState(Controller::State::RIGHT_R_STICK, Controller::Type::NONE))
-	{
-		dy = -speed * scaleY;
-		angleY = dy * XM_PI;
-		dirty = true;
-	}
-	else if (controller->GetPadState(Controller::State::RIGHT_U_STICK, Controller::Type::NONE))
-	{
-		dx = speed * scaleX;
-		angleX = dx * XM_PI;
-		dirty = true;
-	}
-	else if (controller->GetPadState(Controller::State::RIGHT_D_STICK, Controller::Type::NONE))
-	{
-		dx = -speed * scaleX;
-		angleX = dx * XM_PI;
-		dirty = true;
-	}
-
-	// LB + 右スティック上下操作で距離を変更
+	// LB + 右スティック上下でカメラの距離を変更
 	if (controller->GetPadState(Controller::State::LB, Controller::Type::PUSH) && controller->GetPadState(Controller::State::RIGHT_U_STICK, Controller::Type::NONE))
 	{
-		distance -= 0.1f;
+		if (distance > distanceMin)
+		{
+			saveEye.x += cameraTrack.x;
+			saveEye.y += cameraTrack.y;
+			saveEye.z += cameraTrack.z;
+		}
 		dirty = true;
 	}
 	else if (controller->GetPadState(Controller::State::LB, Controller::Type::PUSH) && controller->GetPadState(Controller::State::RIGHT_D_STICK, Controller::Type::NONE))
 	{
-		distance += 0.1f;
+		if (distance < distanceMax)
+		{
+			saveEye.x -= cameraTrack.x;
+			saveEye.y -= cameraTrack.y;
+			saveEye.z -= cameraTrack.z;
+		}
 		dirty = true;
+	}
+
+	if (!dirty)
+	{
+		// 右スティック操作でカメラを回転
+		if (controller->GetPadState(Controller::State::RIGHT_L_STICK, Controller::Type::NONE))
+		{
+			angleY -= XM_PI * controllerSensitivity;
+			dirty = true;
+		}
+		else if (controller->GetPadState(Controller::State::RIGHT_R_STICK, Controller::Type::NONE))
+		{
+			angleY += XM_PI * controllerSensitivity;
+			dirty = true;
+		}
+
+		if (controller->GetPadState(Controller::State::RIGHT_U_STICK, Controller::Type::NONE))
+		{
+			saveEye.y -= XM_PI * controllerSensitivity;
+			dirty = true;
+		}
+		else if (controller->GetPadState(Controller::State::RIGHT_D_STICK, Controller::Type::NONE))
+		{
+			saveEye.y += XM_PI * controllerSensitivity;
+			dirty = true;
+		}
 	}
 
 	if (dirty || viewDirty)
 	{
 		// 追加回転分の回転行列を生成
 		XMMATRIX matRotNew = XMMatrixIdentity();
-		matRotNew *= XMMatrixRotationX(-angleX);
-		matRotNew *= XMMatrixRotationY(-angleY);
+		matRotNew *= XMMatrixRotationY(angleY / 10.0f);
 		// 累積の回転行列を合成
 		matRot = matRotNew * matRot;
 
 		// 注視点から視点へのベクトルと、上方向ベクトル
-		vTargetEye = { 0.0f, 0.0f, -distance, 1.0f };
-		vUp = { 0.0f, 1.0f, 0.0f, 0.0f };
+		vTargetEye = { saveEye.x, saveEye.y, saveEye.z, 1.0f };
 
 		// ベクトルを回転
 		vTargetEye = XMVector3Transform(vTargetEye, matRot);
@@ -202,7 +229,6 @@ void Camera::Update()
 		// 注視点からずらした位置に視点座標を決定
 		const XMFLOAT3& target = GetTarget();
 		SetEye({ target.x + vTargetEye.m128_f32[0], target.y + vTargetEye.m128_f32[1], target.z + vTargetEye.m128_f32[2] });
-		SetUp({ vUp.m128_f32[0], vUp.m128_f32[1], vUp.m128_f32[2] });
 	}
 
 	if (viewDirty || projectionDirty)
@@ -372,8 +398,8 @@ float Camera::CameraRot(XMFLOAT3 pPos)
 
 void Camera::Reset()
 {
-	distance = 15.0f;
-	eye = { 0, 0, distance };
+	eye = { 0, 5.0f, -15.0f };
+	saveEye = eye;
 	target = { 0, 0, 0 };
 	up = { 0, 1, 0 };
 	cameraLength = {};
@@ -383,11 +409,8 @@ void Camera::Reset()
 	viewDirty = false;
 	projectionDirty = false;
 	shakeCount = 0;
-	moveCount = 30;
 
 	dirty = false;
-	dx = 0.0f;
-	dy = 0.0f;
 	angleX = 0.0f;
 	angleY = 0.0f;
 

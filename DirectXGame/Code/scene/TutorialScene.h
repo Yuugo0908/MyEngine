@@ -137,17 +137,7 @@ private: // メンバ変数
 	// カメラ
 	XMFLOAT3 cPos = {};
 	XMFLOAT3 cTarget = {};
-	XMVECTOR cameraLength = {};
 	const float trackLimit = -30.0f;
-	bool dirty = false;
-	float dx = 0.0f;
-	float dy = 0.0f;
-	float angleX = 0.0f;
-	float angleY = 0.0f;
-	float speed = 7.0f;
-	float distance = 15.0f;
-	float scaleX = 1.0f;
-	float scaleY = 1.0f;
 
 	// シーン管理用
 	bool fadeFlag = false;
@@ -164,7 +154,6 @@ private: // メンバ変数
 	int vSpeedL = 0;
 	int vSpeedR = 0;
 
-
 	// 座標保存用
 	XMFLOAT3 posSave = {};
 	XMFLOAT3 oldPosSave = { 1000.0f, 1000.0f, 1000.0f };
@@ -177,11 +166,5 @@ private: // メンバ変数
 	// エネミーの座標と距離
 	XMFLOAT3 posEnemySave = {};
 	float minEnemyLength = 15.0f;
-
-	// ボックスとの距離
-	float minBoxLength = 15.0f;
-
-	// 壁との距離
-	float minWallLength = 15.0f;
 };
 

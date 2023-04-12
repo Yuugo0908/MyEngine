@@ -23,12 +23,9 @@ void Player::Update(bool rFlag, bool moveFlag)
 {
 	// カメラが向いている方向を調べる
 	cameraTrack = camera->CameraTrack(pPos);
-	cameraRot = camera->CameraRot(pPos);
 	cameraTrack = cameraTrack * pSpeed;
 
 	pPosOld = playerObj->GetPosition();
-	// カメラが向いている方向にプレイヤーも向く
-	playerObj->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
 
 	// ダメージを受けた後の処理
 	if (damageInterval > 0)
@@ -41,6 +38,7 @@ void Player::Update(bool rFlag, bool moveFlag)
 	{
 		playerObj->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
 	}
+
 
 	if (moveFlag)
 	{
@@ -222,6 +220,18 @@ void Player::ReSpawn()
 	playerObj->SetPosition(pPos);
 	playerObj->SetScale(pScale);
 	playerObj->Update();
+}
+
+void Player::TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos)
+{
+	XMVECTOR sPos = { startPos.x, startPos.y, startPos.z, 0 };
+	XMVECTOR ePos = { endPos.x, endPos.y, endPos.z, 0 };
+
+	XMVECTOR subPos = XMVectorSubtract(sPos, ePos);
+
+	float angle = (float)atan2(subPos.m128_f32[0], subPos.m128_f32[2]);
+
+	playerObj->SetRotation({ 0, XMConvertToDegrees(angle), 0 });
 }
 
 bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)

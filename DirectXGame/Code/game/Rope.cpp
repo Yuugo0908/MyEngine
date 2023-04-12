@@ -46,8 +46,6 @@ void Rope::Update(XMFLOAT3& pPos)
 	}
 
 	objLength = GetLength(startPos, endPos);
-	XMFLOAT3 length = { startPos.x - endPos.x, startPos.y - endPos.y, startPos.z - endPos.z };
-
 	angleY = (float)atan2(startPos.x - endPos.x, startPos.z - endPos.z);
 	vecXZ = sqrtf((startPos.x - endPos.x) * (startPos.x - endPos.x) + (startPos.z - endPos.z) * (startPos.z - endPos.z));
 	angleX = (float)atan2(endPos.y - startPos.y, vecXZ);
@@ -103,19 +101,10 @@ void Rope::Throw(XMFLOAT3& pPos, const XMFLOAT3 targetPos, const float targetLen
 			manageRopePos.y += subPE.y;
 			manageRopePos.z += subPE.z;
 		}
-		else
-		{
-			tLength = 15.0f;
-			rRot = { 0, XMConvertToDegrees(cRot), 0 };
-			ropeObj->SetRotation(rRot);
-			manageRopePos.x += cSpeed.x;
-			manageRopePos.z += cSpeed.z;
-			rRotFlag = false;
-		}
 
 		manageRopeScale.x += 0.02f;
 		manageRopeScale.y += 0.02f;
-		manageRopeScale.z += 0.6f;
+		manageRopeScale.z += 0.7f;
 
 		avoidTime += 0.1f;
 
@@ -141,15 +130,10 @@ void Rope::Throw(XMFLOAT3& pPos, const XMFLOAT3 targetPos, const float targetLen
 			manageRopePos.y -= subPE.y;
 			manageRopePos.z -= subPE.z;
 		}
-		else
-		{
-			manageRopePos.x -= cSpeed.x;
-			manageRopePos.z -= cSpeed.z;
-		}
 
 		manageRopeScale.x -= 0.02f;
 		manageRopeScale.y -= 0.02f;
-		manageRopeScale.z -= 0.6f;
+		manageRopeScale.z -= 0.7f;
 
 		avoidTime += 0.1f;
 

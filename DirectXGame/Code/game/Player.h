@@ -29,6 +29,8 @@ public: // メンバ関数
 
 	void ReSpawn();
 
+	void TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos);
+
 	// マップ当たり判定
 	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale);
 
