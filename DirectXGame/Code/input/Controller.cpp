@@ -21,7 +21,6 @@ Controller* Controller::GetInstance()
 
 bool Controller::Update()
 {
-	DWORD dwResult;
 	statePre = state;
 	ZeroMemory(&state, sizeof(XINPUT_STATE));
 	// 情報取得
@@ -39,7 +38,6 @@ bool Controller::Update()
 	
 	if (dwResult == ERROR_SUCCESS)
 	{
-		//DebugText::GetInstance()->Print((float)WinApp::window_width / 2.0f, (float)WinApp::window_height / 2.0f, 2.0f, "ControllerConnecting");
 		return true;
 	}
 	return false;
@@ -48,7 +46,6 @@ bool Controller::Update()
 
 bool Controller::GetPadState(Controller::State p_state, Type p_type)
 {
-	DWORD dwResult;	// 関数結果判定用
 	// 情報取得
 	dwResult = XInputGetState(controllerNum, &state);
 
@@ -280,6 +277,7 @@ void Controller::CheckMode(Controller::State p_state)
 {
 	stateNum = p_state;
 
+	// デジタルかアナログかの判別
 	if (stateNum <= Controller::State::RIGHT_THUMB)
 	{
 		mode = Controller::Mode::BUTTON;
@@ -296,4 +294,16 @@ void Controller::Vibration()
 	vibration.wRightMotorSpeed = USHRT_MAX; // 数値は0～65535
 	XInputSetState(controllerNum, &vibration);
 	vCount = 20;
+}
+
+bool Controller::Detection()
+{
+	if (dwResult == ERROR_SUCCESS)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

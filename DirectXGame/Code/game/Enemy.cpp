@@ -254,13 +254,14 @@ bool Enemy::BulletCollision()
 	return false;
 }
 
-bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
+bool Enemy::MapCollide(const XMFLOAT3 boxPos, const XMFLOAT3 boxScale)
 {
 	if (!eAlive)
 	{
 		return false;
 	}
 
+	// 弾のマップオブジェクトの当たり判定
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
 		if (bullet->MapCollide(boxPos, boxScale))
@@ -367,7 +368,7 @@ bool Enemy::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 	return hitFlag;
 }
 
-bool Enemy::StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale)
+bool Enemy::StageCollide(const XMFLOAT3 stagePos, const XMFLOAT3 stageScale)
 {
 	if (!eAlive)
 	{

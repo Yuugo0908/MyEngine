@@ -91,52 +91,6 @@ void GameScene::Update()
 {
 	// マウスの移動範囲の制限
 	mouse->CursorLimit();
-	// フラグの取得
-	rFlag = rope->GetrFlag();
-	moveFlag = rope->GetmoveFlag();
-	avoidFlag = player->GetAvoidFlag();
-
-	if (rushFlag)
-	{
-		player->Rush(catchPos, rushFlag, elapsedTime);
-	}
-	player->Update(rFlag, moveFlag);
-	pPos = player->GetObj()->GetPosition();
-	pScale = player->GetObj()->GetScale();
-	rope->Update(pPos);
-
-	// jsonファイルから読み込んだオブジェクトの更新
-	jsonObjectUpdate();
-	CollisionUpdate();
-	LightUpdate();
-	CameraUpdate();
-	RopeUpdate();
-	effectBox->Update();
-	effectCircle->Update();
-	effectCircle2->Update();
-	effectTarget->Update();
-
-	if (avoidFlag)
-	{
-		effectAvoid->CreateParticles(
-			pPos, 1.0f, 2.0f,
-			{ 0.0f, 0.0f, 0.0f, 1.0f },
-			{ 1.0f, 0.0f, 0.0f, 1.0f },
-			1, 10, false, false
-		);
-	}
-	effectAvoid->Update();
-
-	if (enemyHp <= 0)
-	{
-		fadeFlag = true;
-		gameClearFlag = true;
-	}
-	else if (playerHp <= 0)
-	{
-		fadeFlag = true;
-		gameOverFlag = true;
-	}
 
 	if (fadeFlag == false && alpha > 0.0f)
 	{
@@ -151,6 +105,88 @@ void GameScene::Update()
 		}
 	}
 	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
+
+	// 敵をすべて倒せばクリア
+	if (enemyCount <= 0)
+	{
+		fadeFlag = true;
+		gameClearFlag = true;
+	}
+	// プレイヤーのHPが0になったらゲームオーバー
+	else if (playerHp <= 0)
+	{
+		if (!gameOverFlag)
+		{
+			// パーティクル生成
+			effectBox->CreateParticles(
+				pPos,
+				2.0f, 5.0f,
+				{ 0.0f, 0.0f, 1.0f, 1.0f },
+				{ 1.0f, 0.0f, 0.0f, 1.0f },
+				5, 60, true, true
+			);
+			effectCircle2->CreateParticles(
+				pPos,
+				1.0f, 10.0f,
+				{ 0.0f, 0.0f, 1.0f, 1.0f },
+				{ 0.0f, 0.0f, 1.0f, 1.0f },
+				5, 10, false, false
+			);
+			alpha = -1.0f;
+		}
+
+		// エフェクトの更新
+		effectBox->Update();
+		effectCircle2->Update();
+		fadeFlag = true;
+		gameOverFlag = true;
+		return;
+	}
+
+	// タイトルから移行後の更新
+	//	プレイヤーの座標、半径の設定
+	if (rushFlag)
+	{
+		player->Rush(catchPos, rushFlag, elapsedTime);
+	}
+	player->Update(rFlag, moveFlag);
+	pPos = player->GetObj()->GetPosition();
+	pScale = player->GetObj()->GetScale();
+	rope->Update(pPos);
+
+	// jsonファイルから読み込んだオブジェクトの更新
+	jsonObjectUpdate();
+	// 当たり判定の更新
+	CollisionUpdate();
+	// ライトの更新
+	LightUpdate();
+	// カメラの更新
+	CameraUpdate();
+	// ロープの更新
+	RopeUpdate();
+
+	// エフェクトの更新
+	effectBox->Update();
+	effectCircle->Update();
+	effectCircle2->Update();
+	effectTarget->Update();
+
+	// フラグの取得
+	rFlag = rope->GetrFlag();
+	moveFlag = rope->GetmoveFlag();
+	avoidFlag = player->GetAvoidFlag();
+
+	// 回避した際にエフェクトが発生
+	if (avoidFlag)
+	{
+		effectAvoid->CreateParticles(
+			pPos, 1.0f, 2.0f,
+			{ 0.0f, 0.0f, 0.0f, 1.0f },
+			{ 1.0f, 0.0f, 0.0f, 1.0f },
+			1, 10, false, false
+		);
+	}
+	effectAvoid->Update();
 }
 
 void GameScene::Draw()
@@ -173,7 +209,10 @@ void GameScene::Draw()
 	Object3d::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 
 	// 3Dオブクジェクトの描画
-	player->GetObj()->Draw();
+	if (playerHp > 0.0f)
+	{
+		player->GetObj()->Draw();
+	}
 
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
@@ -222,18 +261,30 @@ void GameScene::Draw()
 
 void GameScene::reset()
 {
-	player->Reset();
-	for (std::unique_ptr<Enemy>& enemy : enemys)
-	{
-		enemy->Reset();
-	}
-	enemys.erase(enemys.begin(), enemys.end());
-	rope->Reset();
-	jsonObject.erase(jsonObject.begin(), jsonObject.end());
-
 	if (gameClearFlag)
 	{
-		SceneManager::GetInstance()->ChangeScene("GameClear");
+		if (stageClearCount == 0)
+		{
+			jsonObject.erase(jsonObject.begin(), jsonObject.end());
+			stageClearCount++;
+			fadeFlag = false;
+			gameClearFlag = false;
+			levelData = nullptr;
+			jsonObjectInit("tutorial");
+		}
+		else if (stageClearCount == 1)
+		{
+			player->Reset();
+			for (std::unique_ptr<Enemy>& enemy : enemys)
+			{
+				enemy->Reset();
+			}
+
+			enemys.erase(enemys.begin(), enemys.end());
+			rope->Reset();
+			jsonObject.erase(jsonObject.begin(), jsonObject.end());
+			SceneManager::GetInstance()->ChangeScene("GameClear");
+		}
 	}
 	else if (gameOverFlag)
 	{
@@ -317,7 +368,6 @@ void GameScene::CollisionUpdate()
 				shakeFlag = true;
 
 				rope->SetmoveFlag(true);
-
 				// パーティクル生成
 				effectBox->CreateParticles(
 					enemy->GetObj()->GetPosition(),
@@ -339,7 +389,7 @@ void GameScene::CollisionUpdate()
 				rushFlag = false;
 				catchPos = {};
 				elapsedTime = 0.0f;
-				enemyHp -= (360.0f / enemyCount);
+				enemyCount--;
 				controller->Vibration();
 				enemys.remove(enemy);
 				break;
@@ -483,7 +533,7 @@ void GameScene::RopeUpdate()
 	if (minLength < 15.0f)
 	{
 		rope->Throw(pPos, posSave, minLength);
-		// ロープを飛ばす方向にプレイヤーも向く
+		// ロープを飛ばした方向にプレイヤーも向く
 		player->TrackRot(pPos, posSave);
 	}
 	else
@@ -521,8 +571,8 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 
 			// プレイヤーを生成
 			player->Initialize(pos, scale);
-			player->GetObj()->SetCollisionScale(size);
 			pPos = player->GetObj()->GetPosition();
+			player->GetObj()->SetCollisionScale(size);
 			// カメラの設定
 			camera->Reset();
 			camera->SetTarget(pPos);
@@ -619,6 +669,7 @@ void GameScene::jsonObjectUpdate()
 	{
 		XMFLOAT3 pos = object->GetPosition();
 		XMFLOAT3 scale = object->GetCollisionScale();
+
 		// プレイヤーとカメラの間にオブジェクトがあった時、オブジェクトを描画しない
 		if (Collision::CollisionRayBox(cPos, pPos, pos, scale))
 		{

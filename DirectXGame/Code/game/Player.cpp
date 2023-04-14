@@ -109,7 +109,7 @@ void Player::Rush(XMFLOAT3 targetPos, bool& flag, float& avoidTime)
 		avoidTime += 0.1f;
 	}
 
-	pPos = Easing::GetInstance()->easeIn(pPos, targetPos, avoidTime);
+	pPos = Easing::easeIn(pPos, targetPos, avoidTime);
 	playerObj->Update();
 }
 
@@ -152,8 +152,8 @@ void Player::Jump()
 	{
 		pVel -= pGra;
 		pPos.y += pVel;
-		pPos.x += inertiaSave.x * 0.3f;
-		pPos.z += inertiaSave.z * 0.3f;
+		pPos.x += inertiaSave.x * 0.1f;
+		pPos.z += inertiaSave.z * 0.1f;
 
 		if (onGround)
 		{

@@ -92,55 +92,6 @@ void TutorialScene::Update()
 	// マウスの移動範囲の制限
 	mouse->CursorLimit();
 
-	// タイトルから移行後の更新
-	//	プレイヤーの座標、半径の設定
-	if (rushFlag)
-	{
-		player->Rush(catchPos, rushFlag, elapsedTime);
-	}
-	player->Update(rFlag, moveFlag);
-	pPos = player->GetObj()->GetPosition();
-	pScale = player->GetObj()->GetScale();
-	rope->Update(pPos);
-
-	// jsonファイルから読み込んだオブジェクトの更新
-	jsonObjectUpdate();
-	CollisionUpdate();
-	LightUpdate();
-	CameraUpdate();
-	RopeUpdate();
-	effectBox->Update();
-	effectCircle->Update();
-	effectCircle2->Update();
-	effectTarget->Update();
-
-	// フラグの取得
-	rFlag = rope->GetrFlag();
-	moveFlag = rope->GetmoveFlag();
-	avoidFlag = player->GetAvoidFlag();
-
-	if (avoidFlag)
-	{
-		effectAvoid->CreateParticles(
-			pPos, 1.0f, 2.0f,
-			{ 0.0f, 0.0f, 0.0f, 1.0f },
-	  		{ 1.0f, 0.0f, 0.0f, 1.0f },
-			1, 10, false, false
-		);
-	}
-	effectAvoid->Update();
-
-	if (enemyHp <= 0)
-	{
-		fadeFlag = true;
-		gameClearFlag = true;
-	}
-	else if (playerHp <= 0)
-	{
-		fadeFlag = true;
-		gameOverFlag = true;
-	}
-
 	if (fadeFlag == false && alpha > 0.0f)
 	{
 		alpha -= 0.02f;
@@ -154,6 +105,88 @@ void TutorialScene::Update()
 		}
 	}
 	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
+
+	// 敵をすべて倒せばクリア
+	if (enemyCount <= 0)
+	{
+		fadeFlag = true;
+		gameClearFlag = true;
+	}
+	// プレイヤーのHPが0になったらゲームオーバー
+	else if (playerHp <= 0)
+	{
+		if (!gameOverFlag)
+		{
+			// パーティクル生成
+			effectBox->CreateParticles(
+				pPos,
+				2.0f, 5.0f,
+				{ 0.0f, 0.0f, 1.0f, 1.0f },
+				{ 1.0f, 0.0f, 0.0f, 1.0f },
+				5, 60, true, true
+			);
+			effectCircle2->CreateParticles(
+				pPos,
+				1.0f, 10.0f,
+				{ 0.0f, 0.0f, 1.0f, 1.0f },
+				{ 0.0f, 0.0f, 1.0f, 1.0f },
+				5, 10, false, false
+			);
+			alpha = -1.0f;
+		}
+
+		// エフェクトの更新
+		effectBox->Update();
+		effectCircle2->Update();
+		fadeFlag = true;
+		gameOverFlag = true;
+		return;
+	}
+
+	// タイトルから移行後の更新
+	//	プレイヤーの座標、半径の設定
+	if (rushFlag)
+	{
+		player->Rush(catchPos, rushFlag, elapsedTime);
+	}
+	player->Update(rFlag, moveFlag);
+	pPos = player->GetObj()->GetPosition();
+	pScale = player->GetObj()->GetScale();
+	rope->Update(pPos);
+
+	// jsonファイルから読み込んだオブジェクトの更新
+	jsonObjectUpdate();
+	// 当たり判定の更新
+	CollisionUpdate();
+	// ライトの更新
+	LightUpdate();
+	// カメラの更新
+	CameraUpdate();
+	// ロープの更新
+	RopeUpdate();
+
+	// エフェクトの更新
+	effectBox->Update();
+	effectCircle->Update();
+	effectCircle2->Update();
+	effectTarget->Update();
+
+	// フラグの取得
+	rFlag = rope->GetrFlag();
+	moveFlag = rope->GetmoveFlag();
+	avoidFlag = player->GetAvoidFlag();
+
+	// 回避した際にエフェクトが発生
+	if (avoidFlag)
+	{
+		effectAvoid->CreateParticles(
+			pPos, 1.0f, 2.0f,
+			{ 0.0f, 0.0f, 0.0f, 1.0f },
+	  		{ 1.0f, 0.0f, 0.0f, 1.0f },
+			1, 10, false, false
+		);
+	}
+	effectAvoid->Update();
 }
 
 void TutorialScene::Draw()
@@ -176,7 +209,10 @@ void TutorialScene::Draw()
 	Object3d::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 
 	// 3Dオブクジェクトの描画
-	player->GetObj()->Draw();
+	if (playerHp > 0.0f)
+	{
+		player->GetObj()->Draw();
+	}
 
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
@@ -323,7 +359,9 @@ void TutorialScene::CollisionUpdate()
 
 			if (rFlag && enemy->EnemyCollision(player->GetObj()))
 			{
+				// カメラシェイクの発生
 				shakeFlag = true;
+
 				rope->SetmoveFlag(true);
 				// パーティクル生成
 				effectBox->CreateParticles(
@@ -346,7 +384,7 @@ void TutorialScene::CollisionUpdate()
 				rushFlag = false;
 				catchPos = {};
 				elapsedTime = 0.0f;
-				enemyHp -= (360.0f / enemyCount);
+				enemyCount--;
 				controller->Vibration();
 				enemys.remove(enemy);
 				break;
@@ -355,7 +393,7 @@ void TutorialScene::CollisionUpdate()
 			{
 				shakeFlag = true;
 				rope->SetmoveFlag(true);
-				playerHp -= 36;
+				playerHp -= 18;
 
 				// パーティクル生成
 				effectCircle->CreateParticles(
@@ -372,7 +410,7 @@ void TutorialScene::CollisionUpdate()
 				if (!rFlag)
 				{
 					shakeFlag = true;
-					playerHp -= 36;
+					playerHp -= 18;
 
 					// パーティクル生成
 					effectCircle->CreateParticles(
@@ -400,11 +438,12 @@ void TutorialScene::CollisionUpdate()
 					}
 					else
 					{
+						// プレイヤーと敵の座標と距離を取得
 						pPos = player->GetObj()->GetPosition();
 						ePos = enemy->GetObj()->GetPosition();
-
 						float length = GetLength(pPos, ePos);
 
+						// ロープが届く距離にいた場合、その敵の座標と距離を保存
 						if (length < minEnemyLength)
 						{
 							posEnemySave = ePos;
@@ -625,6 +664,8 @@ void TutorialScene::jsonObjectUpdate()
 	{
 		XMFLOAT3 pos = object->GetPosition();
 		XMFLOAT3 scale = object->GetCollisionScale();
+
+		// プレイヤーとカメラの間にオブジェクトがあった時、オブジェクトを描画しない
 		if (Collision::CollisionRayBox(cPos, pPos, pos, scale))
 		{
 			object->SetDrawFlag(false);
@@ -633,8 +674,6 @@ void TutorialScene::jsonObjectUpdate()
 		{
 			object->SetDrawFlag(true);
 		}
-
-		object->Update();
 
 		if (object->GetType() == box_)
 		{
@@ -712,5 +751,7 @@ void TutorialScene::jsonObjectUpdate()
 				oldPosSave = posPoleSave;
 			}
 		}
+
+		object->Update();
 	}
 }

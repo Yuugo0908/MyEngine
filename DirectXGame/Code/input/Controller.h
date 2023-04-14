@@ -28,6 +28,7 @@ public:
 		RIGHT,	//	十字キーの右
 		LEFT_THUMB,		//	左スティック
 		RIGHT_THUMB,	//	右スティック
+
 		// アナログ
 		LT,	//	左トリガー
 		RT,	//	右トリガー
@@ -58,6 +59,7 @@ public:
 	bool Update();
 	bool GetPadState(State p_state, Type p_type);
 	void Vibration();
+	bool Detection();
 
 private:
 	bool GetButtonState(XINPUT_STATE state, State p_state, Type p_type);
@@ -66,12 +68,20 @@ private:
 	bool TriggerButton(XINPUT_STATE state, State& p_state);
 	void CheckMode(State p_state);
 
+	// ボタンを押したか、スティックを操作したかの判別
 	Mode mode{};
+	// コントローラーの状態
 	XINPUT_STATE state{};
 	XINPUT_STATE statePre{};
+	// コントローラーの検出
+	DWORD dwResult = {};
+
 	State stateNum{};
 	WORD buttonNum{};
+	// 振動
 	XINPUT_VIBRATION vibration{};
-	const int controllerNum = 0;
+	// 振動するフレーム数
 	int vCount = 0;
+	// コントローラーの接続番号
+	const int controllerNum = 0;
 };

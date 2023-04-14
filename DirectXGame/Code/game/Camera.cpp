@@ -129,28 +129,6 @@ void Camera::Update()
 		saveEye.y = eyeMin;
 	}
 
-	// ホイール入力でカメラの距離を変更
-	if (mouse->GetMouseMove().MouseZ > 0)
-	{
-		if (distance > 10.0f)
-		{
-			saveEye.x += cameraTrack.x;
-			saveEye.y += cameraTrack.y;
-			saveEye.z += cameraTrack.z;
-		}
-		dirty = true;
-	}
-	else if (mouse->GetMouseMove().MouseZ < 0)
-	{
-		if (distance < 20.0f)
-		{
-			saveEye.x -= cameraTrack.x;
-			saveEye.y -= cameraTrack.y;
-			saveEye.z -= cameraTrack.z;
-		}
-		dirty = true;
-	}
-
 	// マウスのカーソル移動でカメラの回転
 	if (mouse->GetMouseMove().MouseX != 0)
 	{
@@ -164,29 +142,8 @@ void Camera::Update()
 		dirty = true;
 	}
 
-	// LB + 右スティック上下でカメラの距離を変更
-	if (controller->GetPadState(Controller::State::LB, Controller::Type::PUSH) && controller->GetPadState(Controller::State::RIGHT_U_STICK, Controller::Type::NONE))
-	{
-		if (distance > distanceMin)
-		{
-			saveEye.x += cameraTrack.x;
-			saveEye.y += cameraTrack.y;
-			saveEye.z += cameraTrack.z;
-		}
-		dirty = true;
-	}
-	else if (controller->GetPadState(Controller::State::LB, Controller::Type::PUSH) && controller->GetPadState(Controller::State::RIGHT_D_STICK, Controller::Type::NONE))
-	{
-		if (distance < distanceMax)
-		{
-			saveEye.x -= cameraTrack.x;
-			saveEye.y -= cameraTrack.y;
-			saveEye.z -= cameraTrack.z;
-		}
-		dirty = true;
-	}
-
-	if (!dirty)
+	// コントローラーが接続されているか
+	if (controller->Detection())
 	{
 		// 右スティック操作でカメラを回転
 		if (controller->GetPadState(Controller::State::RIGHT_L_STICK, Controller::Type::NONE))
@@ -379,9 +336,9 @@ XMFLOAT3 Camera::CameraTrack(XMFLOAT3 pPos)
 	XMVECTOR subCameraPlayer = XMVectorSubtract(playerPos, cameraPos);
 	cameraLength= XMVector3Normalize(subCameraPlayer);
 
-	XMFLOAT3 cameraTrack = { cameraLength.m128_f32[0], cameraLength.m128_f32[1], cameraLength.m128_f32[2] };
+	XMFLOAT3 Track = { cameraLength.m128_f32[0], cameraLength.m128_f32[1], cameraLength.m128_f32[2] };
 
-	return cameraTrack;
+	return Track;
 }
 
 float Camera::CameraRot(XMFLOAT3 pPos)

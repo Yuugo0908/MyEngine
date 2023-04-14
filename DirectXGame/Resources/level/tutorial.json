@@ -200,146 +200,6 @@
         },
         {
             "type": "MESH",
-            "name": "pole",
-            "transform": {
-                "translation": [
-                    4.0,
-                    5.0,
-                    25.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "file_name": "pole",
-            "collider": {
-                "type": "BOX",
-                "center": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    2.0,
-                    0.5,
-                    0.5
-                ]
-            }
-        },
-        {
-            "type": "MESH",
-            "name": "pole.001",
-            "transform": {
-                "translation": [
-                    -4.0,
-                    5.0,
-                    25.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "file_name": "pole",
-            "collider": {
-                "type": "BOX",
-                "center": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    2.0,
-                    0.5,
-                    0.5
-                ]
-            }
-        },
-        {
-            "type": "MESH",
-            "name": "pole.002",
-            "transform": {
-                "translation": [
-                    8.0,
-                    5.0,
-                    25.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "file_name": "pole",
-            "collider": {
-                "type": "BOX",
-                "center": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    2.0,
-                    0.5,
-                    0.5
-                ]
-            }
-        },
-        {
-            "type": "MESH",
-            "name": "pole.003",
-            "transform": {
-                "translation": [
-                    -8.0,
-                    5.0,
-                    25.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scaling": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "file_name": "pole",
-            "collider": {
-                "type": "BOX",
-                "center": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    2.0,
-                    0.5,
-                    0.5
-                ]
-            }
-        },
-        {
-            "type": "MESH",
             "name": "pole.004",
             "transform": {
                 "translation": [
@@ -353,7 +213,7 @@
                     0.0
                 ],
                 "scaling": [
-                    1.0,
+                    5.0,
                     1.0,
                     1.0
                 ]
@@ -367,7 +227,7 @@
                     0.0
                 ],
                 "size": [
-                    2.0,
+                    10.0,
                     0.5,
                     0.5
                 ]

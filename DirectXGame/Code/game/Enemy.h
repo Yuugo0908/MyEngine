@@ -52,8 +52,8 @@ public:
 	bool BulletCollision();
 
 	// ƒ}ƒbƒv“–‚½‚è”»’è
-	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale);
-	bool StageCollide(XMFLOAT3 stagePos, XMFLOAT3 stageScale);
+	bool MapCollide(const XMFLOAT3 boxPos, const XMFLOAT3 boxScale);
+	bool StageCollide(const XMFLOAT3 stagePos, const XMFLOAT3 stageScale);
 
 	const std::unique_ptr<Object3d>& GetObj() { return enemyObj; }
 

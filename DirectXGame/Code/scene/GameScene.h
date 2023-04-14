@@ -126,7 +126,6 @@ private: // メンバ変数
 	XMFLOAT3 ePosOld = {};
 	XMFLOAT3 eScale = {};
 	int enemyCount = 0;
-	float enemyHp = 360;
 	bool eAlive = false;
 
 	// ロープ
@@ -143,6 +142,7 @@ private: // メンバ変数
 	bool fadeFlag = false;
 	bool gameClearFlag = false;
 	bool gameOverFlag = false;
+	int stageClearCount = 0;
 
 	// シェイク用
 	bool shakeFlag = false;
@@ -166,10 +166,4 @@ private: // メンバ変数
 	// エネミーの座標と距離
 	XMFLOAT3 posEnemySave = {};
 	float minEnemyLength = 15.0f;
-
-	// ボックスとの距離
-	float minBoxLength = 15.0f;
-	
-	// 壁との距離
-	float minWallLength = 15.0f;
 };

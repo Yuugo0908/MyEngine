@@ -44,7 +44,6 @@ private: // ƒƒ“ƒo•Ï”
 
 	float alpha = 0.0f;
 	bool fadeIn = false;
-	bool fadeOut = false;
 	bool expFlag = false;
 
 	bool tutorialFlag = false;

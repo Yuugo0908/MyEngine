@@ -49,18 +49,7 @@ void TitleScene::Update()
 {
 	if (!fadeIn && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
 	{
-		// 操作説明はプレイ中、一度だけ表示する
-		if (!expFlag)
-		{
-			expFlag = true;
-			title->SetColor({ 0.0f, 0.0f, 0.0f, 0.0f });
-			explanation->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-		}
-
-		else if (!fadeIn)
-		{
-			fadeIn = true;
-		}
+		fadeIn = true;
 	}
 
 	if (fadeIn)
@@ -70,11 +59,10 @@ void TitleScene::Update()
 		if (alpha >= 1.0f)
 		{
 			fadeIn = false;
-			fadeOut = true;
 			explanation->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 			backGround->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 			{
-				SceneManager::GetInstance()->ChangeScene("Tutorial");
+				SceneManager::GetInstance()->ChangeScene("Game");
 			}
 		}
 	}
@@ -111,7 +99,6 @@ void TitleScene::Draw()
 	// 前景画像の描画
 
 	title->Draw();
-	explanation->Draw();
 	fadeTex->Draw();
 
 	// デバッグテキストの描画

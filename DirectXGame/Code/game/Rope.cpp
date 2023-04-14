@@ -82,12 +82,13 @@ void Rope::Throw(XMFLOAT3& pPos, const XMFLOAT3 targetPos, const float targetLen
 	XMVECTOR enemyPos = { tPos.x, tPos.y, tPos.z, 1 };
 
 	XMVECTOR subPlayerEnemy = XMVectorSubtract(enemyPos, playerPos);
-	XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
 
-	XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
+	XMFLOAT3 subPE = { subPlayerEnemy.m128_f32[0], subPlayerEnemy.m128_f32[1], subPlayerEnemy.m128_f32[2] };
 
 	if (rThrowFlag)
 	{
+		avoidTime += 0.1f;
+
 		if (rRotFlag)
 		{
 			// YŽ²Žü‚è‚ÌŠp“x
@@ -97,16 +98,16 @@ void Rope::Throw(XMFLOAT3& pPos, const XMFLOAT3 targetPos, const float targetLen
 			angleX = (float)atan2(tPos.y - pPos.y, vecXZ);
 			rRot = { XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 };
 			ropeObj->SetRotation(rRot);
-			manageRopePos.x += subPE.x;
-			manageRopePos.y += subPE.y;
-			manageRopePos.z += subPE.z;
+
+			float timeThrowPos = avoidTime;
+			manageRopePos = manageRopePos * (1.0f - timeThrowPos) + subPE * timeThrowPos;
 		}
 
 		manageRopeScale.x += 0.02f;
 		manageRopeScale.y += 0.02f;
-		manageRopeScale.z += 0.7f;
 
-		avoidTime += 0.1f;
+		float timeThrowScale = avoidTime;
+		manageRopeScale.z = manageRopeScale.z * (1.0f - timeThrowScale) + subPE.z * timeThrowScale;
 
 		if (avoidTime >= 1.0f)
 		{
@@ -118,6 +119,8 @@ void Rope::Throw(XMFLOAT3& pPos, const XMFLOAT3 targetPos, const float targetLen
 
 	if (rBackFlag)
 	{
+		avoidTime += 0.1f;
+
 		if (rRotFlag)
 		{
 			// YŽ²Žü‚è‚ÌŠp“x
@@ -126,16 +129,18 @@ void Rope::Throw(XMFLOAT3& pPos, const XMFLOAT3 targetPos, const float targetLen
 			// XŽ²Žü‚è‚ÌŠp“x
 			angleX = (float)atan2(tPos.y - pPos.y, vecXZ);
 			ropeObj->SetRotation({ XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 });
-			manageRopePos.x -= subPE.x;
-			manageRopePos.y -= subPE.y;
-			manageRopePos.z -= subPE.z;
+
+			float timeBackPos = avoidTime;
+			manageRopePos.x = -(manageRopePos.x * (1.0f - timeBackPos) + subPE.x * timeBackPos);
+			manageRopePos.y = -(manageRopePos.y * (1.0f - timeBackPos) + subPE.y * timeBackPos);
+			manageRopePos.z = -(manageRopePos.z * (1.0f - timeBackPos) + subPE.z * timeBackPos);
 		}
 
 		manageRopeScale.x -= 0.02f;
 		manageRopeScale.y -= 0.02f;
-		manageRopeScale.z -= 0.7f;
 
-		avoidTime += 0.1f;
+		float timeBackScale = avoidTime;
+		manageRopeScale.z = -(manageRopeScale.z * (1.0f - timeBackScale) + subPE.z * timeBackScale);
 
 		if (avoidTime >= 1.0f)
 		{

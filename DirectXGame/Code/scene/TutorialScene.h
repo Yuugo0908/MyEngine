@@ -123,7 +123,6 @@ private: // メンバ変数
 
 	// エネミー
 	int enemyCount = 0;
-	float enemyHp = 360;
 	bool eAlive = false;
 	XMFLOAT3 ePos = {};
 	XMFLOAT3 ePosOld = {};
