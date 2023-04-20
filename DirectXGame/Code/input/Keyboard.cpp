@@ -107,3 +107,18 @@ bool Keyboard::TriggerKey(BYTE keyNumber)
 	// トリガーでない
 	return false;
 }
+
+bool Keyboard::ReleaseKey(BYTE keyNumber)
+{
+	// 異常な引数を検出
+	assert(0 <= keyNumber && keyNumber <= 256);
+
+	// 前回が0で、今回が0でなければリリース
+	if (keyPre[keyNumber] && !key[keyNumber])
+	{
+		return true;
+	}
+
+	// リリースでない
+	return false;
+}

@@ -5,7 +5,7 @@
 
 void TutorialScene::Initialize()
 {
-	rope = new Rope;
+	rope = Rope::GetInstance();
 	player = new Player;
 	enemy = new Enemy;
 
@@ -41,6 +41,45 @@ void TutorialScene::Initialize()
 	fadeTex->SetSize({ 1280.0f,720.0f });
 	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 
+	if (!Image2d::LoadTexture(wasdNum, L"Resources/wasdKey.png"))
+	{
+		assert(0);
+	}
+	wasdKey = Image2d::Create(wasdNum, { 0.0f, 0.0f });
+	wasdKey->SetPosition({50.0f, 400.0f});
+	wasdKey->SetSize({ 256.0f,256.0f });
+	if (!Image2d::LoadTexture(spaceNum, L"Resources/spaceKey.png"))
+	{
+		assert(0);
+	}
+	spaceKey = Image2d::Create(spaceNum, { 0.0f, 0.0f });
+	spaceKey->SetPosition({ 512.0f, 500.0f });
+	spaceKey->SetSize({ 256.0f,256.0f });
+
+	if (!Image2d::LoadTexture(mouseNum, L"Resources/mouse.png"))
+	{
+		assert(0);
+	}
+	mouseImg = Image2d::Create(mouseNum, { 0.0f, 0.0f });
+	mouseImg->SetPosition({ 1000.0f, 400.0f });
+	mouseImg->SetSize({ 256.0f,256.0f });
+
+	if (!Image2d::LoadTexture(mouseLeftNum, L"Resources/mouse_left.png"))
+	{
+		assert(0);
+	}
+	mouseLeftImg = Image2d::Create(mouseLeftNum, { 0.0f, 0.0f });
+	mouseLeftImg->SetPosition({ 1000.0f, 400.0f });
+	mouseLeftImg->SetSize({ 256.0f,256.0f });
+
+	if (!Image2d::LoadTexture(mouseRightNum, L"Resources/mouse_right.png"))
+	{
+		assert(0);
+	}
+	mouseRightImg = Image2d::Create(mouseRightNum, { 0.0f, 0.0f });
+	mouseRightImg->SetPosition({ 1000.0f, 400.0f });
+	mouseRightImg->SetSize({ 256.0f,256.0f });
+
 	// パーティクル生成
 	effectBox = Particle::Create(L"Resources/effectBox.png");
 	effectCircle = Particle::Create(L"Resources/effectCircle.png");
@@ -71,15 +110,29 @@ void TutorialScene::Finalize()
 
 	// マウスカーソルを表示
 	ShowCursor(true);
+
+	player->Reset();
+	for (std::unique_ptr<Enemy>& enemy : enemys)
+	{
+		enemy->Reset();
+	}
+	enemys.erase(enemys.begin(), enemys.end());
+	rope->Reset();
+	jsonObject.erase(jsonObject.begin(), jsonObject.end());
+
 	safe_delete(player);
 	safe_delete(enemy);
-	safe_delete(rope);
 	safe_delete(light);
 	safe_delete(levelData);
 	safe_delete(HPText);
 	safe_delete(PlayerHPBar);
 	safe_delete(PlayerHPGauge);
 	safe_delete(fadeTex);
+	safe_delete(wasdKey);
+	safe_delete(spaceKey);
+	safe_delete(mouseImg);
+	safe_delete(mouseLeftImg);
+	safe_delete(mouseRightImg);
 	safe_delete(effectBox);
 	safe_delete(effectCircle);
 	safe_delete(effectCircle2);
@@ -92,16 +145,28 @@ void TutorialScene::Update()
 	// マウスの移動範囲の制限
 	mouse->CursorLimit();
 
-	if (fadeFlag == false && alpha > 0.0f)
+	if (!fadeFlag && alpha > 0.0f)
 	{
 		alpha -= 0.02f;
 	}
-	else
+
+	if(gameClearFlag)
 	{
 		alpha += 0.02f;
 		if (alpha >= 1.0f)
 		{
 			reset();
+		}
+	}
+	else if (gameOverFlag)
+	{
+		alpha += 0.02f;
+		if (alpha >= 1.0f)
+		{
+			gameOverFlag = false;
+			fadeFlag = false;
+			playerHp = 360;
+			player->ReSpawn();
 		}
 	}
 	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
@@ -143,13 +208,47 @@ void TutorialScene::Update()
 		return;
 	}
 
+	if (targetFlag && firstThrowFlag)
+	{
+		if (controller->GetPadState(Controller::State::X, Controller::Type::TRIGGER) || mouse->TriggerMouseLeft())
+		{
+			fadeFlag = false;
+			alpha = 0.0f;
+			firstThrowFlag = false;
+			rope->SetThrowFlag(true);
+		}
+		else
+		{
+			fadeFlag = true;
+			alpha = 0.7f;
+			return;
+		}
+	}
+	else if (eAttackFlag && firstAvoidFlag)
+	{
+		if (mouse->TriggerMouseRight() || controller->GetPadState(Controller::State::RT, Controller::Type::NONE))
+		{
+			fadeFlag = false;
+			alpha = 0.0f;
+			firstAvoidFlag = false;
+			player->SetAvoidFlag(true);
+			player->Avoid();
+		}
+		else
+		{
+			fadeFlag = true;
+			alpha = 0.7f;
+			return;
+		}
+	}
+
 	// タイトルから移行後の更新
-	//	プレイヤーの座標、半径の設定
+	// プレイヤーの座標、半径の設定
 	if (rushFlag)
 	{
 		player->Rush(catchPos, rushFlag, elapsedTime);
 	}
-	player->Update(rFlag, moveFlag);
+	player->Update();
 	pPos = player->GetObj()->GetPosition();
 	pScale = player->GetObj()->GetScale();
 	rope->Update(pPos);
@@ -173,7 +272,6 @@ void TutorialScene::Update()
 
 	// フラグの取得
 	rFlag = rope->GetrFlag();
-	moveFlag = rope->GetmoveFlag();
 	avoidFlag = player->GetAvoidFlag();
 
 	// 回避した際にエフェクトが発生
@@ -182,7 +280,7 @@ void TutorialScene::Update()
 		effectAvoid->CreateParticles(
 			pPos, 1.0f, 2.0f,
 			{ 0.0f, 0.0f, 0.0f, 1.0f },
-	  		{ 1.0f, 0.0f, 0.0f, 1.0f },
+			{ 1.0f, 0.0f, 0.0f, 1.0f },
 			1, 10, false, false
 		);
 	}
@@ -191,7 +289,7 @@ void TutorialScene::Update()
 
 void TutorialScene::Draw()
 {
-	SetImgui();
+	//SetImgui();
 
 #pragma region 背景画像描画
 	// 背景画像描画前処理
@@ -222,7 +320,11 @@ void TutorialScene::Draw()
 
 	for (auto& object : jsonObject)
 	{
-		if (object->GetDrawFlag())
+		if (object->GetType() == stage_)
+		{
+			object->Draw();
+		}
+		else if (object->GetDrawFlag())
 		{
 			object->Draw();
 		}
@@ -250,7 +352,20 @@ void TutorialScene::Draw()
 	PlayerHPGauge->SetSize({ playerHp,60 });
 	PlayerHPGauge->Draw();
 
+	wasdKey->Draw();
+	spaceKey->Draw();
+	mouseImg->Draw();
+
 	fadeTex->Draw();
+
+	if (targetFlag && firstThrowFlag)
+	{
+		mouseLeftImg->Draw();
+	}
+	if (eAttackFlag && firstAvoidFlag)
+	{
+		mouseRightImg->Draw();
+	}
 
 	// デバッグテキストの描画
 	DebugText::GetInstance()->DrawAll(DirectXCommon::GetInstance()->GetCommandList());
@@ -261,22 +376,9 @@ void TutorialScene::Draw()
 
 void TutorialScene::reset()
 {
-	player->Reset();
-	for (std::unique_ptr<Enemy>& enemy : enemys)
-	{
-		enemy->Reset();
-	}
-	enemys.erase(enemys.begin(), enemys.end());
-	rope->Reset();
-	jsonObject.erase(jsonObject.begin(), jsonObject.end());
-
 	if (gameClearFlag)
 	{
 		SceneManager::GetInstance()->ChangeScene("Game");
-	}
-	else if (gameOverFlag)
-	{
-		SceneManager::GetInstance()->ChangeScene("Tutorial");
 	}
 }
 
@@ -351,10 +453,10 @@ void TutorialScene::CollisionUpdate()
 
 		if (eAlive)
 		{
-			if (rope->Collision(enemy->GetObj(), pPos))
+			if (!rushFlag && rope->GetrFlag())
 			{
 				rushFlag = true;
-				catchPos = enemy->GetObj()->GetPosition();
+				catchPos = posSave;
 			}
 
 			if (rFlag && enemy->EnemyCollision(player->GetObj()))
@@ -362,7 +464,6 @@ void TutorialScene::CollisionUpdate()
 				// カメラシェイクの発生
 				shakeFlag = true;
 
-				rope->SetmoveFlag(true);
 				// パーティクル生成
 				effectBox->CreateParticles(
 					enemy->GetObj()->GetPosition(),
@@ -379,7 +480,6 @@ void TutorialScene::CollisionUpdate()
 					5, 10, false, false
 				);
 
-				oldPosSave = posEnemySave;
 				rope->SetrFlag(false);
 				rushFlag = false;
 				catchPos = {};
@@ -392,7 +492,6 @@ void TutorialScene::CollisionUpdate()
 			else if (!rFlag && player->Damage(enemy->GetObj()))
 			{
 				shakeFlag = true;
-				rope->SetmoveFlag(true);
 				playerHp -= 18;
 
 				// パーティクル生成
@@ -421,6 +520,12 @@ void TutorialScene::CollisionUpdate()
 						3, 60, true, true
 					);
 				}
+			}
+
+			bool getThrowFlag = rope->GetThrowFlag();
+			if (!getThrowFlag && !rFlag &&  enemy->Danger())
+			{
+				eAttackFlag = true;
 			}
 
 			for (auto& object : jsonObject)
@@ -459,17 +564,22 @@ void TutorialScene::CollisionUpdate()
 
 void TutorialScene::RopeUpdate()
 {
-	if (throwCount < 60)
+	if (targetEffectCount < 60)
 	{
-		throwCount++;
+		targetEffectCount++;
 	}
 
 	// ポールと敵の距離を比較して短い方を代入
 	float minLength = (std::min)(minEnemyLength, minPoleLength);
-	bool getThrowFlag = rope->GetThrowFlag();
+
+	// どちらも基準内の距離だった場合、敵を優先する
+	if (minEnemyLength < baseLength && minPoleLength < baseLength)
+	{
+		minLength = minEnemyLength;
+	}
 
 	// 距離に応じて代入する座標を変更(敵を優先する)
-	if (minLength < 15.0f)
+	if (minLength < baseLength)
 	{
 		if (minLength == minEnemyLength)
 		{
@@ -486,13 +596,13 @@ void TutorialScene::RopeUpdate()
 			{
 				XMFLOAT3 pos = object->GetPosition();
 				XMFLOAT3 scale = object->GetCollisionScale();
-				if (GetLength(pPos, pos) >= 15.0f)
+				if (GetLength(pPos, pos) >= baseLength)
 				{
 					continue;
 				}
 				else if (Collision::CollisionRayBox(pPos, posSave, pos, scale))
 				{
-					minLength = 15.0f;
+					minLength = baseLength;
 					rope->SetThrowFlag(false);
 					break;
 				}
@@ -502,16 +612,17 @@ void TutorialScene::RopeUpdate()
 		// 周辺にあるポールには反応しない
 		if (GetLength(posSave, oldPosSave) <= 0.0f && minLength == minPoleLength)
 		{
-			minLength = 15.0f; 
-			rope->SetThrowFlag(false);
+			minLength = minEnemyLength;
+			posSave = posEnemySave;
 		}
-		else if (minLength < 15.0f)
+
+		if (minLength < baseLength)
 		{
 			effectTarget->TargetEffect(
 				posSave, 3.0f, 1.0f,
 				{ 1.0f, 0.0f, 0.0f, 1.0f },
 				{ 1.0f, 1.0f, 1.0f, 1.0f },
-				throwCount
+				targetEffectCount
 			);
 		}
 	}
@@ -520,22 +631,25 @@ void TutorialScene::RopeUpdate()
 		rope->SetThrowFlag(false);
 	}
 
-	if (GetLength(pPos, oldPosSave) > 15.0f)
+	if (GetLength(pPos, oldPosSave) > 30.0f)
 	{
 		oldPosSave = {};
 	}
 
-	if (minLength < 15.0f)
+	if (minLength < baseLength)
 	{
 		rope->Throw(pPos, posSave, minLength);
 		// ロープを飛ばした方向にプレイヤーも向く
 		player->TrackRot(pPos, posSave);
+		targetFlag = true;
 	}
 	else
 	{
 		float cameraRot = camera->CameraRot(pPos);
 		// カメラが向いている方向にプレイヤーも向く
-		player->GetObj()->SetRotation({0, XMConvertToDegrees(cameraRot), 0});
+		player->GetObj()->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
+		rope->SetThrowFlag(false);
+		targetFlag = false;
 	}
 
 	posPoleSave = {};
@@ -736,10 +850,10 @@ void TutorialScene::jsonObjectUpdate()
 				posPoleSave = polePos;
 			}
 
-			if (rope->Collision(object, pPos))
+			if (!rushFlag && rope->GetrFlag())
 			{
 				rushFlag = true;
-				catchPos = object->GetPosition();
+				catchPos = posSave;
 			}
 
 			if (rushFlag && player->PoleCollide(polePos, poleScale))

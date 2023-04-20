@@ -301,9 +301,6 @@
     <None Include="Resources\shaders\Object.hlsli">
       <Filter>シェーダーファイル</Filter>
     </None>
-    <None Include="Resources\shaders\FBX.hlsli">
-      <Filter>シェーダーファイル</Filter>
-    </None>
     <None Include="Resources\shaders\PostEffect.hlsli">
       <Filter>シェーダーファイル</Filter>
     </None>
@@ -328,12 +325,6 @@
       <Filter>シェーダーファイル</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\ObjectVS.hlsl">
-      <Filter>シェーダーファイル</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\FBXPS.hlsl">
-      <Filter>シェーダーファイル</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\FBXVS.hlsl">
       <Filter>シェーダーファイル</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\PostEffectPS.hlsl">

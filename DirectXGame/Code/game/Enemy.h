@@ -51,6 +51,8 @@ public:
 
 	bool BulletCollision();
 
+	bool Danger();
+
 	// ƒ}ƒbƒv“–‚½‚è”»’è
 	bool MapCollide(const XMFLOAT3 boxPos, const XMFLOAT3 boxScale);
 	bool StageCollide(const XMFLOAT3 stagePos, const XMFLOAT3 stageScale);

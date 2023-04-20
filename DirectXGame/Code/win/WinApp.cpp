@@ -1,5 +1,6 @@
 #include "WinApp.h"
 #include <imgui_impl_win32.h>
+#include <d3d12sdklayers.h>
 
 #pragma comment(lib, "winmm.lib")
 
@@ -42,10 +43,12 @@ void WinApp::CreateGameWindow()
 	RECT wrc = { 0, 0, window_width, window_height };
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false); // 自動でサイズ補正
 
+	// モニターの解像度を取得
 	HWND hDwnd = GetDesktopWindow();
 	RECT desktop_rect;
 	GetWindowRect(hDwnd, &desktop_rect);
 
+	// ウィンドウの表示位置を設定
 	int desktop_width = (desktop_rect.right - (wrc.right - wrc.left)) / 2;
 	int desktop_height = (desktop_rect.bottom - (wrc.bottom - wrc.top)) / 3;
 

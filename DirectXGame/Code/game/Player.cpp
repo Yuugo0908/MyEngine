@@ -13,17 +13,24 @@ bool Player::Initialize(const XMFLOAT3 pos, const XMFLOAT3 scale)
 
 	playerObj->SetPosition(pPos);
 	playerObj->SetScale(pScale);
-	playerObj->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
 	playerObj->Update();
 
 	return true;
 }
 
-void Player::Update(bool rFlag, bool moveFlag)
+void Player::Update()
 {
+	bool rFlag = Rope::GetInstance()->GetrFlag();
+	bool throwFlag = Rope::GetInstance()->GetThrowFlag();
+
 	// カメラが向いている方向を調べる
 	cameraTrack = camera->CameraTrack(pPos);
 	cameraTrack = cameraTrack * pSpeed;
+
+	if (!rushFlag && (keyboard->ReleaseKey(DIK_D) || keyboard->ReleaseKey(DIK_A) || keyboard->ReleaseKey(DIK_W) || keyboard->ReleaseKey(DIK_S)))
+	{
+		inertiaSaveMove = pPos - pPosOld;
+	}
 
 	pPosOld = playerObj->GetPosition();
 
@@ -32,21 +39,18 @@ void Player::Update(bool rFlag, bool moveFlag)
 	{
 		damageInterval--;
 		float alpha = 0.5f;
-		playerObj->SetColor({ 1.0f, 0.0f, 0.4f, alpha });
+		playerObj->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
 	}
 	else
 	{
-		playerObj->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+		playerObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	}
 
 
-	if (moveFlag)
+	if (!throwFlag && !rFlag)
 	{
-		if (!rFlag)
-		{
-			Jump();
-			Avoid();
-		}
+		Jump();
+		Avoid();
 
 		// 移動
 		rate = 1.0f;
@@ -65,28 +69,55 @@ void Player::Update(bool rFlag, bool moveFlag)
 				rate = sqrtf(1.0f / 2.0f);
 			}
 		}
-		cameraTrack = cameraTrack * pAcc * rate;
+		cameraTrack = cameraTrack * pAcc * rate * pMove;
+
+		pMove = (std::min)((std::max)(pMove, 0.0f), 1.0f);
 
 		if (controller->GetPadState(Controller::State::LEFT_R_STICK, Controller::Type::NONE) || keyboard->PushKey(DIK_D))
 		{
 			pPos.x += cameraTrack.z;
 			pPos.z -= cameraTrack.x;
+			moveFlag = true;
 		}
 		else if (controller->GetPadState(Controller::State::LEFT_L_STICK, Controller::Type::NONE) || keyboard->PushKey(DIK_A))
 		{
 			pPos.x -= cameraTrack.z;
 			pPos.z += cameraTrack.x;
+			moveFlag = true;
 		}
 
 		if (controller->GetPadState(Controller::State::LEFT_U_STICK, Controller::Type::NONE) || keyboard->PushKey(DIK_W))
 		{
 			pPos.x += cameraTrack.x;
 			pPos.z += cameraTrack.z;
+			moveFlag = true;
 		}
 		else if (controller->GetPadState(Controller::State::LEFT_D_STICK, Controller::Type::NONE) || keyboard->PushKey(DIK_S))
 		{
 			pPos.x -= cameraTrack.x;
 			pPos.z -= cameraTrack.z;
+			moveFlag = true;
+		}
+
+		if (!keyboard->PushKey(DIK_D) && !keyboard->PushKey(DIK_A) && !keyboard->PushKey(DIK_W) && !keyboard->PushKey(DIK_S))
+		{
+			moveFlag = false;
+		}
+
+		if (moveFlag)
+		{
+			pMove += 0.1f;
+		}
+		else if (!avoidFlag)
+		{
+			pMove -= 0.1f;
+			pPos.x += inertiaSaveMove.x * pMove;
+			pPos.z += inertiaSaveMove.z * pMove;
+
+			if (pMove <= 0.0f)
+			{
+				inertiaSaveMove = {};
+			}
 		}
 	}
 
@@ -101,9 +132,11 @@ void Player::Rush(XMFLOAT3 targetPos, bool& flag, float& avoidTime)
 	if (!flag)
 	{
 		avoidTime = 0.0f;
+		rushFlag = false;
 		return;
 	}
 
+	rushFlag = true;
 	if (avoidTime < 1.0f)
 	{
 		avoidTime += 0.1f;
@@ -127,6 +160,14 @@ void Player::Avoid()
 		pAcc = 3.0f;
 	}
 
+	// 移動キーとジャンプキーの入力状態
+	if (!moveFlag && avoidFlag)
+	{
+		pPos.x -= cameraTrack.x * pAcc;
+		pPos.z -= cameraTrack.z * pAcc;
+		pMove = 1.0f;
+	}
+
 	if (!avoidFlag)
 	{
 		pAcc = 1.0f;
@@ -143,6 +184,7 @@ void Player::Jump()
 	{
 		onGround = false;
 		jumpFlag = true;
+		moveFlag = true;
 		// 上昇率の更新
 		pVel = 1.25f;
 	}
@@ -152,14 +194,15 @@ void Player::Jump()
 	{
 		pVel -= pGra;
 		pPos.y += pVel;
-		pPos.x += inertiaSave.x * 0.1f;
-		pPos.z += inertiaSave.z * 0.1f;
+		pPos.x += inertiaSaveJump.x * 0.15f;
+		pPos.z += inertiaSaveJump.z * 0.15f;
 
 		if (onGround)
 		{
 			jumpFlag = false;
+			moveFlag = false;
 			pVel = 0.0f;
-			inertiaSave = {};
+			inertiaSaveJump = {};
 		}
 	}
 	// 重力
@@ -366,8 +409,6 @@ bool Player::PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale)
 	float maxBoxZ = polePos.z + poleScale.z;
 	float minBoxZ = polePos.z - poleScale.z;
 
-	playerObj->SetPosition(pPos);
-
 	if ((pPos.x <= maxBoxX && pPos.x >= minBoxX) &&
 		(pPos.z <= maxBoxZ && pPos.z >= minBoxZ))
 	{
@@ -409,7 +450,7 @@ bool Player::PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale)
 
 	if (hitFlag)
 	{
-		inertiaSave = pPos - pPosOld;
+		inertiaSaveJump = pPos - pPosOld;
 		onGround = false;
 		jumpFlag = true;
 		// 上昇率の更新

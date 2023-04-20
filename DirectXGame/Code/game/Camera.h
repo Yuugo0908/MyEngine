@@ -100,12 +100,7 @@ private: // メンバ変数
 	// カメラの変化フラグ
 	bool dirty = false;
 	// 回転
-	float angleX = 0.0f;
 	float angleY = 0.0f;
-	//対象とカメラの距離
-	float distance = 0.0f;
-	const float distanceMin = 10.0f;
-	const float distanceMax = 20.0f;
 	// 感度
 	float mouseSensitivity = 0.01f;
 	float controllerSensitivity = 0.075f;

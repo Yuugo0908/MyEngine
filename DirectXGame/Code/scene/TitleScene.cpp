@@ -62,7 +62,7 @@ void TitleScene::Update()
 			explanation->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 			backGround->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 			{
-				SceneManager::GetInstance()->ChangeScene("Game");
+				SceneManager::GetInstance()->ChangeScene("Tutorial");
 			}
 		}
 	}

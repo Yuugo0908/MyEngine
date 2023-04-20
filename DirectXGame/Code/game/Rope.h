@@ -9,13 +9,13 @@ class Rope
 {
 public: // メンバ関数
 
+	static Rope* GetInstance();
+
 	bool Initialize();
 
 	void Update(XMFLOAT3& pPos);
 
 	void Throw(XMFLOAT3& pPos, const XMFLOAT3 ePos, const float length);
-
-	bool Collision(const std::unique_ptr<Object3d>& object, XMFLOAT3 pPos);
 
 	void Reset();
 
@@ -28,9 +28,6 @@ public: // メンバ関数
 	// 円運動
 	void CircularMotion(XMFLOAT3& pos, const XMFLOAT3 centerPos, const float r, int& angle, const int add);
 
-	// 移動しているか
-	const bool& GetmoveFlag() { return moveFlag; }
-	void SetmoveFlag(bool moveFlag) { this->moveFlag = moveFlag; }
 	// ロープがつながっているか
 	const bool& GetrFlag() { return rFlag; }
 	void SetrFlag(bool rFlag) { this->rFlag = rFlag; }
@@ -62,11 +59,9 @@ private: // メンバ変数
 	float objLength = 0.0f;
 	bool rFlag = false; // 接触フラグ
 	bool rThrowFlag = false; // ロープを飛ばす
-	bool rBackFlag = false; // ロープを戻す
 	bool rRotFlag = false;
-
-	XMFLOAT3 cSpeed = {};
-	float cRot = 0.0f;
+	// ターゲットする距離の基準
+	const float baseLength = 15.0f;
 
 	XMFLOAT3 tPos = {};
 	float tLength = 0.0f;
@@ -77,8 +72,5 @@ private: // メンバ変数
 	float avoidTime = 0.0f; // 経過時間
 	bool pEaseFlag = false;
 	bool eEaseFlag = false;
-
-	// 移動管理フラグ
-	bool moveFlag = false; // 自機が移動しているか
 };
 

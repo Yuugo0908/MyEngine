@@ -254,6 +254,18 @@ bool Enemy::BulletCollision()
 	return false;
 }
 
+bool Enemy::Danger()
+{
+	for (std::unique_ptr<Bullet>& bullet : bullets)
+	{
+		if (GetLength(player->GetObj()->GetPosition(), bullet->GetPos()) <= 5.0f)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 bool Enemy::MapCollide(const XMFLOAT3 boxPos, const XMFLOAT3 boxScale)
 {
 	if (!eAlive)

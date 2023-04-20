@@ -69,13 +69,12 @@ private: // メンバ変数
 	Mouse* mouse = Mouse::GetInstance();
 	Camera* camera = Camera::GetInstance();
 	Light* light = nullptr;
-
 	Rope* rope = nullptr;
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
-	// 複数生成用リスト
+
+	// 敵の複数生成用リスト
 	std::list<std::unique_ptr<Enemy>> enemys;
-	LevelData* levelData = nullptr;
 
 	enum Scene
 	{
@@ -89,10 +88,13 @@ private: // メンバ変数
 
 	enum Image2dNum
 	{
-		HPTextNum = 1, HPBarNum, HPGaugeNum, fadeNum,
+		// 0番はデバッグテキストなので除外
+		HPTextNum = 1, HPBarNum, HPGaugeNum, fadeNum, wasdNum, spaceNum, mouseNum, mouseLeftNum, mouseRightNum
 	};
 
-	// jsonオブジェクト
+	// レベルデータ
+	LevelData* levelData = nullptr;
+	// レベルデータで読み込んだオブジェクト
 	std::vector<std::unique_ptr<Object3d>> jsonObject{};
 
 	// 画像
@@ -100,6 +102,11 @@ private: // メンバ変数
 	Image2d* PlayerHPBar = nullptr;
 	Image2d* PlayerHPGauge = nullptr;
 	Image2d* fadeTex = nullptr;
+	Image2d* wasdKey = nullptr;
+	Image2d* spaceKey = nullptr;
+	Image2d* mouseImg = nullptr;
+	Image2d* mouseLeftImg = nullptr;
+	Image2d* mouseRightImg = nullptr;
 	float alpha = 1.0f;
 
 	// 音声
@@ -111,6 +118,7 @@ private: // メンバ変数
 	Particle* effectCircle2 = nullptr;
 	Particle* effectTarget = nullptr;
 	Particle* effectAvoid = nullptr;
+	int targetEffectCount = 0;
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
@@ -124,13 +132,13 @@ private: // メンバ変数
 	// エネミー
 	int enemyCount = 0;
 	bool eAlive = false;
+	bool eAttackFlag = false;
 	XMFLOAT3 ePos = {};
 	XMFLOAT3 ePosOld = {};
 	XMFLOAT3 eScale = {};
 
 	// ロープ
 	bool rFlag = false;
-	int throwCount = 0;
 	XMFLOAT3 catchPos = {};
 
 	// カメラ
@@ -153,9 +161,12 @@ private: // メンバ変数
 	int vSpeedL = 0;
 	int vSpeedR = 0;
 
-	// 座標保存用
+	// ターゲット座標保存用
 	XMFLOAT3 posSave = {};
+	// 過去にターゲットしたオブジェクトの座標
 	XMFLOAT3 oldPosSave = { 1000.0f, 1000.0f, 1000.0f };
+	// ターゲットする距離の基準
+	const float baseLength = 15.0f;
 	bool targetFlag = false;
 
 	// ポールの座標と距離
@@ -165,5 +176,9 @@ private: // メンバ変数
 	// エネミーの座標と距離
 	XMFLOAT3 posEnemySave = {};
 	float minEnemyLength = 15.0f;
+
+	// チュートリアル用フラグ
+	bool firstAvoidFlag = true;
+	bool firstThrowFlag = true;
 };
 

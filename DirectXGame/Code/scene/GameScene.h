@@ -73,9 +73,8 @@ private: // メンバ変数
 	Rope* rope = nullptr;
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
-	// 複数生成用リスト
+	// 敵の複数生成用リスト
 	std::list<std::unique_ptr<Enemy>> enemys;
-	LevelData* levelData = nullptr;
 
 	enum Scene
 	{
@@ -89,10 +88,13 @@ private: // メンバ変数
 
 	enum Image2dNum
 	{
+		// 0番はデバッグテキストなので除外
 		HPTextNum = 1, HPBarNum, HPGaugeNum, fadeNum,
 	};
 
-	// jsonオブジェクト
+	// レベルデータ
+	LevelData* levelData = nullptr;
+	// レベルデータで読み込んだオブジェクト
 	std::vector<std::unique_ptr<Object3d>> jsonObject{};
 
 	// 画像
@@ -111,6 +113,7 @@ private: // メンバ変数
 	Particle* effectCircle2 = nullptr;
 	Particle* effectTarget = nullptr;
 	Particle* effectAvoid = nullptr;
+	int targetEffectCount = 0;
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};//座標
@@ -131,7 +134,6 @@ private: // メンバ変数
 	// ロープ
 	XMFLOAT3 catchPos = {};
 	bool rFlag = false;
-	int throwCount = 0;
 
 	// カメラ
 	XMFLOAT3 cPos = {};
@@ -154,9 +156,12 @@ private: // メンバ変数
 	int vSpeedL = 0;
 	int vSpeedR = 0;
 
-	// 座標保存用
+	// ターゲット座標保存用
 	XMFLOAT3 posSave = {};
+	// 過去にターゲットしたオブジェクトの座標
 	XMFLOAT3 oldPosSave = {1000.0f, 1000.0f, 1000.0f};
+	// ターゲットする距離の基準
+	const float baseLength = 15.0f;
 	bool targetFlag = false;
 
 	// ポールの座標と距離

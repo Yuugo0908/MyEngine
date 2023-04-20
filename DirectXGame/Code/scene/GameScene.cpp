@@ -5,7 +5,7 @@
 
 void GameScene::Initialize()
 {
-	rope = new Rope;
+	rope = Rope::GetInstance();
 	player = new Player;
 	enemy = new Enemy;
 
@@ -71,9 +71,19 @@ void GameScene::Finalize()
 
 	// マウスカーソルを表示
 	ShowCursor(true);
+
+	player->Reset();
+	for (std::unique_ptr<Enemy>& enemy : enemys)
+	{
+		enemy->Reset();
+	}
+
+	enemys.erase(enemys.begin(), enemys.end());
+	rope->Reset();
+	jsonObject.erase(jsonObject.begin(), jsonObject.end());
+
 	safe_delete(player);
 	safe_delete(enemy);
-	safe_delete(rope);
 	safe_delete(light);
 	safe_delete(levelData);
 	safe_delete(HPText);
@@ -92,11 +102,12 @@ void GameScene::Update()
 	// マウスの移動範囲の制限
 	mouse->CursorLimit();
 
-	if (fadeFlag == false && alpha > 0.0f)
+	if (!fadeFlag && alpha > 0.0f)
 	{
 		alpha -= 0.02f;
 	}
-	else
+
+	if(gameClearFlag || gameOverFlag)
 	{
 		alpha += 0.02f;
 		if (alpha >= 1.0f)
@@ -144,12 +155,12 @@ void GameScene::Update()
 	}
 
 	// タイトルから移行後の更新
-	//	プレイヤーの座標、半径の設定
+	// プレイヤーの座標、半径の設定
 	if (rushFlag)
 	{
 		player->Rush(catchPos, rushFlag, elapsedTime);
 	}
-	player->Update(rFlag, moveFlag);
+	player->Update();
 	pPos = player->GetObj()->GetPosition();
 	pScale = player->GetObj()->GetScale();
 	rope->Update(pPos);
@@ -173,7 +184,6 @@ void GameScene::Update()
 
 	// フラグの取得
 	rFlag = rope->GetrFlag();
-	moveFlag = rope->GetmoveFlag();
 	avoidFlag = player->GetAvoidFlag();
 
 	// 回避した際にエフェクトが発生
@@ -222,7 +232,11 @@ void GameScene::Draw()
 
 	for (auto& object : jsonObject)
 	{
-		if (object->GetDrawFlag())
+		if (object->GetType() == stage_)
+		{
+			object->Draw();
+		}
+		else if (object->GetDrawFlag())
 		{
 			object->Draw();
 		}
@@ -270,19 +284,10 @@ void GameScene::reset()
 			fadeFlag = false;
 			gameClearFlag = false;
 			levelData = nullptr;
-			jsonObjectInit("tutorial");
+			jsonObjectInit("stage2");
 		}
 		else if (stageClearCount == 1)
 		{
-			player->Reset();
-			for (std::unique_ptr<Enemy>& enemy : enemys)
-			{
-				enemy->Reset();
-			}
-
-			enemys.erase(enemys.begin(), enemys.end());
-			rope->Reset();
-			jsonObject.erase(jsonObject.begin(), jsonObject.end());
 			SceneManager::GetInstance()->ChangeScene("GameClear");
 		}
 	}
@@ -356,10 +361,10 @@ void GameScene::CollisionUpdate()
 
 		if (eAlive)
 		{
-			if (rope->Collision(enemy->GetObj(), pPos))
+			if (!rushFlag && rope->GetrFlag())
 			{
 				rushFlag = true;
-				catchPos = enemy->GetObj()->GetPosition();
+				catchPos = posSave;
 			}
 
 			if (rFlag && enemy->EnemyCollision(player->GetObj()))
@@ -367,7 +372,6 @@ void GameScene::CollisionUpdate()
 				// カメラシェイクの発生
 				shakeFlag = true;
 
-				rope->SetmoveFlag(true);
 				// パーティクル生成
 				effectBox->CreateParticles(
 					enemy->GetObj()->GetPosition(),
@@ -384,7 +388,6 @@ void GameScene::CollisionUpdate()
 					5, 10, false, false
 				);
 
-				oldPosSave = posEnemySave;
 				rope->SetrFlag(false);
 				rushFlag = false;
 				catchPos = {};
@@ -397,7 +400,6 @@ void GameScene::CollisionUpdate()
 			else if (!rFlag && player->Damage(enemy->GetObj()))
 			{
 				shakeFlag = true;
-				rope->SetmoveFlag(true);
 				playerHp -= 36;
 
 				// パーティクル生成
@@ -464,17 +466,22 @@ void GameScene::CollisionUpdate()
 
 void GameScene::RopeUpdate()
 {
-	if (throwCount < 60)
+	if (targetEffectCount < 60)
 	{
-		throwCount++;
+		targetEffectCount++;
 	}
 
 	// ポールと敵の距離を比較して短い方を代入
 	float minLength = (std::min)(minEnemyLength, minPoleLength);
-	bool getThrowFlag = rope->GetThrowFlag();
+
+	// どちらも基準内の距離だった場合、敵を優先する
+	if (minEnemyLength < baseLength && minPoleLength < baseLength)
+	{
+		minLength = minEnemyLength;
+	}
 
 	// 距離に応じて代入する座標を変更(敵を優先する)
-	if (minLength < 15.0f)
+	if (minLength < baseLength)
 	{
 		if (minLength == minEnemyLength)
 		{
@@ -491,13 +498,13 @@ void GameScene::RopeUpdate()
 			{
 				XMFLOAT3 pos = object->GetPosition();
 				XMFLOAT3 scale = object->GetCollisionScale();
-				if (GetLength(pPos, pos) >= 15.0f)
+				if (GetLength(pPos, pos) >= baseLength)
 				{
 					continue;
 				}
 				else if (Collision::CollisionRayBox(pPos, posSave, pos, scale))
 				{
-					minLength = 15.0f;
+					minLength = baseLength;
 					rope->SetThrowFlag(false);
 					break;
 				}
@@ -507,16 +514,17 @@ void GameScene::RopeUpdate()
 		// 周辺にあるポールには反応しない
 		if (GetLength(posSave, oldPosSave) <= 0.0f && minLength == minPoleLength)
 		{
-			minLength = 15.0f;
-			rope->SetThrowFlag(false);
+			minLength = minEnemyLength;
+			posSave = posEnemySave;
 		}
-		else if (minLength < 15.0f)
+		
+		if (minLength < baseLength)
 		{
 			effectTarget->TargetEffect(
 				posSave, 3.0f, 1.0f,
 				{ 1.0f, 0.0f, 0.0f, 1.0f },
 				{ 1.0f, 1.0f, 1.0f, 1.0f },
-				throwCount
+				targetEffectCount
 			);
 		}
 	}
@@ -525,12 +533,12 @@ void GameScene::RopeUpdate()
 		rope->SetThrowFlag(false);
 	}
 
-	if (GetLength(pPos, oldPosSave) > 15.0f)
+	if (GetLength(pPos, oldPosSave) > 30.0f)
 	{
 		oldPosSave = {};
 	}
 
-	if (minLength < 15.0f)
+	if (minLength < baseLength)
 	{
 		rope->Throw(pPos, posSave, minLength);
 		// ロープを飛ばした方向にプレイヤーも向く
@@ -541,6 +549,7 @@ void GameScene::RopeUpdate()
 		float cameraRot = camera->CameraRot(pPos);
 		// カメラが向いている方向にプレイヤーも向く
 		player->GetObj()->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
+		rope->SetThrowFlag(false);
 	}
 
 	posPoleSave = {};
@@ -741,10 +750,10 @@ void GameScene::jsonObjectUpdate()
 				posPoleSave = polePos;
 			}
 
-			if (rope->Collision(object, pPos))
+			if (!rushFlag && rope->GetrFlag())
 			{
 				rushFlag = true;
-				catchPos = object->GetPosition();
+				catchPos = posSave;
 			}
 
 			if (rushFlag && player->PoleCollide(polePos, poleScale))

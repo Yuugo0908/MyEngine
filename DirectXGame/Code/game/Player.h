@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Particle.h"
 #include "DirectXCommon.h"
+#include "Rope.h"
 
 class Player
 {
@@ -15,7 +16,7 @@ public: // メンバ関数
 
 	bool Initialize(const XMFLOAT3 pos, const XMFLOAT3 scale);
 
-	void Update(bool rFlag, bool moveFlag);
+	void Update();
 
 	void Rush(XMFLOAT3 targetPos, bool& flag, float& avoidTime);
 
@@ -30,6 +31,8 @@ public: // メンバ関数
 	void ReSpawn();
 
 	void TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos);
+
+	void CameraTarget() { camera->SetTarget(pPos); }
 
 	// マップ当たり判定
 	bool MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale);
@@ -66,12 +69,15 @@ private: // メンバ変数
 	XMFLOAT3 pPosOld = {};
 	XMFLOAT3 pScale = {};//大きさ
 	XMFLOAT3 pRot = {};//回転
-	XMFLOAT3 inertiaSave = {}; // 慣性
+	XMFLOAT3 inertiaSaveJump = {}; // ジャンプ慣性
+	XMFLOAT3 inertiaSaveMove = {};
 	XMFLOAT3 reSpawnPos = {};
 
 	float pSpeed = 0.35f;
 	bool onGround = false;//自由落下のフラグ
 	bool jumpFlag = false;
+	bool moveFlag = false; // 移動フラグ
+	bool rushFlag = false; // 突進フラグ
 	float pMove = 0.0f;//移動量
 	float pAcc = 0.2f;//加速
 	float pVel = 0.2f;//速度
@@ -82,6 +88,7 @@ private: // メンバ変数
 
 	// 突進用
 	bool avoidFlag = false; // 回避開始フラグ
+	bool firstAvoidFlag = true;
 	int avoidCount = 0;
 
 	// カメラ距離取得用

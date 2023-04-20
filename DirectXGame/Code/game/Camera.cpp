@@ -113,12 +113,10 @@ void Camera::CameraMoveEyeVector(const XMVECTOR& move)
 
 void Camera::Update()
 {
-	angleX = 0.0f;
 	angleY = 0.0f;
 	dirty = false;
 
 	XMFLOAT3 cameraTrack = CameraTrack(target);
-	distance = GetLength(eye, target);
 
 	if (saveEye.y > eyeMax)
 	{
@@ -368,7 +366,6 @@ void Camera::Reset()
 	shakeCount = 0;
 
 	dirty = false;
-	angleX = 0.0f;
 	angleY = 0.0f;
 
 	// ƒrƒ…[s—ñ

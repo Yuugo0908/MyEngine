@@ -32,6 +32,8 @@ public: //メンバ関数
 	bool PushKey(BYTE keyNumber);
 	// キーのトリガーをチェック
 	bool TriggerKey(BYTE keyNumber);
+	// キーを離したかチェック
+	bool ReleaseKey(BYTE keyNumber);
 
 private: //メンバ変数
 	ComPtr<IDirectInput8> dinput;
