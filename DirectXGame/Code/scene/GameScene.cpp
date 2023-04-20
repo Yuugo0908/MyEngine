@@ -154,12 +154,11 @@ void GameScene::Update()
 		return;
 	}
 
+	// プレイヤーの突進
+	player->Rush(catchPos, rushFlag, elapsedTime);
+
 	// タイトルから移行後の更新
 	// プレイヤーの座標、半径の設定
-	if (rushFlag)
-	{
-		player->Rush(catchPos, rushFlag, elapsedTime);
-	}
 	player->Update();
 	pPos = player->GetObj()->GetPosition();
 	pScale = player->GetObj()->GetScale();
