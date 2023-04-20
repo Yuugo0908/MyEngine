@@ -33,14 +33,13 @@ private: // ƒƒ“ƒo•Ï”
 
 	enum Image2dNum
 	{
-		titleNum = 1, backNum, expNum, fadeNum,
+		titleNum = 1, backNum, fadeNum,
 	};
 
 	// ‰æ‘œ
 	Image2d* title = nullptr;
-	Image2d* fadeTex = nullptr;
-	Image2d* explanation = nullptr;
 	Image2d* backGround = nullptr;
+	Image2d* fadeTex = nullptr;
 
 	float alpha = 0.0f;
 	bool fadeIn = false;

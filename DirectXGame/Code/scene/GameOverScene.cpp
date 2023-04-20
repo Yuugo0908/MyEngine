@@ -49,6 +49,16 @@ void GameOverScene::Update()
 		}
 		else if(keyboard->TriggerKey(DIK_R))
 		{
+			retryFlag = true;
+			fadeFlag = true;
+		}
+	}
+
+	if (retryFlag)
+	{
+		alpha += 0.02f;
+		if (alpha >= 1.0f)
+		{
 			SceneManager::GetInstance()->ChangeScene("Game");
 		}
 	}

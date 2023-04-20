@@ -44,5 +44,6 @@ private: // ƒƒ“ƒo•Ï”
 
 	float alpha = 1.0f;
 	bool fadeFlag = false;
+	bool retryFlag = false;
 };
 

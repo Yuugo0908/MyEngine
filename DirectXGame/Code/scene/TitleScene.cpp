@@ -20,14 +20,6 @@ void TitleScene::Initialize() {
 	fadeTex->SetSize({ 1280.0f,720.0f });
 	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 
-	if (!Image2d::LoadTexture(expNum, L"Resources/Operation_Explanation.png"))
-	{
-		assert(0);
-	}
-	explanation = Image2d::Create(expNum, { 0.0f,0.0f });
-	explanation->SetSize({ 1280.0f,720.0f });
-	explanation->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
-
 	if (!Image2d::LoadTexture(backNum, L"Resources/backGround.png"))
 	{
 		assert(0);
@@ -41,7 +33,6 @@ void TitleScene::Finalize()
 {
 	safe_delete(title);
 	safe_delete(fadeTex);
-	safe_delete(explanation);
 	safe_delete(backGround);
 }
 
@@ -59,7 +50,6 @@ void TitleScene::Update()
 		if (alpha >= 1.0f)
 		{
 			fadeIn = false;
-			explanation->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 			backGround->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 			{
 				SceneManager::GetInstance()->ChangeScene("Tutorial");

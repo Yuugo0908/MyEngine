@@ -25,14 +25,11 @@ void Player::Update()
 
 	// カメラが向いている方向を調べる
 	cameraTrack = camera->CameraTrack(pPos);
-	cameraTrack = cameraTrack * pSpeed;
 
 	if (!rushFlag && (keyboard->ReleaseKey(DIK_D) || keyboard->ReleaseKey(DIK_A) || keyboard->ReleaseKey(DIK_W) || keyboard->ReleaseKey(DIK_S)))
 	{
 		inertiaSaveMove = pPos - pPosOld;
 	}
-
-	pPosOld = playerObj->GetPosition();
 
 	// ダメージを受けた後の処理
 	if (damageInterval > 0)
@@ -46,14 +43,12 @@ void Player::Update()
 		playerObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	}
 
-
 	if (!throwFlag && !rFlag)
 	{
-		Jump();
-		Avoid();
 
 		// 移動
 		rate = 1.0f;
+
 		// 移動量の倍数計算
 		if (controller->GetPadState(Controller::State::LEFT_L_STICK, Controller::Type::NONE) || controller->GetPadState(Controller::State::LEFT_R_STICK, Controller::Type::NONE))
 		{
@@ -69,9 +64,18 @@ void Player::Update()
 				rate = sqrtf(1.0f / 2.0f);
 			}
 		}
-		cameraTrack = cameraTrack * pAcc * rate * pMove;
 
+		// 正規化したカメラ距離に加速度、移動量、斜め移動時の補正をかける
+		cameraTrack.x = cameraTrack.x * pSpeed * pAcc * rate * pMove;
+		cameraTrack.z = cameraTrack.z * pSpeed * pAcc * rate * pMove;
+
+		// 移動値の範囲は0.0f～1.0fにする
 		pMove = (std::min)((std::max)(pMove, 0.0f), 1.0f);
+
+		// ジャンプ
+		Jump();
+		// 回避
+		Avoid();
 
 		if (controller->GetPadState(Controller::State::LEFT_R_STICK, Controller::Type::NONE) || keyboard->PushKey(DIK_D))
 		{
@@ -121,6 +125,9 @@ void Player::Update()
 		}
 	}
 
+	// 前フレームのプレイヤー座標を取得
+	pPosOld = playerObj->GetPosition();
+	// プレイヤーの座標を反映
 	playerObj->SetPosition(pPos);
 	playerObj->SetScale(pScale);
 	playerObj->Update();
@@ -151,6 +158,7 @@ void Player::Avoid()
 	if (avoidFlag)
 	{
 		pAcc -= pGra;
+		pMove = 1.0f;
 	}
 	// 自機の突進
 	else if (mouse->TriggerMouseRight() || controller->GetPadState(Controller::State::RT, Controller::Type::NONE))
@@ -163,9 +171,8 @@ void Player::Avoid()
 	// 移動キーとジャンプキーの入力状態
 	if (!moveFlag && avoidFlag)
 	{
-		pPos.x -= cameraTrack.x * pAcc;
-		pPos.z -= cameraTrack.z * pAcc;
-		pMove = 1.0f;
+		pPos.x -= cameraTrack.x;
+		pPos.z -= cameraTrack.z;
 	}
 
 	if (!avoidFlag)
