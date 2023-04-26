@@ -127,12 +127,13 @@ private: // メンバ変数
 	bool onGround = false;//自由落下のフラグ
 	bool moveFlag = false;//移動管理フラグ
 	bool avoidFlag = false;//回避管理フラグ
+	bool playerAttackFlag = false;
 	float playerHp = 360;
 
 	// エネミー
 	int enemyCount = 0;
-	bool eAlive = false;
-	bool eAttackFlag = false;
+	bool enemyAlive = false;
+	bool enemyAttackFlag = false;
 	XMFLOAT3 ePos = {};
 	XMFLOAT3 ePosOld = {};
 	XMFLOAT3 eScale = {};
@@ -145,6 +146,7 @@ private: // メンバ変数
 	XMFLOAT3 cPos = {};
 	XMFLOAT3 cTarget = {};
 	const float trackLimit = -30.0f;
+	float easeTime = 0.0f;
 
 	// シーン管理用
 	bool fadeFlag = false;
@@ -180,5 +182,6 @@ private: // メンバ変数
 	// チュートリアル用フラグ
 	bool firstAvoidFlag = true;
 	bool firstThrowFlag = true;
+	bool firstAttackFlag = false;
 };
 

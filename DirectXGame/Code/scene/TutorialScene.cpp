@@ -208,7 +208,7 @@ void TutorialScene::Update()
 		return;
 	}
 
-	if (targetFlag && firstThrowFlag)
+	if (targetFlag && firstThrowFlag && !avoidFlag)
 	{
 		if (controller->GetPadState(Controller::State::X, Controller::Type::TRIGGER) || mouse->TriggerMouseLeft())
 		{
@@ -224,15 +224,32 @@ void TutorialScene::Update()
 			return;
 		}
 	}
-	else if (eAttackFlag && firstAvoidFlag)
+	else if (enemyAttackFlag && firstAvoidFlag && !avoidFlag)
 	{
 		if (mouse->TriggerMouseRight() || controller->GetPadState(Controller::State::RT, Controller::Type::NONE))
 		{
 			fadeFlag = false;
 			alpha = 0.0f;
 			firstAvoidFlag = false;
+			firstAttackFlag = true;
 			player->SetAvoidFlag(true);
 			player->Avoid();
+		}
+		else
+		{
+			fadeFlag = true;
+			alpha = 0.7f;
+			return;
+		}
+	}
+	else if (playerAttackFlag && firstAttackFlag && !avoidFlag)
+	{
+		if (controller->GetPadState(Controller::State::X, Controller::Type::TRIGGER) || mouse->TriggerMouseLeft())
+		{
+			fadeFlag = false;
+			alpha = 0.0f;
+			firstAttackFlag = false;
+			rope->SetThrowFlag(true);
 		}
 		else
 		{
@@ -357,11 +374,11 @@ void TutorialScene::Draw()
 
 	fadeTex->Draw();
 
-	if (targetFlag && firstThrowFlag)
+	if ((playerAttackFlag || targetFlag) && (firstThrowFlag || firstAttackFlag))
 	{
 		mouseLeftImg->Draw();
 	}
-	if (eAttackFlag && firstAvoidFlag)
+	if (enemyAttackFlag && firstAvoidFlag)
 	{
 		mouseRightImg->Draw();
 	}
@@ -432,6 +449,23 @@ void TutorialScene::CameraUpdate()
 		{
 			playerHp = 0;
 		}
+
+		//// 範囲は0.0f～1.0fにする
+		//easeTime = (std::min)((std::max)(easeTime, 0.0f), 1.0f);
+
+		//// ターゲットとプレイヤーの間をターゲットする
+		//if (targetFlag || playerAttackFlag)
+		//{
+		//	XMFLOAT3 cameratarget =  pPos * (1.0f - easeTime) + ((posSave + pPos) / 2) * easeTime;
+		//	camera->SetTarget(cameratarget);
+		//	easeTime += 0.05f;
+		//}
+		//else
+		//{
+		//	XMFLOAT3 cameratarget = pPos * (1.0f - easeTime) + ((posSave + pPos) / 2) * easeTime;
+		//	camera->SetTarget(cameratarget);
+		//	easeTime -= 0.05f;
+		//}
 	}
 
 	//カメラ更新
@@ -448,9 +482,9 @@ void TutorialScene::CollisionUpdate()
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
 		pPos = player->GetObj()->GetPosition();
-		eAlive = enemy->GetAlive();
+		enemyAlive = enemy->GetAlive();
 
-		if (eAlive)
+		if (enemyAlive)
 		{
 			if (!rushFlag && rope->GetrFlag())
 			{
@@ -524,7 +558,7 @@ void TutorialScene::CollisionUpdate()
 			bool getThrowFlag = rope->GetThrowFlag();
 			if (!getThrowFlag && !rFlag &&  enemy->Danger())
 			{
-				eAttackFlag = true;
+				enemyAttackFlag = true;
 			}
 
 			for (auto& object : jsonObject)
@@ -583,12 +617,15 @@ void TutorialScene::RopeUpdate()
 		if (minLength == minEnemyLength)
 		{
 			posSave = posEnemySave;
+			playerAttackFlag = true;
 		}
 		else
 		{
 			posSave = posPoleSave;
+			targetFlag = true;
 		}
 
+		// 障害物を検知したらターゲットしない
 		for (auto& object : jsonObject)
 		{
 			if (object->GetType() == box_ || object->GetType() == wall_ || object->GetType() == stage_)
@@ -603,18 +640,22 @@ void TutorialScene::RopeUpdate()
 				{
 					minLength = baseLength;
 					rope->SetThrowFlag(false);
+					targetFlag = false;
+					playerAttackFlag = false;
 					break;
 				}
 			}
 		}
 
-		// 周辺にあるポールには反応しない
+		// 過去にターゲットしたポールには反応しない
 		if (GetLength(posSave, oldPosSave) <= 0.0f && minLength == minPoleLength)
 		{
 			minLength = minEnemyLength;
 			posSave = posEnemySave;
+			targetFlag = false;
 		}
 
+		// ターゲットが距離内にいればターゲットエフェクトを発生させる
 		if (minLength < baseLength)
 		{
 			effectTarget->TargetEffect(
@@ -628,6 +669,8 @@ void TutorialScene::RopeUpdate()
 	else
 	{
 		rope->SetThrowFlag(false);
+		targetFlag = false;
+		playerAttackFlag = false;
 	}
 
 	if (GetLength(pPos, oldPosSave) > 30.0f)
@@ -638,9 +681,9 @@ void TutorialScene::RopeUpdate()
 	if (minLength < baseLength)
 	{
 		rope->Throw(pPos, posSave, minLength);
-		// ロープを飛ばした方向にプレイヤーも向く
+		// ターゲットしている方向にプレイヤーも向く
 		player->TrackRot(pPos, posSave);
-		targetFlag = true;
+		camera->SetTarget(posSave);
 	}
 	else
 	{
@@ -649,6 +692,7 @@ void TutorialScene::RopeUpdate()
 		player->GetObj()->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
 		rope->SetThrowFlag(false);
 		targetFlag = false;
+		playerAttackFlag = false;
 	}
 
 	posPoleSave = {};
