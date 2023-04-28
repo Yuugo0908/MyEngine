@@ -45,9 +45,11 @@ void Player::Update()
 
 	if (!throwFlag && !rFlag)
 	{
-
-		// 移動
+		// 斜め移動
 		rate = 1.0f;
+
+		// 移動値の範囲は0.0f～1.0fにする
+		pMove = (std::min)((std::max)(pMove, 0.0f), 1.0f);
 
 		// 移動量の倍数計算
 		if (controller->GetPadState(Controller::State::LEFT_L_STICK, Controller::Type::NONE) || controller->GetPadState(Controller::State::LEFT_R_STICK, Controller::Type::NONE))
@@ -68,9 +70,6 @@ void Player::Update()
 		// 正規化したカメラ距離に加速度、移動量、斜め移動時の補正をかける
 		cameraTrack.x = cameraTrack.x * pSpeed * pAcc * rate * pMove;
 		cameraTrack.z = cameraTrack.z * pSpeed * pAcc * rate * pMove;
-
-		// 移動値の範囲は0.0f～1.0fにする
-		pMove = (std::min)((std::max)(pMove, 0.0f), 1.0f);
 
 		// ジャンプ
 		Jump();
