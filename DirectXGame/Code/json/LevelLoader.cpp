@@ -115,5 +115,11 @@ void LevelLoader::Recursive(nlohmann::json& object, LevelData* levelData)
 			objectData.size.m128_f32[2] = (float)collider["size"][2];
 			objectData.size.m128_f32[3] = 0.0f;
 		}
+
+		// オブジェクトタイプの読み込み
+		if (object.contains("obj_type"))
+		{
+			objectData.objType = object["obj_type"];
+		}
 	}
 }

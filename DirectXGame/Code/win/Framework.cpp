@@ -25,12 +25,15 @@ void Framework::Initialize()
 	camera = Camera::GetInstance();
 	camera->Initialize(WinApp::window_width, WinApp::window_height);
 
+	// ポストエフェクト初期化
+	postEffect = new PostEffect;
+	postEffect->Initialize(dxCommon->GetDevice());
+
 	// 画像静的初期化
 	if (!Image2d::StaticInitialize(dxCommon->GetDevice()))
 	{
 		assert(0);
 	}
-
 	// 3Dオブジェクト静的初期化
 	if (!Object3d::StaticInitialize(dxCommon->GetDevice(), camera))
 	{
@@ -41,8 +44,6 @@ void Framework::Initialize()
 	{
 		assert(0);
 	}
-
-
 	// デバッグテキスト用テクスチャ読み込み
 	if (!Image2d::LoadTexture(debugTextNum, L"Resources/debugfont.png"))
 	{
@@ -59,6 +60,7 @@ void Framework::Finalize()
 	safe_delete(image2d);
 	safe_delete(light);
 	safe_delete(sceneFactory_);
+	safe_delete(postEffect);
 	firstBootFlag = false;
 
 	// ゲームウィンドウの破棄
@@ -93,8 +95,14 @@ void Framework::Update()
 
 void Framework::Draw()
 {
+	//postEffect->PreDraw(dxCommon->GetCommandList());
+	//// ゲームシーンの描画
+	//SceneManager::GetInstance()->Draw();
+	//postEffect->PostDraw(dxCommon->GetCommandList());
+
 	// 描画開始
 	dxCommon->PreDraw();
+	//postEffect->Draw(dxCommon->GetCommandList());
 	// ゲームシーンの描画
 	SceneManager::GetInstance()->Draw();
 	// 描画終了

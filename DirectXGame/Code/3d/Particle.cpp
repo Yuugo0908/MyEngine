@@ -10,6 +10,10 @@ using namespace DirectX;
 using namespace Microsoft::WRL;
 using namespace std;
 
+ID3D12GraphicsCommandList*  Particle::cmdList = nullptr;
+ComPtr<ID3D12RootSignature> Particle::rootsignature;
+ComPtr<ID3D12PipelineState> Particle::pipelinestate;
+
 Particle * Particle::Create(const wchar_t* fileName)
 {
 	// 3Dオブジェクトのインスタンスを生成
@@ -125,7 +129,29 @@ void Particle::Update()
 	}
 }
 
-void Particle::Draw(ID3D12GraphicsCommandList * cmdList)
+void Particle::PreDraw(ID3D12GraphicsCommandList* cmdList)
+{
+	// PreDrawとPostDrawがペアで呼ばれていなければエラー
+	assert(Particle::cmdList == nullptr);
+
+	// コマンドリストをセット
+	Particle::cmdList = cmdList;
+
+	// パイプラインステートの設定
+	cmdList->SetPipelineState(pipelinestate.Get());
+	// ルートシグネチャの設定
+	cmdList->SetGraphicsRootSignature(rootsignature.Get());
+	// プリミティブ形状を設定
+	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+void Particle::PostDraw()
+{
+	// コマンドリストを解除
+	Particle::cmdList = nullptr;
+}
+
+void Particle::Draw()
 {
 	UINT drawNum = (UINT)std::distance(particles.begin(), particles.end());
 	if (drawNum > vertexCount)
@@ -138,6 +164,8 @@ void Particle::Draw(ID3D12GraphicsCommandList * cmdList)
 	{
 		return;
 	}
+
+	Update();
 
 	// nullptrチェック
 	assert(cmdList);
@@ -237,6 +265,7 @@ void Particle::StageEffect(XMFLOAT3 setPos, float startScale, float endScale, XM
 
 void Particle::TargetEffect(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int& count)
 {
+	count++;
 	if (count >= 10)
 	{
 		// 追加

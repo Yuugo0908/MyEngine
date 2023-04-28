@@ -4,6 +4,7 @@
 #include "Keyboard.h"
 #include "Camera.h"
 #include "Object3d.h"
+#include "PostEffect.h"
 #include "SceneManager.h"
 #include "Controller.h"
 #include "Light.h"
@@ -46,6 +47,7 @@ protected: // ƒƒ“ƒo•Ï”
 	Audio* audio = nullptr;
 	Camera* camera = nullptr;
 	Image2d* image2d = nullptr;
+	PostEffect* postEffect = nullptr;
 	Light* light = nullptr;
 	SceneManager* sceneManager = nullptr;
 	AbstructSceneFactory* sceneFactory_ = nullptr;

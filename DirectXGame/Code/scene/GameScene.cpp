@@ -231,7 +231,7 @@ void GameScene::Draw()
 
 	for (auto& object : jsonObject)
 	{
-		if (object->GetType() == stage_)
+		if (object->GetType() == "stage")
 		{
 			object->Draw();
 		}
@@ -241,16 +241,26 @@ void GameScene::Draw()
 		}
 	}
 
-	// パーティクルの描画
-	effectBox->Draw(DirectXCommon::GetInstance()->GetCommandList());
-	effectCircle->Draw(DirectXCommon::GetInstance()->GetCommandList());
-	effectCircle2->Draw(DirectXCommon::GetInstance()->GetCommandList());
-	effectTarget->Draw(DirectXCommon::GetInstance()->GetCommandList());
-	effectAvoid->Draw(DirectXCommon::GetInstance()->GetCommandList());
-
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
 #pragma endregion 3Dオブジェクト描画
+
+#pragma region パーティクル描画
+
+	// パーティクル描画前処理
+	Particle::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
+
+	// パーティクルの描画
+	effectBox->Draw();
+	effectCircle->Draw();
+	effectCircle2->Draw();
+	effectTarget->Draw();
+	effectAvoid->Draw();
+
+	// パーティクル描画後処理
+	Particle::PostDraw();
+
+#pragma endregion パーティクル描画
 
 #pragma region 前景画像描画
 	// 前景画像描画前処理
@@ -431,7 +441,7 @@ void GameScene::CollisionUpdate()
 
 			for (auto& object : jsonObject)
 			{
-				if (object->GetType() == box_ || object->GetType() == wall_)
+				if (object->GetType() == "box" || object->GetType() == "wall")
 				{
 					object->Update();
 					XMFLOAT3 boxPos = object->GetPosition();
@@ -493,7 +503,7 @@ void GameScene::RopeUpdate()
 
 		for (auto& object : jsonObject)
 		{
-			if (object->GetType() == box_ || object->GetType() == wall_ || object->GetType() == stage_)
+			if (object->GetType() == "box" || object->GetType() == "wall" || object->GetType() == "stage")
 			{
 				XMFLOAT3 pos = object->GetPosition();
 				XMFLOAT3 scale = object->GetCollisionScale();
@@ -644,27 +654,8 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 		XMStoreFloat3(&colScale, objectData.size);
 		newObject->SetCollisionScale(colScale);
 
-		if (objectData.fileName == "stage")
-		{
-			newObject->SetType(stage_);
-		}
-		else if (objectData.fileName == "box")
-		{
-			newObject->SetType(box_);
-		}
-		else if (objectData.fileName == "wall")
-		{
-			newObject->SetType(wall_);
-		}
-		else if (objectData.fileName == "pole")
-		{
-			newObject->SetColor({ 1.0f, 0.1f, 0.1f, 1.0f });
-			newObject->SetType(pole_);
-		}
-		else if (objectData.fileName == "skydome")
-		{
-			newObject->SetType(skydome_);
-		}
+		// オブジェクトのタイプをセット
+		newObject->SetType(objectData.objType);
 
 		// 配列に登録
 		jsonObject.push_back(std::move(newObject));
@@ -688,7 +679,7 @@ void GameScene::jsonObjectUpdate()
 			object->SetDrawFlag(true);
 		}
 
-		if (object->GetType() == box_)
+		if (object->GetType() == "box")
 		{
 			XMFLOAT3 boxPos = object->GetPosition();
 			XMFLOAT3 boxScale = object->GetCollisionScale();
@@ -701,7 +692,7 @@ void GameScene::jsonObjectUpdate()
 			}
 		}
 
-		else if (object->GetType() == wall_)
+		else if (object->GetType() == "wall")
 		{
 			XMFLOAT3 wallPos = object->GetPosition();
 			XMFLOAT3 wallScale = object->GetCollisionScale();
@@ -714,7 +705,7 @@ void GameScene::jsonObjectUpdate()
 			}
 		}
 
-		else if (object->GetType() == stage_)
+		else if (object->GetType() == "stage")
 		{
 			bool reverseFlag = false;
 			XMFLOAT3 stagePos = object->GetPosition();
@@ -736,7 +727,7 @@ void GameScene::jsonObjectUpdate()
 			}
 		}
 
-		else if (object->GetType() == pole_)
+		else if (object->GetType() == "pole")
 		{
 			pPos = player->GetObj()->GetPosition();
 			XMFLOAT3 polePos = object->GetPosition();

@@ -81,11 +81,6 @@ private: // メンバ変数
 		title_, tutorial_, game_, clear_, failure_
 	};
 
-	enum ObjectType
-	{
-		sphere_, box_, stage_, wall_, pole_, skydome_,
-	};
-
 	enum Image2dNum
 	{
 		// 0番はデバッグテキストなので除外

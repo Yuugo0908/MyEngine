@@ -7,6 +7,7 @@
 #include "Image2d.h"
 #include "DebugText.h"
 #include "Object3d.h"
+#include "PostEffect.h"
 #include "Model.h"
 #include "Operator.h"
 #include "Camera.h"
@@ -79,11 +80,6 @@ private: // メンバ変数
 	enum Scene
 	{
 		title_, tutorial_, game_, clear_, failure_
-	};
-
-	enum ObjectType
-	{
-		sphere_, box_, stage_, wall_, pole_, skydome_,
 	};
 
 	enum Image2dNum
@@ -179,9 +175,10 @@ private: // メンバ変数
 	XMFLOAT3 posEnemySave = {};
 	float minEnemyLength = 15.0f;
 
-	// チュートリアル用フラグ
+	// チュートリアル用
 	bool firstAvoidFlag = true;
 	bool firstThrowFlag = true;
 	bool firstAttackFlag = false;
+	int imgShowCount = 0;
 };
 

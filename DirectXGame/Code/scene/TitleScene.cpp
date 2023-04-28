@@ -87,7 +87,6 @@ void TitleScene::Draw()
 	Image2d::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 
 	// ‘OŒi‰æ‘œ‚Ì•`‰æ
-
 	title->Draw();
 	fadeTex->Draw();
 

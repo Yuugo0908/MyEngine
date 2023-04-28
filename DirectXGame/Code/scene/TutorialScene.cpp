@@ -98,7 +98,7 @@ void TutorialScene::Initialize()
 	Object3d::SetLight(light);
 
 	//Bgm->PlayWave("Resources/BGM/bgm.wav", 255, 0.08f);
-	jsonObjectInit("Tutorial");
+	jsonObjectInit("tutorial");
 
 	// マウスカーソルを非表示
 	ShowCursor(false);
@@ -208,56 +208,110 @@ void TutorialScene::Update()
 		return;
 	}
 
+#pragma region チュートリアル
+	// 初めてポールにロープを飛ばす場合
 	if (targetFlag && firstThrowFlag && !avoidFlag)
 	{
 		if (controller->GetPadState(Controller::State::X, Controller::Type::TRIGGER) || mouse->TriggerMouseLeft())
 		{
-			fadeFlag = false;
-			alpha = 0.0f;
+			// ロープを発射させ、次のチュートリアルに進む
 			firstThrowFlag = false;
 			rope->SetThrowFlag(true);
+
+			// ステージオブジェクトの色を元に戻す
+			for (auto& object : jsonObject)
+			{
+				object->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+			}
 		}
 		else
 		{
-			fadeFlag = true;
-			alpha = 0.7f;
+			// ターゲットエフェクトの発生
+			effectTarget->TargetEffect(
+				posSave, 3.0f, 1.0f,
+				{ 1.0f, 0.0f, 0.0f, 1.0f },
+				{ 1.0f, 1.0f, 1.0f, 1.0f },
+				targetEffectCount
+			);
+
+
+			// ポール以外のステージオブジェクトの色を暗くする
+			for (auto& object : jsonObject)
+			{
+				if (object->GetType() != "pole")
+				{
+					object->SetColor({ 0.3f, 0.3f, 0.3f, 1.0f });
+				}
+				object->Update();
+			}
 			return;
 		}
 	}
+
+	// 初めて回避を使う場合
 	else if (enemyAttackFlag && firstAvoidFlag && !avoidFlag)
 	{
 		if (mouse->TriggerMouseRight() || controller->GetPadState(Controller::State::RT, Controller::Type::NONE))
 		{
-			fadeFlag = false;
-			alpha = 0.0f;
+			// 回避を発生させ、次のチュートリアルに進む
 			firstAvoidFlag = false;
 			firstAttackFlag = true;
 			player->SetAvoidFlag(true);
 			player->Avoid();
+
+			// ステージオブジェクトの色を元に戻す
+			for (auto& object : jsonObject)
+			{
+				object->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+			}
 		}
 		else
 		{
-			fadeFlag = true;
-			alpha = 0.7f;
+			// ステージオブジェクトの色を暗くする
+			for (auto& object : jsonObject)
+			{
+				object->SetColor({ 0.3f, 0.3f, 0.3f, 1.0f });
+				object->Update();
+			}
 			return;
 		}
 	}
+
+	// 初めて敵を攻撃する場合
 	else if (playerAttackFlag && firstAttackFlag && !avoidFlag)
 	{
 		if (controller->GetPadState(Controller::State::X, Controller::Type::TRIGGER) || mouse->TriggerMouseLeft())
 		{
-			fadeFlag = false;
-			alpha = 0.0f;
+			// ロープを発射させる(チュートリアルは終了)
 			firstAttackFlag = false;
 			rope->SetThrowFlag(true);
+
+			// ステージオブジェクトの色を元に戻す
+			for (auto& object : jsonObject)
+			{
+				object->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+			}
 		}
 		else
 		{
-			fadeFlag = true;
-			alpha = 0.7f;
+			// ターゲットエフェクトの発生
+			effectTarget->TargetEffect(
+				posSave, 3.0f, 1.0f,
+				{ 1.0f, 0.0f, 0.0f, 1.0f },
+				{ 1.0f, 1.0f, 1.0f, 1.0f },
+				targetEffectCount
+			);
+
+			// ステージオブジェクトの色を暗くする
+			for (auto& object : jsonObject)
+			{
+				object->SetColor({ 0.3f, 0.3f, 0.3f, 1.0f });
+				object->Update();
+			}
 			return;
 		}
 	}
+# pragma endregion チュートリアル
 
 	// プレイヤーの突進
 	player->Rush(catchPos, rushFlag, elapsedTime);
@@ -279,12 +333,6 @@ void TutorialScene::Update()
 	CameraUpdate();
 	// ロープの更新
 	RopeUpdate();
-
-	// エフェクトの更新
-	effectBox->Update();
-	effectCircle->Update();
-	effectCircle2->Update();
-	effectTarget->Update();
 
 	// フラグの取得
 	rFlag = rope->GetrFlag();
@@ -336,7 +384,7 @@ void TutorialScene::Draw()
 
 	for (auto& object : jsonObject)
 	{
-		if (object->GetType() == stage_)
+		if (object->GetType() == "stage")
 		{
 			object->Draw();
 		}
@@ -346,16 +394,26 @@ void TutorialScene::Draw()
 		}
 	}
 
-	// パーティクルの描画
-	effectBox->Draw(DirectXCommon::GetInstance()->GetCommandList());
-	effectCircle->Draw(DirectXCommon::GetInstance()->GetCommandList());
-	effectCircle2->Draw(DirectXCommon::GetInstance()->GetCommandList());
-	effectTarget->Draw(DirectXCommon::GetInstance()->GetCommandList());
-	effectAvoid->Draw(DirectXCommon::GetInstance()->GetCommandList());
-
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
 #pragma endregion 3Dオブジェクト描画
+
+#pragma region パーティクル描画
+
+	// パーティクル描画前処理
+	Particle::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
+
+	// パーティクルの描画
+	effectBox->Draw();
+	effectCircle->Draw();
+	effectCircle2->Draw();
+	effectTarget->Draw();
+	effectAvoid->Draw();
+
+	// パーティクル描画後処理
+	Particle::PostDraw();
+
+#pragma endregion パーティクル描画
 
 #pragma region 前景画像描画
 	// 前景画像描画前処理
@@ -376,11 +434,27 @@ void TutorialScene::Draw()
 
 	if ((playerAttackFlag || targetFlag) && (firstThrowFlag || firstAttackFlag))
 	{
-		mouseLeftImg->Draw();
+		imgShowCount++;
+		if (imgShowCount >= 30)
+		{
+			mouseLeftImg->Draw();
+			if (imgShowCount >= 60)
+			{
+				imgShowCount = 0;
+			}
+		}
 	}
 	if (enemyAttackFlag && firstAvoidFlag)
 	{
-		mouseRightImg->Draw();
+		imgShowCount++;
+		if (imgShowCount >= 30)
+		{
+			mouseRightImg->Draw();
+			if (imgShowCount >= 60)
+			{
+				imgShowCount = 0;
+			}
+		}
 	}
 
 	// デバッグテキストの描画
@@ -449,23 +523,6 @@ void TutorialScene::CameraUpdate()
 		{
 			playerHp = 0;
 		}
-
-		//// 範囲は0.0f～1.0fにする
-		//easeTime = (std::min)((std::max)(easeTime, 0.0f), 1.0f);
-
-		//// ターゲットとプレイヤーの間をターゲットする
-		//if (targetFlag || playerAttackFlag)
-		//{
-		//	XMFLOAT3 cameratarget =  pPos * (1.0f - easeTime) + ((posSave + pPos) / 2) * easeTime;
-		//	camera->SetTarget(cameratarget);
-		//	easeTime += 0.05f;
-		//}
-		//else
-		//{
-		//	XMFLOAT3 cameratarget = pPos * (1.0f - easeTime) + ((posSave + pPos) / 2) * easeTime;
-		//	camera->SetTarget(cameratarget);
-		//	easeTime -= 0.05f;
-		//}
 	}
 
 	//カメラ更新
@@ -563,7 +620,7 @@ void TutorialScene::CollisionUpdate()
 
 			for (auto& object : jsonObject)
 			{
-				if (object->GetType() == box_ || object->GetType() == wall_)
+				if (object->GetType() == "box" || object->GetType() == "wall")
 				{
 					object->Update();
 					XMFLOAT3 boxPos = object->GetPosition();
@@ -597,11 +654,6 @@ void TutorialScene::CollisionUpdate()
 
 void TutorialScene::RopeUpdate()
 {
-	if (targetEffectCount < 60)
-	{
-		targetEffectCount++;
-	}
-
 	// ポールと敵の距離を比較して短い方を代入
 	float minLength = (std::min)(minEnemyLength, minPoleLength);
 
@@ -628,7 +680,7 @@ void TutorialScene::RopeUpdate()
 		// 障害物を検知したらターゲットしない
 		for (auto& object : jsonObject)
 		{
-			if (object->GetType() == box_ || object->GetType() == wall_ || object->GetType() == stage_)
+			if (object->GetType() == "box" || object->GetType() == "wall" || object->GetType() == "stage")
 			{
 				XMFLOAT3 pos = object->GetPosition();
 				XMFLOAT3 scale = object->GetCollisionScale();
@@ -788,27 +840,8 @@ void TutorialScene::jsonObjectInit(const std::string sceneName)
 		XMStoreFloat3(&colScale, objectData.size);
 		newObject->SetCollisionScale(colScale);
 
-		if (objectData.fileName == "stage")
-		{
-			newObject->SetType(stage_);
-		}
-		else if (objectData.fileName == "box")
-		{
-			newObject->SetType(box_);
-		}
-		else if (objectData.fileName == "wall")
-		{
-			newObject->SetType(wall_);
-		}
-		else if (objectData.fileName == "pole")
-		{
-			newObject->SetColor({ 1.0f, 0.1f, 0.1f, 1.0f });
-			newObject->SetType(pole_);
-		}
-		else if (objectData.fileName == "skydome")
-		{
-			newObject->SetType(skydome_);
-		}
+		// オブジェクトのタイプをセット
+		newObject->SetType(objectData.objType);
 
 		// 配列に登録
 		jsonObject.push_back(std::move(newObject));
@@ -832,7 +865,7 @@ void TutorialScene::jsonObjectUpdate()
 			object->SetDrawFlag(true);
 		}
 
-		if (object->GetType() == box_)
+		if (object->GetType() == "box")
 		{
 			XMFLOAT3 boxPos = object->GetPosition();
 			XMFLOAT3 boxScale = object->GetCollisionScale();
@@ -845,7 +878,7 @@ void TutorialScene::jsonObjectUpdate()
 			}
 		}
 
-		else if (object->GetType() == wall_)
+		else if (object->GetType() == "wall")
 		{
 			XMFLOAT3 wallPos = object->GetPosition();
 			XMFLOAT3 wallScale = object->GetCollisionScale();
@@ -858,7 +891,7 @@ void TutorialScene::jsonObjectUpdate()
 			}
 		}
 
-		else if (object->GetType() == stage_)
+		else if (object->GetType() == "stage")
 		{
 			bool reverseFlag = false;
 			XMFLOAT3 stagePos = object->GetPosition();
@@ -880,7 +913,7 @@ void TutorialScene::jsonObjectUpdate()
 			}
 		}
 
-		else if (object->GetType() == pole_)
+		else if (object->GetType() == "pole")
 		{
 			pPos = player->GetObj()->GetPosition();
 			XMFLOAT3 polePos = object->GetPosition();

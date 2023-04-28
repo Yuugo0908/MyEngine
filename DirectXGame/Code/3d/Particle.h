@@ -80,6 +80,13 @@ public: // サブクラス
 private: // 定数
 	static const int vertexCount = 65536;		// 頂点数
 
+		// コマンドリスト
+	static ID3D12GraphicsCommandList* cmdList;
+		// ルートシグネチャ
+	static ComPtr<ID3D12RootSignature> rootsignature;
+	// パイプラインステートオブジェクト
+	static ComPtr<ID3D12PipelineState> pipelinestate;
+
 public: // 静的メンバ関数
 	/// <summary>
 	/// インスタンス生成
@@ -98,10 +105,15 @@ public: // メンバ関数
 	/// </summary>
 	void Update();
 
+	// 描画前処理
+	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
+	// 描画後処理
+	static void PostDraw();
+
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw(ID3D12GraphicsCommandList * cmdList);
+	void Draw();
 
 	/// <summary>
 	/// パーティクルの追加
@@ -151,10 +163,6 @@ private: // メンバ変数
 	ID3D12Device* device = nullptr;
 	// デスクリプタサイズ
 	UINT descriptorHandleIncrementSize = 0u;
-	// ルートシグネチャ
-	ComPtr<ID3D12RootSignature> rootsignature;
-	// パイプラインステートオブジェクト
-	ComPtr<ID3D12PipelineState> pipelinestate;
 	// デスクリプタヒープ
 	ComPtr<ID3D12DescriptorHeap> descHeap;
 	// 頂点バッファ
