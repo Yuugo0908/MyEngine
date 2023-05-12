@@ -33,14 +33,6 @@ void GameScene::Initialize()
 	PlayerHPGauge = Image2d::Create(HPGaugeNum, { 0.0f,45.0f });
 	PlayerHPGauge->SetSize({ 30.0f,60.0f });
 
-	if (!Image2d::LoadTexture(fadeNum, L"Resources/fade.png"))
-	{
-		assert(0);
-	}
-	fadeTex = Image2d::Create(fadeNum, { 0.0f,0.0f });
-	fadeTex->SetSize({ 1280.0f,720.0f });
-	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
-
 	// パーティクル生成
 	effectBox = Particle::Create(L"Resources/effectBox.png");
 	effectCircle = Particle::Create(L"Resources/effectCircle.png");
@@ -89,7 +81,6 @@ void GameScene::Finalize()
 	safe_delete(HPText);
 	safe_delete(PlayerHPBar);
 	safe_delete(PlayerHPGauge);
-	safe_delete(fadeTex);
 	safe_delete(effectBox);
 	safe_delete(effectCircle);
 	safe_delete(effectCircle2);
@@ -102,20 +93,30 @@ void GameScene::Update()
 	// マウスの移動範囲の制限
 	mouse->CursorLimit();
 
-	if (!fadeFlag && alpha > 0.0f)
+	// フェードアウト
+	if (!gameClearFlag && !gameOverFlag)
 	{
-		alpha -= 0.02f;
+		FadeScene::GetInstance()->FadeOut(1.0f);
 	}
 
-	if(gameClearFlag || gameOverFlag)
+	if (gameClearFlag)
 	{
-		alpha += 0.02f;
-		if (alpha >= 1.0f)
+		FadeScene::GetInstance()->FadeIn(0.0f);
+		bool fadeIn = FadeScene::GetInstance()->GetFadeInEnd();
+		if (fadeIn)
 		{
 			reset();
 		}
 	}
-	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
+	else if (gameOverFlag)
+	{
+		FadeScene::GetInstance()->FadeIn(-1.0f);
+		bool fadeIn = FadeScene::GetInstance()->GetFadeInEnd();
+		if (fadeIn)
+		{
+			reset();
+		}
+	}
 
 	// 敵をすべて倒せばクリア
 	if (enemyCount <= 0)
@@ -146,9 +147,7 @@ void GameScene::Update()
 			alpha = -1.0f;
 		}
 
-		// エフェクトの更新
-		effectBox->Update();
-		effectCircle2->Update();
+		// ゲームオーバーフラグ
 		fadeFlag = true;
 		gameOverFlag = true;
 		return;
@@ -174,12 +173,6 @@ void GameScene::Update()
 	CameraUpdate();
 	// ロープの更新
 	RopeUpdate();
-
-	// エフェクトの更新
-	effectBox->Update();
-	effectCircle->Update();
-	effectCircle2->Update();
-	effectTarget->Update();
 
 	// フラグの取得
 	rFlag = rope->GetrFlag();
@@ -257,6 +250,11 @@ void GameScene::Draw()
 	effectTarget->Draw();
 	effectAvoid->Draw();
 
+	for (std::unique_ptr<Enemy>& enemy : enemys)
+	{
+		enemy->reactionDraw();
+	}
+
 	// パーティクル描画後処理
 	Particle::PostDraw();
 
@@ -273,7 +271,7 @@ void GameScene::Draw()
 	PlayerHPGauge->SetSize({ playerHp,60 });
 	PlayerHPGauge->Draw();
 
-	fadeTex->Draw();
+	FadeScene::GetInstance()->Draw();
 
 	// デバッグテキストの描画
 	DebugText::GetInstance()->DrawAll(DirectXCommon::GetInstance()->GetCommandList());
@@ -286,6 +284,7 @@ void GameScene::reset()
 {
 	if (gameClearFlag)
 	{
+		// 1ステージ目をクリアしたら次のステージへ
 		if (stageClearCount == 0)
 		{
 			jsonObject.erase(jsonObject.begin(), jsonObject.end());
@@ -295,11 +294,13 @@ void GameScene::reset()
 			levelData = nullptr;
 			jsonObjectInit("stage2");
 		}
+		// すべてのステージをクリアしたらゲームクリア
 		else if (stageClearCount == 1)
 		{
 			SceneManager::GetInstance()->ChangeScene("GameClear");
 		}
 	}
+	// ゲームオーバーシーンに移行
 	else if (gameOverFlag)
 	{
 		SceneManager::GetInstance()->ChangeScene("GameOver");
@@ -475,11 +476,6 @@ void GameScene::CollisionUpdate()
 
 void GameScene::RopeUpdate()
 {
-	if (targetEffectCount < 60)
-	{
-		targetEffectCount++;
-	}
-
 	// ポールと敵の距離を比較して短い方を代入
 	float minLength = (std::min)(minEnemyLength, minPoleLength);
 
@@ -555,7 +551,7 @@ void GameScene::RopeUpdate()
 	}
 	else
 	{
-		float cameraRot = camera->CameraRot(pPos);
+		float cameraRot = camera->CameraAngle(pPos);
 		// カメラが向いている方向にプレイヤーも向く
 		player->GetObj()->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
 		rope->SetThrowFlag(false);

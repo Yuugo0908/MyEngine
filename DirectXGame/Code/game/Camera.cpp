@@ -32,6 +32,8 @@ bool Camera::Initialize(const int window_width, const int window_height)
 	// ビュープロジェクションの合成
 	matViewProjection = matView * matProjection;
 
+	saveEye = eye;
+
 	return true;
 }
 
@@ -339,7 +341,7 @@ XMFLOAT3 Camera::CameraTrack(XMFLOAT3 pPos)
 	return Track;
 }
 
-float Camera::CameraRot(XMFLOAT3 pPos)
+float Camera::CameraAngle(XMFLOAT3 pPos)
 {
 	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 0 };
 	XMVECTOR cameraPos = { eye.x, eye.y, eye.z, 0 };
@@ -349,6 +351,78 @@ float Camera::CameraRot(XMFLOAT3 pPos)
 	float angle = (float)atan2(subCameraPlayer.m128_f32[0], subCameraPlayer.m128_f32[2]);
 
 	return angle;
+}
+
+void Camera::CameraRotation()
+{
+	if (!rotationFlag)
+	{
+		eye = { 0, 10.0f, -100.0f };
+		target = { 0, 0, 0 };
+		saveEye = eye;
+		angleY = 0.0f;
+
+		// ビュー行列
+		matView = DirectX::XMMatrixIdentity();
+		// 射影行列
+		matProjection = DirectX::XMMatrixIdentity();
+		// ビュー射影行列
+		matViewProjection = DirectX::XMMatrixIdentity();
+		// 回転行列
+		matRot = DirectX::XMMatrixIdentity();
+
+		//ビュー行列の計算
+		UpdateViewMatrix();
+		// 射影行列の計算
+		UpdateProjectionMatrix();
+		// ビュープロジェクションの合成
+		matViewProjection = matView * matProjection;
+
+		rotationFlag = true;
+	}
+
+	angleY = 0.01f;
+	dirty = true;
+
+	if (dirty || viewDirty)
+	{
+		// 追加回転分の回転行列を生成
+		XMMATRIX matRotNew = XMMatrixIdentity();
+		matRotNew *= XMMatrixRotationY(angleY / 10.0f);
+		// 累積の回転行列を合成
+		matRot = matRotNew * matRot;
+
+		// 注視点から視点へのベクトルと、上方向ベクトル
+		vTargetEye = { saveEye.x, saveEye.y, saveEye.z, 1.0f };
+
+		// ベクトルを回転
+		vTargetEye = XMVector3Transform(vTargetEye, matRot);
+
+		// 注視点からずらした位置に視点座標を決定
+		const XMFLOAT3& target = GetTarget();
+		SetEye({ target.x + vTargetEye.m128_f32[0], target.y + vTargetEye.m128_f32[1], target.z + vTargetEye.m128_f32[2] });
+	}
+
+	if (viewDirty || projectionDirty)
+	{
+		// 再計算必要なら
+		if (viewDirty)
+		{
+			// ビュー行列更新
+			UpdateViewMatrix();
+			viewDirty = false;
+		}
+
+		// 再計算必要なら
+		if (projectionDirty)
+		{
+			// ビュー行列更新
+			UpdateProjectionMatrix();
+			projectionDirty = false;
+		}
+		// ビュープロジェクションの合成
+		matViewProjection = matView * matProjection;
+	}
 }
 
 void Camera::Reset()
@@ -366,6 +440,7 @@ void Camera::Reset()
 	shakeCount = 0;
 
 	dirty = false;
+	rotationFlag = false;
 	angleY = 0.0f;
 
 	// ビュー行列

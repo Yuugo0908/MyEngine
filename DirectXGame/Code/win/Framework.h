@@ -11,6 +11,7 @@
 #include "Mouse.h"
 #include "AbstructSceneFactory.h"
 #include "SafeDelete.h"
+#include "FadeScene.h"
 
 class Framework
 {

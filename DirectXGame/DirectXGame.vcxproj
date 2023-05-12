@@ -115,6 +115,7 @@
     <ClCompile Include="Code\postEffect\MultiRT.cpp" />
     <ClCompile Include="Code\postEffect\MultiTex.cpp" />
     <ClCompile Include="Code\postEffect\PostEffect.cpp" />
+    <ClCompile Include="Code\scene\FadeScene.cpp" />
     <ClCompile Include="Code\scene\GameClearScene.cpp" />
     <ClCompile Include="Code\scene\GameOverScene.cpp" />
     <ClCompile Include="Code\scene\GameScene.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="Code\postEffect\PostEffect.h" />
     <ClInclude Include="Code\scene\AbstructSceneFactory.h" />
     <ClInclude Include="Code\scene\BaseScene.h" />
+    <ClInclude Include="Code\scene\FadeScene.h" />
     <ClInclude Include="Code\scene\GameClearScene.h" />
     <ClInclude Include="Code\scene\GameOverScene.h" />
     <ClInclude Include="Code\scene\GameScene.h" />

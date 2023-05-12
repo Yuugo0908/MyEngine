@@ -38,18 +38,14 @@ void GameClearScene::Finalize()
 void GameClearScene::Update()
 {
 	ClipCursor(NULL);
-	if (fadeFlag == false && alpha > 0.0f)
+
+	FadeScene::GetInstance()->FadeOut(1.0f);
+
+	if (keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
 	{
-		alpha -= 0.02f;
+		FadeScene::GetInstance()->reset();
+		SceneManager::GetInstance()->ChangeScene("Title");
 	}
-	else
-	{
-		if (keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
-		{
-			SceneManager::GetInstance()->ChangeScene("Title");
-		}
-	}
-	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
 }
 
 void GameClearScene::Draw()
@@ -82,7 +78,7 @@ void GameClearScene::Draw()
 
 	// 前景画像の描画
 	GameClear->Draw();
-	fadeTex->Draw();
+	FadeScene::GetInstance()->Draw();
 
 	// デバッグテキストの描画
 	DebugText::GetInstance()->DrawAll(DirectXCommon::GetInstance()->GetCommandList());

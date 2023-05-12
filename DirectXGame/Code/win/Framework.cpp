@@ -50,6 +50,9 @@ void Framework::Initialize()
 		assert(0);
 	}
 
+	// フェードの初期化
+	FadeScene::GetInstance()->Initialize();
+
 	// デバッグテキスト初期化
 	DebugText::GetInstance()->Initialize(debugTextNum);
 }
@@ -89,20 +92,16 @@ void Framework::Update()
 	keyboard->Update();
 	controller->Update();
 	mouse->Update();
+	// フェードのアップデート
+	FadeScene::GetInstance()->Update();
 	// ゲームシーンの毎フレーム処理
 	SceneManager::GetInstance()->Update();
 }
 
 void Framework::Draw()
 {
-	//postEffect->PreDraw(dxCommon->GetCommandList());
-	//// ゲームシーンの描画
-	//SceneManager::GetInstance()->Draw();
-	//postEffect->PostDraw(dxCommon->GetCommandList());
-
 	// 描画開始
 	dxCommon->PreDraw();
-	//postEffect->Draw(dxCommon->GetCommandList());
 	// ゲームシーンの描画
 	SceneManager::GetInstance()->Draw();
 	// 描画終了

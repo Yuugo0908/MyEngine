@@ -198,11 +198,15 @@ void Player::Jump()
 	// ジャンプ
 	if (jumpFlag)
 	{
+		// 重力
 		pVel -= pGra;
+		// プレイヤー座標に加算
 		pPos.y += pVel;
+		// 慣性
 		pPos.x += inertiaSaveJump.x * 0.15f;
 		pPos.z += inertiaSaveJump.z * 0.15f;
 
+		// 着地したら無効化
 		if (onGround)
 		{
 			jumpFlag = false;
@@ -211,9 +215,10 @@ void Player::Jump()
 			inertiaSaveJump = {};
 		}
 	}
-	// 重力
+	// 重力(ジャンプしていない状態でも重力は働く)
 	else
 	{
+
 		pDown = -0.75f;
 		pPos.y += pDown;
 		if (onGround)

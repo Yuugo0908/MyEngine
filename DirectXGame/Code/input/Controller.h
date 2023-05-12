@@ -3,7 +3,6 @@
 #include <windows.h>
 #include <Xinput.h>
 
-
 class Controller
 {
 private:

@@ -71,13 +71,17 @@ public: // 静的メンバ関数
 	void CameraShake(bool& flag);
 	// カメラの追尾
 	XMFLOAT3 CameraTrack(XMFLOAT3 pPos);
-	float CameraRot(XMFLOAT3 pPos);
+	float CameraAngle(XMFLOAT3 pPos);
 	// 距離を求める
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
 		XMFLOAT3 len = { posA.x - posB.x, posA.y - posB.y, posA.z - posB.z };
 		return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
 	}
+
+	// カメラの回転
+	void CameraRotation();
+
 	// 変数のリセット
 	void Reset();
 private: // メンバ変数
@@ -101,6 +105,7 @@ private: // メンバ変数
 	bool dirty = false;
 	// 回転
 	float angleY = 0.0f;
+	bool rotationFlag = false;
 	// 感度
 	float mouseSensitivity = 0.01f;
 	float controllerSensitivity = 0.075f;
@@ -108,7 +113,7 @@ private: // メンバ変数
 	// 視点座標保存用
 	XMFLOAT3 saveEye = {};
 	// 視点座標
-	XMFLOAT3 eye = { 0, 5.0f, -15.0f };
+	XMFLOAT3 eye = { 0.0f, 10.0f, -100.0f };
 	// 視点のY座標の最小と最大
 	const float eyeMin = 0.0f;
 	const float eyeMax = 20.0f;

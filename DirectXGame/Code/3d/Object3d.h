@@ -85,10 +85,13 @@ public: // メンバ関数
 	const XMFLOAT3& GetPosition() { return position; }
 	// 座標の設定
 	void SetPosition(XMFLOAT3 position) { this->position = position; }
-	// モデルの設定
-	void SetModel(Model* model) { this->model = model; }
 	// 色の設定
 	void SetColor(XMFLOAT4 color) { this->color = color; }
+	// 色の設定
+	const XMFLOAT4& GetColor() { return color; }
+
+	// モデルの設定
+	void SetModel(Model* model) { this->model = model; }
 	// オブジェクトのタイプ設定
 	void SetType(std::string type) { this->type = type; }
 	// オブジェクトタイプの取得

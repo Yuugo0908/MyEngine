@@ -23,6 +23,7 @@
 #include "Particle.h"
 #include "BaseScene.h"
 #include "SafeDelete.h"
+#include "FadeScene.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -85,7 +86,7 @@ private: // メンバ変数
 	enum Image2dNum
 	{
 		// 0番はデバッグテキストなので除外
-		HPTextNum = 1, HPBarNum, HPGaugeNum, fadeNum, wasdNum, spaceNum, mouseNum, mouseLeftNum, mouseRightNum
+		HPTextNum = 1, HPBarNum, HPGaugeNum, wasdNum, spaceNum, mouseNum, mouseLeftNum, mouseRightNum
 	};
 
 	// レベルデータ
@@ -97,7 +98,6 @@ private: // メンバ変数
 	Image2d* HPText = nullptr;
 	Image2d* PlayerHPBar = nullptr;
 	Image2d* PlayerHPGauge = nullptr;
-	Image2d* fadeTex = nullptr;
 	Image2d* wasdKey = nullptr;
 	Image2d* spaceKey = nullptr;
 	Image2d* mouseImg = nullptr;

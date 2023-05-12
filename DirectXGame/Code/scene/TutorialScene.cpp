@@ -33,14 +33,6 @@ void TutorialScene::Initialize()
 	PlayerHPGauge = Image2d::Create(HPGaugeNum, { 0.0f,45.0f });
 	PlayerHPGauge->SetSize({ 30.0f,60.0f });
 
-	if (!Image2d::LoadTexture(fadeNum, L"Resources/fade.png"))
-	{
-		assert(0);
-	}
-	fadeTex = Image2d::Create(fadeNum, { 0.0f,0.0f });
-	fadeTex->SetSize({ 1280.0f,720.0f });
-	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
-
 	if (!Image2d::LoadTexture(wasdNum, L"Resources/wasdKey.png"))
 	{
 		assert(0);
@@ -127,7 +119,6 @@ void TutorialScene::Finalize()
 	safe_delete(HPText);
 	safe_delete(PlayerHPBar);
 	safe_delete(PlayerHPGauge);
-	safe_delete(fadeTex);
 	safe_delete(wasdKey);
 	safe_delete(spaceKey);
 	safe_delete(mouseImg);
@@ -145,23 +136,25 @@ void TutorialScene::Update()
 	// マウスの移動範囲の制限
 	mouse->CursorLimit();
 
-	if (!fadeFlag && alpha > 0.0f)
+	if (!gameClearFlag && !gameOverFlag)
 	{
-		alpha -= 0.02f;
+		FadeScene::GetInstance()->FadeOut(1.0f);
 	}
 
 	if(gameClearFlag)
 	{
-		alpha += 0.02f;
-		if (alpha >= 1.0f)
+		FadeScene::GetInstance()->FadeIn(0.0f);
+		bool fadeIn = FadeScene::GetInstance()->GetFadeInEnd();
+		if (fadeIn)
 		{
 			reset();
 		}
 	}
 	else if (gameOverFlag)
 	{
-		alpha += 0.02f;
-		if (alpha >= 1.0f)
+		FadeScene::GetInstance()->FadeIn(-1.0f);
+		bool fadeIn = FadeScene::GetInstance()->GetFadeInEnd();
+		if (fadeIn)
 		{
 			gameOverFlag = false;
 			fadeFlag = false;
@@ -169,7 +162,6 @@ void TutorialScene::Update()
 			player->ReSpawn();
 		}
 	}
-	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
 
 	// 敵をすべて倒せばクリア
 	if (enemyCount <= 0)
@@ -195,14 +187,11 @@ void TutorialScene::Update()
 				1.0f, 10.0f,
 				{ 0.0f, 0.0f, 1.0f, 1.0f },
 				{ 0.0f, 0.0f, 1.0f, 1.0f },
-				5, 10, false, false
+				5, 20, false, false
 			);
-			alpha = -1.0f;
 		}
 
-		// エフェクトの更新
-		effectBox->Update();
-		effectCircle2->Update();
+		// ゲームオーバーフラグ
 		fadeFlag = true;
 		gameOverFlag = true;
 		return;
@@ -348,7 +337,6 @@ void TutorialScene::Update()
 			1, 10, false, false
 		);
 	}
-	effectAvoid->Update();
 }
 
 void TutorialScene::Draw()
@@ -410,6 +398,11 @@ void TutorialScene::Draw()
 	effectTarget->Draw();
 	effectAvoid->Draw();
 
+	for (std::unique_ptr<Enemy>& enemy : enemys)
+	{
+		enemy->reactionDraw();
+	}
+
 	// パーティクル描画後処理
 	Particle::PostDraw();
 
@@ -430,7 +423,7 @@ void TutorialScene::Draw()
 	spaceKey->Draw();
 	mouseImg->Draw();
 
-	fadeTex->Draw();
+	FadeScene::GetInstance()->Draw();
 
 	if ((playerAttackFlag || targetFlag) && (firstThrowFlag || firstAttackFlag))
 	{
@@ -444,7 +437,7 @@ void TutorialScene::Draw()
 			}
 		}
 	}
-	if (enemyAttackFlag && firstAvoidFlag)
+	else if (enemyAttackFlag && firstAvoidFlag)
 	{
 		imgShowCount++;
 		if (imgShowCount >= 30)
@@ -466,6 +459,7 @@ void TutorialScene::Draw()
 
 void TutorialScene::reset()
 {
+	// ゲーム、ステージ1からスタート
 	if (gameClearFlag)
 	{
 		SceneManager::GetInstance()->ChangeScene("Game");
@@ -739,7 +733,7 @@ void TutorialScene::RopeUpdate()
 	}
 	else
 	{
-		float cameraRot = camera->CameraRot(pPos);
+		float cameraRot = camera->CameraAngle(pPos);
 		// カメラが向いている方向にプレイヤーも向く
 		player->GetObj()->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
 		rope->SetThrowFlag(false);

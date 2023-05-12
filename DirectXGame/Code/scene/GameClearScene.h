@@ -12,6 +12,7 @@
 #include "Audio.h"
 #include "Light.h"
 #include "BaseScene.h"
+#include "FadeScene.h"
 
 #include "SafeDelete.h"
 class GameClearScene : public BaseScene

@@ -10,6 +10,9 @@
 #include "Audio.h"
 #include "BaseScene.h"
 #include "SafeDelete.h"
+#include "Easing.h"
+#include "LevelLoader.h"
+#include "FadeScene.h"
 
 class TitleScene : public BaseScene
 {
@@ -23,6 +26,11 @@ public: // メンバ関数
 	// 描画
 	void Draw() override;
 
+	// jsonオブジェクトの初期化
+	void jsonObjectInit(const std::string sceneName);
+	// jsonオブジェクトの更新
+	void jsonObjectUpdate();
+
 private: // メンバ変数
 
 	Keyboard* keyboard = Keyboard::GetInstance();
@@ -31,19 +39,22 @@ private: // メンバ変数
 	Audio* audio = Audio::GetInstance();
 	Camera* camera = Camera::GetInstance();
 
+	Light* light = nullptr;
+
 	enum Image2dNum
 	{
-		titleNum = 1, backNum, fadeNum,
+		titleNum = 1, backNum
 	};
+
+	// レベルデータ
+	LevelData* levelData = nullptr;
+	// レベルデータで読み込んだオブジェクト
+	std::vector<std::unique_ptr<Object3d>> jsonObject{};
 
 	// 画像
 	Image2d* title = nullptr;
 	Image2d* backGround = nullptr;
-	Image2d* fadeTex = nullptr;
 
 	float alpha = 0.0f;
-	bool fadeIn = false;
-	bool expFlag = false;
-
-	bool tutorialFlag = false;
+	bool fadeFlag = false;
 };

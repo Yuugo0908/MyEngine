@@ -12,6 +12,7 @@
 #include "Light.h"
 #include "BaseScene.h"
 #include "SafeDelete.h"
+#include "FadeScene.h"
 
 class GameOverScene : public BaseScene
 {
@@ -34,15 +35,13 @@ private: // ƒƒ“ƒo•Ï”
 
 	enum Image2dNum
 	{
-		GameOverNum = 1, backNum, fadeNum,
+		GameOverNum = 1, backNum
 	};
 
 	// ‰æ‘œ
 	Image2d* GameOver = nullptr;
 	Image2d* backGround = nullptr;
-	Image2d* fadeTex = nullptr;
 
-	float alpha = 1.0f;
 	bool fadeFlag = false;
 	bool retryFlag = false;
 };

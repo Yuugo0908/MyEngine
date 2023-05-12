@@ -26,6 +26,9 @@ bool Enemy::Initialize(Player* player)
 	enemyObj->SetModel(enemyModel);
 	eAlive = false;
 
+	exclamation_mark = Particle::Create(L"Resources/exclamation_mark.png");
+	question_mark = Particle::Create(L"Resources/question_mark.png");
+
 	return true;
 }
 
@@ -99,13 +102,52 @@ void Enemy::Update()
 	switch (phase)
 	{
 	case Enemy::Phase::attack:
+		if (!visibleFlag)
+		{
+			exclamation_mark->CreateParticles(
+				{ ePos.x, ePos.y + 3.0f, ePos.z },
+				2.0f, 2.0f,
+				{ 1.0f, 1.0f, 1.0f, 1.0f },
+				{ 1.0f, 1.0f, 1.0f, 1.0f },
+				1, 60, false, false
+			);
+
+			visibleFlag = true;
+			invisibleFlag = false;
+		}
 		Attack();
 		break;
 	case Enemy::Phase::move:
+		if (!visibleFlag)
+		{
+			exclamation_mark->CreateParticles(
+				{ ePos.x, ePos.y + 3.0f, ePos.z },
+				2.0f, 2.0f,
+				{ 1.0f, 1.0f, 1.0f, 1.0f },
+				{ 1.0f, 1.0f, 1.0f, 1.0f },
+				1, 60, false, false
+			);
+
+			visibleFlag = true;
+			invisibleFlag = false;
+		}
 		Move();
 		break;
 	case Enemy::Phase::stay:
 	default:
+		if (!invisibleFlag)
+		{
+			question_mark->CreateParticles(
+				{ ePos.x, ePos.y + 3.0f, ePos.z },
+				2.0f, 2.0f,
+				{ 1.0f, 1.0f, 1.0f, 1.0f },
+				{ 1.0f, 1.0f, 1.0f, 1.0f },
+				1, 60, false, false
+			);
+
+			visibleFlag = false;
+			invisibleFlag = true;
+		}
 		Stay();
 	}
 
@@ -425,6 +467,12 @@ void Enemy::Draw()
 	{
 		bullet->Draw();
 	}
+}
+
+void Enemy::reactionDraw()
+{
+	exclamation_mark->Draw();
+	question_mark->Draw();
 }
 
 void Enemy::Finalize()

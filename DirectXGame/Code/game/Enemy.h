@@ -31,6 +31,8 @@ public:
 
 	void Draw();
 
+	void reactionDraw();
+
 	void Attack();
 
 	void Move();
@@ -79,6 +81,10 @@ private:
 	static Model* enemyModel;
 	std::unique_ptr<Object3d> enemyObj = nullptr;
 
+	// パーティクル
+	Particle* exclamation_mark = nullptr;
+	Particle* question_mark = nullptr;
+
 	// 弾複数生成用
 	static Model* bulletModel;
 	std::list<std::unique_ptr<Bullet>> bullets;
@@ -108,6 +114,9 @@ private:
 	bool jumpFlag = false;
 	bool onGround = false;
 	bool hitFlag = false;
+
+	bool visibleFlag = false;
+	bool invisibleFlag = true;
 
 	// プレイヤー
 	XMFLOAT3 pPos = {};

@@ -10,14 +10,6 @@ void GameOverScene::Initialize()
 	GameOver = Image2d::Create(GameOverNum, { 0.0f,0.0f });
 	GameOver->SetSize({ 1280.0f,720.0f });
 
-	if (!Image2d::LoadTexture(fadeNum, L"Resources/fade.png"))
-	{
-		assert(0);
-	}
-	fadeTex = Image2d::Create(fadeNum, { 0.0f,0.0f });
-	fadeTex->SetSize({ 1280.0f,720.0f });
-	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
-
 	if (!Image2d::LoadTexture(backNum, L"Resources/backGround.png"))
 	{
 		assert(0);
@@ -30,39 +22,36 @@ void GameOverScene::Initialize()
 void GameOverScene::Finalize()
 {
 	safe_delete(GameOver);
-	safe_delete(fadeTex);
 	safe_delete(backGround);
 }
 
 void GameOverScene::Update()
 {
 	ClipCursor(NULL);
-	if (fadeFlag == false && alpha > 0.0f)
+	if (!retryFlag)
 	{
-		alpha -= 0.02f;
+		FadeScene::GetInstance()->FadeOut(1.0f);
 	}
-	else
+
+	if (keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
 	{
-		if (keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
-		{
-			SceneManager::GetInstance()->ChangeScene("Title");
-		}
-		else if(keyboard->TriggerKey(DIK_R))
-		{
-			retryFlag = true;
-			fadeFlag = true;
-		}
+		FadeScene::GetInstance()->reset();
+		SceneManager::GetInstance()->ChangeScene("Title");
+	}
+	else if (keyboard->TriggerKey(DIK_R))
+	{
+		retryFlag = true;
 	}
 
 	if (retryFlag)
 	{
-		alpha += 0.02f;
-		if (alpha >= 1.0f)
+		FadeScene::GetInstance()->FadeIn(0.0f);
+		bool fadeIn = FadeScene::GetInstance()->GetFadeInEnd();
+		if (fadeIn)
 		{
 			SceneManager::GetInstance()->ChangeScene("Game");
 		}
 	}
-	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
 }
 
 void GameOverScene::Draw()
@@ -96,7 +85,7 @@ void GameOverScene::Draw()
 	// 前景画像の描画
 
 	GameOver->Draw();
-	fadeTex->Draw();
+	FadeScene::GetInstance()->Draw();
 
 	// デバッグテキストの描画
 	DebugText::GetInstance()->DrawAll(DirectXCommon::GetInstance()->GetCommandList());
