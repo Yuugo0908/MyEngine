@@ -34,10 +34,18 @@ bool Enemy::Initialize(Player* player)
 
 bool Enemy::BulletCreate()
 {
+	// 弾の生成カウント
+	if (attackCount <= 10)
+	{
+		attackCount++;
+		return false;
+	}
+
 	std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>();
 	newBullet->Initialize(bulletModel, pPos, ePos);
 	newBullet->SetPos(enemyObj->GetPosition());
 	bullets.push_back(std::move(newBullet));
+	attackCount = 0;
 	return true;
 }
 
@@ -45,21 +53,22 @@ void Enemy::Update()
 {
 	if (!eAlive)
 	{
-		Spawn();
 		eAlive = true;
 		phase = Enemy::Phase::stay;
+
+		ePos = enemyObj->GetPosition();
+		eOldPos = ePos;
+		eScale = { 0.8f, 0.8f, 0.8f };
+
+		enemyObj->SetPosition(ePos);
+		enemyObj->SetScale(eScale);
+		enemyObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+		enemyObj->Update();
 		return;
 	}
 
-	if (attackCount <= 30)
-	{
-		attackCount++;
-	}
-
-	if (ePos.y <= -30.0f)
-	{
-		Spawn();
-	}
+	// 敵が一定座標まで落下した場合、スポーン地点に戻る
+	ReSpawn();
 
 	eOldPos = enemyObj->GetPosition();
 	enemyObj->SetPosition(ePos);
@@ -72,25 +81,19 @@ void Enemy::Update()
 	{
 		bullet->Update();
 	}
-	Jump();
 
+	// 一定距離内なら近づいてくる
+	if (PElength <= 30.0f)
+	{
+		phase = Enemy::Phase::move;
+	}
+
+	// 攻撃範囲なら攻撃してくる
 	if (attackFlag)
 	{
-		if (PElength <= 20.0f)
+		if (PElength <= 15.0f)
 		{
-			phase = Enemy::Phase::move;
-		}
-		else
-		{
-			phase = Enemy::Phase::stay;
-		}
-
-		if (onGround)
-		{
-			if (PElength <= 15.0f)
-			{
-				phase = Enemy::Phase::attack;
-			}
+			phase = Enemy::Phase::attack;
 		}
 	}
 	else
@@ -98,11 +101,14 @@ void Enemy::Update()
 		phase = Enemy::Phase::stay;
 	}
 
-
 	switch (phase)
 	{
 	case Enemy::Phase::attack:
-		if (!visibleFlag)
+		if (visibleFlag)
+		{
+			Attack();
+		}
+		else
 		{
 			exclamation_mark->CreateParticles(
 				{ ePos.x, ePos.y + 3.0f, ePos.z },
@@ -114,11 +120,20 @@ void Enemy::Update()
 
 			visibleFlag = true;
 			invisibleFlag = false;
+
+			// ジャンプする
+			onGround = false;
+			jumpFlag = true;
+			// 上昇率の更新
+			eUp = 0.5f;
 		}
-		Attack();
 		break;
 	case Enemy::Phase::move:
-		if (!visibleFlag)
+		if (visibleFlag)
+		{
+			Move();
+		}
+		else
 		{
 			exclamation_mark->CreateParticles(
 				{ ePos.x, ePos.y + 3.0f, ePos.z },
@@ -130,8 +145,13 @@ void Enemy::Update()
 
 			visibleFlag = true;
 			invisibleFlag = false;
+
+			// ジャンプする
+			onGround = false;
+			jumpFlag = true;
+			// 上昇率の更新
+			eUp = 0.5f;
 		}
-		Move();
 		break;
 	case Enemy::Phase::stay:
 	default:
@@ -151,15 +171,15 @@ void Enemy::Update()
 		Stay();
 	}
 
+	Jump();
 	enemyObj->Update();
 }
 
 void Enemy::Attack()
 {
-	if (eAlive && attackCount >= 10)
+	if (eAlive)
 	{
 		BulletCreate();
-		attackCount = 0;
 	}
 	TrackRot(ePos, pPos);
 }
@@ -210,20 +230,6 @@ void Enemy::Jump()
 	}
 }
 
-void Enemy::Spawn()
-{
-	phase = Enemy::Phase::stay;
-
-	ePos = enemyObj->GetPosition();
-	eOldPos = ePos;
-	eScale = { 0.8f, 0.8f, 0.8f };
-
-	enemyObj->SetPosition(ePos);
-	enemyObj->SetScale(eScale);
-	enemyObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-	enemyObj->Update();
-}
-
 void Enemy::TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos)
 {
 	XMVECTOR sPos = { startPos.x, startPos.y, startPos.z, 0 };
@@ -236,6 +242,24 @@ void Enemy::TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos)
 	enemyObj->SetRotation({ 0, XMConvertToDegrees(angle), 0 });
 }
 
+void Enemy::ReSpawn()
+{
+	if (ePos.y <= limitPos)
+	{
+		eAlive = true;
+		phase = Enemy::Phase::stay;
+
+		ePos = spawnPos;
+		eOldPos = ePos;
+		eScale = { 0.8f, 0.8f, 0.8f };
+
+		enemyObj->SetPosition(ePos);
+		enemyObj->SetScale(eScale);
+		enemyObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+		enemyObj->Update();
+	}
+}
+
 void Enemy::Reset()
 {
 	eAlive = false;
@@ -246,7 +270,7 @@ bool Enemy::ObstacleDetection(XMFLOAT3 pPos, XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 {
 	float length = GetLength(pPos, ePos);
 
-	if (length < 15.0f)
+	if (length < 30.0f)
 	{
 		if (Collision::CollisionRayBox(pPos, ePos, boxPos, boxScale))
 		{
@@ -271,7 +295,6 @@ bool Enemy::EnemyCollision(const std::unique_ptr<Object3d>& object)
 	else
 	{
 		eAlive = false;
-		eAliveCount = 0;
 		bullets.erase(bullets.begin(), bullets.end());
 		return true;
 	}
@@ -281,13 +304,15 @@ bool Enemy::BulletCollision()
 {
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
+		// 敵から一定の距離離れたら消える
 		if (GetLength(ePos, bullet->GetPos()) >= 30.0f)
 		{
 			bullets.remove(bullet);
 			return false;
 		}
 
-		if (Collision::CollisionObject(bullet->GetObj(), player->GetObj()))
+		// 弾がプレイヤーに当たったら消える
+		else if (Collision::CollisionObject(bullet->GetObj(), player->GetObj()))
 		{
 			bullets.remove(bullet);
 			return true;

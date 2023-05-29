@@ -68,6 +68,7 @@ void GameClearScene::Draw()
 
 	// 3Dオブクジェクトの描画
 
+
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
 #pragma endregion 3Dオブジェクト描画
@@ -78,6 +79,8 @@ void GameClearScene::Draw()
 
 	// 前景画像の描画
 	GameClear->Draw();
+
+	// フェードの描画
 	FadeScene::GetInstance()->Draw();
 
 	// デバッグテキストの描画

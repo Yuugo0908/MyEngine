@@ -41,9 +41,9 @@ public:
 
 	void Jump();
 
-	void Spawn();
-
 	void TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos);
+
+	void ReSpawn();
 
 	void Reset();
 
@@ -68,6 +68,8 @@ public:
 	const bool& GetAttackFlag() { return attackFlag; }
 	// 着地
 	void SetOnGround(bool onGround) { this->onGround = onGround; }
+	// 出現座標の取得
+	void SetRespawnPos(XMFLOAT3 spawnPos) { this->spawnPos = spawnPos; }
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
@@ -95,7 +97,8 @@ private:
 	XMFLOAT3 eScale = {};
 	XMFLOAT3 eRot = {};
 	XMFLOAT3 spawnPos = {};
-	XMFLOAT3 randPos = {}; // ランダムなスポーン位置
+
+	const float limitPos = -30.0f;
 
 	Phase phase = Enemy::Phase::move;
 
@@ -105,10 +108,8 @@ private:
 	float PElength = 0.0f;
 	float lengthOld = 0.0f;
 
-	int eAliveCount = 0;
-	int attackCount = 0;
+	int attackCount = 10;
 
-	bool eFlag = false; // 自由落下のフラグ
 	bool eAlive = false;// 生きているかのフラグ
 	bool attackFlag = false;// 攻撃がプレイヤーに当たるかのフラグ
 	bool jumpFlag = false;

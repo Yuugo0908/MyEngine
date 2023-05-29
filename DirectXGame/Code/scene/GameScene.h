@@ -48,8 +48,8 @@ public: // メンバ関数
 	void LightUpdate();
 	// カメラの更新
 	void CameraUpdate();
-	// 当たり判定
-	void CollisionUpdate();
+	// 敵の更新
+	void EnemyUpdate();
 	// ロープの更新
 	void RopeUpdate();
 
@@ -124,7 +124,7 @@ private: // メンバ変数
 	XMFLOAT3 ePosOld = {};
 	XMFLOAT3 eScale = {};
 	int enemyCount = 0;
-	bool eAlive = false;
+	bool getEnemyAlive = false;
 
 	// ロープ
 	XMFLOAT3 catchPos = {};

@@ -43,6 +43,8 @@ void Player::Update()
 		playerObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	}
 
+	// プレイヤーがロープを飛ばしている
+	// もしくは、ロープが敵に接着していなければ移動操作ができる
 	if (!throwFlag && !rFlag)
 	{
 		// 斜め移動

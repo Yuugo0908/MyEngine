@@ -83,8 +83,9 @@ void GameOverScene::Draw()
 	Image2d::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 
 	// 前景画像の描画
-
 	GameOver->Draw();
+
+	// フェードの描画
 	FadeScene::GetInstance()->Draw();
 
 	// デバッグテキストの描画

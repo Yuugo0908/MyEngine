@@ -29,6 +29,7 @@
 #include <time.h>
 #include <list>
 
+
 class TutorialScene : public BaseScene
 {
 public: // メンバ関数
@@ -49,8 +50,8 @@ public: // メンバ関数
 	void LightUpdate();
 	// カメラの更新
 	void CameraUpdate();
-	// 当たり判定
-	void CollisionUpdate();
+	// 敵の更新
+	void EnemyUpdate();
 	// ロープの更新
 	void RopeUpdate();
 
@@ -89,6 +90,11 @@ private: // メンバ変数
 		HPTextNum = 1, HPBarNum, HPGaugeNum, wasdNum, spaceNum, mouseNum, mouseLeftNum, mouseRightNum
 	};
 
+	enum TutorialState
+	{
+		None, ropeThrow, Avoid, Attack
+	};
+
 	// レベルデータ
 	LevelData* levelData = nullptr;
 	// レベルデータで読み込んだオブジェクト
@@ -123,13 +129,11 @@ private: // メンバ変数
 	bool onGround = false;//自由落下のフラグ
 	bool moveFlag = false;//移動管理フラグ
 	bool avoidFlag = false;//回避管理フラグ
-	bool playerAttackFlag = false;
 	float playerHp = 360;
 
 	// エネミー
 	int enemyCount = 0;
-	bool enemyAlive = false;
-	bool enemyAttackFlag = false;
+	bool getEnemyAlive = false;
 	XMFLOAT3 ePos = {};
 	XMFLOAT3 ePosOld = {};
 	XMFLOAT3 eScale = {};
@@ -160,25 +164,25 @@ private: // メンバ変数
 	int vSpeedR = 0;
 
 	// ターゲット座標保存用
-	XMFLOAT3 posSave = {};
+	XMFLOAT3 targetPos= {};
 	// 過去にターゲットしたオブジェクトの座標
-	XMFLOAT3 oldPosSave = { 1000.0f, 1000.0f, 1000.0f };
+	XMFLOAT3 oldTargetPos = { 1000.0f, 1000.0f, 1000.0f };
 	// ターゲットする距離の基準
 	const float baseLength = 15.0f;
-	bool targetFlag = false;
 
 	// ポールの座標と距離
-	XMFLOAT3 posPoleSave = {};
+	XMFLOAT3 targetPolePos = {};
 	float minPoleLength = 15.0f;
 
 	// エネミーの座標と距離
-	XMFLOAT3 posEnemySave = {};
+	XMFLOAT3 targetEnemyPos = {};
 	float minEnemyLength = 15.0f;
 
 	// チュートリアル用
-	bool firstAvoidFlag = true;
-	bool firstThrowFlag = true;
-	bool firstAttackFlag = false;
+	TutorialState tutorialState = ropeThrow;
+	bool playerAttackFlag = false;
+	bool enemyAttackFlag = false;
+	bool throwFlag = false;
 	int imgShowCount = 0;
 };
 

@@ -12,14 +12,6 @@ void TitleScene::Initialize() {
 	title = Image2d::Create(titleNum, { 0.0f,0.0f });
 	title->SetSize({ 1280.0f,720.0f });
 
-	if (!Image2d::LoadTexture(backNum, L"Resources/backGround.png"))
-	{
-		assert(0);
-	}
-	backGround = Image2d::Create(backNum, { 0.0f,0.0f });
-	backGround->SetSize({ 1280.0f,720.0f });
-	backGround->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-
 	// ライトの生成
 	light = Light::Create();
 	// ライトの色を設定
@@ -34,7 +26,6 @@ void TitleScene::Initialize() {
 void TitleScene::Finalize()
 {
 	safe_delete(title);
-	safe_delete(backGround);
 }
 
 void TitleScene::Update()
@@ -55,6 +46,7 @@ void TitleScene::Update()
 	{
 		SceneManager::GetInstance()->ChangeScene("Tutorial");
 	}
+
 	jsonObjectUpdate();
 }
 
@@ -63,8 +55,6 @@ void TitleScene::Draw()
 #pragma region 背景画像描画
 	// 背景画像描画前処理
 	Image2d::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
-
-	//backGround->Draw();
 
 	// 画像描画後処理
 	Image2d::PostDraw();

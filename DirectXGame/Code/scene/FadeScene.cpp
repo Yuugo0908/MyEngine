@@ -21,24 +21,9 @@ void FadeScene::Initialize()
 	{
 		assert(0);
 	}
-	fadeTex = Image2d::Create(fadeNum, { 0.0f,0.0f });
-	fadeTex->SetSize({ 1280.0f,720.0f });
-	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
-
-	// ライトの生成
-	light = Light::Create();
-	// ライトの色を設定
-	light->SetLightColor({ 1.0f, 1.0f, 1.0f });
-	// 3Dオブジェクトにライトをセット
-	Object3d::SetLight(light);
-
-	jsonObjectInit("fade");
-}
-
-void FadeScene::Finalize()
-{
-	safe_delete(light);
-	safe_delete(fadeTex);
+	fade = Image2d::Create(fadeNum, { 0.0f,0.0f });
+	fade->SetSize({ 1280.0f,720.0f });
+	fade->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 }
 
 void FadeScene::Update()
@@ -79,57 +64,17 @@ void FadeScene::Update()
 		break;
 	}
 
-	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
+	fade->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
 }
 
 void FadeScene::Draw()
 {
-	fadeTex->Draw();
+	fade->Draw();
 }
 
-void FadeScene::jsonObjectInit(const std::string sceneName)
+void FadeScene::reset()
 {
-	// レベルデータの読み込み
-	levelData = LevelLoader::LoadFile(sceneName);
-
-	// レベルデータからオブジェクトを生成、配置
-	for (LevelData::ObjectData& objectData : levelData->objects)
-	{
-
-		// 3Dオブジェクトを生成
-		std::unique_ptr<Object3d> newObject = Object3d::Create();
-
-		// ファイル名から登録済みモデルを検索
-		Model* model = nullptr;
-		decltype(levelData->models)::iterator it = levelData->models.find(objectData.fileName);
-		if (it != levelData->models.end())
-		{
-			model = it->second;
-		}
-
-		newObject->SetModel(model);
-
-		// 座標
-		XMFLOAT3 pos;
-		XMStoreFloat3(&pos, objectData.trans);
-		newObject->SetPosition(pos);
-
-		// 回転角
-		XMFLOAT3 rot;
-		XMStoreFloat3(&rot, objectData.rot);
-		newObject->SetRotation(rot);
-
-		// 大きさ
-		XMFLOAT3 scale;
-		XMStoreFloat3(&scale, objectData.scale);
-		newObject->SetScale(scale);
-
-		// オブジェクトのタイプをセット
-		newObject->SetType(objectData.objType);
-
-		// 配列に登録
-		jsonObject.push_back(std::move(newObject));
-	}
+	fadeState = None;
 }
 
 void FadeScene::FadeIn(float alpha)
@@ -154,9 +99,4 @@ void FadeScene::FadeOut(float alpha)
 		// フェードアウト開始
 		fadeState = FadeOutPlay;
 	}
-}
-
-void FadeScene::reset()
-{
-	fadeState = None;
 }

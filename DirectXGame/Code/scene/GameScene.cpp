@@ -93,7 +93,7 @@ void GameScene::Update()
 	// マウスの移動範囲の制限
 	mouse->CursorLimit();
 
-	// フェードアウト
+#pragma region フェードアウト
 	if (!gameClearFlag && !gameOverFlag)
 	{
 		FadeScene::GetInstance()->FadeOut(1.0f);
@@ -117,6 +117,7 @@ void GameScene::Update()
 			reset();
 		}
 	}
+#pragma endregion
 
 	// 敵をすべて倒せばクリア
 	if (enemyCount <= 0)
@@ -166,7 +167,7 @@ void GameScene::Update()
 	// jsonファイルから読み込んだオブジェクトの更新
 	jsonObjectUpdate();
 	// 当たり判定の更新
-	CollisionUpdate();
+	EnemyUpdate();
 	// ライトの更新
 	LightUpdate();
 	// カメラの更新
@@ -193,7 +194,7 @@ void GameScene::Update()
 
 void GameScene::Draw()
 {
-	//SetImgui();
+	SetImgui();
 
 #pragma region 背景画像描画
 	// 背景画像描画前処理
@@ -271,6 +272,7 @@ void GameScene::Draw()
 	PlayerHPGauge->SetSize({ playerHp,60 });
 	PlayerHPGauge->Draw();
 
+	// フェードの描画
 	FadeScene::GetInstance()->Draw();
 
 	// デバッグテキストの描画
@@ -362,55 +364,76 @@ void GameScene::CameraUpdate()
 	camera->Update();
 }
 
-void GameScene::CollisionUpdate()
+void GameScene::EnemyUpdate()
 {
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
 		pPos = player->GetObj()->GetPosition();
-		eAlive = enemy->GetAlive();
+		getEnemyAlive = enemy->GetAlive();
 
-		if (eAlive)
+		if (!getEnemyAlive)
 		{
-			if (!rushFlag && rope->GetrFlag())
-			{
-				rushFlag = true;
-				catchPos = posSave;
-			}
+			enemy->Update();
+			continue;
+		}
 
-			if (rFlag && enemy->EnemyCollision(player->GetObj()))
+		if (!rushFlag && rope->GetrFlag())
+		{
+			rushFlag = true;
+			catchPos = posSave;
+		}
+
+		if (rFlag && enemy->EnemyCollision(player->GetObj()))
+		{
+			// カメラシェイクの発生
+			shakeFlag = true;
+
+			// パーティクル生成
+			effectBox->CreateParticles(
+				enemy->GetObj()->GetPosition(),
+				2.0f, 5.0f,
+				{ 1.0f, 0.0f, 0.0f, 1.0f },
+				{ 0.0f, 1.0f, 0.0f, 1.0f },
+				5, 60, true, true
+			);
+			effectCircle2->CreateParticles(
+				enemy->GetObj()->GetPosition(),
+				1.0f, 10.0f,
+				{ 1.0f, 0.0f, 0.0f, 1.0f },
+				{ 1.0f, 0.0f, 0.0f, 1.0f },
+				5, 10, false, false
+			);
+
+			rope->SetrFlag(false);
+			rushFlag = false;
+			catchPos = {};
+			elapsedTime = 0.0f;
+			enemyCount--;
+			controller->Vibration();
+			enemys.remove(enemy);
+			break;
+		}
+		else if (!rFlag && player->Damage(enemy->GetObj()))
+		{
+			shakeFlag = true;
+			playerHp -= 18;
+
+			// パーティクル生成
+			effectCircle->CreateParticles(
+				player->GetObj()->GetPosition(),
+				1.0f, 2.0f,
+				{ 0.0f, 1.0f, 0.0f, 1.0f },
+				{ 1.0f, 0.0f, 0.0f, 1.0f },
+				3, 60, true, true
+			);
+		}
+
+		if (!avoidFlag && enemy->BulletCollision())
+		{
+			if (!rFlag)
 			{
-				// カメラシェイクの発生
 				shakeFlag = true;
-
-				// パーティクル生成
-				effectBox->CreateParticles(
-					enemy->GetObj()->GetPosition(),
-					2.0f, 5.0f,
-					{ 1.0f, 0.0f, 0.0f, 1.0f },
-					{ 0.0f, 1.0f, 0.0f, 1.0f },
-					5, 60, true, true
-				);
-				effectCircle2->CreateParticles(
-					enemy->GetObj()->GetPosition(),
-					1.0f, 10.0f,
-					{ 1.0f, 0.0f, 0.0f, 1.0f },
-					{ 1.0f, 0.0f, 0.0f, 1.0f },
-					5, 10, false, false
-				);
-
-				rope->SetrFlag(false);
-				rushFlag = false;
-				catchPos = {};
-				elapsedTime = 0.0f;
-				enemyCount--;
-				controller->Vibration();
-				enemys.remove(enemy);
-				break;
-			}
-			else if (!rFlag && player->Damage(enemy->GetObj()))
-			{
-				shakeFlag = true;
-				playerHp -= 36;
+				playerHp -= 18;
 
 				// パーティクル生成
 				effectCircle->CreateParticles(
@@ -421,51 +444,33 @@ void GameScene::CollisionUpdate()
 					3, 60, true, true
 				);
 			}
+		}
 
-			if (!avoidFlag && enemy->BulletCollision())
+		for (auto& object : jsonObject)
+		{
+			if (object->GetType() == "box" || object->GetType() == "wall")
 			{
-				if (!rFlag)
+				object->Update();
+				XMFLOAT3 boxPos = object->GetPosition();
+				XMFLOAT3 boxScale = object->GetCollisionScale();
+
+				// 障害物を検知していたら攻撃してこない
+				if (enemy->ObstacleDetection(pPos, boxPos, boxScale))
 				{
-					shakeFlag = true;
-					playerHp -= 36;
-					
-					// パーティクル生成
-					effectCircle->CreateParticles(
-						player->GetObj()->GetPosition(),
-						1.0f, 2.0f,
-						{ 0.0f, 1.0f, 0.0f, 1.0f },
-						{ 1.0f, 0.0f, 0.0f, 1.0f },
-						3, 60, true, true
-					);
+					break;
 				}
-			}
-
-			for (auto& object : jsonObject)
-			{
-				if (object->GetType() == "box" || object->GetType() == "wall")
+				else
 				{
-					object->Update();
-					XMFLOAT3 boxPos = object->GetPosition();
-					XMFLOAT3 boxScale = object->GetCollisionScale();
+					// プレイヤーと敵の座標と距離を取得
+					pPos = player->GetObj()->GetPosition();
+					ePos = enemy->GetObj()->GetPosition();
+					float length = GetLength(pPos, ePos);
 
-					// 障害物を検知していたら攻撃してこない
-					if (enemy->ObstacleDetection(pPos, boxPos, boxScale))
+					// ロープが届く距離にいた場合、その敵の座標と距離を保存
+					if (length < minEnemyLength)
 					{
-						break;
-					}
-					else
-					{
-						// プレイヤーと敵の座標と距離を取得
-						pPos = player->GetObj()->GetPosition();
-						ePos = enemy->GetObj()->GetPosition();
-						float length = GetLength(pPos, ePos);
-
-						// ロープが届く距離にいた場合、その敵の座標と距離を保存
-						if (length < minEnemyLength)
-						{
-							posEnemySave = ePos;
-							minEnemyLength = length;
-						}
+						posEnemySave = ePos;
+						minEnemyLength = length;
 					}
 				}
 			}
@@ -612,6 +617,7 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 			newEnemy->GetObj()->SetPosition(pos);
 			newEnemy->GetObj()->SetScale(scale);
 			newEnemy->GetObj()->SetCollisionScale(size);
+			newEnemy->SetRespawnPos(pos);
 			enemys.push_back(std::move(newEnemy));
 			enemyCount++;
 			continue;

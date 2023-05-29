@@ -5,7 +5,6 @@
 #include "BaseScene.h"
 #include "SafeDelete.h"
 #include "Easing.h"
-#include "LevelLoader.h"
 
 enum FadeState
 {
@@ -36,16 +35,10 @@ public: // 静的メンバ関数
 public: // メンバ関数
 	// 初期化
 	void Initialize();
-	// 終了
-	void Finalize();
 	// 毎フレーム処理
 	void Update();
 	// 描画
 	void Draw();
-
-	// jsonオブジェクトの初期化
-	void jsonObjectInit(const std::string sceneName);
-
 	// フェードイン
 	void FadeIn(float alpha);
 	// フェードアウト
@@ -58,26 +51,14 @@ public: // メンバ関数
 	const bool& GetFadeOutEnd() { return fadeOutEnd; }
 
 private: // メンバ変数
-
-	Camera* camera = Camera::GetInstance();
-	Light* light = nullptr;
-
-	// レベルデータ
-	LevelData* levelData = nullptr;
-	// レベルデータで読み込んだオブジェクト
-	std::vector<std::unique_ptr<Object3d>> jsonObject{};
-
-	enum Image2dNum
-	{
-		fadeNum = 10,
-	};
+	Image2d* fade = nullptr;
+	std::vector<Image2d*> fades;
 
 	FadeState fadeState;
-	Image2d* fadeTex = nullptr;
 
 	float alpha = 0.0f;
-
 	bool fadeInEnd = false;
 	bool fadeOutEnd = false;
+	int fadeNum = 10;
 };
 
