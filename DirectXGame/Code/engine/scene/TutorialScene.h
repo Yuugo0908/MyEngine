@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 #include "DirectXCommon.h"
 #include "Keyboard.h"
@@ -7,6 +7,7 @@
 #include "Image2d.h"
 #include "DebugText.h"
 #include "Object3d.h"
+#include "PostEffect.h"
 #include "Model.h"
 #include "Operator.h"
 #include "Camera.h"
@@ -28,34 +29,35 @@
 #include <time.h>
 #include <list>
 
-class GameScene : public BaseScene
+
+class TutorialScene : public BaseScene
 {
-public: // ãƒ¡ãƒ³ãƒé–¢æ•°
-	// åˆæœŸåŒ–
+public: // ƒƒ“ƒoŠÖ”
+	// ‰Šú‰»
 	void Initialize() override;
-	// çµ‚äº†
+	// I—¹
 	void Finalize() override;
-	// æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å‡¦ç†
+	// –ˆƒtƒŒ[ƒ€ˆ—
 	void Update() override;
-	// æç”»
+	// •`‰æ
 	void Draw() override;
 
-	//posåˆæœŸåŒ–
-	void reset();
-	// Imguiã®è¨­å®š
+	//pos‰Šú‰»
+	void Reset();
+	// Imgui‚Ìİ’è
 	void SetImgui();
-	// ãƒ©ã‚¤ãƒˆã®æ›´æ–°
+	// ƒ‰ƒCƒg‚ÌXV
 	void LightUpdate();
-	// ã‚«ãƒ¡ãƒ©ã®æ›´æ–°
+	// ƒJƒƒ‰‚ÌXV
 	void CameraUpdate();
-	// æ•µã®æ›´æ–°
+	// “G‚ÌXV
 	void EnemyUpdate();
-	// ãƒ­ãƒ¼ãƒ—ã®æ›´æ–°
+	// ƒ[ƒv‚ÌXV
 	void RopeUpdate();
 
-	// jsonã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®åˆæœŸåŒ–
+	// jsonƒIƒuƒWƒFƒNƒg‚Ì‰Šú‰»
 	void jsonObjectInit(const std::string sceneName);
-	// jsonã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æ›´æ–°
+	// jsonƒIƒuƒWƒFƒNƒg‚ÌXV
 	void jsonObjectUpdate();
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
@@ -64,17 +66,17 @@ public: // ãƒ¡ãƒ³ãƒé–¢æ•°
 		return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
 	}
 
-private: // ãƒ¡ãƒ³ãƒå¤‰æ•°
+private: // ƒƒ“ƒo•Ï”
 	Keyboard* keyboard = Keyboard::GetInstance();
 	Controller* controller = Controller::GetInstance();
 	Mouse* mouse = Mouse::GetInstance();
 	Camera* camera = Camera::GetInstance();
 	Light* light = nullptr;
-
 	Rope* rope = nullptr;
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
-	// æ•µã®è¤‡æ•°ç”Ÿæˆç”¨ãƒªã‚¹ãƒˆ
+
+	// “G‚Ì•¡”¶¬—pƒŠƒXƒg
 	std::list<std::unique_ptr<Enemy>> enemys;
 
 	enum Scene
@@ -84,25 +86,35 @@ private: // ãƒ¡ãƒ³ãƒå¤‰æ•°
 
 	enum Image2dNum
 	{
-		// 0ç•ªã¯ãƒ‡ãƒãƒƒã‚°ãƒ†ã‚­ã‚¹ãƒˆãªã®ã§é™¤å¤–
-		HPTextNum = 1, HPBarNum, HPGaugeNum,
+		// 0”Ô‚ÍƒfƒoƒbƒOƒeƒLƒXƒg‚È‚Ì‚ÅœŠO
+		HPTextNum = 1, HPBarNum, HPGaugeNum, wasdNum, spaceNum, mouseNum, mouseLeftNum, mouseRightNum
 	};
 
-	// ãƒ¬ãƒ™ãƒ«ãƒ‡ãƒ¼ã‚¿
+	enum TutorialState
+	{
+		None, ropeThrow, Avoid, Attack
+	};
+
+	// ƒŒƒxƒ‹ƒf[ƒ^
 	LevelData* levelData = nullptr;
-	// ãƒ¬ãƒ™ãƒ«ãƒ‡ãƒ¼ã‚¿ã§èª­ã¿è¾¼ã‚“ã ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+	// ƒŒƒxƒ‹ƒf[ƒ^‚Å“Ç‚İ‚ñ‚¾ƒIƒuƒWƒFƒNƒg
 	std::vector<std::unique_ptr<Object3d>> jsonObject{};
 
-	// ç”»åƒ
+	// ‰æ‘œ
 	Image2d* HPText = nullptr;
 	Image2d* PlayerHPBar = nullptr;
 	Image2d* PlayerHPGauge = nullptr;
+	Image2d* wasdKey = nullptr;
+	Image2d* spaceKey = nullptr;
+	Image2d* mouseImg = nullptr;
+	Image2d* mouseLeftImg = nullptr;
+	Image2d* mouseRightImg = nullptr;
 	float alpha = 1.0f;
 
-	// éŸ³å£°
+	// ‰¹º
 	Audio* Bgm = Audio::GetInstance();
 
-	// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«
+	// ƒp[ƒeƒBƒNƒ‹
 	Particle* effectBox = nullptr;
 	Particle* effectCircle = nullptr;
 	Particle* effectCircle2 = nullptr;
@@ -110,60 +122,63 @@ private: // ãƒ¡ãƒ³ãƒå¤‰æ•°
 	Particle* effectAvoid = nullptr;
 	int targetEffectCount = 0;
 
-	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
-	XMFLOAT3 pPos = {};//åº§æ¨™
+	// ƒvƒŒƒCƒ„[
+	XMFLOAT3 pPos = {};//À•W
 	XMFLOAT3 pPosOld = {};
 	XMFLOAT3 pScale = {};
-	bool onGround = false;//è‡ªç”±è½ä¸‹ã®ãƒ•ãƒ©ã‚°
-	bool moveFlag = false;//ç§»å‹•ç®¡ç†ãƒ•ãƒ©ã‚°
-	bool avoidFlag = false;//å›é¿ç®¡ç†ãƒ•ãƒ©ã‚°
+	bool avoidFlag = false;//‰ñ”ğŠÇ—ƒtƒ‰ƒO
 	float playerHp = 360;
 
-	// ã‚¨ãƒãƒŸãƒ¼
+	// ƒGƒlƒ~[
 	XMFLOAT3 ePos = {};
 	XMFLOAT3 ePosOld = {};
 	XMFLOAT3 eScale = {};
 	int enemyCount = 0;
 	bool getEnemyAlive = false;
 
-	// ãƒ­ãƒ¼ãƒ—
+	// ƒ[ƒv
 	XMFLOAT3 catchPos = {};
 	bool rFlag = false;
+	bool rushFlag = false; // “ËiŠJnƒtƒ‰ƒO
+	float elapsedTime = 0.0f;
 
-	// ã‚«ãƒ¡ãƒ©
+	// ƒJƒƒ‰
 	XMFLOAT3 cPos = {};
 	XMFLOAT3 cTarget = {};
 	const float trackLimit = -30.0f;
 
-	// ã‚·ãƒ¼ãƒ³ç®¡ç†ç”¨
-	bool fadeFlag = false;
+	// ƒV[ƒ“ŠÇ——p
 	bool gameClearFlag = false;
 	bool gameOverFlag = false;
-	int stageClearCount = 0;
 
-	// ã‚·ã‚§ã‚¤ã‚¯ç”¨
+	// ƒVƒFƒCƒN—p
 	bool shakeFlag = false;
-	bool rushFlag = false; // çªé€²é–‹å§‹ãƒ•ãƒ©ã‚°
-	float elapsedTime = 0.0f;
 
-	// ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼
-	// æŒ¯å‹•ç”¨å¤‰æ•°
+	// ƒRƒ“ƒgƒ[ƒ‰[
+	// U“®—p•Ï”
 	int vSpeedL = 0;
 	int vSpeedR = 0;
 
-	// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆåº§æ¨™ä¿å­˜ç”¨
-	XMFLOAT3 posSave = {};
-	// éå»ã«ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã—ãŸã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®åº§æ¨™
-	XMFLOAT3 oldPosSave = {1000.0f, 1000.0f, 1000.0f};
-	// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã™ã‚‹è·é›¢ã®åŸºæº–
+	// ƒ^[ƒQƒbƒgÀ•W•Û‘¶—p
+	XMFLOAT3 targetPos= {};
+	// ‰ß‹‚Éƒ^[ƒQƒbƒg‚µ‚½ƒIƒuƒWƒFƒNƒg‚ÌÀ•W
+	XMFLOAT3 oldTargetPos = { 1000.0f, 1000.0f, 1000.0f };
+	// ƒ^[ƒQƒbƒg‚·‚é‹——£‚ÌŠî€
 	const float baseLength = 15.0f;
-	bool targetFlag = false;
 
-	// ãƒãƒ¼ãƒ«ã®åº§æ¨™ã¨è·é›¢
-	XMFLOAT3 posPoleSave = {};
+	// ƒ|[ƒ‹‚ÌÀ•W‚Æ‹——£
+	XMFLOAT3 targetPolePos = {};
 	float minPoleLength = 15.0f;
 
-	// ã‚¨ãƒãƒŸãƒ¼ã®åº§æ¨™ã¨è·é›¢
-	XMFLOAT3 posEnemySave = {};
+	// ƒGƒlƒ~[‚ÌÀ•W‚Æ‹——£
+	XMFLOAT3 targetEnemyPos = {};
 	float minEnemyLength = 15.0f;
+
+	// ƒ`ƒ…[ƒgƒŠƒAƒ‹—p
+	TutorialState tutorialState = ropeThrow; // ƒ`ƒ…[ƒgƒŠƒAƒ‹
+	bool playerAttackFlag = false; // ƒvƒŒƒCƒ„[‚ª“G‚ğUŒ‚‚µ‚Ä‚¢‚é‚©‚Ìƒtƒ‰ƒO
+	bool enemyAttackFlag = false; // “G‚ªƒvƒŒƒCƒ„[‚ğUŒ‚‚µ‚Ä‚¢‚é‚©‚Ìƒtƒ‰ƒO
+	bool throwFlag = false; // ƒ[ƒv‚ğ”­Ë‚µ‚Ä‚¢‚é‚©‚Ìƒtƒ‰ƒO
+	int imgShowCount = 0; // ƒ`ƒ…[ƒgƒŠƒAƒ‹—p‰æ‘œ‚Ì“_–ÅƒJƒEƒ“ƒg
 };
+

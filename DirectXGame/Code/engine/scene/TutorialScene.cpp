@@ -1,15 +1,15 @@
-ï»¿#include "GameScene.h"
+#include "TutorialScene.h"
 #include <imgui.h>
 #include <cassert>
 #include "SceneManager.h"
 
-void GameScene::Initialize()
+void TutorialScene::Initialize()
 {
 	rope = Rope::GetInstance();
 	player = new Player;
 	enemy = new Enemy;
 
-	// 3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ã‚«ãƒ¡ãƒ©ã‚’ã‚»ãƒƒãƒˆ
+	// 3DƒIƒuƒWƒFƒNƒg‚ÉƒJƒƒ‰‚ğƒZƒbƒg
 	Object3d::SetCamera(camera);
 
 	if (!Image2d::LoadTexture(HPTextNum, L"Resources/HPText.png"))
@@ -33,7 +33,46 @@ void GameScene::Initialize()
 	PlayerHPGauge = Image2d::Create(HPGaugeNum, { 0.0f,45.0f });
 	PlayerHPGauge->SetSize({ 30.0f,60.0f });
 
-	// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç”Ÿæˆ
+	if (!Image2d::LoadTexture(wasdNum, L"Resources/wasdKey.png"))
+	{
+		assert(0);
+	}
+	wasdKey = Image2d::Create(wasdNum, { 0.0f, 0.0f });
+	wasdKey->SetPosition({50.0f, 400.0f});
+	wasdKey->SetSize({ 256.0f,256.0f });
+	if (!Image2d::LoadTexture(spaceNum, L"Resources/spaceKey.png"))
+	{
+		assert(0);
+	}
+	spaceKey = Image2d::Create(spaceNum, { 0.0f, 0.0f });
+	spaceKey->SetPosition({ 512.0f, 500.0f });
+	spaceKey->SetSize({ 256.0f,256.0f });
+
+	if (!Image2d::LoadTexture(mouseNum, L"Resources/mouse.png"))
+	{
+		assert(0);
+	}
+	mouseImg = Image2d::Create(mouseNum, { 0.0f, 0.0f });
+	mouseImg->SetPosition({ 1000.0f, 400.0f });
+	mouseImg->SetSize({ 256.0f,256.0f });
+
+	if (!Image2d::LoadTexture(mouseLeftNum, L"Resources/mouse_left.png"))
+	{
+		assert(0);
+	}
+	mouseLeftImg = Image2d::Create(mouseLeftNum, { 0.0f, 0.0f });
+	mouseLeftImg->SetPosition({ 1000.0f, 400.0f });
+	mouseLeftImg->SetSize({ 256.0f,256.0f });
+
+	if (!Image2d::LoadTexture(mouseRightNum, L"Resources/mouse_right.png"))
+	{
+		assert(0);
+	}
+	mouseRightImg = Image2d::Create(mouseRightNum, { 0.0f, 0.0f });
+	mouseRightImg->SetPosition({ 1000.0f, 400.0f });
+	mouseRightImg->SetSize({ 256.0f,256.0f });
+
+	// ƒp[ƒeƒBƒNƒ‹¶¬
 	effectBox = Particle::Create(L"Resources/effectBox.png");
 	effectCircle = Particle::Create(L"Resources/effectCircle.png");
 	effectCircle2 = Particle::Create(L"Resources/effectCircle2.png");
@@ -43,25 +82,25 @@ void GameScene::Initialize()
 	enemy->ModelInit();
 	rope->Initialize();
 
-	// ãƒ©ã‚¤ãƒˆã®ç”Ÿæˆ
+	// ƒ‰ƒCƒg‚Ì¶¬
 	light = Light::Create();
-	// ãƒ©ã‚¤ãƒˆã®è‰²ã‚’è¨­å®š
+	// ƒ‰ƒCƒg‚ÌF‚ğİ’è
 	light->SetLightColor({ 1.0f, 1.0f, 1.0f });
-	// 3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ãƒ©ã‚¤ãƒˆã‚’ã‚»ãƒƒãƒˆ
+	// 3DƒIƒuƒWƒFƒNƒg‚Éƒ‰ƒCƒg‚ğƒZƒbƒg
 	Object3d::SetLight(light);
 
 	//Bgm->PlayWave("Resources/BGM/bgm.wav", 255, 0.08f);
-	jsonObjectInit("stage1");
+	jsonObjectInit("tutorial");
 
-	// ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã‚’éè¡¨ç¤º
+	// ƒ}ƒEƒXƒJ[ƒ\ƒ‹‚ğ”ñ•\¦
 	ShowCursor(false);
 }
 
-void GameScene::Finalize()
+void TutorialScene::Finalize()
 {
 	//Bgm->Stop();
 
-	// ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã‚’è¡¨ç¤º
+	// ƒ}ƒEƒXƒJ[ƒ\ƒ‹‚ğ•\¦
 	ShowCursor(true);
 
 	player->Reset();
@@ -69,7 +108,6 @@ void GameScene::Finalize()
 	{
 		enemy->Reset();
 	}
-
 	enemys.erase(enemys.begin(), enemys.end());
 	rope->Reset();
 	jsonObject.erase(jsonObject.begin(), jsonObject.end());
@@ -81,6 +119,11 @@ void GameScene::Finalize()
 	safe_delete(HPText);
 	safe_delete(PlayerHPBar);
 	safe_delete(PlayerHPGauge);
+	safe_delete(wasdKey);
+	safe_delete(spaceKey);
+	safe_delete(mouseImg);
+	safe_delete(mouseLeftImg);
+	safe_delete(mouseRightImg);
 	safe_delete(effectBox);
 	safe_delete(effectCircle);
 	safe_delete(effectCircle2);
@@ -88,16 +131,16 @@ void GameScene::Finalize()
 	safe_delete(effectAvoid);
 }
 
-void GameScene::Update()
+void TutorialScene::Update()
 {
-	// ãƒã‚¦ã‚¹ã®ç§»å‹•ç¯„å›²ã®åˆ¶é™
+	// ƒ}ƒEƒX‚ÌˆÚ“®”ÍˆÍ‚Ì§ŒÀ
 	mouse->CursorLimit();
 
-	// ãƒ•ãƒ©ã‚°ã®å–å¾—
+	// ƒtƒ‰ƒO‚Ìæ“¾
 	rFlag = rope->GetrFlag();
 	avoidFlag = player->GetAvoidFlag();
 
-#pragma region ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ
+#pragma region ƒtƒF[ƒh
 	if (!gameClearFlag && !gameOverFlag)
 	{
 		FadeScene::GetInstance()->FadeOut(1.0f);
@@ -108,32 +151,33 @@ void GameScene::Update()
 		FadeScene::GetInstance()->FadeIn(0.0f);
 		if (FadeScene::fadeInEnd)
 		{
-			reset();
+			Reset();
 		}
 	}
 	else if (gameOverFlag)
 	{
-		FadeScene::GetInstance()->FadeIn(-10.0f);
+		FadeScene::GetInstance()->FadeIn(-1.0f);
 		if (FadeScene::fadeInEnd)
 		{
-			reset();
+			gameOverFlag = false;
+			playerHp = 360;
+			player->ReSpawn();
 		}
 	}
 #pragma endregion
 
-#pragma region ã‚¯ãƒªã‚¢orã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼
-	// æ•µã‚’ã™ã¹ã¦å€’ã›ã°ã‚¯ãƒªã‚¢
+#pragma region ƒNƒŠƒAorƒQ[ƒ€ƒI[ƒo[
+	// “G‚ğ‚·‚×‚Ä“|‚¹‚ÎƒNƒŠƒA
 	if (enemyCount <= 0)
 	{
-		fadeFlag = true;
 		gameClearFlag = true;
 	}
-	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®HPãŒ0ã«ãªã£ãŸã‚‰ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼
+	// ƒvƒŒƒCƒ„[‚ÌHP‚ª0‚É‚È‚Á‚½‚çƒQ[ƒ€ƒI[ƒo[
 	else if (playerHp <= 0)
 	{
 		if (!gameOverFlag)
 		{
-			// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç”Ÿæˆ
+			// ƒp[ƒeƒBƒNƒ‹¶¬
 			effectBox->CreateParticles(
 				pPos,
 				2.0f, 5.0f,
@@ -146,46 +190,159 @@ void GameScene::Update()
 				1.0f, 10.0f,
 				{ 0.0f, 0.0f, 1.0f, 1.0f },
 				{ 0.0f, 0.0f, 1.0f, 1.0f },
-				5, 10, false, false
+				5, 20, false, false
 			);
-			alpha = -1.0f;
 		}
 
-		// ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ãƒ•ãƒ©ã‚°
-		fadeFlag = true;
+		// ƒQ[ƒ€ƒI[ƒo[ƒtƒ‰ƒO
 		gameOverFlag = true;
 		return;
 	}
 #pragma endregion
 
+#pragma region ƒ`ƒ…[ƒgƒŠƒAƒ‹
+	switch (tutorialState)
+	{
+	case ropeThrow:
+		// ‰‚ß‚Äƒ|[ƒ‹‚Éƒ[ƒv‚ğ”ò‚Î‚·ê‡
+		if (throwFlag && !avoidFlag)
+		{
+			if (controller->GetPadState(Controller::State::X, Controller::Type::TRIGGER) || mouse->TriggerMouseLeft())
+			{
+				// ƒ[ƒv‚ğ”­Ë‚³‚¹AŸ‚Ìƒ`ƒ…[ƒgƒŠƒAƒ‹‚Éi‚Ş
+				rope->SetThrowFlag(true);
+
+				// ƒXƒe[ƒWƒIƒuƒWƒFƒNƒg‚ÌF‚ğŒ³‚É–ß‚·
+				for (auto& object : jsonObject)
+				{
+					object->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+				}
+				tutorialState = Avoid;
+			}
+			else
+			{
+				// ƒ^[ƒQƒbƒgƒGƒtƒFƒNƒg‚Ì”­¶
+				effectTarget->TargetEffect(
+					targetPos, 3.0f, 1.0f,
+					{ 1.0f, 0.0f, 0.0f, 1.0f },
+					{ 1.0f, 1.0f, 1.0f, 1.0f },
+					targetEffectCount
+				);
+
+				// ƒ|[ƒ‹ˆÈŠO‚ÌƒXƒe[ƒWƒIƒuƒWƒFƒNƒg‚ÌF‚ğˆÃ‚­‚·‚é
+				for (auto& object : jsonObject)
+				{
+					if (object->GetType() != "pole")
+					{
+						object->SetColor({ 0.3f, 0.3f, 0.3f, 1.0f });
+					}
+					object->Update();
+				}
+				return;
+			}
+		}
+
+		break;
+	case Avoid:
+		// ‰‚ß‚Ä‰ñ”ğ‚ğg‚¤ê‡
+		if (enemyAttackFlag && !avoidFlag)
+		{
+			if (controller->GetPadState(Controller::State::RT, Controller::Type::TRIGGER) || mouse->TriggerMouseRight())
+			{
+				// ‰ñ”ğ‚ğ”­¶‚³‚¹AŸ‚Ìƒ`ƒ…[ƒgƒŠƒAƒ‹‚Éi‚Ş
+				player->SetAvoidFlag(true);
+				player->Avoid();
+
+				// ƒXƒe[ƒWƒIƒuƒWƒFƒNƒg‚ÌF‚ğŒ³‚É–ß‚·
+				for (auto& object : jsonObject)
+				{
+					object->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+				}
+				tutorialState = Attack;
+			}
+			else
+			{
+				// ƒXƒe[ƒWƒIƒuƒWƒFƒNƒg‚ÌF‚ğˆÃ‚­‚·‚é
+				for (auto& object : jsonObject)
+				{
+					object->SetColor({ 0.3f, 0.3f, 0.3f, 1.0f });
+					object->Update();
+				}
+				return;
+			}
+		}
+		break;
+	case Attack:
+		// ‰‚ß‚Ä“G‚ğUŒ‚‚·‚éê‡
+		if (playerAttackFlag && !avoidFlag)
+		{
+			if (controller->GetPadState(Controller::State::X, Controller::Type::TRIGGER) || mouse->TriggerMouseLeft())
+			{
+				// ƒ[ƒv‚ğ”­Ë‚³‚¹‚é(ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ÍI—¹)
+				rope->SetThrowFlag(true);
+
+				// ƒXƒe[ƒWƒIƒuƒWƒFƒNƒg‚ÌF‚ğŒ³‚É–ß‚·
+				for (auto& object : jsonObject)
+				{
+					object->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+				}
+				tutorialState = None;
+			}
+			else
+			{
+				// ƒ^[ƒQƒbƒgƒGƒtƒFƒNƒg‚Ì”­¶
+				effectTarget->TargetEffect(
+					targetPos, 3.0f, 1.0f,
+					{ 1.0f, 0.0f, 0.0f, 1.0f },
+					{ 1.0f, 1.0f, 1.0f, 1.0f },
+					targetEffectCount
+				);
+
+				// ƒXƒe[ƒWƒIƒuƒWƒFƒNƒg‚ÌF‚ğˆÃ‚­‚·‚é
+				for (auto& object : jsonObject)
+				{
+					object->SetColor({ 0.3f, 0.3f, 0.3f, 1.0f });
+					object->Update();
+				}
+				return;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+# pragma endregion
+
 	if (FadeScene::fadeOutEnd)
 	{
-		// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®çªé€²
+		// ƒvƒŒƒCƒ„[‚Ì“Ëi
 		player->Rush(catchPos, rushFlag, elapsedTime);
-		// ã‚¿ã‚¤ãƒˆãƒ«ã‹ã‚‰ç§»è¡Œå¾Œã®æ›´æ–°
+		// ƒ^ƒCƒgƒ‹‚©‚çˆÚsŒã‚ÌXV
 		player->Update();
 	}
 
-	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åº§æ¨™ã€åŠå¾„ã®è¨­å®š
+	// ƒvƒŒƒCƒ„[‚ÌÀ•WA”¼Œa‚Ìİ’è
 	pPos = player->GetObj()->GetPosition();
 	pScale = player->GetObj()->GetScale();
 
 	if (FadeScene::fadeOutEnd)
 	{
-		// ãƒ­ãƒ¼ãƒ—ã®æ›´æ–°
-		RopeUpdate();
-		// æ•µã®æ›´æ–°
+		// “G‚ÌXV
 		EnemyUpdate();
 	}
-
-	// jsonãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚“ã ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æ›´æ–°
+	// jsonƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İ‚ñ‚¾ƒIƒuƒWƒFƒNƒg‚ÌXV
 	jsonObjectUpdate();
-	// ãƒ©ã‚¤ãƒˆã®æ›´æ–°
+	if (FadeScene::fadeOutEnd)
+	{
+		// ƒ[ƒv‚ÌXV
+		RopeUpdate();
+	}
+	// ƒ‰ƒCƒg‚ÌXV
 	LightUpdate();
-	// ã‚«ãƒ¡ãƒ©ã®æ›´æ–°
+	// ƒJƒƒ‰‚ÌXV
 	CameraUpdate();
 
-	// å›é¿ã—ãŸéš›ã«ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãŒç™ºç”Ÿ
+	// ‰ñ”ğ‚µ‚½Û‚ÉƒGƒtƒFƒNƒg‚ª”­¶
 	if (avoidFlag)
 	{
 		effectAvoid->CreateParticles(
@@ -195,29 +352,28 @@ void GameScene::Update()
 			1, 10, false, false
 		);
 	}
-	effectAvoid->Update();
 }
 
-void GameScene::Draw()
+void TutorialScene::Draw()
 {
 	//SetImgui();
 
-#pragma region èƒŒæ™¯ç”»åƒæç”»
-	// èƒŒæ™¯ç”»åƒæç”»å‰å‡¦ç†
+#pragma region ”wŒi‰æ‘œ•`‰æ
+	// ”wŒi‰æ‘œ•`‰æ‘Oˆ—
 	Image2d::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 
 
-	// ç”»åƒæç”»å¾Œå‡¦ç†
+	// ‰æ‘œ•`‰æŒãˆ—
 	Image2d::PostDraw();
-	// æ·±åº¦ãƒãƒƒãƒ•ã‚¡ã‚¯ãƒªã‚¢
+	// [“xƒoƒbƒtƒ@ƒNƒŠƒA
 	DirectXCommon::GetInstance()->ClearDepthBuffer();
-#pragma endregion èƒŒæ™¯ç”»åƒæç”»
+#pragma endregion ”wŒi‰æ‘œ•`‰æ
 
-#pragma region 3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæç”»
-	// 3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæç”»å‰å‡¦ç†
+#pragma region 3DƒIƒuƒWƒFƒNƒg•`‰æ
+	// 3DƒIƒuƒWƒFƒNƒg•`‰æ‘Oˆ—
 	Object3d::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 
-	// 3Dã‚ªãƒ–ã‚¯ã‚¸ã‚§ã‚¯ãƒˆã®æç”»
+	// 3DƒIƒuƒNƒWƒFƒNƒg‚Ì•`‰æ
 	if (playerHp > 0.0f)
 	{
 		player->GetObj()->Draw();
@@ -241,16 +397,16 @@ void GameScene::Draw()
 		}
 	}
 
-	// 3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæç”»å¾Œå‡¦ç†
+	// 3DƒIƒuƒWƒFƒNƒg•`‰æŒãˆ—
 	Object3d::PostDraw();
-#pragma endregion 3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæç”»
+#pragma endregion 3DƒIƒuƒWƒFƒNƒg•`‰æ
 
-#pragma region ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«æç”»
+#pragma region ƒp[ƒeƒBƒNƒ‹•`‰æ
 
-	// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«æç”»å‰å‡¦ç†
+	// ƒp[ƒeƒBƒNƒ‹•`‰æ‘Oˆ—
 	Particle::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 
-	// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ã®æç”»
+	// ƒp[ƒeƒBƒNƒ‹‚Ì•`‰æ
 	effectBox->Draw();
 	effectCircle->Draw();
 	effectCircle2->Draw();
@@ -262,60 +418,72 @@ void GameScene::Draw()
 		enemy->reactionDraw();
 	}
 
-	// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«æç”»å¾Œå‡¦ç†
+	// ƒp[ƒeƒBƒNƒ‹•`‰æŒãˆ—
 	Particle::PostDraw();
 
-#pragma endregion ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«æç”»
+#pragma endregion ƒp[ƒeƒBƒNƒ‹•`‰æ
 
-#pragma region å‰æ™¯ç”»åƒæç”»
-	// å‰æ™¯ç”»åƒæç”»å‰å‡¦ç†
+#pragma region ‘OŒi‰æ‘œ•`‰æ
+	// ‘OŒi‰æ‘œ•`‰æ‘Oˆ—
 	Image2d::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 
-	// å‰æ™¯ç”»åƒã®æç”»
+	// ‘OŒi‰æ‘œ‚Ì•`‰æ
 	HPText->Draw();
 	PlayerHPBar->Draw();
 
 	PlayerHPGauge->SetSize({ playerHp,60 });
 	PlayerHPGauge->Draw();
 
-	// ãƒ•ã‚§ãƒ¼ãƒ‰ã®æç”»
+	wasdKey->Draw();
+	spaceKey->Draw();
+	mouseImg->Draw();
+
+
+	if ((playerAttackFlag || throwFlag) && (tutorialState == ropeThrow || tutorialState == Attack))
+	{
+		imgShowCount++;
+		if (imgShowCount >= 30)
+		{
+			mouseLeftImg->Draw();
+			if (imgShowCount >= 60)
+			{
+				imgShowCount = 0;
+			}
+		}
+	}
+	else if (enemyAttackFlag && tutorialState == Avoid)
+	{
+		imgShowCount++;
+		if (imgShowCount >= 30)
+		{
+			mouseRightImg->Draw();
+			if (imgShowCount >= 60)
+			{
+				imgShowCount = 0;
+			}
+		}
+	}
+
+	// ƒtƒF[ƒh‚Ì•`‰æ
 	FadeScene::GetInstance()->Draw();
 
-	// ãƒ‡ãƒãƒƒã‚°ãƒ†ã‚­ã‚¹ãƒˆã®æç”»
+	// ƒfƒoƒbƒOƒeƒLƒXƒg‚Ì•`‰æ
 	DebugText::GetInstance()->DrawAll(DirectXCommon::GetInstance()->GetCommandList());
-	// ç”»åƒæç”»å¾Œå‡¦ç†
+	// ‰æ‘œ•`‰æŒãˆ—
 	Image2d::PostDraw();
-#pragma endregion å‰æ™¯ç”»åƒæç”»
+#pragma endregion ‘OŒi‰æ‘œ•`‰æ
 }
 
-void GameScene::reset()
+void TutorialScene::Reset()
 {
+	// ƒQ[ƒ€AƒXƒe[ƒW1‚©‚çƒXƒ^[ƒg
 	if (gameClearFlag)
 	{
-		// 1ã‚¹ãƒ†ãƒ¼ã‚¸ç›®ã‚’ã‚¯ãƒªã‚¢ã—ãŸã‚‰æ¬¡ã®ã‚¹ãƒ†ãƒ¼ã‚¸ã¸
-		if (stageClearCount == 0)
-		{
-			jsonObject.erase(jsonObject.begin(), jsonObject.end());
-			stageClearCount++;
-			fadeFlag = false;
-			gameClearFlag = false;
-			levelData = nullptr;
-			jsonObjectInit("stage2");
-		}
-		// ã™ã¹ã¦ã®ã‚¹ãƒ†ãƒ¼ã‚¸ã‚’ã‚¯ãƒªã‚¢ã—ãŸã‚‰ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢
-		else if (stageClearCount == 1)
-		{
-			SceneManager::GetInstance()->ChangeScene("GameClear");
-		}
-	}
-	// ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ã‚·ãƒ¼ãƒ³ã«ç§»è¡Œ
-	else if (gameOverFlag)
-	{
-		SceneManager::GetInstance()->ChangeScene("GameOver");
+		SceneManager::GetInstance()->ChangeScene("Game");
 	}
 }
 
-void GameScene::SetImgui()
+void TutorialScene::SetImgui()
 {
 	ImGui::Begin("DebugText");
 	ImGui::SetWindowSize(ImVec2(300, 200));
@@ -323,20 +491,27 @@ void GameScene::SetImgui()
 	ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
 
 	ImGui::Separator();
+	ImGui::Text("playerPosX : %6.2f", pPos.x);
+	ImGui::Text("playerPosY : %6.2f", pPos.y);
+	ImGui::Text("playerPosZ : %6.2f", pPos.z);
+	ImGui::Separator();
+	ImGui::Text("cameraPosX : %6.2f", cPos.x);
+	ImGui::Text("cameraPosY : %6.2f", cPos.y);
+	ImGui::Text("cameraPosZ : %6.2f", cPos.z);
 
 	ImGui::End();
 }
 
-void GameScene::LightUpdate()
+void TutorialScene::LightUpdate()
 {
-	//å…‰ç·šæ–¹å‘åˆæœŸå€¤
+	//Œõü•ûŒü‰Šú’l
 	static XMVECTOR lightDir = { 5, -5, 5, 0 };
 
 	light->SetLightDir(lightDir);
 	light->Update();
 }
 
-void GameScene::CameraUpdate()
+void TutorialScene::CameraUpdate()
 {
 	cPos = camera->GetEye();
 	cTarget = camera->GetTarget();
@@ -361,7 +536,7 @@ void GameScene::CameraUpdate()
 		}
 	}
 
-	//ã‚«ãƒ¡ãƒ©æ›´æ–°
+	//ƒJƒƒ‰XV
 	if (shakeFlag == true)
 	{
 		camera->CameraShake(shakeFlag);
@@ -370,31 +545,28 @@ void GameScene::CameraUpdate()
 	camera->Update();
 }
 
-void GameScene::EnemyUpdate()
+void TutorialScene::EnemyUpdate()
 {
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
 		pPos = player->GetObj()->GetPosition();
+		rFlag = rope->GetrFlag();
 		getEnemyAlive = enemy->GetAlive();
 
+		// “G‚ª€‚ñ‚Å‚¢‚½‚çŸ‚Ì“G‚Ìˆ—‚Éi‚Ş
 		if (!getEnemyAlive)
 		{
 			enemy->Update();
 			continue;
 		}
 
-		if (!rushFlag && rope->GetrFlag())
+		// “Ëi‚µ‚½ó‘Ô‚Å“G‚ÉG‚ê‚½‚ç
+		if (rushFlag && enemy->EnemyCollision(player->GetObj()))
 		{
-			rushFlag = true;
-			catchPos = posSave;
-		}
-
-		if (rFlag && enemy->EnemyCollision(player->GetObj()))
-		{
-			// ã‚«ãƒ¡ãƒ©ã‚·ã‚§ã‚¤ã‚¯ã®ç™ºç”Ÿ
+			// ƒJƒƒ‰ƒVƒFƒCƒN‚Ì”­¶
 			shakeFlag = true;
 
-			// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç”Ÿæˆ
+			// ƒp[ƒeƒBƒNƒ‹¶¬
 			effectBox->CreateParticles(
 				enemy->GetObj()->GetPosition(),
 				2.0f, 5.0f,
@@ -419,12 +591,14 @@ void GameScene::EnemyUpdate()
 			enemys.remove(enemy);
 			break;
 		}
-		else if (!rFlag && player->Damage(enemy->GetObj()))
+
+		// “Ëi‚¹‚¸‚É“G‚ÉG‚ê‚½‚ç
+		if (!rushFlag && player->Damage(enemy->GetObj()))
 		{
 			shakeFlag = true;
 			playerHp -= 18;
 
-			// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç”Ÿæˆ
+			// ƒp[ƒeƒBƒNƒ‹¶¬
 			effectCircle->CreateParticles(
 				player->GetObj()->GetPosition(),
 				1.0f, 2.0f,
@@ -434,6 +608,7 @@ void GameScene::EnemyUpdate()
 			);
 		}
 
+		// ƒvƒŒƒCƒ„[‚É“G‚Ì’e‚ª“–‚½‚Á‚½Û‚Ìƒ_ƒ[ƒWˆ—
 		if (!avoidFlag && enemy->BulletCollision())
 		{
 			if (!rFlag)
@@ -441,7 +616,7 @@ void GameScene::EnemyUpdate()
 				shakeFlag = true;
 				playerHp -= 18;
 
-				// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç”Ÿæˆ
+				// ƒp[ƒeƒBƒNƒ‹¶¬
 				effectCircle->CreateParticles(
 					player->GetObj()->GetPosition(),
 					1.0f, 2.0f,
@@ -452,6 +627,14 @@ void GameScene::EnemyUpdate()
 			}
 		}
 
+		// ƒ[ƒv‚ğ”­Ë‚Ü‚½‚ÍÚ’…‚µ‚Ä‚¢‚È‚¢ó‘Ô‚Å‚ ‚ê‚Î
+		bool getThrowFlag = rope->GetThrowFlag();
+		if (enemy->Danger() && !getThrowFlag && !rFlag)
+		{
+			enemyAttackFlag = true;
+		}
+
+		// ƒvƒŒƒCƒ„[‚Æ“G‚ÌŠÔ‚ÌáŠQ•¨ŒŸ’m
 		for (auto& object : jsonObject)
 		{
 			if (object->GetType() == "box" || object->GetType() == "wall")
@@ -460,22 +643,22 @@ void GameScene::EnemyUpdate()
 				XMFLOAT3 boxPos = object->GetPosition();
 				XMFLOAT3 boxScale = object->GetCollisionScale();
 
-				// éšœå®³ç‰©ã‚’æ¤œçŸ¥ã—ã¦ã„ãŸã‚‰æ”»æ’ƒã—ã¦ã“ãªã„
+				// áŠQ•¨‚ğŒŸ’m‚µ‚Ä‚¢‚½‚çUŒ‚‚µ‚Ä‚±‚È‚¢(ƒvƒŒƒCƒ„[‚à“G‚ÉUŒ‚‚·‚é‚±‚Æ‚Í‚Å‚«‚È‚¢)
 				if (enemy->ObstacleDetection(pPos, boxPos, boxScale))
 				{
 					break;
 				}
 				else
 				{
-					// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨æ•µã®åº§æ¨™ã¨è·é›¢ã‚’å–å¾—
+					// ƒvƒŒƒCƒ„[‚Æ“G‚ÌÀ•W‚Æ‹——£‚ğæ“¾
 					pPos = player->GetObj()->GetPosition();
 					ePos = enemy->GetObj()->GetPosition();
 					float length = GetLength(pPos, ePos);
 
-					// ãƒ­ãƒ¼ãƒ—ãŒå±Šãè·é›¢ã«ã„ãŸå ´åˆã€ãã®æ•µã®åº§æ¨™ã¨è·é›¢ã‚’ä¿å­˜
+					// ƒ[ƒv‚ª“Í‚­‹——£‚É‚¢‚½ê‡A‚»‚Ì“G‚ÌÀ•W‚Æ‹——£‚ğ•Û‘¶
 					if (length < minEnemyLength)
 					{
-						posEnemySave = ePos;
+						targetEnemyPos = ePos;
 						minEnemyLength = length;
 					}
 				}
@@ -485,123 +668,148 @@ void GameScene::EnemyUpdate()
 	}
 }
 
-void GameScene::RopeUpdate()
+void TutorialScene::RopeUpdate()
 {
 	rope->Update(pPos);
 
-	// ãƒãƒ¼ãƒ«ã¨æ•µã®è·é›¢ã‚’æ¯”è¼ƒã—ã¦çŸ­ã„æ–¹ã‚’ä»£å…¥
+	// ƒ|[ƒ‹‚Æ“G‚Ì‹——£‚ğ”äŠr‚µ‚Ä’Z‚¢•û‚ğ‘ã“ü
 	float minLength = (std::min)(minEnemyLength, minPoleLength);
 
-	// ã©ã¡ã‚‰ã‚‚åŸºæº–å†…ã®è·é›¢ã ã£ãŸå ´åˆã€æ•µã‚’å„ªå…ˆã™ã‚‹
+	// ‚Ç‚¿‚ç‚àŠî€“à‚Ì‹——£‚¾‚Á‚½ê‡A“G‚ğ—Dæ‚·‚é
 	if (minEnemyLength < baseLength && minPoleLength < baseLength)
 	{
 		minLength = minEnemyLength;
 	}
 
-	// è·é›¢ã«å¿œã˜ã¦ä»£å…¥ã™ã‚‹åº§æ¨™ã‚’å¤‰æ›´(æ•µã‚’å„ªå…ˆã™ã‚‹)
-	if (minLength < baseLength)
+	// ƒ^[ƒQƒbƒg‚ª“G‚¾‚Á‚½ê‡
+	if (minLength == minEnemyLength)
 	{
-		if (minLength == minEnemyLength)
-		{
-			posSave = posEnemySave;
-		}
-		else
-		{
-			posSave = posPoleSave;
-		}
+		targetPos = targetEnemyPos;
+		playerAttackFlag = true;
+	}
+	// ƒ^[ƒQƒbƒg‚ªƒ|[ƒ‹‚¾‚Á‚½ê‡
+	else
+	{
+		targetPos = targetPolePos;
+		throwFlag = true;
+	}
 
-		for (auto& object : jsonObject)
+	// áŠQ•¨‚ğŒŸ’m‚µ‚½‚çƒ^[ƒQƒbƒg‚µ‚È‚¢
+	for (auto& object : jsonObject)
+	{
+		if (object->GetType() == "box" || object->GetType() == "wall")
 		{
-			if (object->GetType() == "box" || object->GetType() == "wall")
+			XMFLOAT3 pos = object->GetPosition();
+			XMFLOAT3 scale = object->GetCollisionScale();
+			if (GetLength(pPos, pos) >= baseLength)
 			{
-				XMFLOAT3 pos = object->GetPosition();
-				XMFLOAT3 scale = object->GetCollisionScale();
-				if (GetLength(pPos, pos) >= baseLength)
-				{
-					continue;
-				}
-				else if (Collision::CollisionRayBox(pPos, posSave, pos, scale))
-				{
-					minLength = baseLength;
-					rope->SetThrowFlag(false);
-					break;
-				}
+				continue;
+			}
+
+			if (Collision::CollisionRayBox(pPos, targetPos, pos, scale))
+			{
+				minLength = baseLength;
+				rope->SetThrowFlag(false);
+				throwFlag = false;
+				playerAttackFlag = false;
+				break;
 			}
 		}
+	}
 
-		// å‘¨è¾ºã«ã‚ã‚‹ãƒãƒ¼ãƒ«ã«ã¯åå¿œã—ãªã„
-		if (GetLength(posSave, oldPosSave) <= 0.0f && minLength == minPoleLength)
+	// áŠQ•¨‚ğŒŸ’m‚µ‚Ä‚¢‚È‚¯‚ê‚Î
+	if (minLength < baseLength)
+	{
+		// ‰ß‹‚Éƒ^[ƒQƒbƒg‚µ‚½ƒ|[ƒ‹‚É‚Í”½‰‚µ‚È‚¢
+		if (minLength == minPoleLength && GetLength(targetPos, oldTargetPos) <= 0.0f)
 		{
 			minLength = minEnemyLength;
-			posSave = posEnemySave;
+			targetPos = targetEnemyPos;
+			throwFlag = false;
 		}
-		
+
+		// ƒ^[ƒQƒbƒg‚ª‹——£“à‚É‚¢‚ê‚Îƒ^[ƒQƒbƒgƒGƒtƒFƒNƒg‚ğ”­¶‚³‚¹‚é
 		if (minLength < baseLength)
 		{
 			effectTarget->TargetEffect(
-				posSave, 3.0f, 1.0f,
+				targetPos, 3.0f, 1.0f,
 				{ 1.0f, 0.0f, 0.0f, 1.0f },
 				{ 1.0f, 1.0f, 1.0f, 1.0f },
 				targetEffectCount
 			);
+
+			// ƒ^[ƒQƒbƒg‚µ‚Ä‚¢‚é•ûŒü‚ÉƒvƒŒƒCƒ„[‚àŒü‚­
+			player->TrackRot(pPos, targetPos);
+			camera->SetTarget(targetPos);
 		}
-	}
-	else
-	{
-		rope->SetThrowFlag(false);
-	}
+		else
+		{
+			float cameraRot = camera->CameraAngle(pPos);
+			// ƒJƒƒ‰‚ªŒü‚¢‚Ä‚¢‚é•ûŒü‚ÉƒvƒŒƒCƒ„[‚àŒü‚­
+			player->GetObj()->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
+			rope->SetThrowFlag(false);
+			throwFlag = false;
+			playerAttackFlag = false;
+		}
 
-	if (GetLength(pPos, oldPosSave) > 30.0f)
-	{
-		oldPosSave = {};
-	}
+		// ƒ[ƒv‚ğÚ’…‚µ‚½‚ç“Ëi‚ğŠJn‚·‚é
+		if (!rushFlag && rFlag)
+		{
+			rushFlag = true;
+			catchPos = targetPos;
+		}
 
-	if (minLength < baseLength)
-	{
-		rope->Throw(pPos, posSave, minLength);
-		// ãƒ­ãƒ¼ãƒ—ã‚’é£›ã°ã—ãŸæ–¹å‘ã«ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚‚å‘ã
-		player->TrackRot(pPos, posSave);
+		rope->Throw(pPos, targetPos, minLength);
 	}
 	else
 	{
 		float cameraRot = camera->CameraAngle(pPos);
-		// ã‚«ãƒ¡ãƒ©ãŒå‘ã„ã¦ã„ã‚‹æ–¹å‘ã«ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚‚å‘ã
+		// ƒJƒƒ‰‚ªŒü‚¢‚Ä‚¢‚é•ûŒü‚ÉƒvƒŒƒCƒ„[‚àŒü‚­
 		player->GetObj()->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
 		rope->SetThrowFlag(false);
+		throwFlag = false;
+		playerAttackFlag = false;
 	}
 
-	posPoleSave = {};
-	posEnemySave = {};
+	// ‰ß‹‚Éƒ^[ƒQƒbƒg‚µ‚½‚µ‚½ƒIƒuƒWƒFƒNƒg‚©‚çˆê’è‚Ì‹——£—£‚ê‚Ä‚¢‚½‚ç
+	if (GetLength(pPos, oldTargetPos) > 30.0f)
+	{
+		// ‰ß‹‚Éƒ^[ƒQƒbƒg‚µ‚½ƒIƒuƒWƒFƒNƒg‚ÌÀ•W‚ğƒŠƒZƒbƒg‚·‚é
+		oldTargetPos = { 1000.0f, 1000.0f, 1000.0f };
+	}
+
+	targetPolePos = {};
 	minPoleLength = 15.0f;
+	targetEnemyPos = {};
 	minEnemyLength = 15.0f;
 }
 
-void GameScene::jsonObjectInit(const std::string sceneName)
+void TutorialScene::jsonObjectInit(const std::string sceneName)
 {
-	// ãƒ¬ãƒ™ãƒ«ãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿
+	// ƒŒƒxƒ‹ƒf[ƒ^‚Ì“Ç‚İ‚İ
 	levelData = LevelLoader::LoadFile(sceneName);
 
-	// ãƒ¬ãƒ™ãƒ«ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã€é…ç½®
+	// ƒŒƒxƒ‹ƒf[ƒ^‚©‚çƒIƒuƒWƒFƒNƒg‚ğ¶¬A”z’u
 	for (LevelData::ObjectData& objectData : levelData->objects)
 	{
 		if (objectData.fileName == "player")
 		{
-			// åº§æ¨™
+			// À•W
 			XMFLOAT3 pos;
 			XMStoreFloat3(&pos, objectData.trans);
-			// å¤§ãã•
+			// ‘å‚«‚³
 			XMFLOAT3 scale;
 			XMStoreFloat3(&scale, objectData.scale);
-			// å½“ãŸã‚Šåˆ¤å®š
+			// “–‚½‚è”»’è
 			XMFLOAT3 size;
 			XMStoreFloat3(&size, objectData.size);
 
-			// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ç”Ÿæˆ
+			// ƒvƒŒƒCƒ„[‚ğ¶¬
 			player->Initialize(pos, scale);
 			pPos = player->GetObj()->GetPosition();
 			player->GetObj()->SetCollisionScale(size);
 			player->Update();
-			// ã‚«ãƒ¡ãƒ©ã®è¨­å®š
+			// ƒJƒƒ‰‚Ìİ’è
 			camera->Reset();
 			camera->SetTarget(pPos);
 			camera->Update();
@@ -610,17 +818,17 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 
 		if (objectData.fileName == "enemy")
 		{
-			// åº§æ¨™
+			// À•W
 			XMFLOAT3 pos;
 			XMStoreFloat3(&pos, objectData.trans);
-			// å¤§ãã•
+			// ‘å‚«‚³
 			XMFLOAT3 scale;
 			XMStoreFloat3(&scale, objectData.scale);
-			// å½“ãŸã‚Šåˆ¤å®š
+			// “–‚½‚è”»’è
 			XMFLOAT3 size;
 			XMStoreFloat3(&size, objectData.size);
 
-			// ã‚¨ãƒãƒŸãƒ¼ã‚’ç”Ÿæˆ
+			// ƒGƒlƒ~[‚ğ¶¬
 			std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
 			newEnemy->Initialize(player);
 			newEnemy->GetObj()->SetPosition(pos);
@@ -633,10 +841,10 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 			continue;
 		}
 
-		// 3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆ
+		// 3DƒIƒuƒWƒFƒNƒg‚ğ¶¬
 		std::unique_ptr<Object3d> newObject = Object3d::Create();
 
-		// ãƒ•ã‚¡ã‚¤ãƒ«åã‹ã‚‰ç™»éŒ²æ¸ˆã¿ãƒ¢ãƒ‡ãƒ«ã‚’æ¤œç´¢
+		// ƒtƒ@ƒCƒ‹–¼‚©‚ç“o˜^Ï‚İƒ‚ƒfƒ‹‚ğŒŸõ
 		Model* model = nullptr;
 		decltype(levelData->models)::iterator it = levelData->models.find(objectData.fileName);
 		if (it != levelData->models.end())
@@ -646,43 +854,43 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 
 		newObject->SetModel(model);
 
-		// åº§æ¨™
+		// À•W
 		XMFLOAT3 pos;
 		XMStoreFloat3(&pos, objectData.trans);
 		newObject->SetPosition(pos);
 
-		// å›è»¢è§’
+		// ‰ñ“]Šp
 		XMFLOAT3 rot;
 		XMStoreFloat3(&rot, objectData.rot);
 		newObject->SetRotation(rot);
 
-		// å¤§ãã•
+		// ‘å‚«‚³
 		XMFLOAT3 scale;
 		XMStoreFloat3(&scale, objectData.scale);
 		newObject->SetScale(scale);
 
-		// å½“ãŸã‚Šåˆ¤å®š
+		// “–‚½‚è”»’è
 		XMFLOAT3 colScale;
 		XMStoreFloat3(&colScale, objectData.size);
 		newObject->SetCollisionScale(colScale);
 
-		// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¿ã‚¤ãƒ—ã‚’ã‚»ãƒƒãƒˆ
+		// ƒIƒuƒWƒFƒNƒg‚Ìƒ^ƒCƒv‚ğƒZƒbƒg
 		newObject->SetType(objectData.objType);
 		newObject->Update();
 
-		// é…åˆ—ã«ç™»éŒ²
+		// ”z—ñ‚É“o˜^
 		jsonObject.push_back(std::move(newObject));
 	}
 }
 
-void GameScene::jsonObjectUpdate()
+void TutorialScene::jsonObjectUpdate()
 {
 	for (auto& object : jsonObject)
 	{
 		XMFLOAT3 pos = object->GetPosition();
 		XMFLOAT3 scale = object->GetCollisionScale();
 
-		// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨ã‚«ãƒ¡ãƒ©ã®é–“ã«ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒã‚ã£ãŸæ™‚ã€ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æç”»ã—ãªã„
+		// ƒvƒŒƒCƒ„[‚ÆƒJƒƒ‰‚ÌŠÔ‚ÉƒIƒuƒWƒFƒNƒg‚ª‚ ‚Á‚½AƒIƒuƒWƒFƒNƒg‚ğ•`‰æ‚µ‚È‚¢
 		if (Collision::CollisionRayBox(cPos, pPos, pos, scale))
 		{
 			object->SetDrawFlag(false);
@@ -692,6 +900,7 @@ void GameScene::jsonObjectUpdate()
 			object->SetDrawFlag(true);
 		}
 
+		// ƒ^ƒCƒv‚²‚Æ‚Éˆ—‚ğÀs‚µ‚ÄUpdate
 		if (object->GetType() == "box")
 		{
 			XMFLOAT3 boxPos = object->GetPosition();
@@ -726,7 +935,6 @@ void GameScene::jsonObjectUpdate()
 			player->StageCollide(stagePos, stageScale, reverseFlag);
 			pPos = player->GetObj()->GetPosition();
 
-			// èƒŒé¢ã«å½“ãŸã£ãŸã‚‰ã€ãƒ­ãƒ¼ãƒ—ã®æ¥ç€ã‚’è§£é™¤ã™ã‚‹
 			if (reverseFlag)
 			{
 				rope->SetrFlag(false);
@@ -744,29 +952,26 @@ void GameScene::jsonObjectUpdate()
 		else if (object->GetType() == "pole")
 		{
 			pPos = player->GetObj()->GetPosition();
+			rFlag = rope->GetrFlag();
 			XMFLOAT3 polePos = object->GetPosition();
 			XMFLOAT3 poleScale = object->GetCollisionScale();
 			float length = GetLength(pPos, polePos);
 
-			if (length < minPoleLength)
+			// ƒ|[ƒ‹‚Ì’†‚©‚çˆê”Ô‹ß‚¢‹——£‚Ìƒ|[ƒ‹‚ğŒˆ‚ß‚é
+			if (length < minPoleLength && length < baseLength)
 			{
 				minPoleLength = length;
-				posPoleSave = polePos;
+				targetPolePos = polePos;
 			}
-
-			if (!rushFlag && rope->GetrFlag())
-			{
-				rushFlag = true;
-				catchPos = posSave;
-			}
-
+			
+			// ƒvƒŒƒCƒ„[‚ªƒ|[ƒ‹‚ÉG‚ê‚½‚çƒ[ƒv‚ÌÚ’…‚ğ‚È‚­‚µ‚Ä“Ëi‚ğ~‚ß‚é
 			if (rushFlag && player->PoleCollide(polePos, poleScale))
 			{
 				rope->SetrFlag(false);
 				rushFlag = false;
 				catchPos = {};
 				elapsedTime = 0.0f;
-				oldPosSave = posPoleSave;
+				oldTargetPos = polePos;
 			}
 		}
 

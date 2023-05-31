@@ -42,7 +42,7 @@ void TitleScene::Update()
 
 	if (FadeScene::fadeInEnd)
 	{
-		SceneManager::GetInstance()->ChangeScene("Game");
+		SceneManager::GetInstance()->ChangeScene("Tutorial");
 	}
 
 	jsonObjectUpdate();

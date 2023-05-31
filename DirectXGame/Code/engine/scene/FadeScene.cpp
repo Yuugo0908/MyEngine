@@ -9,6 +9,7 @@ FadeScene::FadeScene()
 
 FadeScene::~FadeScene()
 {
+	safe_delete(fadeImg);
 	fade.erase(fade.begin(), fade.end());
 }
 
