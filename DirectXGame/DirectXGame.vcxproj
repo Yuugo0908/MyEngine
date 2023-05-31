@@ -170,18 +170,18 @@
   <ItemGroup>
     <ClInclude Include="Code\application\scene\AbstructSceneFactory.h" />
     <ClInclude Include="Code\application\scene\BaseScene.h" />
+    <ClInclude Include="Code\application\scene\Framework.h" />
     <ClInclude Include="Code\application\scene\SceneFactory.h" />
     <ClInclude Include="Code\application\scene\SceneManager.h" />
     <ClInclude Include="Code\application\win\DirectXCommon.h" />
-    <ClInclude Include="Code\application\win\Framework.h" />
     <ClInclude Include="Code\application\win\MyGame.h" />
     <ClInclude Include="Code\application\win\SafeDelete.h" />
     <ClInclude Include="Code\application\win\WinApp.h" />
     <ClInclude Include="Code\engine\2d\DebugText.h" />
     <ClInclude Include="Code\engine\2d\Image2d.h" />
+    <ClInclude Include="Code\engine\2d\Particle.h" />
     <ClInclude Include="Code\engine\3d\Model.h" />
     <ClInclude Include="Code\engine\3d\Object3d.h" />
-    <ClInclude Include="Code\engine\3d\Particle.h" />
     <ClInclude Include="Code\engine\audio\Audio.h" />
     <ClInclude Include="Code\engine\game\Bullet.h" />
     <ClInclude Include="Code\engine\game\Camera.h" />
@@ -207,18 +207,18 @@
     <ClInclude Include="Code\engine\scene\TutorialScene.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Code\application\scene\Framework.cpp" />
     <ClCompile Include="Code\application\scene\SceneFactory.cpp" />
     <ClCompile Include="Code\application\scene\SceneManager.cpp" />
     <ClCompile Include="Code\application\win\DirectXCommon.cpp" />
-    <ClCompile Include="Code\application\win\Framework.cpp" />
     <ClCompile Include="Code\application\win\main.cpp" />
     <ClCompile Include="Code\application\win\MyGame.cpp" />
     <ClCompile Include="Code\application\win\WinApp.cpp" />
     <ClCompile Include="Code\engine\2d\DebugText.cpp" />
     <ClCompile Include="Code\engine\2d\Image2d.cpp" />
+    <ClCompile Include="Code\engine\2d\Particle.cpp" />
     <ClCompile Include="Code\engine\3d\Model.cpp" />
     <ClCompile Include="Code\engine\3d\Object3d.cpp" />
-    <ClCompile Include="Code\engine\3d\Particle.cpp" />
     <ClCompile Include="Code\engine\audio\Audio.cpp" />
     <ClCompile Include="Code\engine\game\Bullet.cpp" />
     <ClCompile Include="Code\engine\game\Camera.cpp" />

@@ -55,7 +55,7 @@ private: // ƒƒ“ƒo•Ï”
 	Image2d* fadeImg = nullptr;
 	std::vector<Image2d*> fade;
 
-	FadeState fadeState;
+	FadeState fadeState{};
 
 	float alpha = 0.0f;
 	int fadeNum = 16;

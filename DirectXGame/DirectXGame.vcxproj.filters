@@ -163,9 +163,6 @@
     <ClInclude Include="Code\application\win\DirectXCommon.h">
       <Filter>ヘッダーファイル\application\win</Filter>
     </ClInclude>
-    <ClInclude Include="Code\application\win\Framework.h">
-      <Filter>ヘッダーファイル\application\win</Filter>
-    </ClInclude>
     <ClInclude Include="Code\application\win\MyGame.h">
       <Filter>ヘッダーファイル\application\win</Filter>
     </ClInclude>
@@ -185,9 +182,6 @@
       <Filter>ヘッダーファイル\engine\3d</Filter>
     </ClInclude>
     <ClInclude Include="Code\engine\3d\Object3d.h">
-      <Filter>ヘッダーファイル\engine\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\engine\3d\Particle.h">
       <Filter>ヘッダーファイル\engine\3d</Filter>
     </ClInclude>
     <ClInclude Include="Code\engine\audio\Audio.h">
@@ -259,6 +253,12 @@
     <ClInclude Include="Code\engine\scene\TutorialScene.h">
       <Filter>ヘッダーファイル\engine\scene</Filter>
     </ClInclude>
+    <ClInclude Include="Code\application\scene\Framework.h">
+      <Filter>ヘッダーファイル\application\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\engine\2d\Particle.h">
+      <Filter>ヘッダーファイル\engine\2d</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\application\scene\SceneFactory.cpp">
@@ -268,9 +268,6 @@
       <Filter>ソースファイル\application\scene</Filter>
     </ClCompile>
     <ClCompile Include="Code\application\win\DirectXCommon.cpp">
-      <Filter>ソースファイル\application\win</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\application\win\Framework.cpp">
       <Filter>ソースファイル\application\win</Filter>
     </ClCompile>
     <ClCompile Include="Code\application\win\main.cpp">
@@ -292,9 +289,6 @@
       <Filter>ソースファイル\engine\3d</Filter>
     </ClCompile>
     <ClCompile Include="Code\engine\3d\Object3d.cpp">
-      <Filter>ソースファイル\engine\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\engine\3d\Particle.cpp">
       <Filter>ソースファイル\engine\3d</Filter>
     </ClCompile>
     <ClCompile Include="Code\engine\audio\Audio.cpp">
@@ -365,6 +359,12 @@
     </ClCompile>
     <ClCompile Include="Code\engine\scene\TutorialScene.cpp">
       <Filter>ソースファイル\engine\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\application\scene\Framework.cpp">
+      <Filter>ソースファイル\application\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\engine\2d\Particle.cpp">
+      <Filter>ソースファイル\engine\2d</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -167,7 +167,7 @@ private: // メンバ変数
 	// デバイス
 	ID3D12Device* device = nullptr;
 	// デスクリプタサイズ
-	UINT descriptorHandleIncrementSize = 0u;
+	UINT descriptorHandleIncrementSize = 0;
 	// デスクリプタヒープ
 	ComPtr<ID3D12DescriptorHeap> descHeap;
 	// 頂点バッファ

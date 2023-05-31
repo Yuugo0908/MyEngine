@@ -34,7 +34,7 @@ Particle * Particle::Create(const std::string& fileName)
 	return partMan;
 }
 
-void Particle::Initialize(const std::string& filename)
+void Particle::Initialize(const std::string& fullPath)
 {
 	HRESULT result;
 	// デスクリプタヒープの初期化
@@ -44,7 +44,7 @@ void Particle::Initialize(const std::string& filename)
 	InitializeGraphicsPipeline();
 
 	// テクスチャ読み込み
-	LoadTexture(filename);
+	LoadTexture(fullPath);
 
 	// モデル生成
 	CreateModel();

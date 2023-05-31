@@ -48,7 +48,7 @@ void WinApp::CreateGameWindow()
 	RECT desktop_rect;
 	GetWindowRect(hDwnd, &desktop_rect);
 
-	// ウィンドウの表示位置を設定
+	// ウィンドウの表示位置を設定(メインモニターの中心)
 	int desktop_width = (desktop_rect.right - (wrc.right - wrc.left)) / 2;
 	int desktop_height = (desktop_rect.bottom - (wrc.bottom - wrc.top)) / 3;
 
@@ -69,7 +69,7 @@ void WinApp::CreateGameWindow()
 	);
 
 	// ウィンドウ表示
-	ShowWindow(hwnd, SW_SHOWMAXIMIZED);
+	ShowWindow(hwnd, SW_SHOW);
 }
 
 void WinApp::TerminateGameWindow()

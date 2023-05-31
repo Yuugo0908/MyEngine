@@ -52,6 +52,7 @@ protected: // メンバ変数
 	Light* light = nullptr;
 	SceneManager* sceneManager = nullptr;
 	AbstructSceneFactory* sceneFactory_ = nullptr;
+	// 初回起動確認用のフラグ
 	bool firstBootFlag = false;
 };
 
