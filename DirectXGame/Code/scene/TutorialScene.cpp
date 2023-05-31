@@ -149,8 +149,7 @@ void TutorialScene::Update()
 	if (gameClearFlag)
 	{
 		FadeScene::GetInstance()->FadeIn(0.0f);
-		bool fadeIn = FadeScene::GetInstance()->GetFadeInEnd();
-		if (fadeIn)
+		if (FadeScene::fadeInEnd)
 		{
 			reset();
 		}
@@ -158,8 +157,7 @@ void TutorialScene::Update()
 	else if (gameOverFlag)
 	{
 		FadeScene::GetInstance()->FadeIn(-1.0f);
-		bool fadeIn = FadeScene::GetInstance()->GetFadeInEnd();
-		if (fadeIn)
+		if (FadeScene::fadeInEnd)
 		{
 			gameOverFlag = false;
 			fadeFlag = false;
@@ -252,7 +250,7 @@ void TutorialScene::Update()
 		// 初めて回避を使う場合
 		if (enemyAttackFlag && !avoidFlag)
 		{
-			if (controller->GetPadState(Controller::State::RT, Controller::Type::NONE) || mouse->TriggerMouseRight())
+			if (controller->GetPadState(Controller::State::RT, Controller::Type::TRIGGER) || mouse->TriggerMouseRight())
 			{
 				// 回避を発生させ、次のチュートリアルに進む
 				player->SetAvoidFlag(true);
@@ -318,19 +316,26 @@ void TutorialScene::Update()
 	}
 # pragma endregion
 
-	// プレイヤーの突進
-	player->Rush(catchPos, rushFlag, elapsedTime);
+	
+	if (FadeScene::fadeOutEnd)
+	{
+		// プレイヤーの突進
+		player->Rush(catchPos, rushFlag, elapsedTime);
+		// タイトルから移行後の更新
+		player->Update();
+	}
 
-	// タイトルから移行後の更新
 	// プレイヤーの座標、半径の設定
-	player->Update();
 	pPos = player->GetObj()->GetPosition();
 	pScale = player->GetObj()->GetScale();
 
-	// ロープの更新
-	RopeUpdate();
-	// 敵の更新
-	EnemyUpdate();
+	if (FadeScene::fadeOutEnd)
+	{
+		// ロープの更新
+		RopeUpdate();
+		// 敵の更新
+		EnemyUpdate();
+	}
 	// jsonファイルから読み込んだオブジェクトの更新
 	jsonObjectUpdate();
 	// ライトの更新
@@ -352,7 +357,7 @@ void TutorialScene::Update()
 
 void TutorialScene::Draw()
 {
-	SetImgui();
+	//SetImgui();
 
 #pragma region 背景画像描画
 	// 背景画像描画前処理
@@ -693,7 +698,7 @@ void TutorialScene::RopeUpdate()
 	// 障害物を検知したらターゲットしない
 	for (auto& object : jsonObject)
 	{
-		if (object->GetType() == "box" || object->GetType() == "wall" || object->GetType() == "stage")
+		if (object->GetType() == "box" || object->GetType() == "wall")
 		{
 			XMFLOAT3 pos = object->GetPosition();
 			XMFLOAT3 scale = object->GetCollisionScale();
@@ -793,6 +798,7 @@ void TutorialScene::jsonObjectInit(const std::string sceneName)
 			player->Initialize(pos, scale);
 			pPos = player->GetObj()->GetPosition();
 			player->GetObj()->SetCollisionScale(size);
+			player->Update();
 			// カメラの設定
 			camera->Reset();
 			camera->SetTarget(pPos);
@@ -819,6 +825,7 @@ void TutorialScene::jsonObjectInit(const std::string sceneName)
 			newEnemy->GetObj()->SetScale(scale);
 			newEnemy->GetObj()->SetCollisionScale(size);
 			newEnemy->SetRespawnPos(pos);
+			newEnemy->Update();
 			enemys.push_back(std::move(newEnemy));
 			enemyCount++;
 			continue;
@@ -859,6 +866,7 @@ void TutorialScene::jsonObjectInit(const std::string sceneName)
 
 		// オブジェクトのタイプをセット
 		newObject->SetType(objectData.objType);
+		newObject->Update();
 
 		// 配列に登録
 		jsonObject.push_back(std::move(newObject));

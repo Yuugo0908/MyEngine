@@ -30,6 +30,12 @@ void Player::Update()
 	{
 		inertiaSaveMove = pPos - pPosOld;
 	}
+	else if (!rushFlag &&
+		(controller->GetPadState(Controller::State::LEFT_L_STICK, Controller::Type::RELEASE) || controller->GetPadState(Controller::State::LEFT_R_STICK, Controller::Type::RELEASE) ||
+			controller->GetPadState(Controller::State::LEFT_U_STICK, Controller::Type::RELEASE) || controller->GetPadState(Controller::State::LEFT_D_STICK, Controller::Type::RELEASE)))
+	{
+		inertiaSaveMove = pPos - pPosOld;
+	}
 
 	// ダメージを受けた後の処理
 	if (damageInterval > 0)
@@ -104,7 +110,8 @@ void Player::Update()
 			moveFlag = true;
 		}
 
-		if (!keyboard->PushKey(DIK_D) && !keyboard->PushKey(DIK_A) && !keyboard->PushKey(DIK_W) && !keyboard->PushKey(DIK_S))
+		if ((!keyboard->PushKey(DIK_D) && !keyboard->PushKey(DIK_A) && !keyboard->PushKey(DIK_W) && !keyboard->PushKey(DIK_S)) &&
+			(!controller->GetPadState(Controller::State::LEFT_R_STICK, Controller::Type::NONE) && !controller->GetPadState(Controller::State::LEFT_L_STICK, Controller::Type::NONE) && !controller->GetPadState(Controller::State::LEFT_U_STICK, Controller::Type::NONE) && !controller->GetPadState(Controller::State::LEFT_D_STICK, Controller::Type::NONE)))
 		{
 			moveFlag = false;
 		}
@@ -162,7 +169,7 @@ void Player::Avoid()
 		pMove = 1.0f;
 	}
 	// 自機の突進
-	else if (mouse->TriggerMouseRight() || controller->GetPadState(Controller::State::RT, Controller::Type::NONE))
+	else if (mouse->TriggerMouseRight() || controller->GetPadState(Controller::State::RT, Controller::Type::TRIGGER))
 	{
 		avoidFlag = true;
 		// 加速力の更新

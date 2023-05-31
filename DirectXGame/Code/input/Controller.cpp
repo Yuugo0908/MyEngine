@@ -61,7 +61,7 @@ bool Controller::GetPadState(Controller::State p_state, Type p_type)
 			}
 			break;
 		case Controller::Mode::STICK:
-			if (GetStickState(state, p_state))
+			if (GetStickState(state, p_state, p_type))
 			{
 				return true;
 			}
@@ -87,6 +87,11 @@ bool Controller::GetButtonState(XINPUT_STATE state, Controller::State p_state, T
 		{
 			return true;
 		}
+	case Controller::Type::RELEASE:
+		if (ReleaseButton(state, p_state) && state.Gamepad.wButtons & buttonNum)
+		{
+			return true;
+		}
 		break;
 	default:
 		break;
@@ -95,75 +100,32 @@ bool Controller::GetButtonState(XINPUT_STATE state, Controller::State p_state, T
 	return false;
 }
 
-bool Controller::GetStickState(XINPUT_STATE state, Controller::State p_state)
+bool Controller::GetStickState(XINPUT_STATE state, Controller::State p_state, Type p_type)
 {
-	// 範囲指定用
-	int TRIGGER_DEADZONE = 100;
-	int L_STICK_THUMB_DEAD = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
-	int R_STICK_THUMB_DEAD = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
-	switch (p_state)
+	switch (p_type)
 	{
-	case Controller::State::LT:
-		if (statePre.Gamepad.bLeftTrigger < TRIGGER_DEADZONE && state.Gamepad.bLeftTrigger > TRIGGER_DEADZONE)
+	case Controller::Type::NONE:
+	case Controller::Type::PUSH:
+		if (PushStick(p_state))
 		{
 			return true;
 		}
 		break;
-	case Controller::State::RT:
-		if (statePre.Gamepad.bRightTrigger < TRIGGER_DEADZONE && state.Gamepad.bRightTrigger > TRIGGER_DEADZONE)
+	case Controller::Type::TRIGGER:
+		if (TriggerStick(state, p_state))
+		{
+			return true;
+		}
+	case Controller::Type::RELEASE:
+		if (ReleaseStick(state, p_state))
 		{
 			return true;
 		}
 		break;
-	case Controller::State::LEFT_U_STICK:
-		if (state.Gamepad.sThumbLY > L_STICK_THUMB_DEAD)
-		{
-			return true;
-		}
-		break;
-	case Controller::State::LEFT_D_STICK:
-		if (state.Gamepad.sThumbLY < -L_STICK_THUMB_DEAD)
-		{
-			return true;
-		}
-		break;
-	case Controller::State::LEFT_R_STICK:
-		if (state.Gamepad.sThumbLX > L_STICK_THUMB_DEAD)
-		{
-			return true;
-		}
-		break;
-	case Controller::State::LEFT_L_STICK:
-		if (state.Gamepad.sThumbLX < -L_STICK_THUMB_DEAD)
-		{
-			return true;
-		}
-		break;
-	case Controller::State::RIGHT_U_STICK:
-		if (state.Gamepad.sThumbRY > R_STICK_THUMB_DEAD)
-		{
-			return true;
-		}
-		break;
-	case Controller::State::RIGHT_D_STICK:
-		if (state.Gamepad.sThumbRY < -R_STICK_THUMB_DEAD)
-		{
-			return true;
-		}
-		break;
-	case Controller::State::RIGHT_R_STICK:
-		if (state.Gamepad.sThumbRX > R_STICK_THUMB_DEAD)
-		{
-			return true;
-		}
-		break;
-	case Controller::State::RIGHT_L_STICK:
-		if (state.Gamepad.sThumbRX < -R_STICK_THUMB_DEAD)
-		{
-			return true;
-		}
+	default:
 		break;
 	}
+
 	return false;
 }
 
@@ -269,6 +231,278 @@ bool Controller::TriggerButton(XINPUT_STATE state, Controller::State& p_state)
 	if (!statePre.Gamepad.wButtons && state.Gamepad.wButtons)
 	{
 		return true;
+	}
+	return false;
+}
+
+bool Controller::ReleaseButton(XINPUT_STATE state, State& p_state)
+{
+	switch (p_state)
+	{
+	case Controller::State::A:
+		buttonNum = XINPUT_GAMEPAD_A;
+		break;
+	case Controller::State::B:
+		buttonNum = XINPUT_GAMEPAD_B;
+		break;
+	case Controller::State::X:
+		buttonNum = XINPUT_GAMEPAD_X;
+		break;
+	case Controller::State::Y:
+		buttonNum = XINPUT_GAMEPAD_Y;
+		break;
+	case Controller::State::LB:
+		buttonNum = XINPUT_GAMEPAD_LEFT_SHOULDER;
+		break;
+	case Controller::State::RB:
+		buttonNum = XINPUT_GAMEPAD_RIGHT_SHOULDER;
+		break;
+	case Controller::State::BACK:
+		buttonNum = XINPUT_GAMEPAD_BACK;
+		break;
+	case Controller::State::START:
+		buttonNum = XINPUT_GAMEPAD_START;
+		break;
+	case Controller::State::UP:
+		buttonNum = XINPUT_GAMEPAD_DPAD_UP;
+		break;
+	case Controller::State::DOWN:
+		buttonNum = XINPUT_GAMEPAD_DPAD_DOWN;
+		break;
+	case Controller::State::LEFT:
+		buttonNum = XINPUT_GAMEPAD_DPAD_LEFT;
+		break;
+	case Controller::State::RIGHT:
+		buttonNum = XINPUT_GAMEPAD_DPAD_RIGHT;
+		break;
+	case Controller::State::LEFT_THUMB:
+		buttonNum = XINPUT_GAMEPAD_LEFT_THUMB;
+		break;
+	case Controller::State::RIGHT_THUMB:
+		buttonNum = XINPUT_GAMEPAD_RIGHT_THUMB;
+		break;
+	}
+
+	if (statePre.Gamepad.wButtons && !state.Gamepad.wButtons)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool Controller::PushStick(State& p_state)
+{
+	// 範囲指定用
+	int TRIGGER_DEADZONE = 100;
+	int L_STICK_THUMB_DEAD = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+	int R_STICK_THUMB_DEAD = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+
+	switch (p_state)
+	{
+	case Controller::State::LT:
+		if (state.Gamepad.bLeftTrigger > TRIGGER_DEADZONE)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RT:
+		if (state.Gamepad.bRightTrigger > TRIGGER_DEADZONE)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::LEFT_U_STICK:
+		if (state.Gamepad.sThumbLY > L_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::LEFT_D_STICK:
+		if (state.Gamepad.sThumbLY < -L_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::LEFT_R_STICK:
+		if (state.Gamepad.sThumbLX > L_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::LEFT_L_STICK:
+		if (state.Gamepad.sThumbLX < -L_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RIGHT_U_STICK:
+		if (state.Gamepad.sThumbRY > R_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RIGHT_D_STICK:
+		if (state.Gamepad.sThumbRY < -R_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RIGHT_R_STICK:
+		if (state.Gamepad.sThumbRX > R_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RIGHT_L_STICK:
+		if (state.Gamepad.sThumbRX < -R_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	}
+	return false;
+}
+
+bool Controller::TriggerStick(XINPUT_STATE state, State& p_state)
+{
+	// 範囲指定用
+	int TRIGGER_DEADZONE = 100;
+	int L_STICK_THUMB_DEAD = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+	int R_STICK_THUMB_DEAD = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+	switch (p_state)
+	{
+	case Controller::State::LT:
+		if (statePre.Gamepad.bLeftTrigger < TRIGGER_DEADZONE && state.Gamepad.bLeftTrigger > TRIGGER_DEADZONE)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RT:
+		if (statePre.Gamepad.bRightTrigger < TRIGGER_DEADZONE && state.Gamepad.bRightTrigger > TRIGGER_DEADZONE)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::LEFT_U_STICK:
+		if (statePre.Gamepad.sThumbLY < L_STICK_THUMB_DEAD && state.Gamepad.sThumbLY > L_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::LEFT_D_STICK:
+		if (statePre.Gamepad.sThumbLY > -L_STICK_THUMB_DEAD && state.Gamepad.sThumbLY < -L_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::LEFT_R_STICK:
+		if (statePre.Gamepad.sThumbLX < L_STICK_THUMB_DEAD && state.Gamepad.sThumbLX > L_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::LEFT_L_STICK:
+		if (statePre.Gamepad.sThumbLX > -L_STICK_THUMB_DEAD && state.Gamepad.sThumbLX < -L_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RIGHT_U_STICK:
+		if (statePre.Gamepad.sThumbRY < R_STICK_THUMB_DEAD && state.Gamepad.sThumbRY > R_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RIGHT_D_STICK:
+		if (statePre.Gamepad.sThumbRY > -R_STICK_THUMB_DEAD && state.Gamepad.sThumbRY < -R_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RIGHT_R_STICK:
+		if (statePre.Gamepad.sThumbRX < R_STICK_THUMB_DEAD && state.Gamepad.sThumbRX > R_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RIGHT_L_STICK:
+		if (statePre.Gamepad.sThumbRX > -R_STICK_THUMB_DEAD && state.Gamepad.sThumbRX < -R_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	}
+	return false;
+}
+
+bool Controller::ReleaseStick(XINPUT_STATE state, State& p_state)
+{
+	// 範囲指定用
+	int TRIGGER_DEADZONE = 100;
+	int L_STICK_THUMB_DEAD = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+	int R_STICK_THUMB_DEAD = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+	switch (p_state)
+	{
+	case Controller::State::LT:
+		if (statePre.Gamepad.bLeftTrigger > TRIGGER_DEADZONE && state.Gamepad.bLeftTrigger < TRIGGER_DEADZONE)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RT:
+		if (statePre.Gamepad.bRightTrigger > TRIGGER_DEADZONE && state.Gamepad.bRightTrigger < TRIGGER_DEADZONE)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::LEFT_U_STICK:
+		if (statePre.Gamepad.sThumbLY > L_STICK_THUMB_DEAD && state.Gamepad.sThumbLY < L_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::LEFT_D_STICK:
+		if (statePre.Gamepad.sThumbLY < -L_STICK_THUMB_DEAD && state.Gamepad.sThumbLY > -L_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::LEFT_R_STICK:
+		if (statePre.Gamepad.sThumbLX > L_STICK_THUMB_DEAD && state.Gamepad.sThumbLX < L_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::LEFT_L_STICK:
+		if (statePre.Gamepad.sThumbLX < -L_STICK_THUMB_DEAD && state.Gamepad.sThumbLX > -L_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RIGHT_U_STICK:
+		if (statePre.Gamepad.sThumbRY > R_STICK_THUMB_DEAD && state.Gamepad.sThumbRY < R_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RIGHT_D_STICK:
+		if (statePre.Gamepad.sThumbRY < -R_STICK_THUMB_DEAD && state.Gamepad.sThumbRY > -R_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RIGHT_R_STICK:
+		if (statePre.Gamepad.sThumbRX > R_STICK_THUMB_DEAD && state.Gamepad.sThumbRX < R_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
+	case Controller::State::RIGHT_L_STICK:
+		if (statePre.Gamepad.sThumbRX < -R_STICK_THUMB_DEAD && state.Gamepad.sThumbRX > -R_STICK_THUMB_DEAD)
+		{
+			return true;
+		}
+		break;
 	}
 	return false;
 }

@@ -1,11 +1,15 @@
 #include "FadeScene.h"
 
+bool FadeScene::fadeInEnd = false;
+bool FadeScene::fadeOutEnd = false;
+
 FadeScene::FadeScene()
 {
 }
 
 FadeScene::~FadeScene()
 {
+	fade.erase(fade.begin(), fade.end());
 }
 
 FadeScene* FadeScene::GetInstance()
@@ -21,9 +25,15 @@ void FadeScene::Initialize()
 	{
 		assert(0);
 	}
-	fade = Image2d::Create(fadeNum, { 0.0f,0.0f });
-	fade->SetSize({ 1280.0f,720.0f });
-	fade->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+
+	for (int i = 0; i < fadeNum; i++)
+	{
+		fadeImg = Image2d::Create(fadeNum, { 0.0f,0.0f });
+		fadeImg->SetPosition({ 80.0f * i, 0.0f });
+		fadeImg->SetSize({ 80.0f ,720.0f });
+		fadeImg->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
+		fade.push_back(fadeImg);
+	}
 }
 
 void FadeScene::Update()
@@ -35,9 +45,9 @@ void FadeScene::Update()
 		fadeOutEnd = false;
 		break;
 	case FadeInPlay:
-		if (!fadeInEnd && alpha <= 1.0f)
+		if (!fadeInEnd && alpha <= 2.0f && fadeCount <= fadeNum - 1)
 		{
-			alpha += 0.02f;
+			alpha += 0.2f;
 		}
 		else
 		{
@@ -46,11 +56,12 @@ void FadeScene::Update()
 		break;
 	case FadeInEnd:
 		fadeInEnd = true;
+		fadeCount = 0;
 		break;
 	case FadeOutPlay:
-		if (!fadeOutEnd && alpha > 0.0f)
+		if (!fadeOutEnd && alpha > 0.0f && fadeCount <= fadeNum - 1)
 		{
-			alpha -= 0.02f;
+			alpha -= 0.2f;
 		}
 		else
 		{
@@ -59,17 +70,32 @@ void FadeScene::Update()
 		break;
 	case FadeOutEnd:
 		fadeOutEnd = true;
+		fadeCount = 0;
 		break;
 	default:
 		break;
 	}
 
-	fade->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
+	if (fadeState == FadeInPlay && alpha > 1.0f && fadeCount < fadeNum - 1)
+	{
+		alpha = 0.0f;
+		fadeCount++;
+	}
+	else if(fadeState == FadeOutPlay && alpha <= 0.0f && fadeCount < fadeNum - 1)
+	{
+		alpha = 1.0f;
+		fadeCount++;
+	}
+
+	fade[fadeCount]->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
 }
 
 void FadeScene::Draw()
 {
-	fade->Draw();
+	for (int i = 0; i < fade.size(); i++)
+	{
+		fade[i]->Draw();
+	}
 }
 
 void FadeScene::reset()

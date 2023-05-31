@@ -32,6 +32,10 @@ public:
 public: // 静的メンバ関数
 	static FadeScene* GetInstance();
 
+public: // 静的メンバ変数
+	static bool fadeInEnd;
+	static bool fadeOutEnd;
+
 public: // メンバ関数
 	// 初期化
 	void Initialize();
@@ -46,19 +50,14 @@ public: // メンバ関数
 
 	void reset();
 
-	// フェードフラグのゲッター
-	const bool& GetFadeInEnd() { return fadeInEnd; }
-	const bool& GetFadeOutEnd() { return fadeOutEnd; }
-
 private: // メンバ変数
-	Image2d* fade = nullptr;
-	std::vector<Image2d*> fades;
+
+	Image2d* fadeImg = nullptr;
+	std::vector<Image2d*> fade;
 
 	FadeState fadeState;
 
 	float alpha = 0.0f;
-	bool fadeInEnd = false;
-	bool fadeOutEnd = false;
-	int fadeNum = 10;
+	int fadeNum = 16;
+	int fadeCount = 0;
 };
-

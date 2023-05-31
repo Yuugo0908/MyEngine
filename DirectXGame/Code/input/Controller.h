@@ -51,6 +51,7 @@ public:
 		NONE,
 		PUSH,
 		TRIGGER,
+		RELEASE,
 	};
 
 public:
@@ -62,9 +63,13 @@ public:
 
 private:
 	bool GetButtonState(XINPUT_STATE state, State p_state, Type p_type);
-	bool GetStickState(XINPUT_STATE state, State p_state);
+	bool GetStickState(XINPUT_STATE state, State p_state, Type p_type);
 	bool PushButton(State& p_state);
 	bool TriggerButton(XINPUT_STATE state, State& p_state);
+	bool ReleaseButton(XINPUT_STATE state, State& p_state);
+	bool PushStick(State& p_state);
+	bool TriggerStick(XINPUT_STATE state, State& p_state);
+	bool ReleaseStick(XINPUT_STATE state, State& p_state);
 	void CheckMode(State p_state);
 
 	// ボタンを押したか、スティックを操作したかの判別

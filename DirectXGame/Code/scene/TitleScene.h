@@ -55,5 +55,4 @@ private: // ƒƒ“ƒo•Ï”
 	Image2d* title = nullptr;
 
 	float alpha = 0.0f;
-	bool fadeFlag = false;
 };

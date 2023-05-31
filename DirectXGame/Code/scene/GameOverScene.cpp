@@ -46,8 +46,7 @@ void GameOverScene::Update()
 	if (retryFlag)
 	{
 		FadeScene::GetInstance()->FadeIn(0.0f);
-		bool fadeIn = FadeScene::GetInstance()->GetFadeInEnd();
-		if (fadeIn)
+		if (FadeScene::fadeInEnd)
 		{
 			SceneManager::GetInstance()->ChangeScene("Game");
 		}

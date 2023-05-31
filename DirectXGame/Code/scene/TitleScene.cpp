@@ -30,21 +30,19 @@ void TitleScene::Finalize()
 
 void TitleScene::Update()
 {
-	fadeFlag = FadeScene::GetInstance()->GetFadeInEnd();
-
-	if (!fadeFlag)
+	if (!FadeScene::fadeInEnd)
 	{
 		camera->CameraRotation();
 	}
 
-	if (!fadeFlag && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
+	if (!FadeScene::fadeInEnd && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
 	{
 		FadeScene::GetInstance()->FadeIn(0.0f);
 	}
 
-	if (fadeFlag)
+	if (FadeScene::fadeInEnd)
 	{
-		SceneManager::GetInstance()->ChangeScene("Tutorial");
+		SceneManager::GetInstance()->ChangeScene("Game");
 	}
 
 	jsonObjectUpdate();

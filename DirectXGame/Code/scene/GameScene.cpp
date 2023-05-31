@@ -93,6 +93,10 @@ void GameScene::Update()
 	// マウスの移動範囲の制限
 	mouse->CursorLimit();
 
+	// フラグの取得
+	rFlag = rope->GetrFlag();
+	avoidFlag = player->GetAvoidFlag();
+
 #pragma region フェードアウト
 	if (!gameClearFlag && !gameOverFlag)
 	{
@@ -102,23 +106,22 @@ void GameScene::Update()
 	if (gameClearFlag)
 	{
 		FadeScene::GetInstance()->FadeIn(0.0f);
-		bool fadeIn = FadeScene::GetInstance()->GetFadeInEnd();
-		if (fadeIn)
+		if (FadeScene::fadeInEnd)
 		{
 			reset();
 		}
 	}
 	else if (gameOverFlag)
 	{
-		FadeScene::GetInstance()->FadeIn(-1.0f);
-		bool fadeIn = FadeScene::GetInstance()->GetFadeInEnd();
-		if (fadeIn)
+		FadeScene::GetInstance()->FadeIn(-10.0f);
+		if (FadeScene::fadeInEnd)
 		{
 			reset();
 		}
 	}
 #pragma endregion
 
+#pragma region クリアorゲームオーバー
 	// 敵をすべて倒せばクリア
 	if (enemyCount <= 0)
 	{
@@ -153,31 +156,34 @@ void GameScene::Update()
 		gameOverFlag = true;
 		return;
 	}
+#pragma endregion
 
-	// プレイヤーの突進
-	player->Rush(catchPos, rushFlag, elapsedTime);
+	if (FadeScene::fadeOutEnd)
+	{
+		// プレイヤーの突進
+		player->Rush(catchPos, rushFlag, elapsedTime);
+		// タイトルから移行後の更新
+		player->Update();
+	}
 
-	// タイトルから移行後の更新
 	// プレイヤーの座標、半径の設定
-	player->Update();
 	pPos = player->GetObj()->GetPosition();
 	pScale = player->GetObj()->GetScale();
-	rope->Update(pPos);
+
+	if (FadeScene::fadeOutEnd)
+	{
+		// ロープの更新
+		RopeUpdate();
+		// 敵の更新
+		EnemyUpdate();
+	}
 
 	// jsonファイルから読み込んだオブジェクトの更新
 	jsonObjectUpdate();
-	// 当たり判定の更新
-	EnemyUpdate();
 	// ライトの更新
 	LightUpdate();
 	// カメラの更新
 	CameraUpdate();
-	// ロープの更新
-	RopeUpdate();
-
-	// フラグの取得
-	rFlag = rope->GetrFlag();
-	avoidFlag = player->GetAvoidFlag();
 
 	// 回避した際にエフェクトが発生
 	if (avoidFlag)
@@ -194,7 +200,7 @@ void GameScene::Update()
 
 void GameScene::Draw()
 {
-	SetImgui();
+	//SetImgui();
 
 #pragma region 背景画像描画
 	// 背景画像描画前処理
@@ -481,6 +487,8 @@ void GameScene::EnemyUpdate()
 
 void GameScene::RopeUpdate()
 {
+	rope->Update(pPos);
+
 	// ポールと敵の距離を比較して短い方を代入
 	float minLength = (std::min)(minEnemyLength, minPoleLength);
 
@@ -504,7 +512,7 @@ void GameScene::RopeUpdate()
 
 		for (auto& object : jsonObject)
 		{
-			if (object->GetType() == "box" || object->GetType() == "wall" || object->GetType() == "stage")
+			if (object->GetType() == "box" || object->GetType() == "wall")
 			{
 				XMFLOAT3 pos = object->GetPosition();
 				XMFLOAT3 scale = object->GetCollisionScale();
@@ -592,6 +600,7 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 			player->Initialize(pos, scale);
 			pPos = player->GetObj()->GetPosition();
 			player->GetObj()->SetCollisionScale(size);
+			player->Update();
 			// カメラの設定
 			camera->Reset();
 			camera->SetTarget(pPos);
@@ -618,6 +627,7 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 			newEnemy->GetObj()->SetScale(scale);
 			newEnemy->GetObj()->SetCollisionScale(size);
 			newEnemy->SetRespawnPos(pos);
+			newEnemy->Update();
 			enemys.push_back(std::move(newEnemy));
 			enemyCount++;
 			continue;
@@ -658,6 +668,7 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 
 		// オブジェクトのタイプをセット
 		newObject->SetType(objectData.objType);
+		newObject->Update();
 
 		// 配列に登録
 		jsonObject.push_back(std::move(newObject));
@@ -715,6 +726,7 @@ void GameScene::jsonObjectUpdate()
 			player->StageCollide(stagePos, stageScale, reverseFlag);
 			pPos = player->GetObj()->GetPosition();
 
+			// 背面に当たったら、ロープの接着を解除する
 			if (reverseFlag)
 			{
 				rope->SetrFlag(false);
