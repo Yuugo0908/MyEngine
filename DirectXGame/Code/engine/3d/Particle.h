@@ -87,19 +87,24 @@ private: // 定数
 	// パイプラインステートオブジェクト
 	static ComPtr<ID3D12PipelineState> pipelinestate;
 
+	// ディレクトリ
+	static const std::string baseDirectory;
+	// 拡張子
+	static const std::string Extension;
+
 public: // 静的メンバ関数
 	/// <summary>
 	/// インスタンス生成
 	/// </summary>
 	/// <returns>インスタンス</returns>
-	static Particle* Create(const wchar_t* fileName);
+	static Particle* Create(const std::string& filename);
 
 public: // メンバ関数	
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <returns></returns>
-	void Initialize(const wchar_t* fileName);
+	void Initialize(const std::string& fullPath);
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
@@ -151,7 +156,7 @@ public: // メンバ関数
 	/// テクスチャ読み込み
 	/// </summary>
 	/// <returns>成否</returns>
-	void LoadTexture(const wchar_t* fileName);
+	void LoadTexture(const std::string& fullPath);
 
 	/// <summary>
 	/// モデル作成

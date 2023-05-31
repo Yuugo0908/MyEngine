@@ -19,6 +19,8 @@ ComPtr<ID3D12PipelineState> Image2d::pipelineState;
 XMMATRIX Image2d::matProjection;
 ComPtr<ID3D12DescriptorHeap> Image2d::descHeap;
 ComPtr<ID3D12Resource> Image2d::texBuffer[srvCount];
+const std::string Image2d::baseDirectory = "Resources/Image/";
+const std::string Image2d::Extension = ".png";
 
 bool Image2d::StaticInitialize(ID3D12Device* device)
 {
@@ -36,7 +38,7 @@ bool Image2d::StaticInitialize(ID3D12Device* device)
 	return true;
 }
 
-bool Image2d::LoadTexture(UINT texnumber, const wchar_t* filename)
+bool Image2d::LoadTexture(UINT texnumber, const std::string& fileName)
 {
 	// nullptrチェック
 	assert(device);
@@ -45,10 +47,25 @@ bool Image2d::LoadTexture(UINT texnumber, const wchar_t* filename)
 	// WICテクスチャのロード
 	TexMetadata metadata{};
 	ScratchImage scratchImg{};
+	std::string fullPath{};
+
+	fullPath = baseDirectory + fileName + Extension;
+
+	// ユニコード文字列に変換する
+	wchar_t wfilepath[128];
+	int iBufferSize = MultiByteToWideChar
+	(
+		CP_ACP,
+		0,
+		fullPath.c_str(),
+		-1,
+		wfilepath,
+		_countof(wfilepath)
+	);
 
 	result = LoadFromWICFile
 	(
-		filename, WIC_FLAGS_NONE,
+		wfilepath, WIC_FLAGS_NONE,
 		&metadata, scratchImg
 	);
 	if (FAILED(result))

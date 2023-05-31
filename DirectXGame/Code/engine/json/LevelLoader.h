@@ -43,8 +43,6 @@ public:
 	static const std::string baseDirectory;
 	// 拡張子
 	static const std::string Extension;
-	// エディタファイル名
-	std::string fileName;
 public:
 	// ファイル読み込み
 	static LevelData* LoadFile(const std::string& fileName);

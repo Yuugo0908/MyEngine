@@ -13,8 +13,10 @@ using namespace std;
 ID3D12GraphicsCommandList*  Particle::cmdList = nullptr;
 ComPtr<ID3D12RootSignature> Particle::rootsignature;
 ComPtr<ID3D12PipelineState> Particle::pipelinestate;
+const std::string Particle::baseDirectory = "Resources/Image/";
+const std::string Particle::Extension = ".png";
 
-Particle * Particle::Create(const wchar_t* fileName)
+Particle * Particle::Create(const std::string& fileName)
 {
 	// 3Dオブジェクトのインスタンスを生成
 	Particle* partMan = new Particle;
@@ -23,13 +25,16 @@ Particle * Particle::Create(const wchar_t* fileName)
 		return nullptr;
 	}
 
+	std::string fullPath{};
+	fullPath = baseDirectory + fileName + Extension;
+
 	// 初期化
-	partMan->Initialize(fileName);
+	partMan->Initialize(fullPath);
 
 	return partMan;
 }
 
-void Particle::Initialize(const wchar_t* fileName)
+void Particle::Initialize(const std::string& filename)
 {
 	HRESULT result;
 	// デスクリプタヒープの初期化
@@ -39,7 +44,7 @@ void Particle::Initialize(const wchar_t* fileName)
 	InitializeGraphicsPipeline();
 
 	// テクスチャ読み込み
-	LoadTexture(fileName);
+	LoadTexture(filename);
 
 	// モデル生成
 	CreateModel();
@@ -476,7 +481,7 @@ void Particle::InitializeGraphicsPipeline()
 	}
 }
 
-void Particle::LoadTexture(const wchar_t* fileName)
+void Particle::LoadTexture(const std::string& fullPath)
 {
 	HRESULT result = S_FALSE;
 
@@ -484,9 +489,22 @@ void Particle::LoadTexture(const wchar_t* fileName)
 	TexMetadata metadata{};
 	ScratchImage scratchImg{};
 
+	// ユニコード文字列に変換する
+	wchar_t wfilepath[128];
+	int iBufferSize = MultiByteToWideChar
+	(
+		CP_ACP,
+		0,
+		fullPath.c_str(),
+		-1,
+		wfilepath,
+		_countof(wfilepath)
+	);
+
 	result = LoadFromWICFile(
-		fileName, WIC_FLAGS_NONE,
+		wfilepath, WIC_FLAGS_NONE,
 		&metadata, scratchImg);
+
 	if (FAILED(result))
 	{
 		assert(0);

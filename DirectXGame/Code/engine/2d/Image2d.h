@@ -4,6 +4,7 @@
 #include <wrl.h>
 #include <d3d12.h>
 #include "Operator.h"
+#include <string>
 
 class Image2d
 {
@@ -29,7 +30,7 @@ public: // 静的メンバ関数
 	// 静的初期化
 	static bool StaticInitialize(ID3D12Device* device);
 	// テクスチャ読み込み
-	static bool LoadTexture(UINT texnumber, const wchar_t* filename);
+	static bool LoadTexture(UINT texnumber, const std::string& fileName);
 	// 描画前処理
 	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
 	// 描画後処理
@@ -60,6 +61,10 @@ protected: // 静的メンバ変数
 	static ComPtr<ID3D12DescriptorHeap> descHeap;
 	// テクスチャバッファ
 	static ComPtr<ID3D12Resource> texBuffer[srvCount];
+	// ディレクトリ
+	static const std::string baseDirectory;
+	// 拡張子
+	static const std::string Extension;
 
 public: // メンバ関数
 	// コンストラクタ

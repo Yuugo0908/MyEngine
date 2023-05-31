@@ -22,7 +22,7 @@ FadeScene* FadeScene::GetInstance()
 
 void FadeScene::Initialize()
 {
-	if (!Image2d::LoadTexture(fadeNum, L"Resources/fade.png"))
+	if (!Image2d::LoadTexture(fadeNum, "fade"))
 	{
 		assert(0);
 	}

@@ -12,35 +12,35 @@ void TutorialScene::Initialize()
 	// 3Dオブジェクトにカメラをセット
 	Object3d::SetCamera(camera);
 
-	if (!Image2d::LoadTexture(HPTextNum, L"Resources/HPText.png"))
+	if (!Image2d::LoadTexture(HPTextNum, "HPText"))
 	{
 		assert(0);
 	}
 	HPText = Image2d::Create(HPTextNum, { 0.0f,0.0f });
 	HPText->SetSize({ 1280.0f,720.0f });
 
-	if (!Image2d::LoadTexture(HPBarNum, L"Resources/HPBar.png"))
+	if (!Image2d::LoadTexture(HPBarNum, "HPBar"))
 	{
 		assert(0);
 	}
 	PlayerHPBar = Image2d::Create(HPBarNum, { 0.0f,45.0f });
 	PlayerHPBar->SetSize({ 360.0f,60.0f });
 
-	if (!Image2d::LoadTexture(HPGaugeNum, L"Resources/PlayerHPGauge.png"))
+	if (!Image2d::LoadTexture(HPGaugeNum, "PlayerHPGauge"))
 	{
 		assert(0);
 	}
 	PlayerHPGauge = Image2d::Create(HPGaugeNum, { 0.0f,45.0f });
 	PlayerHPGauge->SetSize({ 30.0f,60.0f });
 
-	if (!Image2d::LoadTexture(wasdNum, L"Resources/wasdKey.png"))
+	if (!Image2d::LoadTexture(wasdNum, "wasdKey"))
 	{
 		assert(0);
 	}
 	wasdKey = Image2d::Create(wasdNum, { 0.0f, 0.0f });
 	wasdKey->SetPosition({50.0f, 400.0f});
 	wasdKey->SetSize({ 256.0f,256.0f });
-	if (!Image2d::LoadTexture(spaceNum, L"Resources/spaceKey.png"))
+	if (!Image2d::LoadTexture(spaceNum, "spaceKey"))
 	{
 		assert(0);
 	}
@@ -48,7 +48,7 @@ void TutorialScene::Initialize()
 	spaceKey->SetPosition({ 512.0f, 500.0f });
 	spaceKey->SetSize({ 256.0f,256.0f });
 
-	if (!Image2d::LoadTexture(mouseNum, L"Resources/mouse.png"))
+	if (!Image2d::LoadTexture(mouseNum, "mouse"))
 	{
 		assert(0);
 	}
@@ -56,7 +56,7 @@ void TutorialScene::Initialize()
 	mouseImg->SetPosition({ 1000.0f, 400.0f });
 	mouseImg->SetSize({ 256.0f,256.0f });
 
-	if (!Image2d::LoadTexture(mouseLeftNum, L"Resources/mouse_left.png"))
+	if (!Image2d::LoadTexture(mouseLeftNum, "mouse_left"))
 	{
 		assert(0);
 	}
@@ -64,7 +64,7 @@ void TutorialScene::Initialize()
 	mouseLeftImg->SetPosition({ 1000.0f, 400.0f });
 	mouseLeftImg->SetSize({ 256.0f,256.0f });
 
-	if (!Image2d::LoadTexture(mouseRightNum, L"Resources/mouse_right.png"))
+	if (!Image2d::LoadTexture(mouseRightNum, "mouse_right"))
 	{
 		assert(0);
 	}
@@ -73,11 +73,11 @@ void TutorialScene::Initialize()
 	mouseRightImg->SetSize({ 256.0f,256.0f });
 
 	// パーティクル生成
-	effectBox = Particle::Create(L"Resources/effectBox.png");
-	effectCircle = Particle::Create(L"Resources/effectCircle.png");
-	effectCircle2 = Particle::Create(L"Resources/effectCircle2.png");
-	effectTarget = Particle::Create(L"Resources/effectBox2.png");
-	effectAvoid = Particle::Create(L"Resources/effectBox2.png");
+	effectBox = Particle::Create("effectBox");
+	effectCircle = Particle::Create("effectCircle");
+	effectCircle2 = Particle::Create("effectCircle2");
+	effectTarget = Particle::Create("effectBox2");
+	effectAvoid = Particle::Create("effectBox2");
 
 	enemy->ModelInit();
 	rope->Initialize();

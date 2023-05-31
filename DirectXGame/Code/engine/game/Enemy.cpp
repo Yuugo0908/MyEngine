@@ -26,8 +26,8 @@ bool Enemy::Initialize(Player* player)
 	enemyObj->SetModel(enemyModel);
 	eAlive = false;
 
-	exclamation_mark = Particle::Create(L"Resources/exclamation_mark.png");
-	question_mark = Particle::Create(L"Resources/question_mark.png");
+	exclamation_mark = Particle::Create("exclamation_mark");
+	question_mark = Particle::Create("question_mark");
 
 	return true;
 }

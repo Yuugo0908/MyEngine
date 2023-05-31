@@ -4,14 +4,14 @@
 void GameClearScene::Initialize()
 {
 	// ƒQ[ƒ€ƒNƒŠƒA‰æ‘œ“Ç‚Ýž‚Ý
-	if (!Image2d::LoadTexture(GameClearNum, L"Resources/GameClear.png"))
+	if (!Image2d::LoadTexture(GameClearNum, "GameClear"))
 	{
 		assert(0);
 	}
 	GameClear = Image2d::Create(GameClearNum, { 0.0f,0.0f });
 	GameClear->SetSize({ 1280.0f,720.0f });
 
-	if (!Image2d::LoadTexture(fadeNum, L"Resources/fade.png"))
+	if (!Image2d::LoadTexture(fadeNum, "fade"))
 	{
 		assert(0);
 	}
@@ -19,7 +19,7 @@ void GameClearScene::Initialize()
 	fadeTex->SetSize({ 1280.0f,720.0f });
 	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
 
-	if (!Image2d::LoadTexture(backNum, L"Resources/backGround.png"))
+	if (!Image2d::LoadTexture(backNum, "backGround"))
 	{
 		assert(0);
 	}

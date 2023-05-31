@@ -3,14 +3,14 @@
 
 void GameOverScene::Initialize()
 {
-	if (!Image2d::LoadTexture(GameOverNum, L"Resources/GameOver.png"))
+	if (!Image2d::LoadTexture(GameOverNum, "GameOver"))
 	{
 		assert(0);
 	}
 	GameOver = Image2d::Create(GameOverNum, { 0.0f,0.0f });
 	GameOver->SetSize({ 1280.0f,720.0f });
 
-	if (!Image2d::LoadTexture(backNum, L"Resources/backGround.png"))
+	if (!Image2d::LoadTexture(backNum, "backGround"))
 	{
 		assert(0);
 	}

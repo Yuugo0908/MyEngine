@@ -5,7 +5,7 @@
 void TitleScene::Initialize() {
 
 	// ƒ^ƒCƒgƒ‹‰æ‘œ“Ç‚İ‚İ
-	if (!Image2d::LoadTexture(titleNum, L"Resources/title.png"))
+	if (!Image2d::LoadTexture(titleNum, "title"))
 	{
 		assert(0);
 	}

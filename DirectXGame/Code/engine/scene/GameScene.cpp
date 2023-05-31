@@ -12,21 +12,21 @@ void GameScene::Initialize()
 	// 3Dオブジェクトにカメラをセット
 	Object3d::SetCamera(camera);
 
-	if (!Image2d::LoadTexture(HPTextNum, L"Resources/HPText.png"))
+	if (!Image2d::LoadTexture(HPTextNum, "HPText"))
 	{
 		assert(0);
 	}
 	HPText = Image2d::Create(HPTextNum, { 0.0f,0.0f });
 	HPText->SetSize({ 1280.0f,720.0f });
 
-	if (!Image2d::LoadTexture(HPBarNum, L"Resources/HPBar.png"))
+	if (!Image2d::LoadTexture(HPBarNum, "HPBar"))
 	{
 		assert(0);
 	}
 	PlayerHPBar = Image2d::Create(HPBarNum, { 0.0f,45.0f });
 	PlayerHPBar->SetSize({ 360.0f,60.0f });
 
-	if (!Image2d::LoadTexture(HPGaugeNum, L"Resources/PlayerHPGauge.png"))
+	if (!Image2d::LoadTexture(HPGaugeNum, "PlayerHPGauge"))
 	{
 		assert(0);
 	}
@@ -34,11 +34,11 @@ void GameScene::Initialize()
 	PlayerHPGauge->SetSize({ 30.0f,60.0f });
 
 	// パーティクル生成
-	effectBox = Particle::Create(L"Resources/effectBox.png");
-	effectCircle = Particle::Create(L"Resources/effectCircle.png");
-	effectCircle2 = Particle::Create(L"Resources/effectCircle2.png");
-	effectTarget = Particle::Create(L"Resources/effectBox2.png");
-	effectAvoid = Particle::Create(L"Resources/effectBox2.png");
+	effectBox = Particle::Create("effectBox");
+	effectCircle = Particle::Create("effectCircle");
+	effectCircle2 = Particle::Create("effectCircle2");
+	effectTarget = Particle::Create("effectBox2");
+	effectAvoid = Particle::Create("effectBox2");
 
 	enemy->ModelInit();
 	rope->Initialize();
