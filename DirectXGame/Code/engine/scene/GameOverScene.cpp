@@ -3,18 +3,11 @@
 
 void GameOverScene::Initialize()
 {
-	if (!Image2d::LoadTexture(GameOverNum, "GameOver"))
-	{
-		assert(0);
-	}
-	GameOver = Image2d::Create(GameOverNum, { 0.0f,0.0f });
+	// ƒQ[ƒ€ƒI[ƒo[‰æ‘œ¶¬
+	GameOver = Image2d::Create(Image2d::ImgNumber::GameOverNum, { 0.0f,0.0f });
 	GameOver->SetSize({ 1280.0f,720.0f });
-
-	if (!Image2d::LoadTexture(backNum, "backGround"))
-	{
-		assert(0);
-	}
-	backGround = Image2d::Create(backNum, { 0.0f,0.0f });
+	// ”wŒi‰æ‘œ¶¬
+	backGround = Image2d::Create(Image2d::ImgNumber::backNum, { 0.0f,0.0f });
 	backGround->SetSize({ 1280.0f,720.0f });
 	backGround->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 }

@@ -84,12 +84,6 @@ private: // メンバ変数
 		title_, tutorial_, game_, clear_, failure_
 	};
 
-	enum Image2dNum
-	{
-		// 0番はデバッグテキストなので除外
-		HPTextNum = 1, HPBarNum, HPGaugeNum, wasdNum, spaceNum, mouseNum, mouseLeftNum, mouseRightNum
-	};
-
 	enum TutorialState
 	{
 		None, ropeThrow, Avoid, Attack

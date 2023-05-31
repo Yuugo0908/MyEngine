@@ -52,8 +52,6 @@ protected: // ƒƒ“ƒo•Ï”
 	Light* light = nullptr;
 	SceneManager* sceneManager = nullptr;
 	AbstructSceneFactory* sceneFactory_ = nullptr;
-
-	const int debugTextNum = 0;
 	bool firstBootFlag = false;
 };
 

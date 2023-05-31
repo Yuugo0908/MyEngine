@@ -82,12 +82,6 @@ private: // メンバ変数
 		title_, tutorial_, game_, clear_, failure_
 	};
 
-	enum Image2dNum
-	{
-		// 0番はデバッグテキストなので除外
-		HPTextNum = 1, HPBarNum, HPGaugeNum,
-	};
-
 	// レベルデータ
 	LevelData* levelData = nullptr;
 	// レベルデータで読み込んだオブジェクト

@@ -33,11 +33,6 @@ private: // ƒƒ“ƒo•Ï”
 	Audio* audio = Audio::GetInstance();
 	Camera* camera = Camera::GetInstance();
 
-	enum Image2dNum
-	{
-		GameOverNum = 1, backNum
-	};
-
 	// ‰æ‘œ
 	Image2d* GameOver = nullptr;
 	Image2d* backGround = nullptr;

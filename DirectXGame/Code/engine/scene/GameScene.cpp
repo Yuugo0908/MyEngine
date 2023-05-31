@@ -12,25 +12,12 @@ void GameScene::Initialize()
 	// 3Dオブジェクトにカメラをセット
 	Object3d::SetCamera(camera);
 
-	if (!Image2d::LoadTexture(HPTextNum, "HPText"))
-	{
-		assert(0);
-	}
-	HPText = Image2d::Create(HPTextNum, { 0.0f,0.0f });
+	// プレイヤーHP表示用画像の生成
+	HPText = Image2d::Create(Image2d::ImgNumber::HPTextNum, { 0.0f,0.0f });
 	HPText->SetSize({ 1280.0f,720.0f });
-
-	if (!Image2d::LoadTexture(HPBarNum, "HPBar"))
-	{
-		assert(0);
-	}
-	PlayerHPBar = Image2d::Create(HPBarNum, { 0.0f,45.0f });
+	PlayerHPBar = Image2d::Create(Image2d::ImgNumber::HPBarNum, { 0.0f,45.0f });
 	PlayerHPBar->SetSize({ 360.0f,60.0f });
-
-	if (!Image2d::LoadTexture(HPGaugeNum, "PlayerHPGauge"))
-	{
-		assert(0);
-	}
-	PlayerHPGauge = Image2d::Create(HPGaugeNum, { 0.0f,45.0f });
+	PlayerHPGauge = Image2d::Create(Image2d::ImgNumber::HPGaugeNum, { 0.0f,45.0f });
 	PlayerHPGauge->SetSize({ 30.0f,60.0f });
 
 	// パーティクル生成

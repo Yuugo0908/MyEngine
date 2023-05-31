@@ -3,27 +3,11 @@
 
 void GameClearScene::Initialize()
 {
-	// ƒQ[ƒ€ƒNƒŠƒA‰æ‘œ“Ç‚Ýž‚Ý
-	if (!Image2d::LoadTexture(GameClearNum, "GameClear"))
-	{
-		assert(0);
-	}
-	GameClear = Image2d::Create(GameClearNum, { 0.0f,0.0f });
+	// ƒQ[ƒ€ƒNƒŠƒA‰æ‘œ¶¬
+	GameClear = Image2d::Create(Image2d::ImgNumber::GameClearNum, { 0.0f,0.0f });
 	GameClear->SetSize({ 1280.0f,720.0f });
-
-	if (!Image2d::LoadTexture(fadeNum, "fade"))
-	{
-		assert(0);
-	}
-	fadeTex = Image2d::Create(fadeNum, { 0.0f,0.0f });
-	fadeTex->SetSize({ 1280.0f,720.0f });
-	fadeTex->SetColor({ 1.0f, 1.0f, 1.0f, 0.0f });
-
-	if (!Image2d::LoadTexture(backNum, "backGround"))
-	{
-		assert(0);
-	}
-	backGround = Image2d::Create(backNum, { 0.0f,0.0f });
+	// ”wŒi‰æ‘œ¶¬
+	backGround = Image2d::Create(Image2d::ImgNumber::backNum, { 0.0f,0.0f });
 	backGround->SetSize({ 1280.0f,720.0f });
 	backGround->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 }
@@ -31,7 +15,6 @@ void GameClearScene::Initialize()
 void GameClearScene::Finalize()
 {
 	safe_delete(GameClear);
-	safe_delete(fadeTex);
 	safe_delete(backGround);
 }
 

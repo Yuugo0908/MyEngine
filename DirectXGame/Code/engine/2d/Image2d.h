@@ -25,6 +25,13 @@ public: // サブクラス
 		XMFLOAT4 color; // 色 (RGBA)
 		XMMATRIX mat; // ３Ｄ変換行列
 	};
+	enum ImgNumber
+	{
+		debugTextNum,
+		titleNum, backNum, GameClearNum, GameOverNum,
+		HPTextNum, HPBarNum, HPGaugeNum,
+		wasdNum, spaceNum, mouseNum, mouseLeftNum, mouseRightNum
+	};
 
 public: // 静的メンバ関数
 	// 静的初期化

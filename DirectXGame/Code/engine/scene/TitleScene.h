@@ -41,11 +41,6 @@ private: // メンバ変数
 
 	Light* light = nullptr;
 
-	enum Image2dNum
-	{
-		titleNum = 1, backNum
-	};
-
 	// レベルデータ
 	LevelData* levelData = nullptr;
 	// レベルデータで読み込んだオブジェクト

@@ -12,63 +12,28 @@ void TutorialScene::Initialize()
 	// 3Dオブジェクトにカメラをセット
 	Object3d::SetCamera(camera);
 
-	if (!Image2d::LoadTexture(HPTextNum, "HPText"))
-	{
-		assert(0);
-	}
-	HPText = Image2d::Create(HPTextNum, { 0.0f,0.0f });
+	// プレイヤーHP表示用画像の生成
+	HPText = Image2d::Create(Image2d::ImgNumber::HPTextNum, { 0.0f,0.0f });
 	HPText->SetSize({ 1280.0f,720.0f });
-
-	if (!Image2d::LoadTexture(HPBarNum, "HPBar"))
-	{
-		assert(0);
-	}
-	PlayerHPBar = Image2d::Create(HPBarNum, { 0.0f,45.0f });
+	PlayerHPBar = Image2d::Create(Image2d::ImgNumber::HPBarNum, { 0.0f,45.0f });
 	PlayerHPBar->SetSize({ 360.0f,60.0f });
-
-	if (!Image2d::LoadTexture(HPGaugeNum, "PlayerHPGauge"))
-	{
-		assert(0);
-	}
-	PlayerHPGauge = Image2d::Create(HPGaugeNum, { 0.0f,45.0f });
+	PlayerHPGauge = Image2d::Create(Image2d::ImgNumber::HPGaugeNum, { 0.0f,45.0f });
 	PlayerHPGauge->SetSize({ 30.0f,60.0f });
 
-	if (!Image2d::LoadTexture(wasdNum, "wasdKey"))
-	{
-		assert(0);
-	}
-	wasdKey = Image2d::Create(wasdNum, { 0.0f, 0.0f });
+	// チュートリアル用画像の生成
+	wasdKey = Image2d::Create(Image2d::ImgNumber::wasdNum, { 0.0f, 0.0f });
 	wasdKey->SetPosition({50.0f, 400.0f});
 	wasdKey->SetSize({ 256.0f,256.0f });
-	if (!Image2d::LoadTexture(spaceNum, "spaceKey"))
-	{
-		assert(0);
-	}
-	spaceKey = Image2d::Create(spaceNum, { 0.0f, 0.0f });
+	spaceKey = Image2d::Create(Image2d::ImgNumber::spaceNum, { 0.0f, 0.0f });
 	spaceKey->SetPosition({ 512.0f, 500.0f });
 	spaceKey->SetSize({ 256.0f,256.0f });
-
-	if (!Image2d::LoadTexture(mouseNum, "mouse"))
-	{
-		assert(0);
-	}
-	mouseImg = Image2d::Create(mouseNum, { 0.0f, 0.0f });
+	mouseImg = Image2d::Create(Image2d::ImgNumber::mouseNum, { 0.0f, 0.0f });
 	mouseImg->SetPosition({ 1000.0f, 400.0f });
 	mouseImg->SetSize({ 256.0f,256.0f });
-
-	if (!Image2d::LoadTexture(mouseLeftNum, "mouse_left"))
-	{
-		assert(0);
-	}
-	mouseLeftImg = Image2d::Create(mouseLeftNum, { 0.0f, 0.0f });
+	mouseLeftImg = Image2d::Create(Image2d::ImgNumber::mouseLeftNum, { 0.0f, 0.0f });
 	mouseLeftImg->SetPosition({ 1000.0f, 400.0f });
 	mouseLeftImg->SetSize({ 256.0f,256.0f });
-
-	if (!Image2d::LoadTexture(mouseRightNum, "mouse_right"))
-	{
-		assert(0);
-	}
-	mouseRightImg = Image2d::Create(mouseRightNum, { 0.0f, 0.0f });
+	mouseRightImg = Image2d::Create(Image2d::ImgNumber::mouseRightNum, { 0.0f, 0.0f });
 	mouseRightImg->SetPosition({ 1000.0f, 400.0f });
 	mouseRightImg->SetSize({ 256.0f,256.0f });
 

@@ -2,14 +2,10 @@
 #include <cassert>
 #include "SceneManager.h"
 
-void TitleScene::Initialize() {
-
-	// タイトル画像読み込み
-	if (!Image2d::LoadTexture(titleNum, "title"))
-	{
-		assert(0);
-	}
-	title = Image2d::Create(titleNum, { 0.0f,0.0f });
+void TitleScene::Initialize()
+{
+	// タイトル画像生成
+	title = Image2d::Create(Image2d::ImgNumber::titleNum, { 0.0f,0.0f });
 	title->SetSize({ 1280.0f,720.0f });
 
 	// ライトの生成

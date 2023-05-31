@@ -34,15 +34,9 @@ private: // ƒƒ“ƒo•Ï”
 	Audio* audio = Audio::GetInstance();
 	Camera* camera = Camera::GetInstance();
 
-	enum Image2dNum
-	{
-		GameClearNum = 1, backNum, fadeNum,
-	};
-
 	// ‰æ‘œ
 	Image2d* GameClear = nullptr;
 	Image2d* backGround = nullptr;
-	Image2d* fadeTex = nullptr;
 
 	float alpha = 1.0f;
 	bool fadeFlag = false;
