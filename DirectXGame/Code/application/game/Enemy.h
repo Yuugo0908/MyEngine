@@ -71,7 +71,7 @@ public:
 	// ’…’n
 	void SetOnGround(bool onGround) { this->onGround = onGround; }
 	// oŒ»À•W‚ÌŽæ“¾
-	void SetRespawnPos(XMFLOAT3 spawnPos) { this->spawnPos = spawnPos; }
+	void SetSpawnPos(XMFLOAT3 spawnPos) { this->spawnPos = spawnPos; }
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
@@ -99,6 +99,7 @@ private:
 	XMFLOAT3 eScale = {};
 	XMFLOAT3 eRot = {};
 	XMFLOAT3 spawnPos = {};
+	XMFLOAT3 preMovePos = {};
 
 	const float limitPos = -30.0f;
 

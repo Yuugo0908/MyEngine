@@ -43,9 +43,6 @@
     <Filter Include="ソースファイル\application\scene">
       <UniqueIdentifier>{8f3f2efc-2db2-4f90-b73e-f11df34d8834}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソースファイル\application\math">
-      <UniqueIdentifier>{5a6546e3-b902-4f40-81af-3942b33045c7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソースファイル\engine\level">
       <UniqueIdentifier>{673c4b44-5bb9-4a8f-ac74-226cd99957b0}</UniqueIdentifier>
     </Filter>
@@ -69,9 +66,6 @@
     </Filter>
     <Filter Include="ヘッダーファイル\application\game">
       <UniqueIdentifier>{5131a954-cdb5-4b97-962a-c9f07ea62072}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダーファイル\application\math">
-      <UniqueIdentifier>{10681935-48d7-43ef-9f9b-2c26e4d03dc6}</UniqueIdentifier>
     </Filter>
     <Filter Include="ヘッダーファイル\application\scene">
       <UniqueIdentifier>{bb905e39-6b2f-4da5-8cc8-43487ca05041}</UniqueIdentifier>
@@ -105,6 +99,12 @@
     </Filter>
     <Filter Include="ヘッダーファイル\engine\winApp">
       <UniqueIdentifier>{dcf76f44-8fd7-43ce-a621-1b0943302dc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソースファイル\engine\math">
+      <UniqueIdentifier>{b73991de-aeee-4217-82e8-61cfaa5aaf3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダーファイル\engine\math">
+      <UniqueIdentifier>{4f5385fe-9b4d-4da8-b94f-4ce91cd4b8b5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -174,15 +174,6 @@
     </ClCompile>
     <ClCompile Include="Code\application\game\Rope.cpp">
       <Filter>ソースファイル\application\game</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\application\math\Collision.cpp">
-      <Filter>ソースファイル\application\math</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\application\math\Easing.cpp">
-      <Filter>ソースファイル\application\math</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\application\math\Operator.cpp">
-      <Filter>ソースファイル\application\math</Filter>
     </ClCompile>
     <ClCompile Include="Code\application\scene\FadeScene.cpp">
       <Filter>ソースファイル\application\scene</Filter>
@@ -256,14 +247,23 @@
     <ClCompile Include="Code\engine\scene\Framework.cpp">
       <Filter>ソースファイル\engine\scene</Filter>
     </ClCompile>
-    <ClCompile Include="Code\engine\scene\SceneFactory.cpp">
-      <Filter>ソースファイル\engine\scene</Filter>
-    </ClCompile>
     <ClCompile Include="Code\engine\scene\SceneManager.cpp">
       <Filter>ソースファイル\engine\scene</Filter>
     </ClCompile>
     <ClCompile Include="Code\engine\winApp\WinApp.cpp">
       <Filter>ソースファイル\engine\winApp</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\engine\math\Collision.cpp">
+      <Filter>ソースファイル\engine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\engine\math\Easing.cpp">
+      <Filter>ソースファイル\engine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\engine\math\Operator.cpp">
+      <Filter>ソースファイル\engine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\application\scene\SceneFactory.cpp">
+      <Filter>ソースファイル\application\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -275,15 +275,6 @@
     </ClInclude>
     <ClInclude Include="Code\application\game\Player.h">
       <Filter>ヘッダーファイル\application\game</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\application\math\Collision.h">
-      <Filter>ヘッダーファイル\application\math</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\application\math\Easing.h">
-      <Filter>ヘッダーファイル\application\math</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\application\math\Operator.h">
-      <Filter>ヘッダーファイル\application\math</Filter>
     </ClInclude>
     <ClInclude Include="Code\application\scene\FadeScene.h">
       <Filter>ヘッダーファイル\application\scene</Filter>
@@ -363,20 +354,29 @@
     <ClInclude Include="Code\engine\scene\Framework.h">
       <Filter>ヘッダーファイル\engine\scene</Filter>
     </ClInclude>
-    <ClInclude Include="Code\engine\scene\SceneFactory.h">
-      <Filter>ヘッダーファイル\engine\scene</Filter>
-    </ClInclude>
     <ClInclude Include="Code\engine\scene\SceneManager.h">
       <Filter>ヘッダーファイル\engine\scene</Filter>
     </ClInclude>
     <ClInclude Include="Code\engine\winApp\WinApp.h">
       <Filter>ヘッダーファイル\engine\winApp</Filter>
     </ClInclude>
-    <ClInclude Include="Code\engine\SafeDelete.h">
-      <Filter>ヘッダーファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Code\application\game\Rope.h">
       <Filter>ヘッダーファイル\application\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\engine\math\Collision.h">
+      <Filter>ヘッダーファイル\engine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\engine\math\Easing.h">
+      <Filter>ヘッダーファイル\engine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\engine\math\Operator.h">
+      <Filter>ヘッダーファイル\engine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\application\scene\SceneFactory.h">
+      <Filter>ヘッダーファイル\application\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\SafeDelete.h">
+      <Filter>ヘッダーファイル\application</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

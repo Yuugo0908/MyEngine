@@ -59,7 +59,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Code\engine;$(ProjectDir)Code\engine\2d;$(ProjectDir)Code\engine\3d;$(ProjectDir)Code\engine\audio;$(ProjectDir)Code\engine\camera;$(ProjectDir)Code\engine\directXCommon;$(ProjectDir)Code\engine\input;$(ProjectDir)Code\engine\level;$(ProjectDir)Code\engine\postEffect;$(ProjectDir)Code\engine\safeDelete;$(ProjectDir)Code\engine\scene;$(ProjectDir)Code\engine\winApp;$(ProjectDir)Code\application;$(ProjectDir)Code\application\game;$(ProjectDir)Code\application\math;$(ProjectDir)Code\application\scene</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Code;$(ProjectDir)Code\engine\2d;$(ProjectDir)Code\engine\3d;$(ProjectDir)Code\engine\audio;$(ProjectDir)Code\engine\camera;$(ProjectDir)Code\engine\directXCommon;$(ProjectDir)Code\engine\input;$(ProjectDir)Code\engine\level;$(ProjectDir)Code\engine\math;$(ProjectDir)Code\engine\postEffect;$(ProjectDir)Code\engine\safeDelete;$(ProjectDir)Code\engine\scene;$(ProjectDir)Code\engine\winApp;$(ProjectDir)Code\application\game;$(ProjectDir)Code\application\scene</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
@@ -78,7 +78,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Code\engine;$(ProjectDir)Code\engine\2d;$(ProjectDir)Code\engine\3d;$(ProjectDir)Code\engine\audio;$(ProjectDir)Code\engine\camera;$(ProjectDir)Code\engine\directXCommon;$(ProjectDir)Code\engine\input;$(ProjectDir)Code\engine\level;$(ProjectDir)Code\engine\postEffect;$(ProjectDir)Code\engine\safeDelete;$(ProjectDir)Code\engine\scene;$(ProjectDir)Code\engine\winApp;$(ProjectDir)Code\application;$(ProjectDir)Code\application\game;$(ProjectDir)Code\application\math;$(ProjectDir)Code\application\scene</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Code;$(ProjectDir)Code\engine\2d;$(ProjectDir)Code\engine\3d;$(ProjectDir)Code\engine\audio;$(ProjectDir)Code\engine\camera;$(ProjectDir)Code\engine\directXCommon;$(ProjectDir)Code\engine\input;$(ProjectDir)Code\engine\level;$(ProjectDir)Code\engine\math;$(ProjectDir)Code\engine\postEffect;$(ProjectDir)Code\engine\safeDelete;$(ProjectDir)Code\engine\scene;$(ProjectDir)Code\engine\winApp;$(ProjectDir)Code\application\game;$(ProjectDir)Code\application\scene</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -172,14 +172,12 @@
     <ClCompile Include="Code\application\game\Enemy.cpp" />
     <ClCompile Include="Code\application\game\Player.cpp" />
     <ClCompile Include="Code\application\game\Rope.cpp" />
-    <ClCompile Include="Code\application\math\Collision.cpp" />
-    <ClCompile Include="Code\application\math\Easing.cpp" />
-    <ClCompile Include="Code\application\math\Operator.cpp" />
     <ClCompile Include="Code\application\scene\FadeScene.cpp" />
     <ClCompile Include="Code\application\scene\GameClearScene.cpp" />
     <ClCompile Include="Code\application\scene\GameOverScene.cpp" />
     <ClCompile Include="Code\application\scene\GameScene.cpp" />
     <ClCompile Include="Code\application\scene\MyGame.cpp" />
+    <ClCompile Include="Code\application\scene\SceneFactory.cpp" />
     <ClCompile Include="Code\application\scene\TitleScene.cpp" />
     <ClCompile Include="Code\application\scene\TutorialScene.cpp" />
     <ClCompile Include="Code\engine\2d\DebugText.cpp" />
@@ -195,11 +193,13 @@
     <ClCompile Include="Code\engine\input\Keyboard.cpp" />
     <ClCompile Include="Code\engine\input\Mouse.cpp" />
     <ClCompile Include="Code\engine\level\LevelLoader.cpp" />
+    <ClCompile Include="Code\engine\math\Collision.cpp" />
+    <ClCompile Include="Code\engine\math\Easing.cpp" />
+    <ClCompile Include="Code\engine\math\Operator.cpp" />
     <ClCompile Include="Code\engine\postEffect\MultiRT.cpp" />
     <ClCompile Include="Code\engine\postEffect\MultiTex.cpp" />
     <ClCompile Include="Code\engine\postEffect\PostEffect.cpp" />
     <ClCompile Include="Code\engine\scene\Framework.cpp" />
-    <ClCompile Include="Code\engine\scene\SceneFactory.cpp" />
     <ClCompile Include="Code\engine\scene\SceneManager.cpp" />
     <ClCompile Include="Code\engine\winApp\WinApp.cpp" />
     <ClCompile Include="Code\main.cpp" />
@@ -209,14 +209,12 @@
     <ClInclude Include="Code\application\game\Enemy.h" />
     <ClInclude Include="Code\application\game\Player.h" />
     <ClInclude Include="Code\application\game\Rope.h" />
-    <ClInclude Include="Code\application\math\Collision.h" />
-    <ClInclude Include="Code\application\math\Easing.h" />
-    <ClInclude Include="Code\application\math\Operator.h" />
     <ClInclude Include="Code\application\scene\FadeScene.h" />
     <ClInclude Include="Code\application\scene\GameClearScene.h" />
     <ClInclude Include="Code\application\scene\GameOverScene.h" />
     <ClInclude Include="Code\application\scene\GameScene.h" />
     <ClInclude Include="Code\application\scene\MyGame.h" />
+    <ClInclude Include="Code\application\scene\SceneFactory.h" />
     <ClInclude Include="Code\application\scene\TitleScene.h" />
     <ClInclude Include="Code\application\scene\TutorialScene.h" />
     <ClInclude Include="Code\engine\2d\DebugText.h" />
@@ -232,16 +230,18 @@
     <ClInclude Include="Code\engine\input\Keyboard.h" />
     <ClInclude Include="Code\engine\input\Mouse.h" />
     <ClInclude Include="Code\engine\level\LevelLoader.h" />
+    <ClInclude Include="Code\engine\math\Collision.h" />
+    <ClInclude Include="Code\engine\math\Easing.h" />
+    <ClInclude Include="Code\engine\math\Operator.h" />
     <ClInclude Include="Code\engine\postEffect\MultiRT.h" />
     <ClInclude Include="Code\engine\postEffect\MultiTex.h" />
     <ClInclude Include="Code\engine\postEffect\PostEffect.h" />
-    <ClInclude Include="Code\engine\SafeDelete.h" />
     <ClInclude Include="Code\engine\scene\AbstructSceneFactory.h" />
     <ClInclude Include="Code\engine\scene\BaseScene.h" />
     <ClInclude Include="Code\engine\scene\Framework.h" />
-    <ClInclude Include="Code\engine\scene\SceneFactory.h" />
     <ClInclude Include="Code\engine\scene\SceneManager.h" />
     <ClInclude Include="Code\engine\winApp\WinApp.h" />
+    <ClInclude Include="Code\SafeDelete.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

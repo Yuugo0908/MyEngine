@@ -618,7 +618,7 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 			newEnemy->GetObj()->SetPosition(pos);
 			newEnemy->GetObj()->SetScale(scale);
 			newEnemy->GetObj()->SetCollisionScale(size);
-			newEnemy->SetRespawnPos(pos);
+			newEnemy->SetSpawnPos(pos);
 			newEnemy->Update();
 			enemies.push_back(std::move(newEnemy));
 			enemyCount++;

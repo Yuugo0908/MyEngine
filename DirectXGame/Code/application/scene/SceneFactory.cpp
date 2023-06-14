@@ -16,6 +16,14 @@ BaseScene* SceneFactory::CreateScene(const std::string& sceneName)
     }
     else if (sceneName == "Tutorial")
     {
+        // ゲーム中、チュートリアルは1回だけ実行
+        if (tutorialFlag)
+        {
+            newScene = new GameScene();
+            return newScene;
+        }
+
+        tutorialFlag = true;
         newScene = new TutorialScene();
     }
     else if (sceneName == "Game")

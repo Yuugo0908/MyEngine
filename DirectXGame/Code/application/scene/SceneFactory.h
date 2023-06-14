@@ -11,5 +11,7 @@ public:
 	/// <param name="sceneName"></param>
 	/// <returns></returns>
 	BaseScene* CreateScene(const std::string& sceneName) override;
+
+	bool tutorialFlag = false;
 };
 

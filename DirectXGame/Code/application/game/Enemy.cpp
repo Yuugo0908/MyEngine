@@ -62,7 +62,7 @@ void Enemy::Update()
 
 		enemyObj->SetPosition(ePos);
 		enemyObj->SetScale(eScale);
-		enemyObj->SetRotation({ 0, 30, 0 });
+		enemyObj->SetRotation({ 0, 0, 0 });
 		enemyObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 		enemyObj->Update();
 		return;
@@ -78,7 +78,6 @@ void Enemy::Update()
 
 	pPos = player->GetObj()->GetPosition();
 	PElength = GetLength(pPos, ePos);
-	lengthOld = GetLength(ePos, spawnPos);
 
 	// プレイヤーのサーチする
 	Search();
@@ -87,25 +86,6 @@ void Enemy::Update()
 	{
 		bullet->Update();
 	}
-
-	// 一定距離内なら近づいてくる
-	//if (PElength <= 30.0f)
-	//{
-	//	phase = Enemy::Phase::move;
-	//}
-
-	// 攻撃範囲なら攻撃してくる
-	//if (attackFlag)
-	//{
-	//	if (PElength <= 15.0f)
-	//	{
-	//		phase = Enemy::Phase::attack;
-	//	}
-	//}
-	//else
-	//{
-	//	phase = Enemy::Phase::stay;
-	//}
 
 	switch (phase)
 	{
@@ -134,6 +114,8 @@ void Enemy::Update()
 	case Enemy::Phase::move:
 		if (!visibleFlag)
 		{
+			preMovePos = ePos;
+
 			exclamation_mark->CreateParticles(
 				{ ePos.x, ePos.y + 3.0f, ePos.z },
 				2.0f, 2.0f,
@@ -186,23 +168,41 @@ void Enemy::Attack()
 
 void Enemy::Move()
 {
-	//XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
-	//XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
+	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
+	XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
 
-	//XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, enemyPos);
-	//XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
+	XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, enemyPos);
+	XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
 
-	//XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
+	XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
 
-	//ePos.x += subPE.x / 5;
-	//ePos.z += subPE.z / 5;
+	ePos.x += subPE.x / 5;
+	ePos.z += subPE.z / 5;
 	TrackRot(ePos, pPos);
 	enemyObj->Update();
 }
 
 void Enemy::Stay()
 {
-	//enemyObj->SetRotation({});
+	if (GetLength(ePos, spawnPos) <= 5.0f)
+	{
+		// 今後実装「敵が徘徊する」
+		enemyObj->SetRotation({});
+		return;
+	}
+
+	// 移動する前の座標に戻る
+	XMVECTOR startPos = { preMovePos.x, preMovePos.y, preMovePos.z, 1 };
+	XMVECTOR endPos = { ePos.x, ePos.y, ePos.z, 1 };
+
+	XMVECTOR sub = XMVectorSubtract(startPos, endPos);
+	XMVECTOR normalSub = XMVector3Normalize(sub);
+
+	XMFLOAT3 convertNormalSub = { normalSub.m128_f32[0], normalSub.m128_f32[1], normalSub.m128_f32[2] };
+
+	ePos.x += convertNormalSub.x / 5;
+	ePos.z += convertNormalSub.z / 5;
+	TrackRot(ePos, preMovePos);
 	enemyObj->Update();
 }
 
@@ -255,6 +255,7 @@ void Enemy::ReSpawn()
 
 		enemyObj->SetPosition(ePos);
 		enemyObj->SetScale(eScale);
+		enemyObj->SetRotation({});
 		enemyObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 		enemyObj->Update();
 	}
@@ -262,37 +263,39 @@ void Enemy::ReSpawn()
 
 void Enemy::Search()
 {
-	XMVECTOR sPos = { ePos.x, ePos.y, ePos.z, 0 };
-	XMVECTOR ePos = { pPos.x, pPos.y, pPos.z, 0 };
+	XMVECTOR startPos = { ePos.x, ePos.y, ePos.z, 0 };
+	XMVECTOR endPos = { pPos.x, pPos.y, pPos.z, 0 };
 	XMFLOAT3 enemyRot = enemyObj->GetRotation();
 
-	XMVECTOR subPos = XMVectorSubtract(sPos, ePos);
-
+	XMVECTOR subPos = XMVectorSubtract(startPos, endPos);
 	float angle = (float)atan2(subPos.m128_f32[0], subPos.m128_f32[2]);
 	angle = XMConvertToDegrees(angle);
+
+	// angleの最大値
+	float angleMax = 180.0f;
+	// エネミーの現在の回転を考慮する
+	angle = angle - enemyRot.y;
+	// angleがマイナスの場合プラスに直す
 	angle = fabsf(angle);
-	enemyRot.y = fabsf(enemyRot.y);
-	float angleMax = angle + enemyRot.y;
-	float angleMin = angle - enemyRot.y;
 
-
-	DebugText::GetInstance()->Print(100, 100, 2, "%f", angle);
+	// 最大値を超えていた場合
+	if (angleMax < angle)
+	{
+		angle = angleMax - (angle - angleMax);
+	}
 
 	// プレイヤーから離れていたらサーチしない
-	if (PElength >= 10.0f)
+	if (PElength > 30.0f || angle > 60.0f || attackFlag == false)
 	{
 		phase = Enemy::Phase::stay;
-		attackFlag = false;
 		return;
 	}
 
-	if (angle <= 60.0f)
+	phase = Enemy::Phase::move;
+
+	if (PElength <= 15.0f)
 	{
-		phase = Enemy::Phase::move;
-	}
-	else
-	{
-		phase = Enemy::Phase::stay;
+		phase = Enemy::Phase::attack;
 	}
 }
 
@@ -304,22 +307,26 @@ void Enemy::Reset()
 
 bool Enemy::ObstacleDetection(XMFLOAT3 pPos, XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 {
-	float length = GetLength(pPos, ePos);
-
-	if (length < 30.0f)
+	// 距離が一定以内だったら
+	if (PElength <= 30.0f)
 	{
+		// 障害物を検知していたら攻撃フラグをfalseにしてtrueを返す
 		if (Collision::CollisionRayBox(pPos, ePos, boxPos, boxScale))
 		{
 			attackFlag = false;
 			return true;
 		}
+		// 検知していなかったら、攻撃フラグをtrueにしてfalseを返す
 		else
 		{
 			attackFlag = true;
 			return false;
 		}
 	}
-	return false;
+
+	// 一定距離にいなければ障害物を検知した時と同じ処理を返す
+	attackFlag = false;
+	return true;
 }
 
 bool Enemy::EnemyCollision(const std::unique_ptr<Object3d>& object)

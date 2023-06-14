@@ -55,7 +55,7 @@ void TutorialScene::Initialize()
 	Object3d::SetLight(light);
 
 	//Bgm->PlayWave("Resources/BGM/bgm.wav", 255, 0.08f);
-	jsonObjectInit("test");
+	jsonObjectInit("tutorial");
 
 	// マウスカーソルを非表示
 	ShowCursor(false);
@@ -799,7 +799,7 @@ void TutorialScene::jsonObjectInit(const std::string sceneName)
 			newEnemy->GetObj()->SetPosition(pos);
 			newEnemy->GetObj()->SetScale(scale);
 			newEnemy->GetObj()->SetCollisionScale(size);
-			newEnemy->SetRespawnPos(pos);
+			newEnemy->SetSpawnPos(pos);
 			newEnemy->Update();
 			enemies.push_back(std::move(newEnemy));
 			enemyCount++;
