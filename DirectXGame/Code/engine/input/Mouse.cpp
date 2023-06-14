@@ -3,6 +3,14 @@
 
 #pragma comment(lib, "dinput8.lib")
 
+Mouse::Mouse()
+{
+}
+
+Mouse::~Mouse()
+{
+}
+
 Mouse* Mouse::GetInstance()
 {
 	static Mouse instance;

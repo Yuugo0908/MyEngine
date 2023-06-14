@@ -55,7 +55,7 @@ void TutorialScene::Initialize()
 	Object3d::SetLight(light);
 
 	//Bgm->PlayWave("Resources/BGM/bgm.wav", 255, 0.08f);
-	jsonObjectInit("tutorial");
+	jsonObjectInit("test");
 
 	// マウスカーソルを非表示
 	ShowCursor(false);
@@ -69,17 +69,17 @@ void TutorialScene::Finalize()
 	ShowCursor(true);
 
 	player->Reset();
-	for (std::unique_ptr<Enemy>& enemy : enemys)
+	for (std::unique_ptr<Enemy>& enemy : enemies)
 	{
 		enemy->Reset();
 	}
-	enemys.erase(enemys.begin(), enemys.end());
+	enemies.erase(enemies.begin(), enemies.end());
 	rope->Reset();
 	jsonObject.erase(jsonObject.begin(), jsonObject.end());
+	jsonObject.shrink_to_fit();
 
 	safe_delete(player);
 	safe_delete(enemy);
-	safe_delete(light);
 	safe_delete(levelData);
 	safe_delete(HPText);
 	safe_delete(PlayerHPBar);
@@ -344,7 +344,7 @@ void TutorialScene::Draw()
 		player->GetObj()->Draw();
 	}
 
-	for (std::unique_ptr<Enemy>& enemy : enemys)
+	for (std::unique_ptr<Enemy>& enemy : enemies)
 	{
 		enemy->Draw();
 	}
@@ -378,7 +378,7 @@ void TutorialScene::Draw()
 	effectTarget->Draw();
 	effectAvoid->Draw();
 
-	for (std::unique_ptr<Enemy>& enemy : enemys)
+	for (std::unique_ptr<Enemy>& enemy : enemies)
 	{
 		enemy->reactionDraw();
 	}
@@ -512,7 +512,7 @@ void TutorialScene::CameraUpdate()
 
 void TutorialScene::EnemyUpdate()
 {
-	for (std::unique_ptr<Enemy>& enemy : enemys)
+	for (std::unique_ptr<Enemy>& enemy : enemies)
 	{
 		pPos = player->GetObj()->GetPosition();
 		rFlag = rope->GetrFlag();
@@ -553,7 +553,7 @@ void TutorialScene::EnemyUpdate()
 			elapsedTime = 0.0f;
 			enemyCount--;
 			controller->Vibration();
-			enemys.remove(enemy);
+			enemies.remove(enemy);
 			break;
 		}
 
@@ -801,7 +801,7 @@ void TutorialScene::jsonObjectInit(const std::string sceneName)
 			newEnemy->GetObj()->SetCollisionScale(size);
 			newEnemy->SetRespawnPos(pos);
 			newEnemy->Update();
-			enemys.push_back(std::move(newEnemy));
+			enemies.push_back(std::move(newEnemy));
 			enemyCount++;
 			continue;
 		}
@@ -873,7 +873,7 @@ void TutorialScene::jsonObjectUpdate()
 			player->MapCollide(boxPos, boxScale);
 			pPos = player->GetObj()->GetPosition();
 
-			for (std::unique_ptr<Enemy>& enemy : enemys)
+			for (std::unique_ptr<Enemy>& enemy : enemies)
 			{
 				enemy->MapCollide(boxPos, boxScale);
 			}
@@ -886,7 +886,7 @@ void TutorialScene::jsonObjectUpdate()
 			player->MapCollide(wallPos, wallScale);
 			pPos = player->GetObj()->GetPosition();
 
-			for (std::unique_ptr<Enemy>& enemy : enemys)
+			for (std::unique_ptr<Enemy>& enemy : enemies)
 			{
 				enemy->MapCollide(wallPos, wallScale);
 			}
@@ -908,7 +908,7 @@ void TutorialScene::jsonObjectUpdate()
 				elapsedTime = 0.0f;
 			}
 
-			for (std::unique_ptr<Enemy>& enemy : enemys)
+			for (std::unique_ptr<Enemy>& enemy : enemies)
 			{
 				enemy->StageCollide(stagePos, stageScale);
 			}

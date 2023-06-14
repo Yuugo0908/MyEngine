@@ -16,14 +16,6 @@ BaseScene* SceneFactory::CreateScene(const std::string& sceneName)
     }
     else if (sceneName == "Tutorial")
     {
-        // 起動してから一度でもチュートリアルを行っていた場合、ゲームシーンへ移行する
-        if (tutorialFlag)
-        {
-            newScene = new GameScene();
-            return newScene;
-        }
-
-        tutorialFlag = true;
         newScene = new TutorialScene();
     }
     else if (sceneName == "Game")

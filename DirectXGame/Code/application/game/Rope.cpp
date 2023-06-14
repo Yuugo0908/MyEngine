@@ -1,5 +1,13 @@
 #include "Rope.h"
 
+Rope::Rope()
+{
+}
+
+Rope::~Rope()
+{
+}
+
 Rope* Rope::GetInstance()
 {
 	static Rope instance;

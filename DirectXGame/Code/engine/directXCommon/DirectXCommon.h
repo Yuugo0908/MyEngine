@@ -16,7 +16,16 @@ class DirectXCommon
 protected: // エイリアス
 // Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+private:
+	// カメラ初期化
+	DirectXCommon();
 
+	~DirectXCommon();
+public:
+	// コピーコンストラクタを無効化
+	DirectXCommon(const DirectXCommon& obj) = delete;
+	// 代入演算子を無効化
+	DirectXCommon& operator=(const DirectXCommon& obj) = delete;
 public: // メンバ関数
 	// インスタンス
 	static DirectXCommon* GetInstance();

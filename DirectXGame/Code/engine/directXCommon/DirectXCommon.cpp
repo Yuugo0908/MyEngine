@@ -11,6 +11,14 @@
 
 using namespace Microsoft::WRL;
 
+DirectXCommon::DirectXCommon()
+{
+}
+
+DirectXCommon::~DirectXCommon()
+{
+}
+
 DirectXCommon* DirectXCommon::GetInstance()
 {
 	static DirectXCommon instance;

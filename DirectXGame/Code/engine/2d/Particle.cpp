@@ -437,7 +437,7 @@ void Particle::InitializeGraphicsPipeline()
 	gpipeline.InputLayout.pInputElementDescs = inputLayout;
 	gpipeline.InputLayout.NumElements = _countof(inputLayout);
 
-	// 図形の形状設定（三角形）
+	// 図形の形状設定
 	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
 
 	gpipeline.NumRenderTargets = 1;	// 描画対象は1つ
@@ -491,8 +491,7 @@ void Particle::LoadTexture(const std::string& fullPath)
 
 	// ユニコード文字列に変換する
 	wchar_t wfilepath[128];
-	int iBufferSize = MultiByteToWideChar
-	(
+	int iBufferSize = MultiByteToWideChar(
 		CP_ACP,
 		0,
 		fullPath.c_str(),
@@ -503,7 +502,8 @@ void Particle::LoadTexture(const std::string& fullPath)
 
 	result = LoadFromWICFile(
 		wfilepath, WIC_FLAGS_NONE,
-		&metadata, scratchImg);
+		&metadata, scratchImg
+	);
 
 	if (FAILED(result))
 	{

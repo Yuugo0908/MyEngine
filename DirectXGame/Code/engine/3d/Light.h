@@ -11,6 +11,19 @@ class Light
 protected: // エイリアス
 // Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+private:
+	Light();
+
+	~Light();
+
+public:
+	// コピーコンストラクタを無効化
+	Light(const Light& obj) = delete;
+	// 代入演算子を無効化
+	Light& operator=(const Light& obj) = delete;
+
+public: // 静的メンバ変数
+	static Light* GetInstance();
 
 public: // サブクラス
 	// 定数バッファ用データ構造体

@@ -30,7 +30,7 @@ bool Image2d::StaticInitialize(ID3D12Device* device)
 	Image2d::device = device;
 
 	// デスクリプタサイズを取得
-	descriptorHandleIncrementSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	descriptorHandleIncrementSize = Image2d::device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	// パイプライン初期化
 	CreateGraphicsPipeline();
@@ -145,11 +145,11 @@ void Image2d::PreDraw(ID3D12GraphicsCommandList* cmdList)
 	Image2d::cmdList = cmdList;
 
 	// パイプラインステートの設定
-	cmdList->SetPipelineState(pipelineState.Get());
+	Image2d::cmdList->SetPipelineState(pipelineState.Get());
 	// ルートシグネチャの設定
-	cmdList->SetGraphicsRootSignature(rootSignature.Get());
+	Image2d::cmdList->SetGraphicsRootSignature(rootSignature.Get());
 	// プリミティブ形状を設定
-	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	Image2d::cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 }
 
 void Image2d::PostDraw()

@@ -40,72 +40,16 @@ void Framework::Initialize()
 		assert(0);
 	}
 	// ライト静的初期化
-	if (!Light::StaticInitialize(dxCommon->GetDevice()))
+	if (!Light::GetInstance()->StaticInitialize(dxCommon->GetDevice()))
 	{
 		assert(0);
 	}
+
 	// デバッグテキスト用テクスチャ読み込み
 	if (!Image2d::LoadTexture(Image2d::ImgNumber::debugTextNum, "debugfont"))
 	{
 		assert(0);
 	}
-	// タイトル画像読み込み
-	if (!Image2d::LoadTexture(Image2d::ImgNumber::titleNum, "title"))
-	{
-		assert(0);
-	}
-	// 背景画像読み込み
-	if (!Image2d::LoadTexture(Image2d::ImgNumber::backNum, "backGround"))
-	{
-		assert(0);
-	}
-	// ゲームクリア画像読み込み
-	if (!Image2d::LoadTexture(Image2d::ImgNumber::GameClearNum, "GameClear"))
-	{
-		assert(0);
-	}
-	// ゲームオーバー画像読み込み
-	if (!Image2d::LoadTexture(Image2d::ImgNumber::GameOverNum, "GameOver"))
-	{
-		assert(0);
-	}
-	// プレイヤーHP表示用画像の読み込み
-	if (!Image2d::LoadTexture(Image2d::ImgNumber::HPTextNum, "HPText"))
-	{
-		assert(0);
-	}
-	if (!Image2d::LoadTexture(Image2d::ImgNumber::HPBarNum, "HPBar"))
-	{
-		assert(0);
-	}
-	if (!Image2d::LoadTexture(Image2d::ImgNumber::HPGaugeNum, "HPGauge"))
-	{
-		assert(0);
-	}
-	// チュートリアル用画像の読み込み
-	if (!Image2d::LoadTexture(Image2d::ImgNumber::wasdNum, "wasdKey"))
-	{
-		assert(0);
-	}
-	if (!Image2d::LoadTexture(Image2d::ImgNumber::spaceNum, "spaceKey"))
-	{
-		assert(0);
-	}
-	if (!Image2d::LoadTexture(Image2d::ImgNumber::mouseNum, "mouse"))
-	{
-		assert(0);
-	}
-	if (!Image2d::LoadTexture(Image2d::ImgNumber::mouseLeftNum, "mouse_left"))
-	{
-		assert(0);
-	}
-	if (!Image2d::LoadTexture(Image2d::ImgNumber::mouseRightNum, "mouse_right"))
-	{
-		assert(0);
-	}
-
-	// フェードの初期化
-	FadeScene::GetInstance()->Initialize();
 	// デバッグテキスト初期化
 	DebugText::GetInstance()->Initialize(Image2d::ImgNumber::debugTextNum);
 }
@@ -113,8 +57,6 @@ void Framework::Initialize()
 void Framework::Finalize()
 {
 	//解放
-	safe_delete(image2d);
-	safe_delete(light);
 	safe_delete(sceneFactory_);
 	safe_delete(postEffect);
 	firstBootFlag = false;

@@ -10,6 +10,11 @@ private:
 
 	~Controller();
 public:
+	// コピーコンストラクタを無効化
+	Controller(const Controller& obj) = delete;
+	// 代入演算子を無効化
+	Controller& operator=(const Controller& obj) = delete;
+public:
 	enum class State
 	{
 		// デジタル

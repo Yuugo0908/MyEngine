@@ -7,6 +7,23 @@
 #include "WinApp.h"
 class Mouse
 {
+private: // エイリアス
+	// Microsoft::WRL::を省略
+	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+
+private:
+	Mouse();
+
+	~Mouse();
+public:
+	// コピーコンストラクタを無効化
+	Mouse(const Mouse& obj) = delete;
+	// 代入演算子を無効化
+	Mouse& operator=(const Mouse& obj) = delete;
+
+public: // 静的メンバ変数
+	static Mouse* GetInstance();
+
 public:
 	// マウスの座標
 	struct MouseMove
@@ -15,15 +32,7 @@ public:
 		long MouseY;
 		long MouseZ;
 	};
-
-private: // エイリアス
-	// Microsoft::WRL::を省略
-	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-public: // 静的メンバ変数
-	static Mouse* GetInstance();
-
 public: // メンバ関数
-
 	// 初期化
 	bool Initialize(WinApp* win_app);
 

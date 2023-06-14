@@ -39,7 +39,7 @@ private: // メンバ変数
 	Audio* audio = Audio::GetInstance();
 	Camera* camera = Camera::GetInstance();
 
-	Light* light = nullptr;
+	Light* light = Light::GetInstance();
 
 	// レベルデータ
 	LevelData* levelData = nullptr;

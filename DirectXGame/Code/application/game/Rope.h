@@ -7,6 +7,16 @@
 
 class Rope
 {
+private:
+	Rope();
+
+	~Rope();
+
+public:
+	// コピーコンストラクタを無効化
+	Rope(const Rope& obj) = delete;
+	// 代入演算子を無効化
+	Rope& operator=(const Rope& obj) = delete;
 public: // メンバ関数
 
 	static Rope* GetInstance();

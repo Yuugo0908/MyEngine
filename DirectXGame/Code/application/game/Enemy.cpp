@@ -62,6 +62,7 @@ void Enemy::Update()
 
 		enemyObj->SetPosition(ePos);
 		enemyObj->SetScale(eScale);
+		enemyObj->SetRotation({ 0, 30, 0 });
 		enemyObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 		enemyObj->Update();
 		return;
@@ -70,12 +71,17 @@ void Enemy::Update()
 	// 敵が一定座標まで落下した場合、スポーン地点に戻る
 	ReSpawn();
 
+	// 1フレーム前の敵の座標
 	eOldPos = enemyObj->GetPosition();
+	// 座標更新
 	enemyObj->SetPosition(ePos);
 
 	pPos = player->GetObj()->GetPosition();
 	PElength = GetLength(pPos, ePos);
 	lengthOld = GetLength(ePos, spawnPos);
+
+	// プレイヤーのサーチする
+	Search();
 
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
@@ -83,39 +89,35 @@ void Enemy::Update()
 	}
 
 	// 一定距離内なら近づいてくる
-	if (PElength <= 30.0f)
-	{
-		phase = Enemy::Phase::move;
-	}
+	//if (PElength <= 30.0f)
+	//{
+	//	phase = Enemy::Phase::move;
+	//}
 
 	// 攻撃範囲なら攻撃してくる
-	if (attackFlag)
-	{
-		if (PElength <= 15.0f)
-		{
-			phase = Enemy::Phase::attack;
-		}
-	}
-	else
-	{
-		phase = Enemy::Phase::stay;
-	}
+	//if (attackFlag)
+	//{
+	//	if (PElength <= 15.0f)
+	//	{
+	//		phase = Enemy::Phase::attack;
+	//	}
+	//}
+	//else
+	//{
+	//	phase = Enemy::Phase::stay;
+	//}
 
 	switch (phase)
 	{
 	case Enemy::Phase::attack:
-		if (visibleFlag)
-		{
-			Attack();
-		}
-		else
+		if (!visibleFlag)
 		{
 			exclamation_mark->CreateParticles(
 				{ ePos.x, ePos.y + 3.0f, ePos.z },
 				2.0f, 2.0f,
 				{ 1.0f, 1.0f, 1.0f, 1.0f },
 				{ 1.0f, 1.0f, 1.0f, 1.0f },
-				1, 60, false, false
+				1, 30, false, false
 			);
 
 			visibleFlag = true;
@@ -127,20 +129,17 @@ void Enemy::Update()
 			// 上昇率の更新
 			eUp = 0.5f;
 		}
+		Attack();
 		break;
 	case Enemy::Phase::move:
-		if (visibleFlag)
-		{
-			Move();
-		}
-		else
+		if (!visibleFlag)
 		{
 			exclamation_mark->CreateParticles(
 				{ ePos.x, ePos.y + 3.0f, ePos.z },
 				2.0f, 2.0f,
 				{ 1.0f, 1.0f, 1.0f, 1.0f },
 				{ 1.0f, 1.0f, 1.0f, 1.0f },
-				1, 60, false, false
+				1, 30, false, false
 			);
 
 			visibleFlag = true;
@@ -152,6 +151,7 @@ void Enemy::Update()
 			// 上昇率の更新
 			eUp = 0.5f;
 		}
+		Move();
 		break;
 	case Enemy::Phase::stay:
 	default:
@@ -162,7 +162,7 @@ void Enemy::Update()
 				2.0f, 2.0f,
 				{ 1.0f, 1.0f, 1.0f, 1.0f },
 				{ 1.0f, 1.0f, 1.0f, 1.0f },
-				1, 60, false, false
+				1, 30, false, false
 			);
 
 			visibleFlag = false;
@@ -186,23 +186,23 @@ void Enemy::Attack()
 
 void Enemy::Move()
 {
-	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
-	XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
+	//XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
+	//XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
 
-	XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, enemyPos);
-	XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
+	//XMVECTOR subPlayerEnemy = XMVectorSubtract(playerPos, enemyPos);
+	//XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
 
-	XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
+	//XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
 
-	ePos.x += subPE.x / 5;
-	ePos.z += subPE.z / 5;
+	//ePos.x += subPE.x / 5;
+	//ePos.z += subPE.z / 5;
 	TrackRot(ePos, pPos);
 	enemyObj->Update();
 }
 
 void Enemy::Stay()
 {
-	enemyObj->SetRotation({});
+	//enemyObj->SetRotation({});
 	enemyObj->Update();
 }
 
@@ -257,6 +257,42 @@ void Enemy::ReSpawn()
 		enemyObj->SetScale(eScale);
 		enemyObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 		enemyObj->Update();
+	}
+}
+
+void Enemy::Search()
+{
+	XMVECTOR sPos = { ePos.x, ePos.y, ePos.z, 0 };
+	XMVECTOR ePos = { pPos.x, pPos.y, pPos.z, 0 };
+	XMFLOAT3 enemyRot = enemyObj->GetRotation();
+
+	XMVECTOR subPos = XMVectorSubtract(sPos, ePos);
+
+	float angle = (float)atan2(subPos.m128_f32[0], subPos.m128_f32[2]);
+	angle = XMConvertToDegrees(angle);
+	angle = fabsf(angle);
+	enemyRot.y = fabsf(enemyRot.y);
+	float angleMax = angle + enemyRot.y;
+	float angleMin = angle - enemyRot.y;
+
+
+	DebugText::GetInstance()->Print(100, 100, 2, "%f", angle);
+
+	// プレイヤーから離れていたらサーチしない
+	if (PElength >= 10.0f)
+	{
+		phase = Enemy::Phase::stay;
+		attackFlag = false;
+		return;
+	}
+
+	if (angle <= 60.0f)
+	{
+		phase = Enemy::Phase::move;
+	}
+	else
+	{
+		phase = Enemy::Phase::stay;
 	}
 }
 

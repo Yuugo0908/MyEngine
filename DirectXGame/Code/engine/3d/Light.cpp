@@ -15,6 +15,21 @@ Light* Light::Create()
 	return instance;
 }
 
+Light::Light()
+{
+}
+
+Light::~Light()
+{
+}
+
+Light* Light::GetInstance()
+{
+	static Light instance;
+
+	return &instance;
+}
+
 bool Light::StaticInitialize(ID3D12Device* device)
 {
 	// 再初期化チェック

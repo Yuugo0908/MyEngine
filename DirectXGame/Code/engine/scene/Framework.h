@@ -47,9 +47,7 @@ protected: // メンバ変数
 	Controller* controller = nullptr;
 	Audio* audio = nullptr;
 	Camera* camera = nullptr;
-	Image2d* image2d = nullptr;
 	PostEffect* postEffect = nullptr;
-	Light* light = nullptr;
 	SceneManager* sceneManager = nullptr;
 	AbstructSceneFactory* sceneFactory_ = nullptr;
 	// 初回起動確認用のフラグ

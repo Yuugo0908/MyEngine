@@ -71,13 +71,13 @@ private: // メンバ変数
 	Controller* controller = Controller::GetInstance();
 	Mouse* mouse = Mouse::GetInstance();
 	Camera* camera = Camera::GetInstance();
-	Light* light = nullptr;
+	Light* light = Light::GetInstance();
 	Rope* rope = nullptr;
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
 
 	// 敵の複数生成用リスト
-	std::list<std::unique_ptr<Enemy>> enemys;
+	std::list<std::unique_ptr<Enemy>> enemies;
 
 	enum Scene
 	{

@@ -21,7 +21,9 @@ void TitleScene::Initialize()
 
 void TitleScene::Finalize()
 {
+	levelData = nullptr;
 	safe_delete(title);
+	jsonObject.erase(jsonObject.begin(), jsonObject.end());
 }
 
 void TitleScene::Update()

@@ -52,18 +52,17 @@ void GameScene::Finalize()
 	ShowCursor(true);
 
 	player->Reset();
-	for (std::unique_ptr<Enemy>& enemy : enemys)
+	for (std::unique_ptr<Enemy>& enemy : enemies)
 	{
 		enemy->Reset();
 	}
 
-	enemys.erase(enemys.begin(), enemys.end());
+	enemies.erase(enemies.begin(), enemies.end());
 	rope->Reset();
 	jsonObject.erase(jsonObject.begin(), jsonObject.end());
 
 	safe_delete(player);
 	safe_delete(enemy);
-	safe_delete(light);
 	safe_delete(levelData);
 	safe_delete(HPText);
 	safe_delete(PlayerHPBar);
@@ -92,7 +91,7 @@ void GameScene::Update()
 
 	if (gameClearFlag)
 	{
-		FadeScene::GetInstance()->FadeIn(0.0f);
+		FadeScene::GetInstance()->FadeIn(-5.0f);
 		if (FadeScene::fadeInEnd)
 		{
 			Reset();
@@ -134,7 +133,6 @@ void GameScene::Update()
 				{ 0.0f, 0.0f, 1.0f, 1.0f },
 				5, 10, false, false
 			);
-			alpha = -1.0f;
 		}
 
 		// ゲームオーバーフラグ
@@ -208,7 +206,7 @@ void GameScene::Draw()
 		player->GetObj()->Draw();
 	}
 
-	for (std::unique_ptr<Enemy>& enemy : enemys)
+	for (std::unique_ptr<Enemy>& enemy : enemies)
 	{
 		enemy->Draw();
 	}
@@ -242,7 +240,7 @@ void GameScene::Draw()
 	effectTarget->Draw();
 	effectAvoid->Draw();
 
-	for (std::unique_ptr<Enemy>& enemy : enemys)
+	for (std::unique_ptr<Enemy>& enemy : enemies)
 	{
 		enemy->reactionDraw();
 	}
@@ -345,7 +343,7 @@ void GameScene::CameraUpdate()
 		}
 	}
 
-	//カメラ更新
+	// カメラ更新
 	if (shakeFlag == true)
 	{
 		camera->CameraShake(shakeFlag);
@@ -356,7 +354,7 @@ void GameScene::CameraUpdate()
 
 void GameScene::EnemyUpdate()
 {
-	for (std::unique_ptr<Enemy>& enemy : enemys)
+	for (std::unique_ptr<Enemy>& enemy : enemies)
 	{
 		pPos = player->GetObj()->GetPosition();
 		getEnemyAlive = enemy->GetAlive();
@@ -394,7 +392,7 @@ void GameScene::EnemyUpdate()
 			elapsedTime = 0.0f;
 			enemyCount--;
 			controller->Vibration();
-			enemys.remove(enemy);
+			enemies.remove(enemy);
 			break;
 		}
 		else if (!rFlag && player->Damage(enemy->GetObj()))
@@ -622,7 +620,7 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 			newEnemy->GetObj()->SetCollisionScale(size);
 			newEnemy->SetRespawnPos(pos);
 			newEnemy->Update();
-			enemys.push_back(std::move(newEnemy));
+			enemies.push_back(std::move(newEnemy));
 			enemyCount++;
 			continue;
 		}
@@ -693,7 +691,7 @@ void GameScene::jsonObjectUpdate()
 			player->MapCollide(boxPos, boxScale);
 			pPos = player->GetObj()->GetPosition();
 
-			for (std::unique_ptr<Enemy>& enemy : enemys)
+			for (std::unique_ptr<Enemy>& enemy : enemies)
 			{
 				enemy->MapCollide(boxPos, boxScale);
 			}
@@ -706,7 +704,7 @@ void GameScene::jsonObjectUpdate()
 			player->MapCollide(wallPos, wallScale);
 			pPos = player->GetObj()->GetPosition();
 
-			for (std::unique_ptr<Enemy>& enemy : enemys)
+			for (std::unique_ptr<Enemy>& enemy : enemies)
 			{
 				enemy->MapCollide(wallPos, wallScale);
 			}
@@ -729,7 +727,7 @@ void GameScene::jsonObjectUpdate()
 				elapsedTime = 0.0f;
 			}
 
-			for (std::unique_ptr<Enemy>& enemy : enemys)
+			for (std::unique_ptr<Enemy>& enemy : enemies)
 			{
 				enemy->StageCollide(stagePos, stageScale);
 			}

@@ -45,6 +45,8 @@ public:
 
 	void ReSpawn();
 
+	void Search();
+
 	void Reset();
 
 	bool ObstacleDetection(XMFLOAT3 pPos, XMFLOAT3 boxPos, XMFLOAT3 boxScale);
