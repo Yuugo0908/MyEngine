@@ -5,6 +5,7 @@ using namespace std;
 
 const std::string LevelLoader::baseDirectory = "Resources/level/";
 const std::string LevelLoader::Extension = ".json";
+int LevelLoader::mapNumber = 0;
 
 LevelData* LevelLoader::LoadFile(const std::string& fileName)
 {

@@ -27,7 +27,6 @@ public: // サブクラス
 		XMMATRIX mat; // ３Ｄ変換行列
 	};
 
-public: // 静的メンバ関数
 
 private: // 静的メンバ変数
 	// 画面クリアカラー

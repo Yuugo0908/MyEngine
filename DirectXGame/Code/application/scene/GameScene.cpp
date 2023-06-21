@@ -37,8 +37,18 @@ void GameScene::Initialize()
 	// 3Dオブジェクトにライトをセット
 	Object3d::SetLight(light);
 
+	stageNum = LevelLoader::mapNumber;
+
 	//Bgm->PlayWave("Resources/BGM/bgm.wav", 255, 0.08f);
 	jsonObjectInit("stage1");
+	jsonObjectInit("stage2");
+
+	// ステージ番号がステージ数より大きい番号だったら止める
+	// stageCountを-1しているのはstageNumとの整合性を取るため
+	if (stageCount - 1 < stageNum)
+	{
+		assert(FALSE);
+	}
 
 	// マウスカーソルを非表示
 	ShowCursor(false);
@@ -59,7 +69,8 @@ void GameScene::Finalize()
 
 	enemies.erase(enemies.begin(), enemies.end());
 	rope->Reset();
-	jsonObject.erase(jsonObject.begin(), jsonObject.end());
+
+	allMapData.erase(allMapData.begin(), allMapData.end());
 
 	safe_delete(player);
 	safe_delete(enemy);
@@ -212,7 +223,7 @@ void GameScene::Draw()
 	}
 	rope->GetObj()->Draw();
 
-	for (auto& object : jsonObject)
+	for (auto& object : allMapData[stageNum])
 	{
 		if (object->GetType() == "stage")
 		{
@@ -276,16 +287,15 @@ void GameScene::Reset()
 	if (gameClearFlag)
 	{
 		// 1ステージ目をクリアしたら次のステージへ
-		if (stageClearCount == 0)
+		if (stageNum == 0)
 		{
-			jsonObject.erase(jsonObject.begin(), jsonObject.end());
-			stageClearCount++;
+			stageNum++;
+			LevelLoader::mapNumber++;
 			gameClearFlag = false;
-			levelData = nullptr;
-			jsonObjectInit("stage2");
+			playerAndEnemyInit("stage2");
 		}
 		// すべてのステージをクリアしたらゲームクリア
-		else if (stageClearCount == 1)
+		else if (stageNum == stageCount - 1)
 		{
 			SceneManager::GetInstance()->ChangeScene("GameClear");
 		}
@@ -428,7 +438,7 @@ void GameScene::EnemyUpdate()
 			}
 		}
 
-		for (auto& object : jsonObject)
+		for (auto& object : allMapData[stageNum])
 		{
 			if (object->GetType() == "box" || object->GetType() == "wall")
 			{
@@ -486,7 +496,7 @@ void GameScene::RopeUpdate()
 	}
 
 	// 障害物を検知したらターゲットしない
-	for (auto& object : jsonObject)
+	for (auto& object : allMapData[stageNum])
 	{
 		if (object->GetType() == "box" || object->GetType() == "wall")
 		{
@@ -573,6 +583,73 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 	// レベルデータの読み込み
 	levelData = LevelLoader::LoadFile(sceneName);
 
+	if (stageCount == stageNum)
+	{
+		playerAndEnemyInit(sceneName);
+	}
+
+	// レベルデータからオブジェクトを生成、配置
+	for (LevelData::ObjectData& objectData : levelData->objects)
+	{
+		if (objectData.fileName == "player")
+		{
+			continue;
+		}
+		if (objectData.fileName == "enemy")
+		{
+			continue;
+		}
+
+		// 3Dオブジェクトを生成
+		std::unique_ptr<Object3d> newObject = Object3d::Create();
+
+		// ファイル名から登録済みモデルを検索
+		Model* model = nullptr;
+		decltype(levelData->models)::iterator it = levelData->models.find(objectData.fileName);
+		if (it != levelData->models.end())
+		{
+			model = it->second;
+		}
+
+		newObject->SetModel(model);
+
+		// 座標
+		XMFLOAT3 pos;
+		XMStoreFloat3(&pos, objectData.trans);
+		newObject->SetPosition(pos);
+
+		// 回転角
+		XMFLOAT3 rot;
+		XMStoreFloat3(&rot, objectData.rot);
+		newObject->SetRotation(rot);
+
+		// 大きさ
+		XMFLOAT3 scale;
+		XMStoreFloat3(&scale, objectData.scale);
+		newObject->SetScale(scale);
+
+		// 当たり判定
+		XMFLOAT3 colScale;
+		XMStoreFloat3(&colScale, objectData.size);
+		newObject->SetCollisionScale(colScale);
+
+		// オブジェクトのタイプをセット
+		newObject->SetType(objectData.objType);
+		newObject->Update();
+
+		// 配列に登録
+		jsonObject.push_back(std::move(newObject));
+	}
+	stageCount++;
+	levelData = nullptr;
+	allMapData.push_back(std::move(jsonObject));
+}
+
+void GameScene::playerAndEnemyInit(const std::string sceneName)
+{
+	// レベルデータの読み込み
+	levelData = LevelLoader::LoadFile(sceneName);
+
 	// レベルデータからオブジェクトを生成、配置
 	for (LevelData::ObjectData& objectData : levelData->objects)
 	{
@@ -624,52 +701,12 @@ void GameScene::jsonObjectInit(const std::string sceneName)
 			enemyCount++;
 			continue;
 		}
-
-		// 3Dオブジェクトを生成
-		std::unique_ptr<Object3d> newObject = Object3d::Create();
-
-		// ファイル名から登録済みモデルを検索
-		Model* model = nullptr;
-		decltype(levelData->models)::iterator it = levelData->models.find(objectData.fileName);
-		if (it != levelData->models.end())
-		{
-			model = it->second;
-		}
-
-		newObject->SetModel(model);
-
-		// 座標
-		XMFLOAT3 pos;
-		XMStoreFloat3(&pos, objectData.trans);
-		newObject->SetPosition(pos);
-
-		// 回転角
-		XMFLOAT3 rot;
-		XMStoreFloat3(&rot, objectData.rot);
-		newObject->SetRotation(rot);
-
-		// 大きさ
-		XMFLOAT3 scale;
-		XMStoreFloat3(&scale, objectData.scale);
-		newObject->SetScale(scale);
-
-		// 当たり判定
-		XMFLOAT3 colScale;
-		XMStoreFloat3(&colScale, objectData.size);
-		newObject->SetCollisionScale(colScale);
-
-		// オブジェクトのタイプをセット
-		newObject->SetType(objectData.objType);
-		newObject->Update();
-
-		// 配列に登録
-		jsonObject.push_back(std::move(newObject));
 	}
 }
 
 void GameScene::jsonObjectUpdate()
 {
-	for (auto& object : jsonObject)
+	for (auto& object : allMapData[stageNum])
 	{
 		XMFLOAT3 pos = object->GetPosition();
 		XMFLOAT3 scale = object->GetCollisionScale();

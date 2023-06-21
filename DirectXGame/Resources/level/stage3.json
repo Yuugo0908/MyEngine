@@ -1,0 +1,888 @@
+{
+    "name": "scene",
+    "objects": [
+        {
+            "type": "LIGHT",
+            "name": "Light",
+            "transform": {
+                "translation": [
+                    1.0054539442062378,
+                    5.903861999511719,
+                    -4.076245307922363
+                ],
+                "rotation": [
+                    -3.1637072563171387,
+                    -106.93630981445312,
+                    37.261043548583984
+                ],
+                "scaling": [
+                    0.9999999403953552,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "CAMERA",
+            "name": "Camera",
+            "transform": {
+                "translation": [
+                    -6.925790786743164,
+                    4.958309173583984,
+                    -7.358891487121582
+                ],
+                "rotation": [
+                    2.664711473698844e-06,
+                    -46.69194793701172,
+                    63.559303283691406
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "stage.006",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    -28.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    7.0,
+                    0.10000000149011612,
+                    7.0
+                ]
+            },
+            "file_name": "stage",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    14.0,
+                    1.0,
+                    14.0
+                ]
+            },
+            "obj_type": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "stage.005",
+            "transform": {
+                "translation": [
+                    28.0,
+                    0.0,
+                    28.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    7.0,
+                    0.10000000149011612,
+                    7.0
+                ]
+            },
+            "file_name": "stage",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    14.0,
+                    1.0,
+                    14.0
+                ]
+            },
+            "obj_type": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "stage.004",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    28.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    7.0,
+                    0.10000000149011612,
+                    7.0
+                ]
+            },
+            "file_name": "stage",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    14.0,
+                    1.0,
+                    14.0
+                ]
+            },
+            "obj_type": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "stage.002",
+            "transform": {
+                "translation": [
+                    28.0,
+                    0.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    7.0,
+                    0.10000000149011612,
+                    7.0
+                ]
+            },
+            "file_name": "stage",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    14.0,
+                    1.0,
+                    14.0
+                ]
+            },
+            "obj_type": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "skydome",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    -16.697547912597656
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    5.0,
+                    5.0,
+                    5.0
+                ]
+            },
+            "file_name": "skydome"
+        },
+        {
+            "type": "MESH",
+            "name": "pole.001",
+            "transform": {
+                "translation": [
+                    -39.0,
+                    21.0,
+                    18.0
+                ],
+                "rotation": [
+                    0.0,
+                    -90.00000762939453,
+                    0.0
+                ],
+                "scaling": [
+                    2.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    4.0
+                ]
+            },
+            "obj_type": "pole"
+        },
+        {
+            "type": "MESH",
+            "name": "pole",
+            "transform": {
+                "translation": [
+                    -19.0,
+                    7.0,
+                    18.0
+                ],
+                "rotation": [
+                    0.0,
+                    -90.00000762939453,
+                    0.0
+                ],
+                "scaling": [
+                    2.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    4.0
+                ]
+            },
+            "obj_type": "pole"
+        },
+        {
+            "type": "MESH",
+            "name": "player",
+            "transform": {
+                "translation": [
+                    0.0,
+                    3.0,
+                    -56.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "player",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "enemy.008",
+            "transform": {
+                "translation": [
+                    22.0,
+                    3.0,
+                    22.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "enemy",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "enemy.007",
+            "transform": {
+                "translation": [
+                    -63.0,
+                    23.0,
+                    30.0
+                ],
+                "rotation": [
+                    0.0,
+                    -90.00000762939453,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "enemy",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "enemy.006",
+            "transform": {
+                "translation": [
+                    -56.0,
+                    23.0,
+                    23.0
+                ],
+                "rotation": [
+                    0.0,
+                    -90.00000762939453,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "enemy",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "enemy.005",
+            "transform": {
+                "translation": [
+                    -49.0,
+                    23.0,
+                    39.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "enemy",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "enemy",
+            "transform": {
+                "translation": [
+                    35.0,
+                    3.0,
+                    27.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "enemy",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "box.004",
+            "transform": {
+                "translation": [
+                    0.0,
+                    20.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    14.0,
+                    20.0,
+                    14.0
+                ]
+            },
+            "file_name": "box",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    14.0,
+                    20.0,
+                    14.0
+                ]
+            },
+            "obj_type": "box"
+        },
+        {
+            "type": "MESH",
+            "name": "stage.008",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    -56.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    7.0,
+                    0.10000000149011612,
+                    7.0
+                ]
+            },
+            "file_name": "stage",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    14.0,
+                    1.0,
+                    14.0
+                ]
+            },
+            "obj_type": "stage"
+        },
+        {
+            "type": "MESH",
+            "name": "box.001",
+            "transform": {
+                "translation": [
+                    -56.0,
+                    10.0,
+                    28.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    14.0,
+                    10.0,
+                    14.0
+                ]
+            },
+            "file_name": "box",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    14.0,
+                    10.0,
+                    14.0
+                ]
+            },
+            "obj_type": "box"
+        },
+        {
+            "type": "MESH",
+            "name": "box.002",
+            "transform": {
+                "translation": [
+                    -28.0,
+                    20.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    14.0,
+                    20.0,
+                    14.0
+                ]
+            },
+            "file_name": "box",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    14.0,
+                    20.0,
+                    14.0
+                ]
+            },
+            "obj_type": "box"
+        },
+        {
+            "type": "MESH",
+            "name": "pole.002",
+            "transform": {
+                "translation": [
+                    25.0,
+                    2.0,
+                    -12.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    90.00000762939453
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    2.0,
+                    0.5
+                ]
+            },
+            "obj_type": "pole"
+        },
+        {
+            "type": "MESH",
+            "name": "pole.003",
+            "transform": {
+                "translation": [
+                    -29.0,
+                    14.0,
+                    18.0
+                ],
+                "rotation": [
+                    0.0,
+                    -90.00000762939453,
+                    0.0
+                ],
+                "scaling": [
+                    2.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    4.0
+                ]
+            },
+            "obj_type": "pole"
+        },
+        {
+            "type": "MESH",
+            "name": "pole.004",
+            "transform": {
+                "translation": [
+                    -46.0,
+                    30.0,
+                    10.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    2.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    4.0,
+                    0.5,
+                    0.5
+                ]
+            },
+            "obj_type": "pole"
+        },
+        {
+            "type": "MESH",
+            "name": "enemy.001",
+            "transform": {
+                "translation": [
+                    5.0,
+                    45.0,
+                    -0.0
+                ],
+                "rotation": [
+                    -0.0,
+                    90.00000762939453,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "enemy",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "pole.005",
+            "transform": {
+                "translation": [
+                    -46.0,
+                    35.0,
+                    5.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    2.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "pole",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    4.0,
+                    0.5,
+                    0.5
+                ]
+            },
+            "obj_type": "pole"
+        },
+        {
+            "type": "MESH",
+            "name": "enemy.002",
+            "transform": {
+                "translation": [
+                    0.0,
+                    45.0,
+                    -10.0
+                ],
+                "rotation": [
+                    -0.0,
+                    90.00000762939453,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "enemy",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "enemy.003",
+            "transform": {
+                "translation": [
+                    0.0,
+                    45.0,
+                    10.0
+                ],
+                "rotation": [
+                    -0.0,
+                    90.00000762939453,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "enemy",
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        }
+    ]
+}

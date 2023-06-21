@@ -86,7 +86,7 @@ private: // メンバ変数
 
 	enum TutorialState
 	{
-		None, ropeThrow, Avoid, Attack
+		None, Throw, Avoid, Attack
 	};
 
 	// レベルデータ
@@ -169,10 +169,10 @@ private: // メンバ変数
 	float minEnemyLength = 15.0f;
 
 	// チュートリアル用
-	TutorialState tutorialState = ropeThrow; // チュートリアル
-	bool playerAttackFlag = false; // プレイヤーが敵を攻撃しているかのフラグ
-	bool enemyAttackFlag = false; // 敵がプレイヤーを攻撃しているかのフラグ
-	bool throwFlag = false; // ロープを発射しているかのフラグ
+	TutorialState tutorialState = Throw; // チュートリアル
+	bool tutorialThrow = false;
+	bool tutorialAvoid = false;
+	bool tutorialAttack = false;
 	int imgShowCount = 0; // チュートリアル用画像の点滅カウント
 };
 

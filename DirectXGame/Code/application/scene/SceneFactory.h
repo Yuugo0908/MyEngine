@@ -12,6 +12,8 @@ public:
 	/// <returns></returns>
 	BaseScene* CreateScene(const std::string& sceneName) override;
 
+private:
+	// チュートリアルシーン移行確認用フラグ
 	bool tutorialFlag = false;
 };
 

@@ -43,6 +43,8 @@ public:
 	static const std::string baseDirectory;
 	// 拡張子
 	static const std::string Extension;
+	// マップデータの番号
+	static int mapNumber;
 public:
 	// ファイル読み込み
 	static LevelData* LoadFile(const std::string& fileName);

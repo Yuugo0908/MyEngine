@@ -55,6 +55,8 @@ public: // メンバ関数
 
 	// jsonオブジェクトの初期化
 	void jsonObjectInit(const std::string sceneName);
+	// プレイヤーとエネミーのデータの初期化
+	void playerAndEnemyInit(const std::string sceneName);
 	// jsonオブジェクトの更新
 	void jsonObjectUpdate();
 
@@ -86,6 +88,12 @@ private: // メンバ変数
 	LevelData* levelData = nullptr;
 	// レベルデータで読み込んだオブジェクト
 	std::vector<std::unique_ptr<Object3d>> jsonObject{};
+	// 全マップのデータ
+	std::vector<std::vector<std::unique_ptr<Object3d>>> allMapData{};
+	// ステージの数
+	int stageCount = 0;
+	// ステージの番号
+	int stageNum = 0;
 
 	// 画像
 	Image2d* HPText = nullptr;
@@ -108,7 +116,7 @@ private: // メンバ変数
 	XMFLOAT3 pPosOld = {};
 	XMFLOAT3 pScale = {};
 	bool avoidFlag = false;//回避管理フラグ
-	float playerHp = 360;
+	float playerHp = 360; 
 
 	// エネミー
 	XMFLOAT3 ePos = {};
@@ -131,7 +139,6 @@ private: // メンバ変数
 	// シーン管理用
 	bool gameClearFlag = false;
 	bool gameOverFlag = false;
-	int stageClearCount = 0;
 
 	// シェイク用
 	bool shakeFlag = false;
