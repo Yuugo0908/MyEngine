@@ -303,6 +303,11 @@ void Enemy::Reset()
 {
 	eAlive = false;
 	bullets.erase(bullets.begin(), bullets.end());
+
+	safe_delete(enemyModel);
+	safe_delete(bulletModel);
+	safe_delete(exclamation_mark);
+	safe_delete(question_mark);
 }
 
 bool Enemy::ObstacleDetection(XMFLOAT3 pPos, XMFLOAT3 boxPos, XMFLOAT3 boxScale)
@@ -329,18 +334,15 @@ bool Enemy::ObstacleDetection(XMFLOAT3 pPos, XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 	return true;
 }
 
-bool Enemy::EnemyCollision(const std::unique_ptr<Object3d>& object)
+bool Enemy::Damage(const std::unique_ptr<Object3d>& object)
 {
-	if (!Collision::CollisionObject(object, enemyObj))
-	{
-		return false;
-	}
-	else
+	if (Collision::CollisionObject(object, enemyObj))
 	{
 		eAlive = false;
 		bullets.erase(bullets.begin(), bullets.end());
 		return true;
 	}
+	return false;
 }
 
 bool Enemy::BulletCollision()
@@ -537,14 +539,8 @@ void Enemy::Draw()
 	}
 }
 
-void Enemy::reactionDraw()
+void Enemy::ReactionDraw()
 {
 	exclamation_mark->Draw();
 	question_mark->Draw();
-}
-
-void Enemy::Finalize()
-{
-	delete enemyModel;
-	delete bulletModel;
 }

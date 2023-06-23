@@ -37,7 +37,7 @@ private: // ƒƒ“ƒo•Ï”
 	Image2d* GameOver = nullptr;
 	Image2d* backGround = nullptr;
 
-	bool fadeFlag = false;
 	bool retryFlag = false;
+	bool titleFlag = false;
 };
 

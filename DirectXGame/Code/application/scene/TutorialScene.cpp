@@ -6,7 +6,7 @@
 void TutorialScene::Initialize()
 {
 	rope = Rope::GetInstance();
-	player = new Player;
+	player = Player::GetInstance();
 	enemy = new Enemy;
 
 	// 3Dオブジェクトにカメラをセット
@@ -78,7 +78,6 @@ void TutorialScene::Finalize()
 	jsonObject.erase(jsonObject.begin(), jsonObject.end());
 	jsonObject.shrink_to_fit();
 
-	safe_delete(player);
 	safe_delete(enemy);
 	safe_delete(levelData);
 	safe_delete(HPText);
@@ -101,9 +100,16 @@ void TutorialScene::Update()
 	// マウスの移動範囲の制限
 	mouse->CursorLimit();
 
-	// フラグの取得
-	rFlag = rope->GetrFlag();
-	avoidFlag = player->GetAvoidFlag();
+	// ターゲットが距離内にいる場合
+	if (targetLength < baseLength)
+	{
+		effectTarget->TargetEffect(
+			targetPos, 3.0f, 1.0f,
+			{ 1.0f, 0.0f, 0.0f, 1.0f },
+			{ 1.0f, 1.0f, 1.0f, 1.0f },
+			targetEffectCount
+		);
+	}
 
 #pragma region フェード
 	if (!gameClearFlag && !gameOverFlag)
@@ -186,14 +192,6 @@ void TutorialScene::Update()
 			}
 			else
 			{
-				// ターゲットエフェクトの発生
-				effectTarget->TargetEffect(
-					targetPos, 3.0f, 1.0f,
-					{ 1.0f, 0.0f, 0.0f, 1.0f },
-					{ 1.0f, 1.0f, 1.0f, 1.0f },
-					targetEffectCount
-				);
-
 				// ポール以外のステージオブジェクトの色を暗くする
 				for (auto& object : jsonObject)
 				{
@@ -206,7 +204,6 @@ void TutorialScene::Update()
 				return;
 			}
 		}
-
 		break;
 	case Avoid:
 		// 初めて回避を使う場合
@@ -255,14 +252,6 @@ void TutorialScene::Update()
 			}
 			else
 			{
-				// ターゲットエフェクトの発生
-				effectTarget->TargetEffect(
-					targetPos, 3.0f, 1.0f,
-					{ 1.0f, 0.0f, 0.0f, 1.0f },
-					{ 1.0f, 1.0f, 1.0f, 1.0f },
-					targetEffectCount
-				);
-
 				// ステージオブジェクトの色を暗くする
 				for (auto& object : jsonObject)
 				{
@@ -308,6 +297,7 @@ void TutorialScene::Update()
 	CameraUpdate();
 
 	// 回避した際にエフェクトが発生
+	avoidFlag = player->GetAvoidFlag();
 	if (avoidFlag)
 	{
 		effectAvoid->CreateParticles(
@@ -380,7 +370,7 @@ void TutorialScene::Draw()
 
 	for (std::unique_ptr<Enemy>& enemy : enemies)
 	{
-		enemy->reactionDraw();
+		enemy->ReactionDraw();
 	}
 
 	// パーティクル描画後処理
@@ -402,7 +392,6 @@ void TutorialScene::Draw()
 	wasdKey->Draw();
 	spaceKey->Draw();
 	mouseImg->Draw();
-
 
 	if ((tutorialThrow || tutorialAttack) && (tutorialState == Throw || tutorialState == Attack))
 	{
@@ -515,7 +504,6 @@ void TutorialScene::EnemyUpdate()
 	for (std::unique_ptr<Enemy>& enemy : enemies)
 	{
 		pPos = player->GetObj()->GetPosition();
-		rFlag = rope->GetrFlag();
 		getEnemyAlive = enemy->GetAlive();
 
 		// 敵が死んでいたら次の敵の処理に進む
@@ -526,7 +514,7 @@ void TutorialScene::EnemyUpdate()
 		}
 
 		// 突進した状態で敵に触れたら
-		if (rushFlag && enemy->EnemyCollision(player->GetObj()))
+		if (rushFlag && enemy->Damage(player->GetObj()))
 		{
 			// カメラシェイクの発生
 			shakeFlag = true;
@@ -550,6 +538,8 @@ void TutorialScene::EnemyUpdate()
 			rope->SetrFlag(false);
 			rushFlag = false;
 			catchPos = {};
+			targetPos = {};
+			targetLength = FLT_MAX;
 			elapsedTime = 0.0f;
 			enemyCount--;
 			controller->Vibration();
@@ -573,9 +563,11 @@ void TutorialScene::EnemyUpdate()
 			);
 		}
 
+		avoidFlag = player->GetAvoidFlag();
 		// プレイヤーに敵の弾が当たった際のダメージ処理
 		if (!avoidFlag && enemy->BulletCollision())
 		{
+			rFlag = rope->GetrFlag();
 			if (!rFlag)
 			{
 				shakeFlag = true;
@@ -594,11 +586,11 @@ void TutorialScene::EnemyUpdate()
 
 		// ロープを発射または接着していない状態であれば
 		bool getThrowFlag = rope->GetThrowFlag();
+		rFlag = rope->GetrFlag();
 		if (enemy->Danger() && !getThrowFlag && !rFlag)
 		{
 			tutorialAvoid = true;
 		}
-
 
 		enemy->Update();
 	}
@@ -622,11 +614,11 @@ void TutorialScene::RopeUpdate()
 			if (object->GetType() == "box" || object->GetType() == "wall")
 			{
 				object->Update();
-				XMFLOAT3 boxPos = object->GetPosition();
-				XMFLOAT3 boxScale = object->GetCollisionScale();
+				XMFLOAT3 pos = object->GetPosition();
+				XMFLOAT3 scale = object->GetCollisionScale();
 
 				// 障害物を検知していたら攻撃してこない(プレイヤーも敵に攻撃することはできない)
-				if (enemy->ObstacleDetection(pPos, boxPos, boxScale))
+				if (enemy->ObstacleDetection(pPos, pos, scale))
 				{
 					break;
 				}
@@ -648,15 +640,16 @@ void TutorialScene::RopeUpdate()
 		}
 	}
 
+	// プレイヤーとポールの間の障害物検知
 	for (auto& object : jsonObject)
 	{
 		if (object->GetType() == "pole")
 		{
+			object->Update();
 			XMFLOAT3 polePos = object->GetPosition();
 			XMFLOAT3 poleScale = object->GetCollisionScale();
 
 			pPos = player->GetObj()->GetPosition();
-			rFlag = rope->GetrFlag();
 			float length = GetLength(pPos, polePos);
 
 			// ポールの中から一番近い距離のポールを決める
@@ -665,75 +658,82 @@ void TutorialScene::RopeUpdate()
 				minPoleLength = length;
 				targetPolePos = polePos;
 			}
-
-			// プレイヤーがポールに触れたらロープの接着をなくして突進を止める
-			if (rushFlag && player->PoleCollide(polePos, poleScale))
-			{
-				rope->SetrFlag(false);
-				rushFlag = false;
-				catchPos = {};
-				elapsedTime = 0.0f;
-				oldTargetPos = polePos;
-			}
 		}
 	}
 
 	// ポールと敵の距離を比較して短い方を代入
-	float minLength = (std::min)(minEnemyLength, minPoleLength);
+	targetLength = (std::min)(minEnemyLength, minPoleLength);
 
 	// どちらも基準内の距離だった場合、敵を優先する
 	if (minEnemyLength < baseLength && minPoleLength < baseLength)
 	{
-		minLength = minEnemyLength;
+		targetLength = minEnemyLength;
 	}
 
 	// ターゲットが敵だった場合
-	if (minLength == minEnemyLength)
+	if (targetLength == minEnemyLength)
 	{
 		targetPos = targetEnemyPos;
 		tutorialAttack = true;
 	}
 	// ターゲットがポールだった場合
-	else
+	else if(targetLength == minPoleLength)
 	{
 		targetPos = targetPolePos;
 		tutorialThrow = true;
 	}
 
 	// 過去にターゲットしたポールには反応しない
-	if (minLength == minPoleLength && GetLength(targetPos, oldTargetPos) <= 0.0f)
+	if (targetLength == minPoleLength && GetLength(targetPos, oldTargetPos) <= 0.0f)
 	{
-		minLength = minEnemyLength;
+		targetLength = minEnemyLength;
 		targetPos = targetEnemyPos;
 		tutorialAttack = true;
 		tutorialThrow = false;
 	}
 
-	// 障害物を検知せず、ターゲットが距離内にいる場合
-	if (minLength < baseLength)
+	// 遮蔽物の検知
+	for (auto& object : jsonObject)
 	{
-		effectTarget->TargetEffect(
-			targetPos, 3.0f, 1.0f,
-			{ 1.0f, 0.0f, 0.0f, 1.0f },
-			{ 1.0f, 1.0f, 1.0f, 1.0f },
-			targetEffectCount
-		);
+		if (object->GetType() == "box" || object->GetType() == "wall")
+		{
+			object->Update();
+			XMFLOAT3 pos = object->GetPosition();
+			XMFLOAT3 scale = object->GetCollisionScale();
 
+			if (Collision::CollisionRayBox(pPos, targetPos, pos, scale))
+			{
+				targetLength = FLT_MAX;
+				targetPos = {};
+				tutorialThrow = false;
+				tutorialAttack = false;
+				break;
+			}
+		}
+	}
+
+	// ターゲットが距離内にいる場合
+	if (targetLength < baseLength)
+	{
 		// ターゲットしている方向にプレイヤーも向く
 		player->TrackRot(pPos, targetPos);
-		camera->SetTarget(targetPos);
 	}
 	else
 	{
-		float cameraRot = camera->CameraAngle(pPos);
 		// カメラが向いている方向にプレイヤーも向く
-		player->GetObj()->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
+		player->TrackRot(pPos, camera->GetEye());
 		rope->SetThrowFlag(false);
+
+		targetPolePos = {};
+		minPoleLength = baseLength;
+		targetEnemyPos = {};
+		minEnemyLength = baseLength;
 		tutorialThrow = false;
 		tutorialAttack = false;
 		return;
 	}
 
+	rFlag = rope->GetrFlag();
 	// ロープを接着したら突進を開始する
 	if (!rushFlag && rFlag)
 	{
@@ -741,12 +741,12 @@ void TutorialScene::RopeUpdate()
 		catchPos = targetPos;
 	}
 
-	rope->Throw(pPos, targetPos, minLength);
+	rope->Throw(pPos, targetPos, targetLength);
 
 	targetPolePos = {};
-	minPoleLength = 15.0f;
+	minPoleLength = baseLength;
 	targetEnemyPos = {};
-	minEnemyLength = 15.0f;
+	minEnemyLength = baseLength;
 }
 
 void TutorialScene::jsonObjectInit(const std::string sceneName)
@@ -884,6 +884,7 @@ void TutorialScene::jsonObjectUpdate()
 			XMFLOAT3 wallPos = object->GetPosition();
 			XMFLOAT3 wallScale = object->GetCollisionScale();
 			player->MapCollide(wallPos, wallScale);
+		
 			pPos = player->GetObj()->GetPosition();
 
 			for (std::unique_ptr<Enemy>& enemy : enemies)
@@ -905,6 +906,8 @@ void TutorialScene::jsonObjectUpdate()
 				rope->SetrFlag(false);
 				rushFlag = false;
 				catchPos = {};
+				targetPos = {};
+				targetLength = FLT_MAX;
 				elapsedTime = 0.0f;
 			}
 
@@ -913,32 +916,25 @@ void TutorialScene::jsonObjectUpdate()
 				enemy->StageCollide(stagePos, stageScale);
 			}
 		}
+		else if (object->GetType() == "pole")
+		{
+			XMFLOAT3 polePos = object->GetPosition();
+			XMFLOAT3 poleScale = object->GetCollisionScale();
 
-		//else if (object->GetType() == "pole")
-		//{
-		//	pPos = player->GetObj()->GetPosition();
-		//	rFlag = rope->GetrFlag();
-		//	XMFLOAT3 polePos = object->GetPosition();
-		//	XMFLOAT3 poleScale = object->GetCollisionScale();
-		//	float length = GetLength(pPos, polePos);
+			pPos = player->GetObj()->GetPosition();
 
-		//	// ポールの中から一番近い距離のポールを決める
-		//	if (length < minPoleLength && length < baseLength)
-		//	{
-		//		minPoleLength = length;
-		//		targetPolePos = polePos;
-		//	}
-		//	
-		//	// プレイヤーがポールに触れたらロープの接着をなくして突進を止める
-		//	if (rushFlag && player->PoleCollide(polePos, poleScale))
-		//	{
-		//		rope->SetrFlag(false);
-		//		rushFlag = false;
-		//		catchPos = {};
-		//		elapsedTime = 0.0f;
-		//		oldTargetPos = polePos;
-		//	}
-		//}
+			// プレイヤーがポールに触れたらロープの接着をなくして突進を止める
+			if (rushFlag && player->PoleCollide(polePos, poleScale))
+			{
+				rope->SetrFlag(false);
+				rushFlag = false;
+				catchPos = {};
+				targetPos = {};
+				targetLength = FLT_MAX;
+				elapsedTime = 0.0f;
+				oldTargetPos = polePos;
+			}
+		}
 
 		object->Update();
 	}

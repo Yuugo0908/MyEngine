@@ -12,7 +12,19 @@
 
 class Player
 {
+private:
+	Player();
+
+	~Player();
+
+public:
+	// コピーコンストラクタを無効化
+	Player(const Player& obj) = delete;
+	// 代入演算子を無効化
+	Player& operator=(const Player& obj) = delete;
 public: // メンバ関数
+
+	static Player* GetInstance();
 
 	bool Initialize(const XMFLOAT3 pos, const XMFLOAT3 scale);
 

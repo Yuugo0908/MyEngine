@@ -6,6 +6,7 @@ Rope::Rope()
 
 Rope::~Rope()
 {
+	safe_delete(ropeModel);
 }
 
 Rope* Rope::GetInstance()

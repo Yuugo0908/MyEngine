@@ -21,22 +21,29 @@ void GameOverScene::Finalize()
 void GameOverScene::Update()
 {
 	ClipCursor(NULL);
-	if (!retryFlag)
+	if (!retryFlag && !titleFlag)
 	{
 		FadeScene::GetInstance()->FadeOut(1.0f);
 	}
 
-	if (keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
+	if (FadeScene::fadeOutEnd && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
 	{
-		FadeScene::GetInstance()->reset();
-		SceneManager::GetInstance()->ChangeScene("Title");
+		titleFlag = true;
 	}
-	else if (keyboard->TriggerKey(DIK_R))
+	else if (FadeScene::fadeOutEnd && keyboard->TriggerKey(DIK_R))
 	{
 		retryFlag = true;
 	}
 
-	if (retryFlag)
+	if (titleFlag)
+	{
+		FadeScene::GetInstance()->FadeIn(0.0f);
+		if (FadeScene::fadeInEnd)
+		{
+			SceneManager::GetInstance()->ChangeScene("Title");
+		}
+	}
+	else if (retryFlag)
 	{
 		FadeScene::GetInstance()->FadeIn(0.0f);
 		if (FadeScene::fadeInEnd)

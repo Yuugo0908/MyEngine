@@ -4,13 +4,14 @@
 #include "Operator.h"
 #include "Player.h"
 #include "Bullet.h"
+#include "SafeDelete.h"
 
 #include <stdlib.h>
 #include <time.h>
 
 class Enemy
 {
-public:
+public: // メンバ関数
 	// 行動フェーズ
 	enum class Phase
 	{
@@ -23,15 +24,15 @@ public:
 
 	bool Initialize(Player* player);
 
-	bool BulletCreate();
-
 	void Update();
-
-	void Finalize();
 
 	void Draw();
 
-	void reactionDraw();
+	void Reset();
+
+	bool BulletCreate();
+
+	void ReactionDraw();
 
 	void Attack();
 
@@ -47,11 +48,9 @@ public:
 
 	void Search();
 
-	void Reset();
-
 	bool ObstacleDetection(XMFLOAT3 pPos, XMFLOAT3 boxPos, XMFLOAT3 boxScale);
 
-	bool EnemyCollision(const std::unique_ptr<Object3d>& object);
+	bool Damage(const std::unique_ptr<Object3d>& object);
 
 	bool BulletCollision();
 

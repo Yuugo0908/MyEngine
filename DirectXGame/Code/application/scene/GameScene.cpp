@@ -6,7 +6,7 @@
 void GameScene::Initialize()
 {
 	rope = Rope::GetInstance();
-	player = new Player;
+	player = Player::GetInstance();
 	enemy = new Enemy;
 
 	// 3Dオブジェクトにカメラをセット
@@ -69,10 +69,8 @@ void GameScene::Finalize()
 
 	enemies.erase(enemies.begin(), enemies.end());
 	rope->Reset();
-
 	allMapData.erase(allMapData.begin(), allMapData.end());
 
-	safe_delete(player);
 	safe_delete(enemy);
 	safe_delete(levelData);
 	safe_delete(HPText);
@@ -253,7 +251,7 @@ void GameScene::Draw()
 
 	for (std::unique_ptr<Enemy>& enemy : enemies)
 	{
-		enemy->reactionDraw();
+		enemy->ReactionDraw();
 	}
 
 	// パーティクル描画後処理
@@ -375,7 +373,7 @@ void GameScene::EnemyUpdate()
 			continue;
 		}
 
-		if (rFlag && enemy->EnemyCollision(player->GetObj()))
+		if (rFlag && enemy->Damage(player->GetObj()))
 		{
 			// カメラシェイクの発生
 			shakeFlag = true;
@@ -399,6 +397,8 @@ void GameScene::EnemyUpdate()
 			rope->SetrFlag(false);
 			rushFlag = false;
 			catchPos = {};
+			targetPos = {};
+			targetLength = FLT_MAX;
 			elapsedTime = 0.0f;
 			enemyCount--;
 			controller->Vibration();
@@ -437,17 +437,33 @@ void GameScene::EnemyUpdate()
 				);
 			}
 		}
+		enemy->Update();
+	}
+}
 
+void GameScene::RopeUpdate()
+{
+	rope->Update(pPos);
+	// 過去にターゲットしたしたオブジェクトから一定の距離離れていたら
+	if (GetLength(pPos, oldTargetPos) > 30.0f)
+	{
+		// 過去にターゲットしたオブジェクトの座標をリセットする
+		oldTargetPos = { 1000.0f, 1000.0f, 1000.0f };
+	}
+
+	// プレイヤーと敵の間の障害物検知
+	for (std::unique_ptr<Enemy>& enemy : enemies)
+	{
 		for (auto& object : allMapData[stageNum])
 		{
 			if (object->GetType() == "box" || object->GetType() == "wall")
 			{
 				object->Update();
-				XMFLOAT3 boxPos = object->GetPosition();
-				XMFLOAT3 boxScale = object->GetCollisionScale();
+				XMFLOAT3 pos = object->GetPosition();
+				XMFLOAT3 scale = object->GetCollisionScale();
 
-				// 障害物を検知していたら攻撃してこない
-				if (enemy->ObstacleDetection(pPos, boxPos, boxScale))
+				// 障害物を検知していたら攻撃してこない(プレイヤーも敵に攻撃することはできない)
+				if (enemy->ObstacleDetection(pPos, pos, scale))
 				{
 					break;
 				}
@@ -467,115 +483,114 @@ void GameScene::EnemyUpdate()
 				}
 			}
 		}
-		enemy->Update();
 	}
-}
 
-void GameScene::RopeUpdate()
-{
-	rope->Update(pPos);
+	// プレイヤーとポールの間の障害物検知
+	for (auto& object : allMapData[stageNum])
+	{
+		if (object->GetType() == "pole")
+		{
+			object->Update();
+			XMFLOAT3 polePos = object->GetPosition();
+			XMFLOAT3 poleScale = object->GetCollisionScale();
+
+			pPos = player->GetObj()->GetPosition();
+			float length = GetLength(pPos, polePos);
+
+			// ポールの中から一番近い距離のポールを決める
+			if (length < minPoleLength && length < baseLength)
+			{
+				minPoleLength = length;
+				targetPolePos = polePos;
+			}
+		}
+	}
 
 	// ポールと敵の距離を比較して短い方を代入
-	float minLength = (std::min)(minEnemyLength, minPoleLength);
+	targetLength = (std::min)(minEnemyLength, minPoleLength);
 
 	// どちらも基準内の距離だった場合、敵を優先する
 	if (minEnemyLength < baseLength && minPoleLength < baseLength)
 	{
-		minLength = minEnemyLength;
+		targetLength = minEnemyLength;
 	}
 
 	// ターゲットが敵だった場合
-	if (minLength == minEnemyLength)
+	if (targetLength == minEnemyLength)
 	{
 		targetPos = targetEnemyPos;
 	}
 	// ターゲットがポールだった場合
-	else
+	else if (targetLength == minPoleLength)
 	{
 		targetPos = targetPolePos;
 	}
 
-	// 障害物を検知したらターゲットしない
+	// 過去にターゲットしたポールには反応しない
+	if (targetLength == minPoleLength && GetLength(targetPos, oldTargetPos) <= 0.0f)
+	{
+		targetLength = minEnemyLength;
+		targetPos = targetEnemyPos;
+	}
+
+	// 遮蔽物の検知
 	for (auto& object : allMapData[stageNum])
 	{
 		if (object->GetType() == "box" || object->GetType() == "wall")
 		{
+			object->Update();
 			XMFLOAT3 pos = object->GetPosition();
 			XMFLOAT3 scale = object->GetCollisionScale();
-			if (GetLength(pPos, pos) >= baseLength)
-			{
-				continue;
-			}
 
 			if (Collision::CollisionRayBox(pPos, targetPos, pos, scale))
 			{
-				minLength = baseLength;
-				rope->SetThrowFlag(false);
+				targetLength = FLT_MAX;
+				targetPos = {};
 				break;
 			}
 		}
 	}
 
-	// 障害物を検知していなければ
-	if (minLength < baseLength)
+	// ターゲットが距離内にいる場合
+	if (targetLength < baseLength)
 	{
-		// 過去にターゲットしたポールには反応しない
-		if (minLength == minPoleLength && GetLength(targetPos, oldTargetPos) <= 0.0f)
-		{
-			minLength = minEnemyLength;
-			targetPos = targetEnemyPos;
-		}
+		effectTarget->TargetEffect(
+			targetPos, 3.0f, 1.0f,
+			{ 1.0f, 0.0f, 0.0f, 1.0f },
+			{ 1.0f, 1.0f, 1.0f, 1.0f },
+			targetEffectCount
+		);
 
-		// ターゲットが距離内にいればターゲットエフェクトを発生させる
-		if (minLength < baseLength)
-		{
-			effectTarget->TargetEffect(
-				targetPos, 3.0f, 1.0f,
-				{ 1.0f, 0.0f, 0.0f, 1.0f },
-				{ 1.0f, 1.0f, 1.0f, 1.0f },
-				targetEffectCount
-			);
-
-			// ターゲットしている方向にプレイヤーも向く
-			player->TrackRot(pPos, targetPos);
-			camera->SetTarget(targetPos);
-		}
-		else
-		{
-			float cameraRot = camera->CameraAngle(pPos);
-			// カメラが向いている方向にプレイヤーも向く
-			player->GetObj()->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
-			rope->SetThrowFlag(false);
-		}
-
-		// ロープを接着したら突進を開始する
-		if (!rushFlag && rFlag)
-		{
-			rushFlag = true;
-			catchPos = targetPos;
-		}
-
-		rope->Throw(pPos, targetPos, minLength);
+		// ターゲットしている方向にプレイヤーも向く
+		player->TrackRot(pPos, targetPos);
 	}
 	else
 	{
-		float cameraRot = camera->CameraAngle(pPos);
 		// カメラが向いている方向にプレイヤーも向く
-		player->GetObj()->SetRotation({ 0, XMConvertToDegrees(cameraRot), 0 });
+		player->TrackRot(pPos, camera->GetEye());
 		rope->SetThrowFlag(false);
+
+		targetPolePos = {};
+		minPoleLength = baseLength;
+		targetEnemyPos = {};
+		minEnemyLength = baseLength;
+		return;
 	}
 
-	// 過去にターゲットしたしたオブジェクトから一定の距離離れていたら
-	if (GetLength(pPos, oldTargetPos) > 30.0f)
+	rFlag = rope->GetrFlag();
+	// ロープを接着したら突進を開始する
+	if (!rushFlag && rFlag)
 	{
-		// 過去にターゲットしたオブジェクトの座標をリセットする
-		oldTargetPos = { 1000.0f, 1000.0f, 1000.0f };
+		rushFlag = true;
+		catchPos = targetPos;
 	}
+
+	rope->Throw(pPos, targetPos, targetLength);
 
 	targetPolePos = {};
-	minPoleLength = 15.0f;
+	minPoleLength = baseLength;
 	targetEnemyPos = {};
-	minEnemyLength = 15.0f;
+	minEnemyLength = baseLength;
 }
 
 void GameScene::jsonObjectInit(const std::string sceneName)
@@ -761,6 +776,8 @@ void GameScene::jsonObjectUpdate()
 				rope->SetrFlag(false);
 				rushFlag = false;
 				catchPos = {};
+				targetPos = {};
+				targetLength = FLT_MAX;
 				elapsedTime = 0.0f;
 			}
 
@@ -769,21 +786,12 @@ void GameScene::jsonObjectUpdate()
 				enemy->StageCollide(stagePos, stageScale);
 			}
 		}
-
 		else if (object->GetType() == "pole")
 		{
-			pPos = player->GetObj()->GetPosition();
-			rFlag = rope->GetrFlag();
 			XMFLOAT3 polePos = object->GetPosition();
 			XMFLOAT3 poleScale = object->GetCollisionScale();
-			float length = GetLength(pPos, polePos);
 
-			// ポールの中から一番近い距離のポールを決める
-			if (length < minPoleLength && length < baseLength)
-			{
-				minPoleLength = length;
-				targetPolePos = polePos;
-			}
+			pPos = player->GetObj()->GetPosition();
 
 			// プレイヤーがポールに触れたらロープの接着をなくして突進を止める
 			if (rushFlag && player->PoleCollide(polePos, poleScale))
@@ -791,11 +799,12 @@ void GameScene::jsonObjectUpdate()
 				rope->SetrFlag(false);
 				rushFlag = false;
 				catchPos = {};
+				targetPos = {};
+				targetLength = FLT_MAX;
 				elapsedTime = 0.0f;
 				oldTargetPos = polePos;
 			}
 		}
-
 		object->Update();
 	}
 }

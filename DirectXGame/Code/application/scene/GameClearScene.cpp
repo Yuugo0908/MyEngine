@@ -21,13 +21,23 @@ void GameClearScene::Finalize()
 void GameClearScene::Update()
 {
 	ClipCursor(NULL);
-
-	FadeScene::GetInstance()->FadeOut(1.0f);
-
-	if (keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
+	if (!titleFlag)
 	{
-		FadeScene::GetInstance()->reset();
-		SceneManager::GetInstance()->ChangeScene("Title");
+		FadeScene::GetInstance()->FadeOut(1.0f);
+	}
+
+	if (FadeScene::fadeOutEnd && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
+	{
+		titleFlag = true;
+	}
+
+	if (titleFlag)
+	{
+		FadeScene::GetInstance()->FadeIn(0.0f);
+		if (FadeScene::fadeInEnd)
+		{
+			SceneManager::GetInstance()->ChangeScene("Title");
+		}
 	}
 }
 

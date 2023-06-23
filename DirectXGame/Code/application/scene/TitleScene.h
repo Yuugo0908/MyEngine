@@ -38,7 +38,6 @@ private: // メンバ変数
 	Mouse* mouse = Mouse::GetInstance();
 	Audio* audio = Audio::GetInstance();
 	Camera* camera = Camera::GetInstance();
-
 	Light* light = Light::GetInstance();
 
 	// レベルデータ
@@ -50,4 +49,5 @@ private: // メンバ変数
 	Image2d* title = nullptr;
 
 	float alpha = 0.0f;
+	bool changeFlag = false;
 };

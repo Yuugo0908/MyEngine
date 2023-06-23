@@ -4,6 +4,7 @@
 #include "Easing.h"
 #include "Collision.h"
 #include "Operator.h"
+#include "SafeDelete.h"
 
 class Rope
 {

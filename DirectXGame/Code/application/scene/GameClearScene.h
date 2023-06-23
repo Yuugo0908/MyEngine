@@ -39,6 +39,6 @@ private: // ƒƒ“ƒo•Ï”
 	Image2d* backGround = nullptr;
 
 	float alpha = 1.0f;
-	bool fadeFlag = false;
+	bool titleFlag = false;
 };
 

@@ -16,7 +16,6 @@ void TitleScene::Initialize()
 	Object3d::SetLight(light);
 
 	jsonObjectInit("tutorial");
-	camera->CameraRotation();
 }
 
 void TitleScene::Finalize()
@@ -28,19 +27,24 @@ void TitleScene::Finalize()
 
 void TitleScene::Update()
 {
-	if (!FadeScene::fadeInEnd)
+	camera->TitleSceneCameraRotation();
+	if (!changeFlag)
 	{
-		camera->CameraRotation();
+		FadeScene::GetInstance()->FadeOut(1.0f);
 	}
 
-	if (!FadeScene::fadeInEnd && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
+	if (FadeScene::fadeOutEnd && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
+	{
+		changeFlag = true;
+	}
+
+	if (changeFlag)
 	{
 		FadeScene::GetInstance()->FadeIn(0.0f);
-	}
-
-	if (FadeScene::fadeInEnd)
-	{
-		SceneManager::GetInstance()->ChangeScene("Game");
+		if (FadeScene::fadeInEnd)
+		{
+			SceneManager::GetInstance()->ChangeScene("Tutorial");
+		}
 	}
 
 	jsonObjectUpdate();

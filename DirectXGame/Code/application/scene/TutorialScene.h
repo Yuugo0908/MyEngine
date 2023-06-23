@@ -155,8 +155,10 @@ private: // メンバ変数
 
 	// ターゲット座標保存用
 	XMFLOAT3 targetPos= {};
+	// ターゲット距離保存用
+	float targetLength = FLT_MAX;
 	// 過去にターゲットしたオブジェクトの座標
-	XMFLOAT3 oldTargetPos = { 1000.0f, 1000.0f, 1000.0f };
+	XMFLOAT3 oldTargetPos = { FLT_MAX, FLT_MAX, FLT_MAX };
 	// ターゲットする距離の基準
 	const float baseLength = 15.0f;
 

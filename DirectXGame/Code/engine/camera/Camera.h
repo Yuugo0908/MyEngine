@@ -70,8 +70,7 @@ public: // 静的メンバ関数
 	// カメラのシェイクを実行
 	void CameraShake(bool& flag);
 	// カメラの追尾
-	XMFLOAT3 CameraTrack(XMFLOAT3 pPos);
-	float CameraAngle(XMFLOAT3 pPos);
+	XMFLOAT3 CameraTrack(XMFLOAT3 pos);
 	// 距離を求める
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
@@ -79,8 +78,8 @@ public: // 静的メンバ関数
 		return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
 	}
 
-	// カメラの回転
-	void CameraRotation();
+	// タイトルシーン用のカメラの回転
+	void TitleSceneCameraRotation();
 
 	// 変数のリセット
 	void Reset();

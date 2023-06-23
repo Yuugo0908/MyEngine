@@ -1,5 +1,21 @@
 #include "Player.h"
 
+Player::Player()
+{
+}
+
+Player::~Player()
+{
+	safe_delete(playerModel);
+}
+
+Player* Player::GetInstance()
+{
+	static Player instance;
+
+	return &instance;
+}
+
 bool Player::Initialize(const XMFLOAT3 pos, const XMFLOAT3 scale)
 {
 	// モデルの生成
@@ -253,11 +269,6 @@ void Player::Reset()
 	pPosOld = { 0.0f, 10.0f, 0.0f };
 	pRot = { 0.0f, 0.0f, 0.0f };//回転
 
-	playerObj->SetPosition(pPos);
-	playerObj->SetScale({ 0.8f,0.8f,0.8f });
-	playerObj->SetRotation(pRot);
-	playerObj->Update();
-
 	pSpeed = 0.35f;
 	onGround = false;//自由落下のフラグ
 	jumpFlag = false;
@@ -295,6 +306,7 @@ void Player::TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos)
 	float angle = (float)atan2(subPos.m128_f32[0], subPos.m128_f32[2]);
 
 	playerObj->SetRotation({ 0, XMConvertToDegrees(angle), 0 });
+	playerObj->Update();
 }
 
 bool Player::MapCollide(XMFLOAT3 boxPos, XMFLOAT3 boxScale)

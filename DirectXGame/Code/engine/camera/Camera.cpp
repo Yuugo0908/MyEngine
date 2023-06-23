@@ -118,8 +118,6 @@ void Camera::Update()
 	angleY = 0.0f;
 	dirty = false;
 
-	XMFLOAT3 cameraTrack = CameraTrack(target);
-
 	if (saveEye.y > eyeMax)
 	{
 		saveEye.y = eyeMax;
@@ -328,32 +326,20 @@ void Camera::CameraShake(bool& flag)
 	SetTarget(target);
 }
 
-XMFLOAT3 Camera::CameraTrack(XMFLOAT3 pPos)
+XMFLOAT3 Camera::CameraTrack(XMFLOAT3 pos)
 {
-	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 0 };
+	XMVECTOR startPos = { pos.x, pos.y, pos.z, 0 };
 	XMVECTOR cameraPos = { eye.x, eye.y, eye.z, 0 };
 
-	XMVECTOR subCameraPlayer = XMVectorSubtract(playerPos, cameraPos);
-	cameraLength= XMVector3Normalize(subCameraPlayer);
+	XMVECTOR subCamera = XMVectorSubtract(startPos, cameraPos);
+	cameraLength= XMVector3Normalize(subCamera);
 
 	XMFLOAT3 Track = { cameraLength.m128_f32[0], cameraLength.m128_f32[1], cameraLength.m128_f32[2] };
 
 	return Track;
 }
 
-float Camera::CameraAngle(XMFLOAT3 pPos)
-{
-	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 0 };
-	XMVECTOR cameraPos = { eye.x, eye.y, eye.z, 0 };
-
-	XMVECTOR subCameraPlayer = XMVectorSubtract(playerPos, cameraPos);
-
-	float angle = (float)atan2(subCameraPlayer.m128_f32[0], subCameraPlayer.m128_f32[2]);
-
-	return angle;
-}
-
-void Camera::CameraRotation()
+void Camera::TitleSceneCameraRotation()
 {
 	if (!rotationFlag)
 	{
