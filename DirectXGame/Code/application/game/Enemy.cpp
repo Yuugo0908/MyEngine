@@ -41,9 +41,9 @@ bool Enemy::BulletCreate()
 		return false;
 	}
 
+	pPos = player->GetObj()->GetPosition();
 	std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>();
 	newBullet->Initialize(bulletModel, pPos, ePos);
-	newBullet->SetPos(enemyObj->GetPosition());
 	bullets.push_back(std::move(newBullet));
 	attackCount = 0;
 	return true;
@@ -58,11 +58,12 @@ void Enemy::Update()
 
 		ePos = enemyObj->GetPosition();
 		eOldPos = ePos;
-		eScale = { 0.8f, 0.8f, 0.8f };
+		eScale = enemyObj->GetScale();
+		eRot = enemyObj->GetRotation();
 
 		enemyObj->SetPosition(ePos);
 		enemyObj->SetScale(eScale);
-		enemyObj->SetRotation({ 0, 0, 0 });
+		enemyObj->SetRotation(eRot);
 		enemyObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 		enemyObj->Update();
 		return;
@@ -187,7 +188,8 @@ void Enemy::Stay()
 	if (GetLength(ePos, spawnPos) <= 5.0f)
 	{
 		// ¡ŒãŽÀ‘•u“G‚ªœpœj‚·‚év
-		enemyObj->SetRotation({});
+		eRot = spawnRot;
+		enemyObj->SetRotation(eRot);
 		return;
 	}
 
@@ -251,11 +253,12 @@ void Enemy::ReSpawn()
 
 		ePos = spawnPos;
 		eOldPos = ePos;
-		eScale = { 0.8f, 0.8f, 0.8f };
+		eScale = enemyObj->GetScale();
+		eRot = spawnRot;
 
 		enemyObj->SetPosition(ePos);
 		enemyObj->SetScale(eScale);
-		enemyObj->SetRotation({});
+		enemyObj->SetRotation(eRot);
 		enemyObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 		enemyObj->Update();
 	}
@@ -350,7 +353,7 @@ bool Enemy::BulletCollision()
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
 		// “G‚©‚çˆê’è‚Ì‹——£—£‚ê‚½‚çÁ‚¦‚é
-		if (GetLength(ePos, bullet->GetPos()) >= 30.0f)
+		if (GetLength(ePos, bullet->GetObj()->GetPosition()) >= 30.0f)
 		{
 			bullets.remove(bullet);
 			return false;
@@ -370,7 +373,7 @@ bool Enemy::Danger()
 {
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
-		if (GetLength(player->GetObj()->GetPosition(), bullet->GetPos()) <= 5.0f)
+		if (GetLength(player->GetObj()->GetPosition(), bullet->GetObj()->GetPosition()) <= 5.0f)
 		{
 			return true;
 		}

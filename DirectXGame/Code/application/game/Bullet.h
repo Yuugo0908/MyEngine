@@ -20,9 +20,6 @@ public: // ÉÅÉìÉoä÷êî
 
 	const std::unique_ptr<Object3d>& GetObj() { return bulletObj; }
 
-	const XMFLOAT3& GetPos() { return bPos; }
-	void SetPos(XMFLOAT3 bPos) { this->bPos = bPos; }
-
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
 		XMFLOAT3 len = { posA.x - posB.x, posA.y - posB.y, posA.z - posB.z };

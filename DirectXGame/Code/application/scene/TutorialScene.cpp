@@ -789,6 +789,9 @@ void TutorialScene::jsonObjectInit(const std::string sceneName)
 			// ‘å‚«‚³
 			XMFLOAT3 scale;
 			XMStoreFloat3(&scale, objectData.scale);
+			// ‰ñ“]Šp
+			XMFLOAT3 rot;
+			XMStoreFloat3(&rot, objectData.rot);
 			// “–‚½‚è”»’è
 			XMFLOAT3 size;
 			XMStoreFloat3(&size, objectData.size);
@@ -798,8 +801,10 @@ void TutorialScene::jsonObjectInit(const std::string sceneName)
 			newEnemy->Initialize(player);
 			newEnemy->GetObj()->SetPosition(pos);
 			newEnemy->GetObj()->SetScale(scale);
+			newEnemy->GetObj()->SetRotation(rot);
 			newEnemy->GetObj()->SetCollisionScale(size);
 			newEnemy->SetSpawnPos(pos);
+			newEnemy->SetSpawnRot(rot);
 			newEnemy->Update();
 			enemies.push_back(std::move(newEnemy));
 			enemyCount++;

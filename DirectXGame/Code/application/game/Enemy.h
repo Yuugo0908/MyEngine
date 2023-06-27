@@ -69,8 +69,10 @@ public: // メンバ関数
 	const bool& GetAttackFlag() { return attackFlag; }
 	// 着地
 	void SetOnGround(bool onGround) { this->onGround = onGround; }
-	// 出現座標の取得
+	// 出現座標の設定
 	void SetSpawnPos(XMFLOAT3 spawnPos) { this->spawnPos = spawnPos; }
+	// 出現回転の設定
+	void SetSpawnRot(XMFLOAT3 spawnRot) { this->spawnRot = spawnRot; }
 
 	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
 	{
@@ -98,6 +100,7 @@ private:
 	XMFLOAT3 eScale = {};
 	XMFLOAT3 eRot = {};
 	XMFLOAT3 spawnPos = {};
+	XMFLOAT3 spawnRot = {};
 	XMFLOAT3 preMovePos = {};
 
 	const float limitPos = -30.0f;

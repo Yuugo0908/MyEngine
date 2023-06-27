@@ -700,6 +700,9 @@ void GameScene::playerAndEnemyInit(const std::string sceneName)
 			// 大きさ
 			XMFLOAT3 scale;
 			XMStoreFloat3(&scale, objectData.scale);
+			// 回転角
+			XMFLOAT3 rot;
+			XMStoreFloat3(&rot, objectData.rot);
 			// 当たり判定
 			XMFLOAT3 size;
 			XMStoreFloat3(&size, objectData.size);
@@ -709,8 +712,10 @@ void GameScene::playerAndEnemyInit(const std::string sceneName)
 			newEnemy->Initialize(player);
 			newEnemy->GetObj()->SetPosition(pos);
 			newEnemy->GetObj()->SetScale(scale);
+			newEnemy->GetObj()->SetRotation(rot);
 			newEnemy->GetObj()->SetCollisionScale(size);
 			newEnemy->SetSpawnPos(pos);
+			newEnemy->SetSpawnRot(rot);
 			newEnemy->Update();
 			enemies.push_back(std::move(newEnemy));
 			enemyCount++;
