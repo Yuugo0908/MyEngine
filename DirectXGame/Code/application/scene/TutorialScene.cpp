@@ -646,7 +646,7 @@ void TutorialScene::RopeUpdate()
 					float length = GetLength(pPos, ePos);
 
 					// ロープが届く距離にいた場合、その敵の座標と距離を保存
-					if (length < minEnemyLength)
+					if (length < minEnemyLength && length < baseLength)
 					{
 						targetEnemyPos = ePos;
 						minEnemyLength = length;
