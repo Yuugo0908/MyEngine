@@ -58,6 +58,7 @@ private: // ƒƒ“ƒo•Ï”
 	FadeState fadeState{};
 
 	float alpha = 0.0f;
+	float alphaAdd = 0.0f;
 	int fadeNum = 16;
 	int fadeCount = 0;
 };

@@ -78,7 +78,6 @@ void Enemy::Update()
 	enemyObj->SetPosition(ePos);
 
 	pPos = player->GetObj()->GetPosition();
-	PElength = GetLength(pPos, ePos);
 
 	// プレイヤーのサーチする
 	Search();
@@ -164,11 +163,13 @@ void Enemy::Attack()
 	{
 		BulletCreate();
 	}
+	pPos = player->GetObj()->GetPosition();
 	TrackRot(ePos, pPos);
 }
 
 void Enemy::Move()
 {
+	pPos = player->GetObj()->GetPosition();
 	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 1 };
 	XMVECTOR enemyPos = { ePos.x, ePos.y, ePos.z, 1 };
 
@@ -177,8 +178,8 @@ void Enemy::Move()
 
 	XMFLOAT3 subPE = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
 
-	ePos.x += subPE.x / 5;
-	ePos.z += subPE.z / 5;
+	ePos.x += subPE.x / 6;
+	ePos.z += subPE.z / 6;
 	TrackRot(ePos, pPos);
 	enemyObj->Update();
 }
@@ -266,6 +267,7 @@ void Enemy::ReSpawn()
 
 void Enemy::Search()
 {
+	pPos = player->GetObj()->GetPosition();
 	XMVECTOR startPos = { ePos.x, ePos.y, ePos.z, 0 };
 	XMVECTOR endPos = { pPos.x, pPos.y, pPos.z, 0 };
 	XMFLOAT3 enemyRot = enemyObj->GetRotation();
@@ -287,6 +289,7 @@ void Enemy::Search()
 		angle = angleMax - (angle - angleMax);
 	}
 
+	PElength = GetLength(pPos, ePos);
 	// プレイヤーから離れていたらサーチしない
 	if (PElength > 30.0f || angle > 60.0f || attackFlag == false)
 	{
@@ -313,10 +316,12 @@ void Enemy::Reset()
 	safe_delete(question_mark);
 }
 
-bool Enemy::ObstacleDetection(XMFLOAT3 pPos, XMFLOAT3 boxPos, XMFLOAT3 boxScale)
+bool Enemy::ObstacleDetection(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 {
-	// 距離が一定以内だったら
-	if (PElength <= 30.0f)
+	pPos = player->GetObj()->GetPosition();
+	PElength = GetLength(pPos, ePos);
+	// 距離が一定以内かつy座標(高さ)の差が一定以内だったら
+	if (PElength <= 30.0f && sqrtf((pPos.y - ePos.y) * (pPos.y - ePos.y)) <= 5.0f)
 	{
 		// 障害物を検知していたら攻撃フラグをfalseにしてtrueを返す
 		if (Collision::CollisionRayBox(pPos, ePos, boxPos, boxScale))

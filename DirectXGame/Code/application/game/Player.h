@@ -97,6 +97,7 @@ private: // メンバ変数
 	float pGra = 0.1f;//重力
 	float rate = 1.0f; // 斜め移動時の制限
 	int damageInterval = 0; // 攻撃を受けた際のインターバル
+	float trackTime = 0.0f;
 
 	// 突進用
 	bool avoidFlag = false; // 回避開始フラグ

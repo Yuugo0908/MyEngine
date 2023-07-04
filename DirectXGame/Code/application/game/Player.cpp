@@ -41,6 +41,8 @@ void Player::Update()
 
 	// カメラが向いている方向を調べる
 	cameraTrack = camera->CameraTrack(pPos);
+	// 向きが変わった経過時間の範囲設定
+	trackTime = (std::min)((std::max)(trackTime, 0.0f), 1.0f);
 
 	if (!rushFlag && (keyboard->ReleaseKey(DIK_D) || keyboard->ReleaseKey(DIK_A) || keyboard->ReleaseKey(DIK_W) || keyboard->ReleaseKey(DIK_S)))
 	{
@@ -72,8 +74,8 @@ void Player::Update()
 		// 斜め移動
 		rate = 1.0f;
 
-		// 移動値の範囲は0.0f～1.0fにする
-		pMove = (std::min)((std::max)(pMove, 0.0f), 1.0f);
+		// 移動値の範囲は0.0f～0.7fにする
+		pMove = (std::min)((std::max)(pMove, 0.0f), 0.7f);
 
 		// 移動量の倍数計算
 		if (controller->GetPadState(Controller::State::LEFT_L_STICK, Controller::Type::NONE) || controller->GetPadState(Controller::State::LEFT_R_STICK, Controller::Type::NONE))
@@ -138,9 +140,9 @@ void Player::Update()
 		}
 		else if (!avoidFlag)
 		{
-			pMove -= 0.1f;
 			pPos.x += inertiaSaveMove.x * pMove;
 			pPos.z += inertiaSaveMove.z * pMove;
+			pMove -= 0.1f;
 
 			if (pMove <= 0.0f)
 			{
@@ -170,7 +172,7 @@ void Player::Rush(XMFLOAT3 targetPos, bool& flag, float& avoidTime)
 	rushFlag = true;
 	if (avoidTime < 1.0f)
 	{
-		avoidTime += 0.1f;
+		avoidTime += 0.05f;
 	}
 
 	pPos = Easing::easeIn(pPos, targetPos, avoidTime);
@@ -228,8 +230,8 @@ void Player::Jump()
 		// プレイヤー座標に加算
 		pPos.y += pVel;
 		// 慣性
-		pPos.x += inertiaSaveJump.x * 0.15f;
-		pPos.z += inertiaSaveJump.z * 0.15f;
+		pPos.x += inertiaSaveJump.x * 0.4f;
+		pPos.z += inertiaSaveJump.z * 0.4f;
 
 		// 着地したら無効化
 		if (onGround)
@@ -298,6 +300,7 @@ void Player::ReSpawn()
 
 void Player::TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos)
 {
+	trackTime += 0.1f;
 	XMVECTOR sPos = { startPos.x, startPos.y, startPos.z, 0 };
 	XMVECTOR ePos = { endPos.x, endPos.y, endPos.z, 0 };
 
@@ -486,7 +489,7 @@ bool Player::PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale)
 		onGround = false;
 		jumpFlag = true;
 		// 上昇率の更新
-		pVel = 1.25f;
+		pVel = 1.5f;
 	}
 
 	playerObj->SetPosition(pPos);

@@ -109,11 +109,12 @@ private: // メンバ変数
 	Audio* Bgm = Audio::GetInstance();
 
 	// パーティクル
-	Particle* effectBox = nullptr;
-	Particle* effectCircle = nullptr;
-	Particle* effectCircle2 = nullptr;
+	Particle* effectKnockDown = nullptr;
+	Particle* effectKnockDown2 = nullptr;
 	Particle* effectTarget = nullptr;
 	Particle* effectAvoid = nullptr;
+	Particle* effectRush = nullptr;
+	Particle* effectCollision = nullptr;
 	int targetEffectCount = 0;
 
 	// プレイヤー
@@ -133,6 +134,7 @@ private: // メンバ変数
 	// ロープ
 	XMFLOAT3 catchPos = {};
 	bool rFlag = false;
+	bool rThrowFlag = false;
 	bool rushFlag = false; // 突進開始フラグ
 	float elapsedTime = 0.0f;
 

@@ -40,10 +40,10 @@ public: // メンバ関数
 	void CircularMotion(XMFLOAT3& pos, const XMFLOAT3 centerPos, const float r, int& angle, const int add);
 
 	// ロープがつながっているか
-	const bool& GetrFlag() { return rFlag; }
+	const bool GetrFlag() { return rFlag; }
 	void SetrFlag(bool rFlag) { this->rFlag = rFlag; }
 	// ロープを飛ばしているか
-	const bool& GetThrowFlag() { return rThrowFlag; }
+	const bool GetThrowFlag() { return rThrowFlag; }
 	void SetThrowFlag(bool throwFlag) { rThrowFlag = throwFlag; }
 	
 	const std::unique_ptr<Object3d>& GetObj() { return ropeObj; }

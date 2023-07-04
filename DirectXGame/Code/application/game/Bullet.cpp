@@ -21,9 +21,9 @@ void Bullet::Update()
 {
 	bOldPos = bPos;
 
-	bPos.x += bSpeed.x / 3;
-	bPos.y += bSpeed.y / 3;
-	bPos.z += bSpeed.z / 3;
+	bPos.x += bSpeed.x / 4;
+	bPos.y += bSpeed.y / 4;
+	bPos.z += bSpeed.z / 4;
 
 	bulletObj->SetPosition(bPos);
 	bulletObj->Update();

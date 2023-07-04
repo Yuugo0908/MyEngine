@@ -43,7 +43,7 @@ void TitleScene::Update()
 		FadeScene::GetInstance()->FadeIn(0.0f);
 		if (FadeScene::fadeInEnd)
 		{
-			SceneManager::GetInstance()->ChangeScene("Game");
+			SceneManager::GetInstance()->ChangeScene("Tutorial");
 		}
 	}
 

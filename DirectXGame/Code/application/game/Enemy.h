@@ -48,7 +48,7 @@ public: // メンバ関数
 
 	void Search();
 
-	bool ObstacleDetection(XMFLOAT3 pPos, XMFLOAT3 boxPos, XMFLOAT3 boxScale);
+	bool ObstacleDetection(XMFLOAT3 boxPos, XMFLOAT3 boxScale);
 
 	bool Damage(const std::unique_ptr<Object3d>& object);
 
@@ -103,8 +103,10 @@ private:
 	XMFLOAT3 spawnRot = {};
 	XMFLOAT3 preMovePos = {};
 
+	// リスポーンするy座標(高さ)
 	const float limitPos = -30.0f;
 
+	// 敵の行動パターン
 	Phase phase = Enemy::Phase::move;
 
 	float eUp = 0.0f; // 上昇

@@ -5,6 +5,7 @@ bool FadeScene::fadeOutEnd = false;
 
 FadeScene::FadeScene()
 {
+
 }
 
 FadeScene::~FadeScene()
@@ -44,11 +45,14 @@ void FadeScene::Update()
 	case None:
 		fadeInEnd = false;
 		fadeOutEnd = false;
+		alphaAdd = 0.0f;
 		break;
 	case FadeInPlay:
-		if (!fadeInEnd && alpha <= 2.0f && fadeCount <= fadeNum - 1)
+		if (!fadeInEnd && alpha <= 1.0f && fadeCount <= fadeNum - 1)
 		{
-			alpha += 0.2f;
+			alpha += alphaAdd;
+
+			fade[fadeCount]->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
 		}
 		else
 		{
@@ -62,7 +66,9 @@ void FadeScene::Update()
 	case FadeOutPlay:
 		if (!fadeOutEnd && alpha > 0.0f && fadeCount <= fadeNum - 1)
 		{
-			alpha -= 0.2f;
+			alpha -= alphaAdd;
+
+			fade[fadeCount]->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
 		}
 		else
 		{
@@ -87,8 +93,6 @@ void FadeScene::Update()
 		alpha = 1.0f;
 		fadeCount++;
 	}
-
-	fade[fadeCount]->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
 }
 
 void FadeScene::Draw()
@@ -109,6 +113,7 @@ void FadeScene::FadeIn(float alpha)
 	if (fadeState != FadeInPlay && fadeState != FadeInEnd)
 	{
 		this->alpha = alpha;
+		alphaAdd = 0.15f;
 		fadeInEnd = false;
 
 		// フェードイン開始
@@ -121,6 +126,7 @@ void FadeScene::FadeOut(float alpha)
 	if (fadeState != FadeOutPlay && fadeState != FadeOutEnd)
 	{
 		this->alpha = alpha;
+		alphaAdd = 0.15f;
 		fadeOutEnd = false;
 
 		// フェードアウト開始

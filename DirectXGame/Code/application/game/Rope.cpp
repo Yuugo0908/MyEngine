@@ -99,7 +99,7 @@ void Rope::Throw(XMFLOAT3& pPos, const XMFLOAT3 targetPos, const float targetLen
 
 	if (rThrowFlag)
 	{
-		avoidTime += 0.1f;
+		avoidTime += 0.05f;
 
 		if (rRotFlag)
 		{
@@ -115,8 +115,8 @@ void Rope::Throw(XMFLOAT3& pPos, const XMFLOAT3 targetPos, const float targetLen
 			manageRopePos = (manageRopePos * (1.0f - timeThrowPos) + subPE * timeThrowPos) / 2;
 		}
 
-		manageRopeScale.x += 0.02f;
-		manageRopeScale.y += 0.02f;
+		manageRopeScale.x += 0.01f;
+		manageRopeScale.y += 0.01f;
 
 		float timeThrowScale = avoidTime * (2.0f - avoidTime);
 		manageRopeScale.z = (manageRopeScale.z * (1.0f - timeThrowScale) + tLength * timeThrowScale) / 2;
