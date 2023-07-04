@@ -558,6 +558,7 @@ void TutorialScene::EnemyUpdate()
 			elapsedTime = 0.0f;
 			enemyCount--;
 			controller->Vibration();
+			tutorialAvoid = false;
 			enemies.remove(enemy);
 			break;
 		}

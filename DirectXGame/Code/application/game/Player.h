@@ -94,7 +94,7 @@ private: // メンバ変数
 	float pAcc = 0.2f;//加速
 	float pVel = 0.2f;//速度
 	float pDown = 0.0f;
-	float pGra = 0.1f;//重力
+	float pGra = 0.08f;//重力
 	float rate = 1.0f; // 斜め移動時の制限
 	int damageInterval = 0; // 攻撃を受けた際のインターバル
 	float trackTime = 0.0f;

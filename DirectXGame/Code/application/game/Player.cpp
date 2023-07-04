@@ -219,7 +219,7 @@ void Player::Jump()
 		jumpFlag = true;
 		moveFlag = true;
 		// 上昇率の更新
-		pVel = 1.25f;
+		pVel = 1.0f;
 	}
 
 	// ジャンプ
@@ -245,7 +245,6 @@ void Player::Jump()
 	// 重力(ジャンプしていない状態でも重力は働く)
 	else
 	{
-
 		pDown = -0.75f;
 		pPos.y += pDown;
 		if (onGround)
@@ -489,7 +488,7 @@ bool Player::PoleCollide(XMFLOAT3 polePos, XMFLOAT3 poleScale)
 		onGround = false;
 		jumpFlag = true;
 		// 上昇率の更新
-		pVel = 1.5f;
+		pVel = 1.15f;
 	}
 
 	playerObj->SetPosition(pPos);
