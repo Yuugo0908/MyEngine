@@ -36,6 +36,8 @@ public: // メンバ関数
 
 	void Jump();
 
+	float Search(const XMFLOAT3& pos, const XMFLOAT3 cameraEye);
+
 	bool Damage(const std::unique_ptr<Object3d>& object);
 
 	void Reset();
@@ -64,6 +66,12 @@ public: // メンバ関数
 
 	// ジャンプ
 	void SetJumpFlag(bool jumpFlag) { this->jumpFlag = jumpFlag; }
+
+	float GetLength(XMFLOAT3 posA, XMFLOAT3 posB)
+	{
+		XMFLOAT3 len = { posA.x - posB.x, posA.y - posB.y, posA.z - posB.z };
+		return sqrtf(len.x * len.x + len.y * len.y + len.z * len.z);
+	}
 
 private: // メンバ変数
 
@@ -97,7 +105,6 @@ private: // メンバ変数
 	float pGra = 0.08f;//重力
 	float rate = 1.0f; // 斜め移動時の制限
 	int damageInterval = 0; // 攻撃を受けた際のインターバル
-	float trackTime = 0.0f;
 
 	// 突進用
 	bool avoidFlag = false; // 回避開始フラグ

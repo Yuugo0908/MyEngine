@@ -103,8 +103,10 @@ void TutorialScene::Update()
 	mouse->CursorLimit();
 
 	// ターゲットが距離内にいる場合
-	if (targetLength < baseLength)
+	if (targetLength < baseLength && targetAngle < baseAngle)
 	{
+		// ターゲットエフェクトの発生
+		// チュートリアルで画面停止時にもエフェクトが発生するようにこの位置で更新する
 		effectTarget->TargetEffect(
 			targetPos, 3.0f, 1.0f,
 			{ 1.0f, 0.0f, 0.0f, 1.0f },
@@ -555,6 +557,7 @@ void TutorialScene::EnemyUpdate()
 			catchPos = {};
 			targetPos = {};
 			targetLength = FLT_MAX;
+			targetAngle = FLT_MAX;
 			elapsedTime = 0.0f;
 			enemyCount--;
 			controller->Vibration();
@@ -634,7 +637,7 @@ void TutorialScene::RopeUpdate()
 				XMFLOAT3 pos = object->GetPosition();
 				XMFLOAT3 scale = object->GetCollisionScale();
 
-				// 障害物を検知していたら攻撃してこない(プレイヤーも敵に攻撃することはできない)
+				// 障害物を検知または、一定距離離れていたら攻撃してこない(プレイヤーも敵に攻撃することはできない)
 				if (enemy->ObstacleDetection(pos, scale))
 				{
 					break;
@@ -645,12 +648,14 @@ void TutorialScene::RopeUpdate()
 					pPos = player->GetObj()->GetPosition();
 					ePos = enemy->GetObj()->GetPosition();
 					float length = GetLength(pPos, ePos);
+					float angle = player->Search(ePos, camera->GetEye());
 
 					// ロープが届く距離にいた場合、その敵の座標と距離を保存
-					if (length < minEnemyLength && length < baseLength)
+					if (length < targetEnemyLength && length < baseLength && angle < targetEnemyAngle && angle < baseAngle)
 					{
 						targetEnemyPos = ePos;
-						minEnemyLength = length;
+						targetEnemyLength = length;
+						targetEnemyAngle = angle;
 					}
 				}
 			}
@@ -668,12 +673,14 @@ void TutorialScene::RopeUpdate()
 
 			pPos = player->GetObj()->GetPosition();
 			float length = GetLength(pPos, polePos);
+			float angle = player->Search(polePos, camera->GetEye());
 
-			// ポールの中から一番近い距離のポールを決める
-			if (length < minPoleLength && length < baseLength)
+			// ポールの中から一番近くかつ、正面に近いポールを決める
+			if (length < targetPoleLength && length < baseLength && angle < targetPoleAngle && angle < baseAngle)
 			{
-				minPoleLength = length;
 				targetPolePos = polePos;
+				targetPoleLength = length;
+				targetPoleAngle = angle;
 			}
 		}
 	}
@@ -684,33 +691,31 @@ void TutorialScene::RopeUpdate()
 	// ロープが発射、もしくは接触している場合はターゲットの変更はしない
 	if (!rFlag && !rThrowFlag)
 	{
-		// ポールと敵の距離を比較して短い方を代入
-		targetLength = (std::min)(minEnemyLength, minPoleLength);
-
-		// どちらも基準内の距離だった場合、敵を優先する
-		if (minEnemyLength < baseLength && minPoleLength < baseLength)
-		{
-			targetLength = minEnemyLength;
-		}
+		// ポールと敵の角度を比較して正面に近い方を代入
+		targetAngle = (std::min)(targetEnemyAngle, targetPoleAngle);
 
 		// ターゲットが敵だった場合
-		if (targetLength == minEnemyLength)
+		if (targetAngle == targetEnemyAngle)
 		{
 			targetPos = targetEnemyPos;
+			targetLength = targetEnemyLength;
 			tutorialAttack = true;
 		}
+
 		// ターゲットがポールだった場合
-		else if (targetLength == minPoleLength)
+		if (targetAngle == targetPoleAngle)
 		{
 			targetPos = targetPolePos;
+			targetLength = targetPoleLength;
 			tutorialThrow = true;
 		}
 
 		// 過去にターゲットしたポールには反応しない
-		if (targetLength == minPoleLength && GetLength(targetPos, oldTargetPos) <= 0.0f)
+		if (GetLength(targetPos, oldTargetPos) <= 0.0f)
 		{
-			targetLength = minEnemyLength;
 			targetPos = targetEnemyPos;
+			targetLength = targetEnemyLength;
+			targetAngle = targetEnemyAngle;
 			tutorialAttack = true;
 			tutorialThrow = false;
 		}
@@ -726,8 +731,9 @@ void TutorialScene::RopeUpdate()
 
 				if (Collision::CollisionRayBox(pPos, targetPos, pos, scale))
 				{
-					targetLength = FLT_MAX;
 					targetPos = {};
+					targetLength = FLT_MAX;
+					targetAngle = FLT_MAX;
 					tutorialThrow = false;
 					tutorialAttack = false;
 					break;
@@ -737,10 +743,10 @@ void TutorialScene::RopeUpdate()
 	}
 
 	// ターゲットが距離内にいる場合
-	if (targetLength < baseLength)
+	if (targetLength < baseLength && targetAngle < baseAngle)
 	{
 		// ターゲットしている方向にプレイヤーも向く
-		player->TrackRot(pPos, targetPos);
+		player->TrackRot(targetPos, pPos);
 	}
 	else
 	{
@@ -749,9 +755,11 @@ void TutorialScene::RopeUpdate()
 		rope->SetThrowFlag(false);
 
 		targetPolePos = {};
-		minPoleLength = baseLength;
+		targetPoleLength = baseLength;
+		targetPoleAngle = baseAngle;
 		targetEnemyPos = {};
-		minEnemyLength = baseLength;
+		targetEnemyLength = baseLength;
+		targetEnemyAngle = baseAngle;
 		tutorialThrow = false;
 		tutorialAttack = false;
 		return;
@@ -768,9 +776,11 @@ void TutorialScene::RopeUpdate()
 	rope->Throw(pPos, targetPos, targetLength);
 
 	targetPolePos = {};
-	minPoleLength = baseLength;
+	targetPoleLength = baseLength;
+	targetPoleAngle = baseAngle;
 	targetEnemyPos = {};
-	minEnemyLength = baseLength;
+	targetEnemyLength = baseLength;
+	targetEnemyAngle = baseAngle;
 }
 
 void TutorialScene::jsonObjectInit(const std::string sceneName)
@@ -900,8 +910,8 @@ void TutorialScene::jsonObjectUpdate()
 			XMFLOAT3 boxPos = object->GetPosition();
 			XMFLOAT3 boxScale = object->GetCollisionScale();
 			player->MapCollide(boxPos, boxScale);
-			pPos = player->GetObj()->GetPosition();
 
+			pPos = player->GetObj()->GetPosition();
 			for (std::unique_ptr<Enemy>& enemy : enemies)
 			{
 				enemy->MapCollide(boxPos, boxScale);
@@ -915,7 +925,6 @@ void TutorialScene::jsonObjectUpdate()
 			player->MapCollide(wallPos, wallScale);
 		
 			pPos = player->GetObj()->GetPosition();
-
 			for (std::unique_ptr<Enemy>& enemy : enemies)
 			{
 				enemy->MapCollide(wallPos, wallScale);
@@ -928,8 +937,8 @@ void TutorialScene::jsonObjectUpdate()
 			XMFLOAT3 stagePos = object->GetPosition();
 			XMFLOAT3 stageScale = object->GetCollisionScale();
 			player->StageCollide(stagePos, stageScale, reverseFlag);
-			pPos = player->GetObj()->GetPosition();
 
+			pPos = player->GetObj()->GetPosition();
 			// 背面に当たったら、ロープの接着を解除する
 			if (reverseFlag)
 			{
@@ -938,6 +947,7 @@ void TutorialScene::jsonObjectUpdate()
 				catchPos = {};
 				targetPos = {};
 				targetLength = FLT_MAX;
+				targetAngle = FLT_MAX;
 				elapsedTime = 0.0f;
 			}
 
@@ -961,11 +971,11 @@ void TutorialScene::jsonObjectUpdate()
 				catchPos = {};
 				targetPos = {};
 				targetLength = FLT_MAX;
+				targetAngle = FLT_MAX;
 				elapsedTime = 0.0f;
 				oldTargetPos = polePos;
 			}
 		}
-
 		object->Update();
 	}
 }

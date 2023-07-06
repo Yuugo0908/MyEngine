@@ -26,9 +26,11 @@ bool Player::Initialize(const XMFLOAT3 pos, const XMFLOAT3 scale)
 	pPos = pos;
 	pScale = scale;
 	reSpawnPos = pos;
+	pRot = { 0.0f, 0.0f, 0.0f };//回転
 
 	playerObj->SetPosition(pPos);
 	playerObj->SetScale(pScale);
+	playerObj->SetRotation(pRot);
 	playerObj->Update();
 
 	return true;
@@ -41,8 +43,6 @@ void Player::Update()
 
 	// カメラが向いている方向を調べる
 	cameraTrack = camera->CameraTrack(pPos);
-	// 向きが変わった経過時間の範囲設定
-	trackTime = (std::min)((std::max)(trackTime, 0.0f), 1.0f);
 
 	if (!rushFlag && (keyboard->ReleaseKey(DIK_D) || keyboard->ReleaseKey(DIK_A) || keyboard->ReleaseKey(DIK_W) || keyboard->ReleaseKey(DIK_S)))
 	{
@@ -254,8 +254,53 @@ void Player::Jump()
 	}
 }
 
+float Player::Search(const XMFLOAT3& pos, const XMFLOAT3 cameraEye)
+{
+	XMVECTOR playerPos = { pPos.x, pPos.y, pPos.z, 0 };
+
+	// プレイヤーとターゲットオブジェクトのなす角を求める
+	XMVECTOR targetPos = { pos.x, pos.y, pos.z, 0 };
+	XMVECTOR subTargetPos = XMVectorSubtract(targetPos, playerPos);
+	float targetAngle = (float)atan2(subTargetPos.m128_f32[0], subTargetPos.m128_f32[2]);
+	targetAngle = XMConvertToDegrees(targetAngle);
+
+	//　カメラが向いている向きを調べる
+	XMVECTOR cameraPos = { cameraEye.x, cameraEye.y, cameraEye.z, 0 };
+	XMVECTOR subCameraPos = XMVectorSubtract(playerPos, cameraPos);
+	float cameraAngle = (float)atan2(subCameraPos.m128_f32[0], subCameraPos.m128_f32[2]);
+	cameraAngle = XMConvertToDegrees(cameraAngle);
+
+	// angleの最大値
+	const float angleMax = 180.0f;
+
+	// 角度の差を求めて、差が一定以上であればターゲットしない
+	float subAngle = fabsf(targetAngle - cameraAngle);
+	if (subAngle > 90.0f)
+	{
+		return angleMax;
+	}
+	else
+	{
+		return subAngle;
+	}
+
+	//// プレイヤーの現在の回転を考慮する
+	//targetAngle = targetAngle - pRot.y;
+	//// angleがマイナスの場合プラスに直す
+	//targetAngle = fabsf(targetAngle);
+
+	//// 最大値を超えていた場合
+	//if (angleMax < targetAngle)
+	//{
+	//	targetAngle = angleMax - (targetAngle - angleMax);
+	//}
+
+	//return targetAngle;
+}
+
 bool Player::Damage(const std::unique_ptr<Object3d>& object)
 {
+	// プレイヤーのダメージ判定にインターバルを付ける
 	if (damageInterval == 0 && Collision::CollisionObject(object, playerObj))
 	{
 		damageInterval = 120;
@@ -299,7 +344,6 @@ void Player::ReSpawn()
 
 void Player::TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos)
 {
-	trackTime += 0.1f;
 	XMVECTOR sPos = { startPos.x, startPos.y, startPos.z, 0 };
 	XMVECTOR ePos = { endPos.x, endPos.y, endPos.z, 0 };
 
@@ -307,7 +351,9 @@ void Player::TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos)
 
 	float angle = (float)atan2(subPos.m128_f32[0], subPos.m128_f32[2]);
 
-	playerObj->SetRotation({ 0, XMConvertToDegrees(angle), 0 });
+	pRot = { 0, XMConvertToDegrees(angle), 0 };
+
+	playerObj->SetRotation(pRot);
 	playerObj->Update();
 }
 

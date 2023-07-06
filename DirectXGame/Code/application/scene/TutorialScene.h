@@ -157,20 +157,26 @@ private: // メンバ変数
 
 	// ターゲット座標保存用
 	XMFLOAT3 targetPos= {};
-	// ターゲット距離保存用
-	float targetLength = FLT_MAX;
 	// 過去にターゲットしたオブジェクトの座標
 	XMFLOAT3 oldTargetPos = { FLT_MAX, FLT_MAX, FLT_MAX };
+	// ターゲット距離保存用
+	float targetLength = FLT_MAX;
+	// ターゲット角度保存用
+	float targetAngle = FLT_MAX;
 	// ターゲットする距離の基準
 	const float baseLength = 15.0f;
+	// ターゲットする角度の基準
+	const float baseAngle = 60.0f;
 
-	// ポールの座標と距離
+	// ポールの座標と距離と角度
 	XMFLOAT3 targetPolePos = {};
-	float minPoleLength = 15.0f;
+	float targetPoleLength = 15.0f;
+	float targetPoleAngle = 60.0f;
 
-	// エネミーの座標と距離
+	// エネミーの座標と距離と角度
 	XMFLOAT3 targetEnemyPos = {};
-	float minEnemyLength = 15.0f;
+	float targetEnemyLength = 15.0f;
+	float targetEnemyAngle = 60.0f;
 
 	// チュートリアル用
 	TutorialState tutorialState = Throw; // チュートリアル
