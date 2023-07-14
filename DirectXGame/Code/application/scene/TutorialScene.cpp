@@ -279,6 +279,13 @@ void TutorialScene::Update()
 		player->Update();
 	}
 
+	// 突進が空振った場合、突進状態を解除
+	if (elapsedTime >= 1.0f)
+	{
+		rope->SetrFlag(false);
+		rushFlag = false;
+	}
+
 	// プレイヤーの座標、半径の設定
 	pPos = player->GetObj()->GetPosition();
 	pScale = player->GetObj()->GetScale();
@@ -522,6 +529,8 @@ void TutorialScene::EnemyUpdate()
 		pPos = player->GetObj()->GetPosition();
 		getEnemyAlive = enemy->GetAlive();
 		rFlag = rope->GetrFlag();
+		rThrowFlag = rope->GetThrowFlag();
+		avoidFlag = player->GetAvoidFlag();
 
 		// 敵が死んでいたら次の敵の処理に進む
 		if (!getEnemyAlive)
@@ -582,8 +591,6 @@ void TutorialScene::EnemyUpdate()
 			);
 		}
 
-		avoidFlag = player->GetAvoidFlag();
-		rFlag = rope->GetrFlag();
 		// プレイヤーに敵の弾が当たった際のダメージ処理
 		if (enemy->BulletCollision())
 		{
@@ -604,8 +611,6 @@ void TutorialScene::EnemyUpdate()
 		}
 
 		// ロープを発射または接着していない状態であれば
-		rFlag = rope->GetrFlag();
-		rThrowFlag = rope->GetThrowFlag();
 		if (enemy->Danger() && !rThrowFlag && !rFlag)
 		{
 			tutorialAvoid = true;
@@ -624,7 +629,6 @@ void TutorialScene::RopeUpdate()
 		// 過去にターゲットしたオブジェクトの座標をリセットする
 		oldTargetPos = { 1000.0f, 1000.0f, 1000.0f };
 	}
-
 
 	// プレイヤーと敵の間の障害物検知
 	for (std::unique_ptr<Enemy>& enemy : enemies)
@@ -767,6 +771,7 @@ void TutorialScene::RopeUpdate()
 
 	rFlag = rope->GetrFlag();
 	// ロープを接着したら突進を開始する
+	// ターゲットの座標と距離はロープを飛ばした時の一度だけにする
 	if (!rushFlag && rFlag)
 	{
 		rushFlag = true;

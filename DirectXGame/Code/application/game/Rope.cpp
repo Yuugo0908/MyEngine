@@ -78,16 +78,13 @@ void Rope::Throw(XMFLOAT3& pPos, const XMFLOAT3 targetPos, const float targetLen
 	{
 		manageRopePos = {};
 		manageRopeScale = {};
-		rRotFlag = false;
 		return;
 	}
 
-	if (!rRotFlag && targetLength <= baseLength && tLength <= 0.0f)
+	if (targetLength <= baseLength && tLength <= 0.0f)
 	{
-		// ターゲットの座標と距離はロープを飛ばした時の一度だけにする
 		tPos = targetPos;
 		tLength = targetLength;
-		rRotFlag = true;
 	}
 
 	XMVECTOR startPos = { pPos.x, pPos.y, pPos.z, 1 };
@@ -101,19 +98,16 @@ void Rope::Throw(XMFLOAT3& pPos, const XMFLOAT3 targetPos, const float targetLen
 	{
 		avoidTime += 0.05f;
 
-		if (rRotFlag)
-		{
-			// Y軸周りの角度
-			angleY = (float)atan2(pPos.x - tPos.x, pPos.z - tPos.z);
-			vecXZ = sqrtf((pPos.x - tPos.x) * (pPos.x - tPos.x) + (pPos.z - tPos.z) * (pPos.z - tPos.z));
-			// X軸周りの角度
-			angleX = (float)atan2(tPos.y - pPos.y, vecXZ);
-			rRot = { XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 };
-			ropeObj->SetRotation(rRot);
+		// Y軸周りの角度
+		angleY = (float)atan2(pPos.x - tPos.x, pPos.z - tPos.z);
+		vecXZ = sqrtf((pPos.x - tPos.x) * (pPos.x - tPos.x) + (pPos.z - tPos.z) * (pPos.z - tPos.z));
+		// X軸周りの角度
+		angleX = (float)atan2(tPos.y - pPos.y, vecXZ);
+		rRot = { XMConvertToDegrees(angleX), XMConvertToDegrees(angleY), 0 };
+		ropeObj->SetRotation(rRot);
 
-			float timeThrowPos = avoidTime * (2.0f - avoidTime);
-			manageRopePos = (manageRopePos * (1.0f - timeThrowPos) + subPE * timeThrowPos) / 2;
-		}
+		float timeThrowPos = avoidTime * (2.0f - avoidTime);
+		manageRopePos = (manageRopePos * (1.0f - timeThrowPos) + subPE * timeThrowPos) / 2;
 
 		manageRopeScale.x += 0.01f;
 		manageRopeScale.y += 0.01f;
@@ -129,7 +123,6 @@ void Rope::Throw(XMFLOAT3& pPos, const XMFLOAT3 targetPos, const float targetLen
 			manageRopeScale = {};
 			avoidTime = 0.0f;
 			rThrowFlag = false;
-			rRotFlag = false;
 			tPos = {};
 			tLength = 0.0f;
 			rFlag = true;

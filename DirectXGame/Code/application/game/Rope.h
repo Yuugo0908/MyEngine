@@ -70,7 +70,6 @@ private: // メンバ変数
 	float objLength = 0.0f;
 	bool rFlag = false; // 接触フラグ
 	bool rThrowFlag = false; // ロープを飛ばす
-	bool rRotFlag = false;
 	// ターゲットする距離の基準
 	const float baseLength = 15.0f;
 

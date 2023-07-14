@@ -156,6 +156,13 @@ void GameScene::Update()
 		player->Update();
 	}
 
+	// 突進が空振った場合、突進状態を解除
+	if (elapsedTime >= 1.0f)
+	{
+		rope->SetrFlag(false);
+		rushFlag = false;
+	}
+
 	// プレイヤーの座標、半径の設定
 	pPos = player->GetObj()->GetPosition();
 	pScale = player->GetObj()->GetScale();
@@ -379,6 +386,7 @@ void GameScene::EnemyUpdate()
 		pPos = player->GetObj()->GetPosition();
 		getEnemyAlive = enemy->GetAlive();
 		rFlag = rope->GetrFlag();
+		avoidFlag = player->GetAvoidFlag();
 
 		// 敵が死んでいたら次の敵の処理に進む
 		if (!getEnemyAlive)
@@ -438,8 +446,6 @@ void GameScene::EnemyUpdate()
 			);
 		}
 
-		avoidFlag = player->GetAvoidFlag();
-		rFlag = rope->GetrFlag();
 		// プレイヤーに敵の弾が当たった際のダメージ処理
 		if (enemy->BulletCollision())
 		{
@@ -619,6 +625,7 @@ void GameScene::RopeUpdate()
 
 	rFlag = rope->GetrFlag();
 	// ロープを接着したら突進を開始する
+	// ターゲットの座標と距離はロープを飛ばした時の一度だけにする
 	if (!rushFlag && rFlag)
 	{
 		rushFlag = true;
