@@ -174,7 +174,7 @@ bool DirectXCommon::InitializeDXGIDevice()
 
 #ifdef _DEBUG
 	ComPtr<ID3D12Debug1> debugController;
-	//デバッグレイヤーをオンに
+	// デバッグレイヤーをオンに
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
 	{
 		debugController->EnableDebugLayer();
@@ -243,11 +243,6 @@ bool DirectXCommon::InitializeDXGIDevice()
 		{
 			// デバイスを生成できた時点でループを抜ける
 			featureLevel = levels[i];
-			break;
-		}
-
-		// このアダプタで生成できてたら完了
-		if (SUCCEEDED(result)) {
 			break;
 		}
 	}

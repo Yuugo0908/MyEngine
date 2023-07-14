@@ -85,6 +85,9 @@ private:
 
 	static Model* enemyModel;
 	std::unique_ptr<Object3d> enemyObj = nullptr;
+	//範囲表示用
+	static Model* rangeModel;
+	std::unique_ptr<Object3d> rangeObj = nullptr;
 
 	// パーティクル
 	Particle* exclamation_mark = nullptr;
@@ -93,6 +96,7 @@ private:
 	// 弾複数生成用
 	static Model* bulletModel;
 	std::list<std::unique_ptr<Bullet>> bullets;
+
 
 	// エネミー
 	XMFLOAT3 ePos = {};

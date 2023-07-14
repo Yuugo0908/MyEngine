@@ -837,6 +837,7 @@ void TutorialScene::jsonObjectInit(const std::string sceneName)
 			newEnemy->GetObj()->SetScale(scale);
 			newEnemy->GetObj()->SetRotation(rot);
 			newEnemy->GetObj()->SetCollisionScale(size);
+			newEnemy->GetObj()->SetType(objectData.objType);
 			newEnemy->SetSpawnPos(pos);
 			newEnemy->SetSpawnRot(rot);
 			newEnemy->Update();

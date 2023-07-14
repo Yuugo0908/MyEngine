@@ -275,27 +275,22 @@ float Player::Search(const XMFLOAT3& pos, const XMFLOAT3 cameraEye)
 
 	// 角度の差を求めて、差が一定以上であればターゲットしない
 	float subAngle = fabsf(targetAngle - cameraAngle);
-	if (subAngle > 90.0f)
+
+	if (angleMax < subAngle)
 	{
+		subAngle = angleMax - (subAngle - angleMax);
+	}
+
+	if (subAngle > 60.0f)
+	{
+		// 最大値を返してターゲットしないようにする
 		return angleMax;
 	}
 	else
 	{
+		// 角度の差を返す
 		return subAngle;
 	}
-
-	//// プレイヤーの現在の回転を考慮する
-	//targetAngle = targetAngle - pRot.y;
-	//// angleがマイナスの場合プラスに直す
-	//targetAngle = fabsf(targetAngle);
-
-	//// 最大値を超えていた場合
-	//if (angleMax < targetAngle)
-	//{
-	//	targetAngle = angleMax - (targetAngle - angleMax);
-	//}
-
-	//return targetAngle;
 }
 
 bool Player::Damage(const std::unique_ptr<Object3d>& object)
@@ -324,6 +319,7 @@ void Player::Reset()
 	pDown = 0.0f;
 	pGra = 0.1f;//重力
 	rate = 1.0f; // 斜め移動時の制限
+	inertiaSaveJump = {};
 
 	// 突進用
 	avoidFlag = false; // 回避開始フラグ
@@ -344,6 +340,7 @@ void Player::ReSpawn()
 
 void Player::TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos)
 {
+	// startPosからendPosに対する角度を求める
 	XMVECTOR sPos = { startPos.x, startPos.y, startPos.z, 0 };
 	XMVECTOR ePos = { endPos.x, endPos.y, endPos.z, 0 };
 
@@ -351,8 +348,8 @@ void Player::TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos)
 
 	float angle = (float)atan2(subPos.m128_f32[0], subPos.m128_f32[2]);
 
+	//プレイヤーの向きを回転させる
 	pRot = { 0, XMConvertToDegrees(angle), 0 };
-
 	playerObj->SetRotation(pRot);
 	playerObj->Update();
 }

@@ -57,7 +57,7 @@ void WinApp::CreateGameWindow()
 	(
 		wndClass.lpszClassName, // クラス名
 		windowClassName, // タイトルバーの文字
-		WS_OVERLAPPEDWINDOW, // タイトルバーと境界線があるウィンドウ
+		WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME, // タイトルバーと境界線があるウィンドウ、サイズ変更はできないようにする
 		desktop_width, // 表示X座標（画面中央にセット）
 		desktop_height, // 表示Y座標（画面中央から上よりにセット）
 		wrc.right - wrc.left, // ウィンドウ横幅

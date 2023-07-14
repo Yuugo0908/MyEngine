@@ -12,7 +12,7 @@ struct PSOutput
 float4 main(VSOutput input) : SV_TARGET
 {
 	//テクスチャマッピング
-	float4 texcolor = tex.Sample(smp, input.uv) * color;
+	float4 texcolor = tex.Sample(smp, input.uv);
 
 	//シェーディングによる色
 	float4 shadecolor;
@@ -35,5 +35,5 @@ float4 main(VSOutput input) : SV_TARGET
 	shadecolor.rgb = (ambient + diffuse + specular) * lightColor;
 	shadecolor.a = m_alpha;
 
-	return shadecolor * texcolor;
+    return texcolor * shadecolor * color;
 }

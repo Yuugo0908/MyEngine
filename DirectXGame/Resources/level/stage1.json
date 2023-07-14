@@ -128,7 +128,8 @@
                     1.0,
                     1.0
                 ]
-            }
+            },
+            "obj_type": "bulletEnemy"
         },
         {
             "type": "MESH",
@@ -377,7 +378,8 @@
                     1.0,
                     1.0
                 ]
-            }
+            },
+            "obj_type": "bulletEnemy"
         },
         {
             "type": "MESH",
@@ -412,7 +414,8 @@
                     1.0,
                     1.0
                 ]
-            }
+            },
+            "obj_type": "bulletEnemy"
         },
         {
             "type": "MESH",
@@ -447,7 +450,8 @@
                     1.0,
                     1.0
                 ]
-            }
+            },
+            "obj_type": "bulletEnemy"
         },
         {
             "type": "MESH",
@@ -662,7 +666,8 @@
                     1.0,
                     1.0
                 ]
-            }
+            },
+            "obj_type": "bulletEnemy"
         },
         {
             "type": "MESH",
@@ -769,7 +774,8 @@
                     1.0,
                     1.0
                 ]
-            }
+            },
+            "obj_type": "bulletEnemy"
         },
         {
             "type": "MESH",
@@ -876,7 +882,8 @@
                     1.0,
                     1.0
                 ]
-            }
+            },
+            "obj_type": "bulletEnemy"
         },
         {
             "type": "MESH",
@@ -947,7 +954,8 @@
                     1.0,
                     1.0
                 ]
-            }
+            },
+            "obj_type": "bulletEnemy"
         },
         {
             "type": "MESH",

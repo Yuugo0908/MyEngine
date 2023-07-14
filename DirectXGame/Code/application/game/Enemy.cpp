@@ -2,13 +2,15 @@
 
 Model* Enemy::bulletModel = nullptr;
 Model* Enemy::enemyModel = nullptr;
+Model* Enemy::rangeModel = nullptr;
 
 bool Enemy::ModelInit()
 {
 	bulletModel = bulletModel->CreateFromObject("bullet");
 	enemyModel = enemyModel->CreateFromObject("enemy");
+	rangeModel = rangeModel->CreateFromObject("range");
 
-	if (bulletModel == nullptr || enemyModel == nullptr)
+	if (bulletModel == nullptr || enemyModel == nullptr || rangeModel == nullptr)
 	{
 		assert(NULL);
 		return false;
@@ -24,6 +26,8 @@ bool Enemy::Initialize(Player* player)
 
 	enemyObj = Object3d::Create();
 	enemyObj->SetModel(enemyModel);
+	rangeObj = Object3d::Create();
+	rangeObj->SetModel(rangeModel);
 	eAlive = false;
 
 	exclamation_mark = Particle::Create("exclamation_mark");
@@ -154,12 +158,19 @@ void Enemy::Update()
 	}
 
 	Jump();
+
+
 	enemyObj->Update();
+	rangeObj->SetPosition(ePos);
+	rangeObj->SetScale({ 5.0f, 5.0f, 5.0f });
+	rangeObj->SetRotation(eRot);
+	rangeObj->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+	rangeObj->Update();
 }
 
 void Enemy::Attack()
 {
-	if (eAlive)
+	if (eAlive && enemyObj->GetType() == "bulletEnemy")
 	{
 		BulletCreate();
 	}
@@ -242,7 +253,8 @@ void Enemy::TrackRot(const XMFLOAT3& startPos, const XMFLOAT3& endPos)
 
 	float angle = (float)atan2(subPos.m128_f32[0], subPos.m128_f32[2]);
 
-	enemyObj->SetRotation({ 0, XMConvertToDegrees(angle), 0 });
+	eRot = { 0, XMConvertToDegrees(angle), 0 };
+	enemyObj->SetRotation(eRot);
 }
 
 void Enemy::ReSpawn()
@@ -312,6 +324,7 @@ void Enemy::Reset()
 
 	safe_delete(enemyModel);
 	safe_delete(bulletModel);
+	safe_delete(rangeModel);
 	safe_delete(exclamation_mark);
 	safe_delete(question_mark);
 }
@@ -321,7 +334,7 @@ bool Enemy::ObstacleDetection(XMFLOAT3 boxPos, XMFLOAT3 boxScale)
 	pPos = player->GetObj()->GetPosition();
 	PElength = GetLength(pPos, ePos);
 	// 距離が一定以内かつy座標(高さ)の差が一定以内だったら
-	if (PElength <= 30.0f && sqrtf((pPos.y - ePos.y) * (pPos.y - ePos.y)) <= 5.0f)
+	if (PElength <= 30.0f && sqrtf((pPos.y - ePos.y) * (pPos.y - ePos.y)) <= 10.0f)
 	{
 		// 障害物を検知していたら攻撃フラグをfalseにしてtrueを返す
 		if (Collision::CollisionRayBox(pPos, ePos, boxPos, boxScale))
@@ -539,6 +552,11 @@ void Enemy::Draw()
 	if (eAlive)
 	{
 		enemyObj->Draw();
+
+		if (phase == Enemy::Phase::stay)
+		{
+			rangeObj->Draw();
+		}
 	}
 
 	for (std::unique_ptr<Bullet>& bullet : bullets)

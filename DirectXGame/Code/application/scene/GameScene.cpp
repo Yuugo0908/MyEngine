@@ -521,7 +521,12 @@ void GameScene::RopeUpdate()
 
 			pPos = player->GetObj()->GetPosition();
 			float length = GetLength(pPos, polePos);
-			float angle = player->Search(polePos, camera->GetEye());
+			float angle;
+
+			if (length < baseLength)
+			{
+				angle = player->Search(polePos, camera->GetEye());
+			}
 
 			// ポールの中から一番近くかつ、正面に近いポールを決める
 			if (length < targetPoleLength && length < baseLength && angle < targetPoleAngle && angle < baseAngle)
@@ -751,6 +756,7 @@ void GameScene::playerAndEnemyInit(const std::string sceneName)
 			newEnemy->GetObj()->SetScale(scale);
 			newEnemy->GetObj()->SetRotation(rot);
 			newEnemy->GetObj()->SetCollisionScale(size);
+			newEnemy->GetObj()->SetType(objectData.objType);
 			newEnemy->SetSpawnPos(pos);
 			newEnemy->SetSpawnRot(rot);
 			newEnemy->Update();

@@ -33,7 +33,7 @@ void TitleScene::Update()
 		FadeScene::GetInstance()->FadeOut(1.0f);
 	}
 
-	if (FadeScene::fadeOutEnd && keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER))
+	if (FadeScene::fadeOutEnd && (keyboard->TriggerKey(DIK_SPACE) || controller->GetPadState(Controller::State::A, Controller::Type::TRIGGER)))
 	{
 		changeFlag = true;
 	}
