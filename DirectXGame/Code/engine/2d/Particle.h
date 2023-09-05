@@ -80,9 +80,9 @@ public: // サブクラス
 private: // 定数
 	static const int vertexCount = 65536;		// 頂点数
 
-		// コマンドリスト
+	// コマンドリスト
 	static ID3D12GraphicsCommandList* cmdList;
-		// ルートシグネチャ
+	// ルートシグネチャ
 	static ComPtr<ID3D12RootSignature> rootsignature;
 	// パイプラインステートオブジェクト
 	static ComPtr<ID3D12PipelineState> pipelinestate;
@@ -132,7 +132,18 @@ public: // メンバ関数
 	void Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale, XMFLOAT4 s_color, XMFLOAT4 e_color);
 
 
-	// パーティクルの生成
+	/// <summary>
+	/// パーティクルの追加
+	/// </summary>
+	/// <param name="setPos">発生座標</param>
+	/// <param name="startScale">開始時スケール</param>
+	/// <param name="endScale">終了時スケール</param>
+	/// <param name="startColor">開始時カラー</param>
+	/// <param name="endColor">終了時カラー</param>
+	/// <param name="count">発生する量</param>
+	/// <param name="life">生存時間</param>
+	/// <param name="verFlag">速度フラグ</param>
+	/// <param name="accFlag">加速度フラグ</param>
 	void CreateParticles(XMFLOAT3 setPos, float startScale, float endScale, XMFLOAT4 startColor, XMFLOAT4 endColor, int count, int life, bool velFlag, bool accFlag);
 
 	// ステージのエフェクト

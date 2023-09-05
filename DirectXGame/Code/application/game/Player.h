@@ -94,25 +94,22 @@ private: // メンバ変数
 	XMFLOAT3 reSpawnPos = {};
 
 	float pSpeed = 0.35f;
-	bool onGround = false;//自由落下のフラグ
-	bool jumpFlag = false;
+	bool onGround = false; // 自由落下のフラグ
+	bool jumpFlag = false; // ジャンプフラグ
 	bool moveFlag = false; // 移動フラグ
 	bool rushFlag = false; // 突進フラグ
-	float pMove = 0.0f;//移動量
-	float pAcc = 0.2f;//加速
-	float pVel = 0.2f;//速度
-	float pDown = 0.0f;
+	float pMove = 0.0f; // 移動量
+	float pAcc = 0.2f; // 加速
+	float pVel = 0.2f; // 速度
+	float pDown = 0.0f; // 減速
 	float pGra = 0.08f;//重力
 	float rate = 1.0f; // 斜め移動時の制限
 	int damageInterval = 0; // 攻撃を受けた際のインターバル
 
 	// 突進用
 	bool avoidFlag = false; // 回避開始フラグ
-	bool firstAvoidFlag = true;
-	int avoidCount = 0;
 
 	// カメラ距離取得用
 	XMFLOAT3 cameraTrack = {};
-	float cameraRot = 0.0f;
 };
 

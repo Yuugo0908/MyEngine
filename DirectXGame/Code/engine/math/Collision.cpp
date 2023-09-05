@@ -1,7 +1,6 @@
 #include "Collision.h"
 
 using namespace DirectX;
-using DirectX::operator+;
 
 float Collision::GetLength(XMFLOAT3 pos_a, XMFLOAT3 pos_b)
 {
@@ -139,6 +138,7 @@ bool Collision::CollisionRayBox(const XMFLOAT3 startPos, const XMFLOAT3 endPos, 
 {
 	// ワールド空間での光線の基点
 	XMFLOAT3 layStart = startPos;
+
 	// ワールド空間での光線の方向
 	XMVECTOR sPos = { startPos.x, startPos.y, startPos.z, 0 };
 	XMVECTOR ePos = { endPos.x, endPos.y, endPos.z, 0 };
@@ -146,13 +146,17 @@ bool Collision::CollisionRayBox(const XMFLOAT3 startPos, const XMFLOAT3 endPos, 
 	XMVECTOR NsubPlayerEnemy = XMVector3Normalize(subPlayerEnemy);
 	XMFLOAT3 layVec = { NsubPlayerEnemy.m128_f32[0], NsubPlayerEnemy.m128_f32[1], NsubPlayerEnemy.m128_f32[2] };
 
+	// 接触判定用のフラグ
 	bool crossFlag = true;
 
 	float t_min = -FLT_MAX;
 	float t_max = FLT_MAX;
+	// 判定対象のオブジェクトの最大座標と最小座標
 	float max[3] = { boxPos.x + boxScale.x, boxPos.y + boxScale.y, boxPos.z + boxScale.z };
 	float min[3] = { boxPos.x - boxScale.x, boxPos.y - boxScale.y, boxPos.z - boxScale.z };
+	// レイの開始点
 	float p[3] = { layStart.x, layStart.y, layStart.z };
+	// レイの方向
 	float d[3] = { layVec.x, layVec.y, layVec.z };
 
 	for (int i = 0; i < 3; i++)
@@ -161,7 +165,8 @@ bool Collision::CollisionRayBox(const XMFLOAT3 startPos, const XMFLOAT3 endPos, 
 		{
 			if (p[i] < min[i] || p[i] > max[i])
 			{
-				crossFlag = false; // 交差していない
+				// 交差していなければフラグをfalseにする
+				crossFlag = false;
 				continue;
 			}
 		}
@@ -173,8 +178,10 @@ bool Collision::CollisionRayBox(const XMFLOAT3 startPos, const XMFLOAT3 endPos, 
 			float t1 = (min[i] - p[i]) * odd;
 			float t2 = (max[i] - p[i]) * odd;
 
+			// 遠スラブよりも近スラブのほうが距離が長ければ
 			if (t1 > t2)
 			{
+				// 近スラブ、遠スラブとの距離を逆にする
 				float tmp = t1;
 				t1 = t2;
 				t2 = tmp;
@@ -198,9 +205,12 @@ bool Collision::CollisionRayBox(const XMFLOAT3 startPos, const XMFLOAT3 endPos, 
 	}
 	else
 	{
+		// レイの衝突始点
 		XMFLOAT3 colPosMin = layStart + (layVec * t_min);
+		// レイの衝突終点
 		XMFLOAT3 colPosMax = layStart + (layVec * t_max);
 
+		// レイの始点と終点の間に衝突始点と衝突終点があるかの判別
 		if (GetLength(startPos, colPosMin) > GetLength(startPos, colPosMax) && GetLength(endPos, colPosMin) < GetLength(endPos, colPosMax))
 		{
 			return true;

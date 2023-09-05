@@ -551,14 +551,14 @@ void TutorialScene::EnemyUpdate()
 				2.0f, 5.0f,
 				{ 1.0f, 0.0f, 0.0f, 1.0f },
 				{ 0.0f, 1.0f, 0.0f, 1.0f },
-				5, 60, true, true
+				10, 60, true, true
 			);
 			effectKnockDown2->CreateParticles(
 				enemy->GetObj()->GetPosition(),
 				1.0f, 10.0f,
 				{ 1.0f, 0.0f, 0.0f, 1.0f },
 				{ 1.0f, 0.0f, 0.0f, 1.0f },
-				5, 10, false, false
+				10, 10, false, false
 			);
 
 			rope->SetrFlag(false);

@@ -306,28 +306,33 @@ bool Player::Damage(const std::unique_ptr<Object3d>& object)
 
 void Player::Reset()
 {
-	pPos = { 0.0f, 10.0f, 0.0f };//座標
-	pPosOld = { 0.0f, 10.0f, 0.0f };
-	pRot = { 0.0f, 0.0f, 0.0f };//回転
+	// プレイヤー
+	pPos = {};//座標
+	pPosOld = {};
+	pScale = {};//大きさ
+	pRot = {};//回転
+	inertiaSaveJump = {}; // ジャンプ慣性
+	inertiaSaveMove = {};
+	reSpawnPos = {};
 
+	onGround = false; // 自由落下のフラグ
+	jumpFlag = false; // ジャンプフラグ
+	moveFlag = false; // 移動フラグ
+	rushFlag = false; // 突進フラグ
 	pSpeed = 0.35f;
-	onGround = false;//自由落下のフラグ
-	jumpFlag = false;
-	pMove = 0.0f;//移動量
-	pAcc = 0.2f;//加速
-	pVel = 0.2f;//速度
-	pDown = 0.0f;
-	pGra = 0.1f;//重力
+	pMove = 0.0f; // 移動量
+	pAcc = 0.2f; // 加速
+	pVel = 0.2f; // 速度
+	pDown = 0.0f; // 減速
+	pGra = 0.08f;//重力
 	rate = 1.0f; // 斜め移動時の制限
-	inertiaSaveJump = {};
+	damageInterval = 0; // 攻撃を受けた際のインターバル
 
 	// 突進用
 	avoidFlag = false; // 回避開始フラグ
-	avoidCount = 0;
 
 	// カメラ距離取得用
 	cameraTrack = {};
-	cameraRot = 0.0f;
 }
 
 void Player::ReSpawn()
